@@ -30,7 +30,7 @@ struct ListStatusView: View {
                 Spacer()
                 image
                     .font(.system(size: 100.0))
-                    .foregroundColor(Color(.symbol))
+                    .foregroundStyle(Color(.symbol))
                     .accessibilityHidden(true)
                 Text(message)
                     .font(.title3)
@@ -78,8 +78,6 @@ struct WhatsNewView: View {
     }
 }
 
-struct ListStatusViewView_Previews: PreviewProvider {
-    static var previews: some View {
-        ListStatusView(image: Image(systemName: "figure.surfing"), message: "Gone surfing, will be back tomorrow", height: 300)
-    }
+#Preview {
+    ListStatusView(image: Image(systemName: "figure.surfing"), message: "Gone surfing, will be back tomorrow", height: 300)
 }

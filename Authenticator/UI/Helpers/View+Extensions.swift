@@ -67,3 +67,35 @@ extension View {
         }
     }
 }
+
+// Toolbar buttons that use the system Cancel and Confirm roles on iOS 26 and later, so the bar draws the standard
+// glyphs and prominent styling, and fall back to text buttons before that.
+struct CancelButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            Button(role: .cancel, action: action)
+        } else {
+            Button(String(localized: "Cancel"), role: .cancel, action: action)
+        }
+    }
+}
+
+struct ConfirmButton: View {
+    let title: String
+    let action: () -> Void
+
+    init(_ title: String, action: @escaping () -> Void) {
+        self.title = title
+        self.action = action
+    }
+
+    var body: some View {
+        if #available(iOS 26.0, *) {
+            Button(title, role: .confirm, action: action)
+        } else {
+            Button(title, action: action)
+        }
+    }
+}
