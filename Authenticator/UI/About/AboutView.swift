@@ -24,7 +24,7 @@ struct AboutView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 VStack(alignment: .center) {
                     Image(.icon)
@@ -112,10 +112,8 @@ struct AboutView: View {
             }
             .navigationTitle(String(localized: "About", comment: "About navigation title"))
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Close") {
-                        dismiss()
-                    }
+                ToolbarItem(placement: .cancellationAction) {
+                    CloseButton { dismiss() }
                 }
             }
         }
