@@ -17,6 +17,7 @@
 import Foundation
 import LocalAuthentication
 import OSLog
+import UIKit
 
 enum AuthenticationType {
     case touchId
