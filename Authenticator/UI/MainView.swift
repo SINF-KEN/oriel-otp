@@ -279,7 +279,7 @@ struct MainView: View {
         }
         .onChange(of: model.showTouchToast) { _, showToast in
             if showToast {
-                toastPresenter.toast(message: "Touch your YubiKey")
+                toastPresenter.toast(message: String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey"))
             }
         }
         .onChange(of: notificationsViewModel.showPIVTokenView) { _, showPIVTokenview in

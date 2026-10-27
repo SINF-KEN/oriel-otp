@@ -102,7 +102,7 @@ struct FIDOResetView: View {
             case .waitingForKeyTouch:
                 self.progress = 3.0
                 self.enableResetButton = false
-                self.messageText = String(localized: "Touch the button on the YubiKey now.", comment: "FIDO reset view")
+                self.messageText = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
             case .success:
                 self.progress = 4.0
                 self.keyHasBeenReset = true

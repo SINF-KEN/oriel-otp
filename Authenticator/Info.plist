@@ -10,6 +10,8 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleDisplayName</key>
+	<string>Authenticator</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -37,29 +39,17 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>The application needs access to NFC reading to communicate with your YubiKey.</string>
+	<string>Hold your YubiKey to your device to get codes and add accounts over NFC.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>The application needs access to Camera to scan QR codes.</string>
+	<string>Scan QR codes to add accounts to your YubiKey.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>The application needs access to Face ID to unlock your password vault.</string>
+	<string>Use Face ID to unlock the YubiKey passwords saved on this device.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>
 	</array>
-	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleLightContent</string>
-	<key>UIStatusBarTintParameters</key>
-	<dict>
-		<key>UINavigationBar</key>
-		<dict>
-			<key>Style</key>
-			<string>UIBarStyleDefault</string>
-			<key>Translucent</key>
-			<false/>
-		</dict>
-	</dict>
 	<key>UISupportedExternalAccessoryProtocols</key>
 	<array>
 		<string>com.yubico.ylp</string>
