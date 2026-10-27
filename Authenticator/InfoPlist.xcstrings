@@ -1,6 +1,42 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticator"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Authenticator"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticator"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authenticator"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autentifikátor"
+          }
+        }
+      }
+    },
     "CFBundleName" : {
       "comment" : "Bundle name",
       "extractionState" : "extracted_with_value",
@@ -43,32 +79,32 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zur Kommunikation mit dem YubiKey benötigt die Applikation NFC-Leseberechtigung."
+            "state" : "needs_review",
+            "value" : "Halte Deinen YubiKey an Dein Gerät, um per NFC Codes abzurufen und Konten hinzuzufügen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The application needs access to NFC reading to communicate with your YubiKey."
+            "value" : "Hold your YubiKey to your device to get codes and add accounts over NFC."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'application doit avoir accès à la lecture NFC pour communiquer avec votre YubiKey."
+            "state" : "needs_review",
+            "value" : "Approchez votre YubiKey de votre appareil pour obtenir des codes et ajouter des comptes via NFC."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリケーションはYubiKeyと通信するためにNFC読み取りへのアクセスが必要です。"
+            "state" : "needs_review",
+            "value" : "YubiKeyをデバイスにかざすと、NFCでコードを取得したりアカウントを追加したりできます。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplikácia potrebuje prístup k čítaniu NFC, aby mohla komunikovať s vaším YubiKey."
+            "state" : "needs_review",
+            "value" : "Priložte YubiKey k zariadeniu a cez NFC získate kódy a pridáte účty."
           }
         }
       }
@@ -79,32 +115,32 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Anwendung benötigt Zugriff auf die Kamera, um QR-Codes zu scannen."
+            "state" : "needs_review",
+            "value" : "Scanne QR-Codes, um Deinem YubiKey Konten hinzuzufügen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The application needs access to Camera to scan QR codes."
+            "value" : "Scan QR codes to add accounts to your YubiKey."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'appli doit accéder à l'appareil photo pour scanner les codes QR."
+            "state" : "needs_review",
+            "value" : "Scannez des codes QR pour ajouter des comptes à votre YubiKey."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "QRコードをスキャンするには、アプリケーションがカメラにアクセスできる必要があります."
+            "state" : "needs_review",
+            "value" : "QRコードをスキャンして、YubiKeyにアカウントを追加します。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplikácia potrebuje prístup ku kamere, aby mohla skenovať QR kódy."
+            "state" : "needs_review",
+            "value" : "Skenujte QR kódy a pridávajte účty do svojho YubiKey."
           }
         }
       }
@@ -115,32 +151,32 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Anwendung benötigt Zugriff auf Face ID, um Deinen Passwortspeicher zu entsperren."
+            "state" : "needs_review",
+            "value" : "Mit Face ID entsperrst Du die auf diesem Gerät gespeicherten YubiKey-Passwörter."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "The application needs access to Face ID to unlock your password vault."
+            "value" : "Use Face ID to unlock the YubiKey passwords saved on this device."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'appli doit accéder à Face ID pour débloquer votre coffre-fort de mots de passe."
+            "state" : "needs_review",
+            "value" : "Utilisez Face ID pour déverrouiller les mots de passe YubiKey enregistrés sur cet appareil."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "パスワードボールトのロックを解除するには、アプリケーションがFace IDにアクセスできる必要があります."
+            "state" : "needs_review",
+            "value" : "Face IDを使用して、このデバイスに保存されているYubiKeyのパスワードのロックを解除します。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Na odomknutie trezoru s heslom potrebuje aplikácia prístup k službe Face ID."
+            "state" : "needs_review",
+            "value" : "Pomocou Face ID odomknete heslá k YubiKey uložené v tomto zariadení."
           }
         }
       }
