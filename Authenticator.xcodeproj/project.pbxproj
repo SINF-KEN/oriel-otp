@@ -122,6 +122,8 @@
 		B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */; };
 		B4FE90D42A443D8400B59170 /* TokenRequestWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FE90D32A443D8400B59170 /* TokenRequestWrapper.swift */; };
 		B9F0FF11F842A39183974083 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		C1A0000000000000000000E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */; };
+		C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -282,6 +284,8 @@
 		B4E9D46228B65B5100D51FFC /* yubikit-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "yubikit-ios"; path = "../yubikit-ios"; sourceTree = "<group>"; };
 		B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
 		B4FE90D32A443D8400B59170 /* TokenRequestWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestWrapper.swift; sourceTree = "<group>"; };
+		C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -382,6 +386,7 @@
 				515542782656707000B19C59 /* TokenSession.swift */,
 				5155427A2656707000B19C59 /* Info.plist */,
 				B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */,
+				C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */,
 				5156D05A265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift */,
 				B4901AF32BD7DF960092E7A2 /* Localizable.xcstrings */,
 			);
@@ -482,6 +487,7 @@
 				C1A0000000000000000000C2 /* AppIcon-Dark.icon */,
 				818866C422DFD72C006BC0A8 /* Info.plist */,
 				B4901B072BD91DA60092E7A2 /* InfoPlist.xcstrings */,
+				C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */,
 				51AFD4D727196AB6008F2630 /* VersionHistory.plist */,
 				B40327752847AE0A00DF4DB0 /* Licensing.md */,
 			);
@@ -709,6 +715,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B43751972C9AD7D8004017A4 /* InfoPlist.xcstrings in Resources */,
+				C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */,
 				B4901AF42BD7DF960092E7A2 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -725,6 +732,7 @@
 				C1A0000000000000000000D1 /* AppIcon.icon in Resources */,
 				C1A0000000000000000000D2 /* AppIcon-Dark.icon in Resources */,
 				B4901B082BD91DA60092E7A2 /* InfoPlist.xcstrings in Resources */,
+				C1A0000000000000000000E2 /* PrivacyInfo.xcprivacy in Resources */,
 				B4901AE42BD697620092E7A2 /* Localizable.xcstrings in Resources */,
 				818866BE22DFD729006BC0A8 /* Main.storyboard in Resources */,
 				B40327762847AE0A00DF4DB0 /* Licensing.md in Resources */,
