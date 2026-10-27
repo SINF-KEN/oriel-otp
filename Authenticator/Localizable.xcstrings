@@ -206,6 +206,64 @@
         }
       }
     },
+    "Accounts that require touch will need an extra NFC tap to calculate its code. Bypassing it minimizes the number of NFC taps needed." : {
+      "comment" : "NFC settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sofern konfiguriert, erfordern (OATH) Konten in dieser App eine zusätzliche Berührung des YubiKeys um den OTP Code zu berechnen. Mit dieser Einstellung kannst Du diese Einstellung deaktivieren und die Anzahl an erforderlichen Berührungen reduzieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les comptes tactiles nécessitent un rapprochement de la clef en NFC de plus pour calculer leur code. Le contournement réduit le nombre de rapprochements en NFC requis."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タッチが必要なアカウントでは、コードを計算するために追加のNFCタップが必要です。これをスキップすることで、必要なNFCタップの数が最小限に抑えられます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty, ktoré vyžadujú dotykové ovládanie, budú na výpočet kódu potrebovať ďalšie ťuknutie NFC. Jeho vynechanie minimalizuje počet potrebných dotykov NFC."
+          }
+        }
+      }
+    },
+    "Activate NFC on OTP tag read" : {
+      "comment" : "NFC settings toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne App und starte NFC Scanning bei NFC-Kontakt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer NFC lors de la lecture de tags OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OTPタグ読み取りでNFCをアクティブにする"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivovať NFC pri načítaní tagu OTP"
+          }
+        }
+      }
+    },
     "Advanced settings" : {
       "comment" : "Add account section header",
       "localizations" : {
@@ -231,6 +289,209 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rozšírené nastavenia"
+          }
+        }
+      }
+    },
+    "Bypass touch requirement" : {
+      "comment" : "NFC settings toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berührung nicht notwendig"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contourner les exigences tactiles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タッチ要件をスキップ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vynechať požiadavku na dotyk"
+          }
+        }
+      }
+    },
+    "Copy Yubico OTP automatically to clipboard when a YubiKey has been passively scanned using the NFC NDEF tag functionality." : {
+      "comment" : "NFC settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiere den Yubico OTP Code automatisch in die Zwischenablage, sobald ein YubiKey mit der NFC-Tag-Funktionalität gescannt wurde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copiez l'OTP automatiquement dans le presse-papiers lorsqu'une YubiKey est scannée à l'aide de la fonctionnalité de tags NFC."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyがNFCタグ機能を使用してスキャンされた場合に、OTPをクリップボードに自動でコピーします。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automaticky skopírovať Yubico OTP do schránky, keď bol YubiKey pasívne naskenovaný pomocou funkcie NFC NDEF."
+          }
+        }
+      }
+    },
+    "Copy Yubico OTP to clipboard" : {
+      "comment" : "NFC settings toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yubico OTP in die Zwischenablage kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier OTP dans presse-papiers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OTPをクリップボードにコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovať Yubico OTP do schránky"
+          }
+        }
+      }
+    },
+    "Enter the PIN, then tap a NFC enabled YubiKey against the iPhone to access the certificate." : {
+      "comment" : "PIV extension NFC message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib die PIN ein und halte einen NFC-fähigen YubiKey an das iPhone, um auf das Zertifikat zuzugreifen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le PIN, puis apposez une YubiKey NFC sur l'iPhone pour accéder au certificat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "証明書にアクセスするには、PINを入力してから、iPhoneに対してNFC対応のYubiKeyをタップしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte PIN a potom priložte YubiKey s funkciou NFC na iPhone, aby ste získali prístup k certifikátu."
+          }
+        }
+      }
+    },
+    "Initiate NFC at application start" : {
+      "comment" : "NFC settings toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC beim Start aktivieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer NFC au démarrage de l'app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリケーションの起動時にNFCを開始"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivovať NFC pri spustení aplikácie"
+          }
+        }
+      }
+    },
+    "Initiate NFC at application start will automatically read your YubiKey as soon as the app becomes active." : {
+      "comment" : "NFC settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Einstellung bewirkt dass die App beim aktiv werden automatisch den NFC Scanvorgang startet."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'activation NFC au démarrage de l'application permet de lire automatiquement votre YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリケーションの起動時にNFCを開始すると、アプリがアクティブになると同時にYubiKeyが自動で読み込まれます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spustenie NFC pri spustení aplikácie automaticky prečíta váš kľúč YubiKey hneď, ako sa aplikácia stane aktívnou."
+          }
+        }
+      }
+    },
+    "Insert a YubiKey and enter its PIN to access the certificate." : {
+      "comment" : "PIV extension insert YubiKey message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde einen YubiKey und gebe die dazugehörige PIN ein, um auf das Zertifikat zuzugreifen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Insérez une YubiKey et saisissez son PIN pour accéder au certificat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "証明書にアクセスするには、YubiKeyを挿入し、そのPINを入力してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vložte YubiKey a zadajte jeho PIN kód, aby ste získali prístup k certifikátu."
           }
         }
       }
@@ -293,6 +554,35 @@
         }
       }
     },
+    "One-Time Password" : {
+      "comment" : "OTP settings title and toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One-Time Password"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basculer le mot de passe à usage unique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ワンタイムパスワード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jednorazové heslo"
+          }
+        }
+      }
+    },
     "Optional" : {
       "comment" : "Add account issuer placeholder",
       "localizations" : {
@@ -318,6 +608,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voliteľné"
+          }
+        }
+      }
+    },
+    "or" : {
+      "comment" : "PIV extension separator between the USB and NFC instructions",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "oder"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ou"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "または"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "alebo"
+          }
+        }
+      }
+    },
+    "Remove and re-insert your YubiKey" : {
+      "comment" : "PIV extension Yubico OTP disabled message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entferne Deinen YubiKey und stecke ihn erneut wieder ein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retirez et réinsérez votre YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyを取り外して再挿入してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstráňte a znovu vložte váš YubiKey"
           }
         }
       }
@@ -405,6 +753,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tajný údaj"
+          }
+        }
+      }
+    },
+    "Smart card (PIV) PIN" : {
+      "comment" : "PIV extension PIN field placeholder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smart card (PIV) PIN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN carte à puce (PIV)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スマートカード（PIV）PIN"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN (PIV) čipovej karty"
+          }
+        }
+      }
+    },
+    "Start NFC and read OATH accounts when the application has been opened by reading the OTP tag on a YubiKey." : {
+      "comment" : "NFC settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte NFC und lese die OATH-Konten aus, sobald die Anwendung durch Lesen des OTP-Tags auf einem YubiKey geöffnet wurde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lancez NFC et lisez les comptes OATH lorsque l'application a été ouverte en lisant le tag OTP sur une YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyのOTPタグを読み取ってアプリケーションを開いた際にNFCを開始し、OATHアカウントを読み取ります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spustiť NFC a načítať účty OATH po otvorení aplikácie načítaním tagu OTP na kľúči YubiKey."
+          }
+        }
+      }
+    },
+    "Tap the back button to continue" : {
+      "comment" : "PIV extension completed message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klicke auf \"Zurück\", um fortzufahren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appuyer sur Retour pour continuer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻るボタンをタップして続行します"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokračujte ťuknutím na tlačidlo späť"
+          }
+        }
+      }
+    },
+    "Yubico OTP has been disabled" : {
+      "comment" : "PIV extension Yubico OTP disabled title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yubico OTP wurde deaktiviert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yubico OTP désactivé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yubico OTPが無効になっています"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yubico OTP bolo vypnuté"
           }
         }
       }
