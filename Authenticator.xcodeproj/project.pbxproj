@@ -7,17 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		51002C2E267C95D9005D5A7C /* YubiKeyInformationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51002C2D267C95D9005D5A7C /* YubiKeyInformationViewModel.swift */; };
 		51394C5826CFE15F009F366D /* YubiMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51394C5726CFE15F009F366D /* YubiMenu.swift */; };
 		51394C5A26D40E64009F366D /* UIGestureRecognizer+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51394C5926D40E64009F366D /* UIGestureRecognizer+Extensions.swift */; };
 		51394C5C26D4D460009F366D /* MenuGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51394C5B26D4D460009F366D /* MenuGestureRecognizer.swift */; };
 		513D4DF22660D6570022C53D /* AddCredentialController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D4DF12660D6570022C53D /* AddCredentialController.swift */; };
-		513D4DF7266634280022C53D /* ShowTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513D4DF6266634280022C53D /* ShowTime.swift */; };
 		513F34C02463F0C900FCE030 /* EditFieldController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513F34BF2463F0C900FCE030 /* EditFieldController.swift */; };
 		513F34C22463F44300FCE030 /* EditCredentialController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513F34C12463F44300FCE030 /* EditCredentialController.swift */; };
 		513F34C82464658F00FCE030 /* SettingsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513F34C72464658F00FCE030 /* SettingsRowView.swift */; };
 		513F34DC246B144300FCE030 /* UIViewAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513F34DB246B144300FCE030 /* UIViewAdditions.swift */; };
-		515542602649BDDB00B19C59 /* PasswordStatusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155425F2649BDDB00B19C59 /* PasswordStatusViewModel.swift */; };
 		515542682654413600B19C59 /* SmartCardConfigurationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542672654413600B19C59 /* SmartCardConfigurationController.swift */; };
 		5155426A26554CAB00B19C59 /* SmartCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155426926554CAB00B19C59 /* SmartCardViewModel.swift */; };
 		515542722656706F00B19C59 /* CryptoTokenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 515542712656706F00B19C59 /* CryptoTokenKit.framework */; };
@@ -39,7 +36,6 @@
 		51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51AFD4D9271D4277008F2630 /* QuartzCore.framework */; };
 		51BBE37F273982D700DA47CC /* YKFOATHSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BBE37E273982D700DA47CC /* YKFOATHSession+Extensions.swift */; };
 		51D1E84C264134F300BDA3FF /* UIAlertController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51D1E84B264134F300BDA3FF /* UIAlertController+Extensions.swift */; };
-		51D1E84E26427F7600BDA3FF /* PasswordCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51D1E84D26427F7600BDA3FF /* PasswordCache.swift */; };
 		51EEC532246D34ED00061A8F /* YKFKeyVersion+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC531246D34ED00061A8F /* YKFKeyVersion+Extensions.swift */; };
 		51EEC536246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC535246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift */; };
 		51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BC263847BD0010686B /* ManagementViewModel.swift */; };
@@ -55,12 +51,10 @@
 		C1A0000000000000000000D1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
 		C1A0000000000000000000D2 /* AppIcon-Dark.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C2 /* AppIcon-Dark.icon */; };
 		818866C322DFD72C006BC0A8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */; };
-		818866CE22DFD72C006BC0A8 /* AuthenticatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818866CD22DFD72C006BC0A8 /* AuthenticatorTests.swift */; };
 		81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */; };
 		81DF8FD3237A090A00737268 /* ApplicationSessionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */; };
 		81FA3C34231AF2D8009C22AB /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81FA3C33231AF2D8009C22AB /* AdvancedSettingsViewController.swift */; };
 		81FA3C39231AF4F0009C22AB /* UIViewControllerAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81FA3C38231AF4F0009C22AB /* UIViewControllerAdditions.swift */; };
-		A525965B23A45501006AA3C0 /* UIImageAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A525965A23A45501006AA3C0 /* UIImageAdditions.swift */; };
 		A5588BF9239B0A7F003E4CA5 /* FavoritesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */; };
 		A591411D23830EB800CCCF67 /* UIApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */; };
 		A591412123835F4600CCCF67 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591412023835F4600CCCF67 /* Constants.swift */; };
@@ -158,17 +152,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		51002C2D267C95D9005D5A7C /* YubiKeyInformationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKeyInformationViewModel.swift; sourceTree = "<group>"; };
 		51394C5726CFE15F009F366D /* YubiMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiMenu.swift; sourceTree = "<group>"; };
 		51394C5926D40E64009F366D /* UIGestureRecognizer+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIGestureRecognizer+Extensions.swift"; sourceTree = "<group>"; };
 		51394C5B26D4D460009F366D /* MenuGestureRecognizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuGestureRecognizer.swift; sourceTree = "<group>"; };
 		513D4DF12660D6570022C53D /* AddCredentialController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddCredentialController.swift; sourceTree = "<group>"; };
-		513D4DF6266634280022C53D /* ShowTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowTime.swift; sourceTree = "<group>"; };
 		513F34BF2463F0C900FCE030 /* EditFieldController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditFieldController.swift; sourceTree = "<group>"; };
 		513F34C12463F44300FCE030 /* EditCredentialController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCredentialController.swift; sourceTree = "<group>"; };
 		513F34C72464658F00FCE030 /* SettingsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRowView.swift; sourceTree = "<group>"; };
 		513F34DB246B144300FCE030 /* UIViewAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewAdditions.swift; sourceTree = "<group>"; };
-		5155425F2649BDDB00B19C59 /* PasswordStatusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordStatusViewModel.swift; sourceTree = "<group>"; };
 		515542672654413600B19C59 /* SmartCardConfigurationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCardConfigurationController.swift; sourceTree = "<group>"; };
 		5155426926554CAB00B19C59 /* SmartCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCardViewModel.swift; sourceTree = "<group>"; };
 		5155426F2656706F00B19C59 /* TokenExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TokenExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -195,7 +186,6 @@
 		51AFD4D9271D4277008F2630 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		51BBE37E273982D700DA47CC /* YKFOATHSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YKFOATHSession+Extensions.swift"; sourceTree = "<group>"; };
 		51D1E84B264134F300BDA3FF /* UIAlertController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extensions.swift"; sourceTree = "<group>"; };
-		51D1E84D26427F7600BDA3FF /* PasswordCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordCache.swift; sourceTree = "<group>"; };
 		51EEC531246D34ED00061A8F /* YKFKeyVersion+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YKFKeyVersion+Extensions.swift"; sourceTree = "<group>"; };
 		51EEC535246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YKFKeyVersionExtensionsTests.swift; sourceTree = "<group>"; };
 		51F8E3BC263847BD0010686B /* ManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementViewModel.swift; sourceTree = "<group>"; };
@@ -214,7 +204,6 @@
 		818866C222DFD72C006BC0A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		818866C422DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuthenticatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		818866CD22DFD72C006BC0A8 /* AuthenticatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorTests.swift; sourceTree = "<group>"; };
 		818866CF22DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866F122E18804006BC0A8 /* Authenticator-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Authenticator-Bridging-Header.h"; sourceTree = "<group>"; };
 		818866F622E7A877006BC0A8 /* Authenticator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Authenticator.entitlements; sourceTree = "<group>"; };
@@ -222,7 +211,6 @@
 		81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSessionObserver.swift; sourceTree = "<group>"; };
 		81FA3C33231AF2D8009C22AB /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
 		81FA3C38231AF4F0009C22AB /* UIViewControllerAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewControllerAdditions.swift; sourceTree = "<group>"; };
-		A525965A23A45501006AA3C0 /* UIImageAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageAdditions.swift; sourceTree = "<group>"; };
 		A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStorage.swift; sourceTree = "<group>"; };
 		A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplicationExtension.swift; sourceTree = "<group>"; };
 		A591412023835F4600CCCF67 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -434,10 +422,8 @@
 				515542842656A30B00B19C59 /* UIButton+Extensions.swift */,
 				817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */,
 				5155428226569ADC00B19C59 /* UIControl+Extensions.swift */,
-				A525965A23A45501006AA3C0 /* UIImageAdditions.swift */,
 				513F34DB246B144300FCE030 /* UIViewAdditions.swift */,
 				81FA3C38231AF4F0009C22AB /* UIViewControllerAdditions.swift */,
-				513D4DF6266634280022C53D /* ShowTime.swift */,
 				51394C5726CFE15F009F366D /* YubiMenu.swift */,
 				51394C5926D40E64009F366D /* UIGestureRecognizer+Extensions.swift */,
 				51394C5B26D4D460009F366D /* MenuGestureRecognizer.swift */,
@@ -497,7 +483,6 @@
 		818866CC22DFD72C006BC0A8 /* AuthenticatorTests */ = {
 			isa = PBXGroup;
 			children = (
-				818866CD22DFD72C006BC0A8 /* AuthenticatorTests.swift */,
 				816C685123440EF900209342 /* SecureStoreTests.swift */,
 				51EEC535246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift */,
 				818866CF22DFD72C006BC0A8 /* Info.plist */,
@@ -538,12 +523,9 @@
 				A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */,
 				81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */,
 				51F8E3BC263847BD0010686B /* ManagementViewModel.swift */,
-				51D1E84D26427F7600BDA3FF /* PasswordCache.swift */,
 				B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */,
-				5155425F2649BDDB00B19C59 /* PasswordStatusViewModel.swift */,
 				5155426926554CAB00B19C59 /* SmartCardViewModel.swift */,
 				5156D05E265D3CEF007A94F8 /* TokenRequestViewModel.swift */,
-				51002C2D267C95D9005D5A7C /* YubiKeyInformationViewModel.swift */,
 				51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */,
 				A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */,
 				B4DB2289299BC373003110ED /* OATHSession.swift */,
@@ -777,13 +759,11 @@
 				B411242F29D423A300D58001 /* ListStatusView.swift in Sources */,
 				816C684823430F8E00209342 /* SecureStoreQueryable.swift in Sources */,
 				515542882656F64100B19C59 /* Data+Extensions.swift in Sources */,
-				51002C2E267C95D9005D5A7C /* YubiKeyInformationViewModel.swift in Sources */,
 				B40D61A02AE7F37900467AE9 /* DisableOTPView.swift in Sources */,
 				B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */,
 				B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */,
 				B452EC442A2A06940045E5D9 /* ToastPresenter.swift in Sources */,
 				5156D05D265D2602007A94F8 /* TokenRequestViewController.swift in Sources */,
-				A525965B23A45501006AA3C0 /* UIImageAdditions.swift in Sources */,
 				B40F44452B27033A000D5E02 /* TokenRequestYubiOTPViewController.swift in Sources */,
 				B4C93E60299D156C00C2A8B8 /* ErrorAlertView.swift in Sources */,
 				A591411D23830EB800CCCF67 /* UIApplicationExtension.swift in Sources */,
@@ -811,7 +791,6 @@
 				513F34C22463F44300FCE030 /* EditCredentialController.swift in Sources */,
 				513D4DF22660D6570022C53D /* AddCredentialController.swift in Sources */,
 				B40D61A22AE7F89500467AE9 /* DisableOTPModel.swift in Sources */,
-				51D1E84E26427F7600BDA3FF /* PasswordCache.swift in Sources */,
 				A5D4E86D24083CF300FD63A0 /* OTPConfigurationController.swift in Sources */,
 				5156D05F265D3CEF007A94F8 /* TokenRequestViewModel.swift in Sources */,
 				B4BB02D92C80987B00B72904 /* SettingsButton.swift in Sources */,
@@ -831,7 +810,6 @@
 				B4C93E9529C1B90900C2A8B8 /* AddAccountWrapper.swift in Sources */,
 				B44E5EBB2C778802007ABB79 /* OATHPasswordView.swift in Sources */,
 				B452EC3D2A264A620045E5D9 /* ToastView.swift in Sources */,
-				513D4DF7266634280022C53D /* ShowTime.swift in Sources */,
 				B4C93E8929B89DE300C2A8B8 /* DetachedMenu.swift in Sources */,
 				81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */,
 				51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */,
@@ -844,7 +822,6 @@
 				51394C5826CFE15F009F366D /* YubiMenu.swift in Sources */,
 				B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */,
 				816C685023440D2200209342 /* SecureStoreError.swift in Sources */,
-				515542602649BDDB00B19C59 /* PasswordStatusViewModel.swift in Sources */,
 				5180974326DE185100A122C1 /* OATHResetViewModel.swift in Sources */,
 				B4BB02E02C80BEBD00B72904 /* OATHSavedPasswordsView.swift in Sources */,
 				81FA3C39231AF4F0009C22AB /* UIViewControllerAdditions.swift in Sources */,
@@ -860,7 +837,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				816C685223440EF900209342 /* SecureStoreTests.swift in Sources */,
-				818866CE22DFD72C006BC0A8 /* AuthenticatorTests.swift in Sources */,
 				51EEC536246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
