@@ -22,6 +22,7 @@ import YubiKit
 enum OATHSessionError: Error, LocalizedError, Equatable {
 
     case credentialAlreadyPresent(issuer: String, accountName: String)
+    case credentialNotFound
     case otpEnabledError
     case oathDisabledError
     case connectionCancelled
@@ -32,7 +33,10 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .credentialAlreadyPresent(let issuer, let accountName):
-            return "\(String(localized: "There's already an account named", comment: "OATH substring in 'There's already an account named [issuer, name] on this YubiKey.")) \(issuer.isEmpty == false ? "\(issuer), \(accountName)" : accountName) \(String(localized: "on this YubiKey", comment: "OATH substring in 'There's already an account named [issuer, name] on this YubiKey."))."
+            let name = issuer.isEmpty ? accountName : "\(issuer), \(accountName)"
+            return String(localized: "There's already an account named \(name) on this YubiKey.", comment: "OATH add account duplicate error. The placeholder is the issuer and account name.")
+        case .credentialNotFound:
+            return String(localized: "The account could not be found on the YubiKey.", comment: "OATH error when an account is missing after renaming it")
         case .otpEnabledError:
             return String(localized: "Yubico OTP enabled", comment: "OATH otp enabled error message")
         case .oathDisabledError:
@@ -235,7 +239,7 @@ final class OATHSession: Sendable {
         try await session.renameCredential(credential.yubiKitCredential, newName: accountName, newIssuer: newIssuer)
         let key = OATHCredentialId.key(accountName: accountName, issuer: newIssuer, period: credential.period, isTOTP: credential.type == .totp)
         guard let renamed = try await session.listCredentials().first(where: { $0.id == Data(key.utf8) }) else {
-            throw OATHSessionError.invalidDeviceInfo
+            throw OATHSessionError.credentialNotFound
         }
         return Credential(yubiKitCredential: renamed, requiresTouch: credential.requiresTouch)
     }
