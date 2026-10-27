@@ -26,11 +26,11 @@ struct ToastView: View {
         ZStack(alignment: .leading) {
             Text(message)
                 .font(.body)
-                .foregroundColor(Color(.white))
+                .foregroundStyle(Color(.white))
                 .fixedSize(horizontal: true, vertical: true)
                 .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
                 .background(Color(.yubiBlue))
-                .cornerRadius(20)
+                .clipShape(.rect(cornerRadius: 20))
                 .shadow(radius: 5)
         }
     }

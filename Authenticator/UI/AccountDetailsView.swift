@@ -242,19 +242,15 @@ struct AccountDetailsView: View {
                 .sheet(isPresented: $showEditing) {
                     EditView(account: account, viewModel: model, showEditing: $showEditing)
                 }
-                .alert(isPresented: $showDeleteConfirmation) {
-                    Alert(title: Text("Delete account?"),
-                          message: Text("This will permanently delete the account from the YubiKey, and your ability to generate codes for it!"),
-                          primaryButton: .default(Text("Cancel")),
-                          secondaryButton: .destructive(
-                            Text("Delete"),
-                            action: {
-                                model.deleteAccount(account) {
-                                    self.data = nil
-                                }
-                            }
-                          )
-                    )
+                .alert("Delete account?", isPresented: $showDeleteConfirmation) {
+                    Button("Cancel", role: .cancel) {}
+                    Button("Delete", role: .destructive) {
+                        model.deleteAccount(account) {
+                            self.data = nil
+                        }
+                    }
+                } message: {
+                    Text("This will permanently delete the account from the YubiKey, and your ability to generate codes for it!")
                 }
                 .onChange(of: model.accountsLoaded) { _, newValue in
                     self.data = nil
