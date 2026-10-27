@@ -16,6 +16,7 @@
  */
 
 import AVFoundation
+import AVKit
 import UIKit
 import YubiKit
 
@@ -150,8 +151,24 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         return view
     }()
     
+    private var overlay: UIView?
     private var errorOverlay: UIView?
-    
+    private var textLabelTopConstraint: NSLayoutConstraint?
+    private var lastLayoutSize: CGSize = .zero
+    private var lastContentRect: CGRect = .zero
+    // Follows contentRect, so the controls stay inside the safe area and clear of the fold and the camera housing.
+    private let contentGuide = UILayoutGuide()
+    private var contentGuideConstraints = [NSLayoutConstraint]()
+
+    // Serializes starting the session and switching cameras off the main thread.
+    private let sessionQueue = DispatchQueue(label: "com.yubico.authenticator.scan-session")
+    private var activeCameraID: String?
+    private var switchingToCameraID: String?
+    private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
+    private var rotationObservation: NSKeyValueObservation?
+    // An AVCaptureDeviceDirectionCoordinator on iOS 27.1 and later.
+    private var directionCoordinator: AnyObject?
+
     init(frame: CGRect, completionHandler: @escaping (ScanResult) -> ()) {
         self.completionHandler = completionHandler
         super.init(frame: frame)
@@ -160,15 +177,18 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         
         previewLayer.frame = layer.bounds
         layer.addSublayer(previewLayer)
-        
-        addSubview(createOverlay())
-        
-        errorOverlay = createOverlay(frameColor: .red, background: .clear)
-        errorOverlay?.alpha = 0
-        if let errorOverlay = errorOverlay {
-            addSubview(errorOverlay)
-        }
-        
+
+        addLayoutGuide(contentGuide)
+        contentGuideConstraints = [
+            contentGuide.leftAnchor.constraint(equalTo: leftAnchor),
+            contentGuide.topAnchor.constraint(equalTo: topAnchor),
+            contentGuide.widthAnchor.constraint(equalToConstant: 0),
+            contentGuide.heightAnchor.constraint(equalToConstant: 0)
+        ]
+        NSLayoutConstraint.activate(contentGuideConstraints)
+
+        layoutOverlays()
+
         closeButton.addAction(UIAction { [weak self] _ in
             self?.completionHandler(.cancel)
         }, for: .primaryActionTriggered)
@@ -192,21 +212,24 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         addSubview(addManuallyButton)
         addSubview(permissionView)
         
+        let textLabelTopConstraint = textLabel.topAnchor.constraint(equalTo: topAnchor, constant: captureRect().maxY + 16)
+        self.textLabelTopConstraint = textLabelTopConstraint
+
         NSLayoutConstraint.activate([
-            closeButton.topAnchor.constraint(equalTo: topAnchor, constant: 10),
-            closeButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            addAccountLabel.topAnchor.constraint(equalTo: topAnchor, constant: 15),
-            addAccountLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            closeButton.topAnchor.constraint(equalTo: contentGuide.topAnchor, constant: 10),
+            closeButton.trailingAnchor.constraint(equalTo: contentGuide.trailingAnchor, constant: -20),
+            addAccountLabel.topAnchor.constraint(equalTo: contentGuide.topAnchor, constant: 15),
+            addAccountLabel.centerXAnchor.constraint(equalTo: contentGuide.centerXAnchor),
             noQRCodeLabel.bottomAnchor.constraint(equalTo: addManuallyButton.topAnchor, constant: -15),
             noQRCodeLabel.centerXAnchor.constraint(equalTo: addManuallyButton.centerXAnchor),
-            addManuallyButton.centerXAnchor.constraint(equalTo: centerXAnchor),
-            addManuallyButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -55),
-            textLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-            textLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-            textLabel.topAnchor.constraint(equalTo: topAnchor, constant: UIDevice.current.userInterfaceIdiom == .pad ? 540.0 : frame.height / 1.55),
-            permissionView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 50),
-            permissionView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -50),
-            permissionView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -50)
+            addManuallyButton.centerXAnchor.constraint(equalTo: contentGuide.centerXAnchor),
+            addManuallyButton.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor, constant: -55),
+            textLabel.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor, constant: 10),
+            textLabel.trailingAnchor.constraint(equalTo: contentGuide.trailingAnchor, constant: -10),
+            textLabelTopConstraint,
+            permissionView.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor, constant: 50),
+            permissionView.trailingAnchor.constraint(equalTo: contentGuide.trailingAnchor, constant: -50),
+            permissionView.centerYAnchor.constraint(equalTo: contentGuide.centerYAnchor, constant: -50)
         ])
         
         addSubview(checkboxImageView)
@@ -216,8 +239,9 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     
         previewLayer.backgroundColor = UIColor(white: 0.2, alpha: 1).cgColor
         
-        Task {
+        Task { [weak self] in
             let result = await AVCaptureDevice.requestAccess(for: .video)
+            guard let self else { return }
             if result {
                 guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
                     self.showPermissionError()
@@ -237,12 +261,20 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
                 // Kept: AVFoundation takes a dispatch queue for delegate callbacks, and the delegate is main actor isolated.
                 self.metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
                 self.metadataOutput.metadataObjectTypes = [.qr]
-                self.updateVideoOrientation()
+                self.activeCameraID = videoCaptureDevice.uniqueID
+                self.observeRotation(of: videoCaptureDevice)
+                if #available(iOS 27.1, *) {
+                    self.observeCameraDirections()
+                }
                 // AVCaptureSession is meant to be started off the main thread.
                 nonisolated(unsafe) let captureSession = self.captureSession
-                DispatchQueue.global(qos: .userInitiated).async {
+                self.sessionQueue.async { [weak self] in
                     if (captureSession.isRunning == false) {
                         captureSession.startRunning()
+                    }
+                    // The preview can only convert the scan area to metadata coordinates once the session is running.
+                    Task { @MainActor in
+                        self?.updateVideoOrientation()
                     }
                 }
             } else {
@@ -251,6 +283,60 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         }
     }
     
+    override func layoutSubviews() {
+        // Before super, so the content guide constraints updated here apply in this layout pass.
+        if bounds.size != lastLayoutSize || contentRect != lastContentRect {
+            layoutOverlays()
+        }
+        super.layoutSubviews()
+    }
+
+    override func safeAreaInsetsDidChange() {
+        super.safeAreaInsetsDidChange()
+        setNeedsLayout()
+    }
+
+    // Rebuilds the capture overlays for the current size so the scan area stays inside the view on every display, orientation and pose.
+    private func layoutOverlays() {
+        let contentRect = self.contentRect
+        lastLayoutSize = bounds.size
+        lastContentRect = contentRect
+        contentGuideConstraints[0].constant = contentRect.minX
+        contentGuideConstraints[1].constant = contentRect.minY
+        contentGuideConstraints[2].constant = contentRect.width
+        contentGuideConstraints[3].constant = contentRect.height
+        previewLayer.frame = layer.bounds
+
+        let errorAlpha = errorOverlay?.alpha ?? 0
+        overlay?.removeFromSuperview()
+        errorOverlay?.removeFromSuperview()
+
+        let overlay = createOverlay()
+        insertSubview(overlay, at: 0)
+        self.overlay = overlay
+
+        let errorOverlay = createOverlay(frameColor: .red, background: .clear)
+        errorOverlay.alpha = errorAlpha
+        insertSubview(errorOverlay, aboveSubview: overlay)
+        self.errorOverlay = errorOverlay
+
+        // Inserting a subview at index 0 can put its layer under the preview layer, which is a plain sublayer,
+        // so move the preview back to the bottom or it hides the overlays.
+        layer.insertSublayer(previewLayer, at: 0)
+
+        let rect = captureRect()
+        textLabelTopConstraint?.constant = rect.maxY + 16
+        checkboxImageView.center = CGPoint(x: rect.midX, y: rect.midY)
+        updateRectOfInterest()
+    }
+
+    // Before the session runs the preview doesn't know the video dimensions and converts to a wrong rect, which can keep
+    // QR codes inside the scan frame from being read. Starting the session updates it again.
+    private func updateRectOfInterest() {
+        guard captureSession.isRunning else { return }
+        metadataOutput.rectOfInterest = previewLayer.metadataOutputRectConverted(fromLayerRect: captureRect())
+    }
+
     func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(
             alongsideTransition: { _ in
@@ -269,26 +355,90 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     }
     
     func updateVideoOrientation() {
-        // Rotation angles matching the former videoOrientation values: portrait 90°, landscapeRight 0°,
-        // landscapeLeft 180°, portraitUpsideDown 270°.
-        let rotationAngle: CGFloat
-        switch (UIDevice.current.orientation) {
-         case .portrait:
-            rotationAngle = 90
-         case .landscapeLeft:
-            rotationAngle = 0
-         case .landscapeRight:
-            rotationAngle = 180
-        case .portraitUpsideDown:
-            rotationAngle = 270
-         default:
-             // This will be fallback when device is placed flat on i.e a table
-            rotationAngle = 90
-         }
-        if let connection = self.previewLayer.connection, connection.isVideoRotationAngleSupported(rotationAngle) {
+        // The rotation coordinator accounts for the interface orientation and, on iPhone Duo, for the display the app is on,
+        // which a fixed mapping from the device orientation can't.
+        if let rotationAngle = rotationCoordinator?.videoRotationAngleForHorizonLevelPreview,
+           let connection = self.previewLayer.connection, connection.isVideoRotationAngleSupported(rotationAngle) {
             connection.videoRotationAngle = rotationAngle
         }
-        self.metadataOutput.rectOfInterest =  self.previewLayer.metadataOutputRectConverted(fromLayerRect: self.captureRect())
+        updateRectOfInterest()
+    }
+
+    // A rotation coordinator reports angles for a single camera, so this runs again for each camera the scanner switches to.
+    private func observeRotation(of device: AVCaptureDevice) {
+        let rotationCoordinator = AVCaptureDevice.RotationCoordinator(device: device, previewLayer: previewLayer)
+        self.rotationCoordinator = rotationCoordinator
+        rotationObservation = rotationCoordinator.observe(\.videoRotationAngleForHorizonLevelPreview, options: [.initial, .new]) { [weak self] _, _ in
+            Task { @MainActor in
+                self?.updateVideoOrientation()
+            }
+        }
+    }
+
+    // The scanner reads a QR code held in front of the device, so it captures from a camera that faces away from the person.
+    // On iPhone Duo that changes as the device opens, closes and turns around, so follow the cameras' direction relative to
+    // this view rather than trusting their position.
+    @available(iOS 27.1, *)
+    private func observeCameraDirections() {
+        directionCoordinator = AVCaptureDeviceDirectionCoordinator(
+            view: self,
+            deviceTypes: [.builtInWideAngleCamera, .builtInOuterUltraWideCamera, .builtInInnerUltraWideCamera]
+        ) { [weak self] deviceDirections in
+            self?.cameraDirectionsDidChange(deviceDirections)
+        }
+    }
+
+    @available(iOS 27.1, *)
+    private func cameraDirectionsDidChange(_ deviceDirections: AVCaptureDeviceDirectionMap) {
+        let backwardFacing = deviceDirections.backwardFacingDeviceDescriptors
+        // A switch already on its way to a backward facing camera will settle this change too.
+        if backwardFacing.contains(where: { $0.uniqueID == (switchingToCameraID ?? activeCameraID) }) { return }
+        // Prefer a rear camera, which focuses closer than the ultra wide cameras.
+        guard let replacement = backwardFacing.first(where: { $0.position == .back }) ?? backwardFacing.first else { return }
+        switchingToCameraID = replacement.uniqueID
+        // Hide frames from the outgoing camera while the new one starts.
+        previewLayer.opacity = 0
+
+        let uniqueID = replacement.uniqueID
+        nonisolated(unsafe) let captureSession = self.captureSession
+        sessionQueue.async { [weak self] in
+            var didSwitch = false
+            if let device = AVCaptureDevice(uniqueID: uniqueID),
+               let newInput = try? AVCaptureDeviceInput(device: device) {
+                captureSession.beginConfiguration()
+                let previousInputs = captureSession.inputs
+                previousInputs.forEach { captureSession.removeInput($0) }
+                if captureSession.canAddInput(newInput) {
+                    captureSession.addInput(newInput)
+                    didSwitch = true
+                } else {
+                    previousInputs.forEach { captureSession.addInput($0) }
+                }
+                captureSession.commitConfiguration()
+            }
+            Task { @MainActor in
+                self?.cameraSwitchDidFinish(switchedTo: didSwitch ? uniqueID : nil)
+            }
+        }
+    }
+
+    // Called with nil when the switch failed and the previous camera is still capturing.
+    private func cameraSwitchDidFinish(switchedTo uniqueID: String?) {
+        switchingToCameraID = nil
+        if let uniqueID {
+            activeCameraID = uniqueID
+            if let device = AVCaptureDevice(uniqueID: uniqueID) {
+                observeRotation(of: device)
+            }
+            // The connection mirrors front cameras automatically, but the active camera always faces away from the person,
+            // so its preview is never mirrored. The new input creates a new connection, which needs this again.
+            if let connection = previewLayer.connection, connection.isVideoMirroringSupported {
+                connection.automaticallyAdjustsVideoMirroring = false
+                connection.isVideoMirrored = false
+            }
+        }
+        updateVideoOrientation()
+        previewLayer.opacity = 1
     }
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -369,19 +519,29 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
 
 extension ScanAccountView {
     
+    // The part of the bounds the scanner lays out its controls and scan area in: inside the safe area, and the largest
+    // part of it that the fold and the camera housing leave clear.
+    private var contentRect: CGRect {
+        let clearRect = boundsClearOfReservedRegions
+        let safeRect = clearRect.intersection(bounds.inset(by: safeAreaInsets))
+        return safeRect.isNull ? clearRect : safeRect
+    }
+
+    // Sized from the view's own bounds rather than the device idiom, so the scan area fits compact and regular widths in any orientation.
     private func captureRect() -> CGRect {
-        let margin = UIDevice.current.userInterfaceIdiom == .pad  ? 150.0 : 50.0
-        let size = frame.width - margin * 2
-        let result = CGRect(x: margin,
-                            y: UIDevice.current.userInterfaceIdiom == .pad ? 120.0 : center.y - size / 1.5,
+        let area = contentRect
+        let size = max(0, min(area.width - 100, area.height * 0.5, 500))
+        let result = CGRect(x: area.midX - size / 2,
+                            y: area.midY - size / 1.5,
                             width: size,
                             height: size)
         return result
     }
-    
+
     private func createOverlay(frameColor: UIColor = .systemGreen, background: UIColor = UIColor.black.withAlphaComponent(0.6)) -> UIView {
-        
-        let overlayView = UIView(frame: CGRect(x: frame.origin.x, y: frame.origin.y, width: frame.size.width, height: frame.size.height * 1.5)) // make size 50% larger than needed to handle orientation changes from landscape to portrait
+
+        let overlayView = UIView(frame: bounds)
+        overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         overlayView.backgroundColor = background
         
         let path = CGMutablePath()
