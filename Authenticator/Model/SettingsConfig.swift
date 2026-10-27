@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import UIKit
 
 /*! Allows to customize behavior of the app
  Using UserDefaults as permanent storage

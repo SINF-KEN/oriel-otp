@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import Foundation
+import UIKit
 
 extension UIColor {
     static var primaryText: UIColor { .label }
