@@ -99,3 +99,22 @@ struct ConfirmButton: View {
         }
     }
 }
+
+// The filled and plain action buttons of the Yubico OTP screens, in glass on iOS 26 and later.
+extension View {
+    @ViewBuilder func prominentActionButtonStyle() -> some View {
+        if #available(iOS 26.0, *) {
+            buttonStyle(.glassProminent)
+        } else {
+            buttonStyle(.borderedProminent)
+        }
+    }
+
+    @ViewBuilder func secondaryActionButtonStyle() -> some View {
+        if #available(iOS 26.0, *) {
+            buttonStyle(.glass)
+        } else {
+            buttonStyle(.bordered)
+        }
+    }
+}
