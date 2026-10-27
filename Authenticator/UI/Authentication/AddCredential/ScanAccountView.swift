@@ -106,13 +106,9 @@ class ScanAccountView: UIView, AVCaptureMetadataOutputObjectsDelegate {
     }()
     
     private let checkboxImageView: UIImageView = {
-        var configuration = UIImage.SymbolConfiguration(pointSize: 250)
-//        if #available(iOS 15.0, *) {
-//            configuration = configuration.applying(UIImage.SymbolConfiguration(paletteColors: [.white, .yubiGreen]))
-//        }
+        let configuration = UIImage.SymbolConfiguration(pointSize: 250)
         let image = UIImage(systemName: "checkmark.circle.fill")?.withConfiguration(configuration)
         let imageView = UIImageView(image: image)
-//        imageView.tintColor = .yubiGreen
         imageView.transform = CGAffineTransform(scaleX: 2.5, y: 2.5)
         imageView.alpha = 0
         return imageView

@@ -18,7 +18,6 @@
 import Foundation
 import CryptoTokenKit
 
-@available(iOS 14.0, *)
 struct TokenCertificateStorage {
     
     enum TokenCertificateStorageError: Error {

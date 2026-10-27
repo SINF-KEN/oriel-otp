@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Yubico.
+ * Copyright (C) 2026 Kenzi Voyer.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,53 +18,11 @@
 import Foundation
 
 extension UIColor {
-    static var primaryText: UIColor {
-        get {
-            if #available(iOS 13.0, *) {
-                return UIColor.label
-            } else {
-                return UIColor.darkGray
-            }
-        }
-    }
+    static var primaryText: UIColor { .label }
 
-    static var secondaryText: UIColor {
-        get {
-            if #available(iOS 13.0, *) {
-                return UIColor.secondaryLabel
-            } else {
-                return UIColor.gray
-            }
-        }
-    }
+    static var secondaryText: UIColor { .secondaryLabel }
     
-    static var background: UIColor {
-        get {
-            if #available(iOS 13.0, *) {
-                return UIColor.systemBackground
-            } else {
-                return UIColor.white
-            }
-        }
-    }
-    
-    static var yubiBlue: UIColor {
-        get {
-            guard let color = UIColor(named: "YubiBlue") else {
-                return UIColor.gray
-            }
-            return color
-        }
-    }
-    
-    static var yubiGreen: UIColor {
-        get {
-            guard let color = UIColor(named: "YubiGreen") else {
-                return UIColor.gray
-            }
-            return color
-        }
-    }
+    static var background: UIColor { .systemBackground }
     
     static let colorSetForAccountIcons = [UIColor(named: "Color1"),
                                           UIColor(named: "Color2"),
