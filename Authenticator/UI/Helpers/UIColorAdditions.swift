@@ -18,12 +18,6 @@
 import UIKit
 
 extension UIColor {
-    static var primaryText: UIColor { .label }
-
-    static var secondaryText: UIColor { .secondaryLabel }
-    
-    static var background: UIColor { .systemBackground }
-    
     static let colorSetForAccountIcons = [UIColor(named: "Color1"),
                                           UIColor(named: "Color2"),
                                           UIColor(named: "Color3"),
