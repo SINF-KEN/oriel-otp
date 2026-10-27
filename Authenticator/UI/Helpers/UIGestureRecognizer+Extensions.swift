@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+import UIKit
+
 extension UIGestureRecognizer {
     
     typealias Action = ((UIGestureRecognizer) -> ())
