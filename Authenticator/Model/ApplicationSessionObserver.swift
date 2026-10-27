@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import UIKit
 
 protocol ApplicationSessionObserverDelegate: NSObjectProtocol {
     func didEnterBackground()

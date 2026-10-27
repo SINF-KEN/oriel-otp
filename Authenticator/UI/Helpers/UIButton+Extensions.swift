@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import UIKit
 
 extension UIButton {
     convenience init(withSymbol symbol: String) {

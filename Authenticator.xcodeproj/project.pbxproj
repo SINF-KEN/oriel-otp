@@ -34,16 +34,18 @@
 		51AFD4D62716FCDB008F2630 /* ApplicationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */; };
 		51AFD4D827196AB6008F2630 /* VersionHistory.plist in Resources */ = {isa = PBXBuildFile; fileRef = 51AFD4D727196AB6008F2630 /* VersionHistory.plist */; };
 		51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51AFD4D9271D4277008F2630 /* QuartzCore.framework */; };
-		51BBE37F273982D700DA47CC /* YKFOATHSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BBE37E273982D700DA47CC /* YKFOATHSession+Extensions.swift */; };
+		51BBE37F273982D700DA47CC /* OATHSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */; };
 		51D1E84C264134F300BDA3FF /* UIAlertController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51D1E84B264134F300BDA3FF /* UIAlertController+Extensions.swift */; };
-		51EEC532246D34ED00061A8F /* YKFKeyVersion+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC531246D34ED00061A8F /* YKFKeyVersion+Extensions.swift */; };
-		51EEC536246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC535246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift */; };
+		51EEC532246D34ED00061A8F /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */; };
+		C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */; };
+		51EEC536246D38B700061A8F /* YubiKitExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */; };
 		51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BC263847BD0010686B /* ManagementViewModel.swift */; };
-		51F8E3BF263848E30010686B /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BE263848E30010686B /* Connection.swift */; };
+		51F8E3BF263848E30010686B /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BE263848E30010686B /* ConnectionManager.swift */; };
 		816C684623430E0700209342 /* SecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684523430E0700209342 /* SecureStore.swift */; };
 		816C684823430F8E00209342 /* SecureStoreQueryable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684723430F8E00209342 /* SecureStoreQueryable.swift */; };
 		816C685023440D2200209342 /* SecureStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684F23440D2200209342 /* SecureStoreError.swift */; };
 		816C685223440EF900209342 /* SecureStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C685123440EF900209342 /* SecureStoreTests.swift */; };
+		A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */; };
 		816C685E234697BF00209342 /* PasswordPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C685D234697BE00209342 /* PasswordPreferences.swift */; };
 		817DBA0D2368B7B7001FC18D /* UIColorAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */; };
 		818866BE22DFD729006BC0A8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818866BC22DFD729006BC0A8 /* Main.storyboard */; };
@@ -65,11 +67,9 @@
 		B40D61A22AE7F89500467AE9 /* DisableOTPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */; };
 		B40F44452B27033A000D5E02 /* TokenRequestYubiOTPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40F44442B27033A000D5E02 /* TokenRequestYubiOTPViewController.swift */; };
 		B411242F29D423A300D58001 /* ListStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B411242E29D423A300D58001 /* ListStatusView.swift */; };
-		B42A39332B2A03D20039DB26 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = B42A39322B2A03D20039DB26 /* YubiKit */; };
 		B43751972C9AD7D8004017A4 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */; };
 		B43751A42CA440E7004017A4 /* NFCSettingsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AFD4D32716FC78008F2630 /* NFCSettingsController.swift */; };
 		B44E5E812C74BE67007ABB79 /* OATHResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44E5E802C74BE67007ABB79 /* OATHResetView.swift */; };
-		B44E5E842C74C8CC007ABB79 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = B44E5E832C74C8CC007ABB79 /* YubiKit */; };
 		B44E5EB32C777F22007ABB79 /* OATHPasswordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44E5EB22C777F22007ABB79 /* OATHPasswordViewModel.swift */; };
 		B44E5EBB2C778802007ABB79 /* OATHPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44E5EBA2C778802007ABB79 /* OATHPasswordView.swift */; };
 		B452EC1F2A1E4F460045E5D9 /* YubiOtpRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452EC1E2A1E4F460045E5D9 /* YubiOtpRowView.swift */; };
@@ -94,7 +94,7 @@
 		B4901AF12BD7DD350092E7A2 /* EditCredential.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B4901AF02BD7DD350092E7A2 /* EditCredential.storyboard */; };
 		B4901AF42BD7DF960092E7A2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B4901AF32BD7DF960092E7A2 /* Localizable.xcstrings */; };
 		B4901B082BD91DA60092E7A2 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B4901B072BD91DA60092E7A2 /* InfoPlist.xcstrings */; };
-		B4A597BA2D9D7BFE00444D97 /* YKFConnectionProtocol+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A597B92D9D7BF000444D97 /* YKFConnectionProtocol+Extensions.swift */; };
+		B4A597BA2D9D7BFE00444D97 /* SmartCardConnection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A597B92D9D7BF000444D97 /* SmartCardConnection+Extensions.swift */; };
 		B4B1711827DF8C48002A62DE /* ScanAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B1711727DF8C48002A62DE /* ScanAccountView.swift */; };
 		B4B83B6A2CBE8D4200B33C47 /* Logger+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B83B692CBE8D3A00B33C47 /* Logger+Extensions.swift */; };
 		B4BB02D92C80987B00B72904 /* SettingsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02D82C80987B00B72904 /* SettingsButton.swift */; };
@@ -184,16 +184,18 @@
 		51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSettingsViewModel.swift; sourceTree = "<group>"; };
 		51AFD4D727196AB6008F2630 /* VersionHistory.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = VersionHistory.plist; sourceTree = "<group>"; };
 		51AFD4D9271D4277008F2630 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		51BBE37E273982D700DA47CC /* YKFOATHSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YKFOATHSession+Extensions.swift"; sourceTree = "<group>"; };
+		51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OATHSession+Extensions.swift"; sourceTree = "<group>"; };
 		51D1E84B264134F300BDA3FF /* UIAlertController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIAlertController+Extensions.swift"; sourceTree = "<group>"; };
-		51EEC531246D34ED00061A8F /* YKFKeyVersion+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YKFKeyVersion+Extensions.swift"; sourceTree = "<group>"; };
-		51EEC535246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YKFKeyVersionExtensionsTests.swift; sourceTree = "<group>"; };
+		51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCapabilities.swift; sourceTree = "<group>"; };
+		C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManagerTests.swift; sourceTree = "<group>"; };
+		51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKitExtensionsTests.swift; sourceTree = "<group>"; };
 		51F8E3BC263847BD0010686B /* ManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementViewModel.swift; sourceTree = "<group>"; };
-		51F8E3BE263848E30010686B /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		51F8E3BE263848E30010686B /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		816C684523430E0700209342 /* SecureStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStore.swift; sourceTree = "<group>"; };
 		816C684723430F8E00209342 /* SecureStoreQueryable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreQueryable.swift; sourceTree = "<group>"; };
 		816C684F23440D2200209342 /* SecureStoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreError.swift; sourceTree = "<group>"; };
 		816C685123440EF900209342 /* SecureStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreTests.swift; sourceTree = "<group>"; };
+		A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredPreferencesTests.swift; sourceTree = "<group>"; };
 		816C685D234697BE00209342 /* PasswordPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPreferences.swift; sourceTree = "<group>"; };
 		817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorAdditions.swift; sourceTree = "<group>"; };
 		818866B322DFD729006BC0A8 /* Authenticator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Authenticator.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -205,7 +207,6 @@
 		818866C422DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuthenticatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		818866CF22DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		818866F122E18804006BC0A8 /* Authenticator-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Authenticator-Bridging-Header.h"; sourceTree = "<group>"; };
 		818866F622E7A877006BC0A8 /* Authenticator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Authenticator.entitlements; sourceTree = "<group>"; };
 		81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySessionError.swift; sourceTree = "<group>"; };
 		81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSessionObserver.swift; sourceTree = "<group>"; };
@@ -251,7 +252,7 @@
 		B4901AF22BD7DD350092E7A2 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/EditCredential.xcstrings; sourceTree = "<group>"; };
 		B4901AF32BD7DF960092E7A2 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B4901B072BD91DA60092E7A2 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		B4A597B92D9D7BF000444D97 /* YKFConnectionProtocol+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "YKFConnectionProtocol+Extensions.swift"; sourceTree = "<group>"; };
+		B4A597B92D9D7BF000444D97 /* SmartCardConnection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SmartCardConnection+Extensions.swift"; sourceTree = "<group>"; };
 		B4B1711727DF8C48002A62DE /* ScanAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanAccountView.swift; sourceTree = "<group>"; };
 		B4B83B692CBE8D3A00B33C47 /* Logger+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Extensions.swift"; sourceTree = "<group>"; };
 		B4BB02D82C80987B00B72904 /* SettingsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButton.swift; sourceTree = "<group>"; };
@@ -268,7 +269,6 @@
 		B4C93E8829B89DE300C2A8B8 /* DetachedMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetachedMenu.swift; sourceTree = "<group>"; };
 		B4C93E9429C1B90900C2A8B8 /* AddAccountWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountWrapper.swift; sourceTree = "<group>"; };
 		B4DB2289299BC373003110ED /* OATHSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHSession.swift; sourceTree = "<group>"; };
-		B4E9D46228B65B5100D51FFC /* yubikit-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "yubikit-ios"; path = "../yubikit-ios"; sourceTree = "<group>"; };
 		B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
 		B4FE90D32A443D8400B59170 /* TokenRequestWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestWrapper.swift; sourceTree = "<group>"; };
 		C1A0000000000000000000A7 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
@@ -289,9 +289,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B44E5E842C74C8CC007ABB79 /* YubiKit in Frameworks */,
 				B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */,
-				B42A39332B2A03D20039DB26 /* YubiKit in Frameworks */,
 				B9F0FF11F842A39183974083 /* (null) in Frameworks */,
 				51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */,
 			);
@@ -393,9 +391,9 @@
 			isa = PBXGroup;
 			children = (
 				B4B83B692CBE8D3A00B33C47 /* Logger+Extensions.swift */,
-				51EEC531246D34ED00061A8F /* YKFKeyVersion+Extensions.swift */,
-				B4A597B92D9D7BF000444D97 /* YKFConnectionProtocol+Extensions.swift */,
-				51BBE37E273982D700DA47CC /* YKFOATHSession+Extensions.swift */,
+				51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */,
+				B4A597B92D9D7BF000444D97 /* SmartCardConnection+Extensions.swift */,
+				51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -466,7 +464,6 @@
 				818BE8DA22F3485600061026 /* UI */,
 				818866F622E7A877006BC0A8 /* Authenticator.entitlements */,
 				B4901AE32BD697620092E7A2 /* Localizable.xcstrings */,
-				818866F122E18804006BC0A8 /* Authenticator-Bridging-Header.h */,
 				B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */,
 				818866BF22DFD72C006BC0A8 /* Assets.xcassets */,
 				C1A0000000000000000000C1 /* AppIcon.icon */,
@@ -483,8 +480,10 @@
 		818866CC22DFD72C006BC0A8 /* AuthenticatorTests */ = {
 			isa = PBXGroup;
 			children = (
+				C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */,
 				816C685123440EF900209342 /* SecureStoreTests.swift */,
-				51EEC535246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift */,
+				A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */,
+				51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */,
 				818866CF22DFD72C006BC0A8 /* Info.plist */,
 			);
 			path = AuthenticatorTests;
@@ -519,7 +518,7 @@
 				51EEC530246D34D800061A8F /* Extensions */,
 				816C684423430DC000209342 /* SecureStore */,
 				81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */,
-				51F8E3BE263848E30010686B /* Connection.swift */,
+				51F8E3BE263848E30010686B /* ConnectionManager.swift */,
 				A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */,
 				81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */,
 				51F8E3BC263847BD0010686B /* ManagementViewModel.swift */,
@@ -570,7 +569,6 @@
 		B4E9D45928B65A6E00D51FFC /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				B4E9D46228B65B5100D51FFC /* yubikit-ios */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -611,8 +609,6 @@
 			);
 			name = Authenticator;
 			packageProductDependencies = (
-				B42A39322B2A03D20039DB26 /* YubiKit */,
-				B44E5E832C74C8CC007ABB79 /* YubiKit */,
 				B4D71E802CE4E6E6004D4C29 /* YubiKit */,
 			);
 			productName = Authenticator;
@@ -678,7 +674,7 @@
 			);
 			mainGroup = 818866AA22DFD729006BC0A8;
 			packageReferences = (
-				B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-ios" */,
+				B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 818866B422DFD729006BC0A8 /* Products */;
@@ -752,7 +748,7 @@
 				B4BB02E42C81B21D00B72904 /* FIDOPINView.swift in Sources */,
 				A591412123835F4600CCCF67 /* Constants.swift in Sources */,
 				515542852656A30B00B19C59 /* UIButton+Extensions.swift in Sources */,
-				51BBE37F273982D700DA47CC /* YKFOATHSession+Extensions.swift in Sources */,
+				51BBE37F273982D700DA47CC /* OATHSession+Extensions.swift in Sources */,
 				B44E5EB32C777F22007ABB79 /* OATHPasswordViewModel.swift in Sources */,
 				B4B83B6A2CBE8D4200B33C47 /* Logger+Extensions.swift in Sources */,
 				B4BB02DC2C80A09500B72904 /* SettingsView.swift in Sources */,
@@ -772,7 +768,7 @@
 				B47486602CEC83F90031A504 /* VersionHistoryView.swift in Sources */,
 				817DBA0D2368B7B7001FC18D /* UIColorAdditions.swift in Sources */,
 				513F34C82464658F00FCE030 /* SettingsRowView.swift in Sources */,
-				51F8E3BF263848E30010686B /* Connection.swift in Sources */,
+				51F8E3BF263848E30010686B /* ConnectionManager.swift in Sources */,
 				B46E378729C348F100CA0B67 /* EditAccountWrapper.swift in Sources */,
 				B4696F3F2CB6CE5800604F6F /* ConfigurationView.swift in Sources */,
 				B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */,
@@ -815,7 +811,7 @@
 				81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */,
 				51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */,
 				B4BB02E62C81C75E00B72904 /* FIDOResetViewModel.swift in Sources */,
-				51EEC532246D34ED00061A8F /* YKFKeyVersion+Extensions.swift in Sources */,
+				51EEC532246D34ED00061A8F /* DeviceCapabilities.swift in Sources */,
 				B47486622CECC2190031A504 /* TutorialView.swift in Sources */,
 				B4BB02E22C81A82300B72904 /* FIDOPINViewModel.swift in Sources */,
 				B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */,
@@ -828,7 +824,7 @@
 				81FA3C39231AF4F0009C22AB /* UIViewControllerAdditions.swift in Sources */,
 				816C684623430E0700209342 /* SecureStore.swift in Sources */,
 				51394C5A26D40E64009F366D /* UIGestureRecognizer+Extensions.swift in Sources */,
-				B4A597BA2D9D7BFE00444D97 /* YKFConnectionProtocol+Extensions.swift in Sources */,
+				B4A597BA2D9D7BFE00444D97 /* SmartCardConnection+Extensions.swift in Sources */,
 				B4C93E63299FB51A00C2A8B8 /* Account.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -838,7 +834,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				816C685223440EF900209342 /* SecureStoreTests.swift in Sources */,
-				51EEC536246D38B700061A8F /* YKFKeyVersionExtensionsTests.swift in Sources */,
+				A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */,
+				C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */,
+				51EEC536246D38B700061A8F /* YubiKitExtensionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -915,8 +913,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yubico.Authenticator.TokenExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -939,8 +939,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yubico.Authenticator.TokenExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -1087,7 +1089,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 204;
 				DEVELOPMENT_TEAM = XW69FY82W3;
-				HEADER_SEARCH_PATHS = "../Submodules/YubiKit/**";
 				INFOPLIST_FILE = Authenticator/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1100,9 +1101,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yubico.Authenticator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Authenticator/Authenticator-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				YKF_ENABLE_VERBOSE_LOGGING = YES;
 			};
@@ -1118,7 +1120,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 204;
 				DEVELOPMENT_TEAM = XW69FY82W3;
-				HEADER_SEARCH_PATHS = "../Submodules/YubiKit/**";
 				INFOPLIST_FILE = Authenticator/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1131,9 +1132,10 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.yubico.Authenticator;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Authenticator/Authenticator-Bridging-Header.h";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				YKF_ENABLE_VERBOSE_LOGGING = NO;
 			};
@@ -1157,8 +1159,10 @@
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4,6,7";
-				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Authenticator.app/Authenticator";
 			};
 			name = Debug;
@@ -1181,8 +1185,10 @@
 				SUPPORTS_MACCATALYST = YES;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4,6,7";
-				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Authenticator.app/Authenticator";
 			};
 			name = Release;
@@ -1229,28 +1235,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-ios" */ = {
+		B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Yubico/yubikit-ios";
+			repositoryURL = "https://github.com/Yubico/yubikit-swift";
 			requirement = {
-				branch = main;
-				kind = branch;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B42A39322B2A03D20039DB26 /* YubiKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = YubiKit;
-		};
-		B44E5E832C74C8CC007ABB79 /* YubiKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = YubiKit;
-		};
 		B4D71E802CE4E6E6004D4C29 /* YubiKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-ios" */;
+			package = B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-swift" */;
 			productName = YubiKit;
 		};
 /* End XCSwiftPackageProductDependency section */

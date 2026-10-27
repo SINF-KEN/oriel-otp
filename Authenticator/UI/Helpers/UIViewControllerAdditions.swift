@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Yubico.
+ * Copyright (C) 2026 Kenzi Voyer.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,45 +17,42 @@
 
 import Foundation
 import LocalAuthentication
+import UIKit
 
 extension UIViewController {
-    static let PasswordUserDefaultsKey = "PasswordSaveType"
+    nonisolated static let PasswordUserDefaultsKey = "PasswordSaveType"
  
     /*! Show error dialog to notify if some operation couldn't be executed
      */
     func showAlertDialog(title: String, message: String? = nil, nfcHandler: (() -> Void)? = nil, okHandler: (() -> Void)? = nil) {
-        DispatchQueue.main.async {
-            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            let cancel = UIAlertAction(title: String(localized: "OK"), style: .cancel) { (action) -> Void in
-                okHandler?()
-            }
-            
-            if YubiKitDeviceCapabilities.supportsISO7816NFCTags && nfcHandler != nil {
-                let activate = UIAlertAction(title: String(localized: "Activate NFC", comment: "Password save type activate NFC"), style: .default) { (action) -> Void in
-                    nfcHandler?()
-                }
-                alertController.addAction(activate)
-            }
-            alertController.addAction(cancel)
-            self.present(alertController, animated: false)
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let cancel = UIAlertAction(title: String(localized: "OK"), style: .cancel) { (action) -> Void in
+            okHandler?()
         }
+        
+        if DeviceCapabilities.supportsNFC && nfcHandler != nil {
+            let activate = UIAlertAction(title: String(localized: "Activate NFC", comment: "Password save type activate NFC"), style: .default) { (action) -> Void in
+                nfcHandler?()
+            }
+            alertController.addAction(activate)
+        }
+        alertController.addAction(cancel)
+        self.present(alertController, animated: false)
     }
     
     /*! Shows warning with option to cancel operation
      */
     func showWarning(title: String, message: String, okButtonTitle: String, style: UIAlertAction.Style = .destructive, okHandler: (() -> Void)? = nil) {
-        DispatchQueue.main.async {
-            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            
-            let reset = UIAlertAction(title: okButtonTitle, style: style, handler: { (action) -> Void in
-                okHandler?()
-            })
-            let cancel = UIAlertAction(title: String(localized: "Cancel"), style: .cancel, handler: nil)
-            alertController.addAction(reset)
-            alertController.addAction(cancel)
-            
-            self.present(alertController, animated: false)
-        }
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        let reset = UIAlertAction(title: okButtonTitle, style: style, handler: { (action) -> Void in
+            okHandler?()
+        })
+        let cancel = UIAlertAction(title: String(localized: "Cancel"), style: .cancel, handler: nil)
+        alertController.addAction(reset)
+        alertController.addAction(cancel)
+        
+        self.present(alertController, animated: false)
     }
     
 }

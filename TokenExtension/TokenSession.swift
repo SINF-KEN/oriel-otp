@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2022 Yubico.
+ * Copyright (C) 2026 Kenzi Voyer.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +33,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     var signSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when signing starts
     var decryptSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when decryption starts
     
-    // These cases match the YKFPIVKeyType in the SDK
+    // These cases match TokenKeyType in the app
     enum KeyType: UInt8 {
         case rsa1024 = 0x06
         case rsa2048 = 0x07
@@ -114,8 +115,8 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: polling tick \(tick)...")
-            if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator"), let signedData = userDefaults.value(forKey: "signedData") as? Data {
-                Logger.ctk.yubilog("Extension: Got signedData from UserDefaults")
+            if let signedData = readTokenResponse(named: "signedData") {
+                Logger.ctk.yubilog("Extension: Got signedData from shared container")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3) // Set in future to block duplicate requests from CryptoTokenKit
                 reset()
                 return signedData
@@ -183,8 +184,8 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: decrypt polling tick \(tick)...")
-            if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator"), let decryptedData = userDefaults.value(forKey: "decryptedData") as? Data {
-                Logger.ctk.yubilog("Extension: Got decryptedData from UserDefaults")
+            if let decryptedData = readTokenResponse(named: "decryptedData") {
+                Logger.ctk.yubilog("Extension: Got decryptedData from shared container")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: -10)
                 reset()
                 return decryptedData
@@ -224,9 +225,25 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         cancelAllNotifications()
         if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator") {
             userDefaults.removeObject(forKey: "canceledByUser")
+            // Older versions handed the data over in UserDefaults; clear anything left behind.
             userDefaults.removeObject(forKey: "signedData")
             userDefaults.removeObject(forKey: "decryptedData")
         }
+        if let directory = tokenResponsesDirectory {
+            try? FileManager.default.removeItem(at: directory)
+        }
+    }
+
+    // The app writes signed and decrypted data to files with complete file protection in the
+    // shared app group container, instead of the unencrypted UserDefaults plist.
+    private var tokenResponsesDirectory: URL? {
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.yubico.Authenticator")?
+            .appendingPathComponent("TokenResponses", isDirectory: true)
+    }
+
+    private func readTokenResponse(named name: String) -> Data? {
+        guard let url = tokenResponsesDirectory?.appendingPathComponent(name) else { return nil }
+        return try? Data(contentsOf: url)
     }
     
     private func cancelAllNotifications() {
@@ -278,4 +295,4 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     }
 }
 
-extension String: Error {}
+extension String: @retroactive Error {}
