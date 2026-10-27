@@ -76,12 +76,8 @@ class PasswordPreferences {
         if !hasBiometricAuthentication {
             return .none
         }
-        
-        if #available(iOS 11.0, *) {
-            return context.biometryType == .faceID ? .faceId : .touchId
-        }
 
-        return .touchId
+        return context.biometryType == .faceID ? .faceId : .touchId
     }
     
     func migrate(fromKeyIdentifier: String, toKeyIdentifier: String) {

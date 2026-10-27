@@ -251,13 +251,7 @@ class SecureStore {
     }
     
     private func error(from status: OSStatus) -> SecureStoreError {
-        var message: String
-        if #available(iOS 11.3, *) {
-            message = SecCopyErrorMessageString(status, nil) as String? ?? NSLocalizedString("Unhandled Error", comment: "")
-        } else {
-            // Fallback on earlier versions
-            message = NSLocalizedString("Unhandled Error", comment: "")
-        }
+        let message = SecCopyErrorMessageString(status, nil) as String? ?? NSLocalizedString("Unhandled Error", comment: "")
         return SecureStoreError.unhandledError(message: message)
     }
 }
