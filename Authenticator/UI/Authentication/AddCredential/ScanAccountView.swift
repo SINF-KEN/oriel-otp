@@ -18,7 +18,6 @@
 import AVFoundation
 import UIKit
 import YubiKit
-import Combine
 
 class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDelegate {
     
@@ -37,7 +36,6 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     }()
     private let metadataOutput = AVCaptureMetadataOutput()
     private var lastScanDate = Date(timeIntervalSince1970: 0)
-    private var cancellables = [Cancellable]()
 
     private let closeButton: UIButton = {
         let button = UIButton()
@@ -171,21 +169,21 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
             addSubview(errorOverlay)
         }
         
-        cancellables.append(closeButton.addHandler(for: .touchUpInside) { [weak self] in
+        closeButton.addAction(UIAction { [weak self] _ in
             self?.completionHandler(.cancel)
-        })
-        
-        cancellables.append(addManuallyButton.addHandler(for: .touchUpInside) { [weak self] in
+        }, for: .primaryActionTriggered)
+
+        addManuallyButton.addAction(UIAction { [weak self] _ in
             self?.completionHandler(.manuelEntry)
             self?.removeFromSuperview()
-        })
-        
-        cancellables.append(openSettingsButton.addHandler(for: .touchUpInside) {
+        }, for: .primaryActionTriggered)
+
+        openSettingsButton.addAction(UIAction { _ in
             guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                 return
             }
             UIApplication.shared.open(settingsUrl)
-        })
+        }, for: .primaryActionTriggered)
         
         addSubview(closeButton)
         addSubview(addAccountLabel)

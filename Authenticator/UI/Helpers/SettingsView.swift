@@ -26,7 +26,7 @@ struct SettingsView<Content: View, Buttons: View>: View {
                             .font(Font.title.weight(.semibold))
                             .padding(10)
                             .frame(width: 60, height: 60)
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .background(imageColor)
                             .cornerRadius(13)
                             .padding(.top, 0)

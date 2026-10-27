@@ -118,7 +118,7 @@ struct MainView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 200, height: 20)
-                            .foregroundColor(Color("YubiGreen"))
+                            .foregroundStyle(Color("YubiGreen"))
                             .accessibilityHidden(true)
                     }
                 }
