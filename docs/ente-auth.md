@@ -1,7 +1,8 @@
 # Syncing accounts from Ente Auth
 
 The app can sign in to [Ente Auth](https://ente.io/auth) and copy the TOTP and HOTP accounts stored there onto
-a YubiKey. Open the menu in the account list and choose **Sync from Ente Auth**.
+a YubiKey. Choose **Sync from Ente Auth** in the menu of the account list, or below the message shown when no
+YubiKey has been read yet or the YubiKey has no accounts.
 
 The sync is one way and read only: accounts are read from Ente and written to the YubiKey. Nothing is created,
 changed or deleted in Ente Auth. Accounts with the same name as one already on the YubiKey are skipped, so the
@@ -42,6 +43,16 @@ Ente's `steam` accounts become TOTP accounts with the issuer `Steam`, which the 
 Accounts the YubiKey can't store, e.g. with 10 digits or a name that is too long, are listed with the reason and
 can't be selected.
 
+## Room on the YubiKey
+
+A YubiKey holds a fixed number of OATH accounts: 64 from firmware 5.7, 32 on earlier YubiKey 4 and 5 models and
+28 on the YubiKey NEO (`OATHSession.credentialCapacity(version:)`). When a YubiKey has been read, the sheet shows
+how many spaces are free, selects only as many accounts as fit, in list order, and warns when more are selected.
+Accounts already on the YubiKey don't take a space. The Add button shows how many accounts are selected.
+
+The limits are an estimate from the OATH version. The YubiKey has the final say: if it reports that it is full,
+adding stops and an alert names the accounts that weren't added.
+
 ## What is stored
 
 By default nothing is stored. The session only lives while the sheet is open, and when it closes the token is
@@ -70,7 +81,7 @@ Everything lives in `Authenticator/EnteAuth/` and is added to the project as a s
 | `EnteSessionStore.swift` | Optional saved session in the keychain |
 | `EnteSyncViewModel.swift`, `EnteSyncView.swift` | The sheet |
 
-Outside that folder the feature adds a menu item and a sheet in `MainView`, and
+Outside that folder the feature adds a menu item, buttons in the empty account list and a sheet in `MainView`, and
 `MainViewModel.addAccounts(_:requiresTouch:completion:)` / `OATHSession.addCredentials(templates:requiresTouch:)`,
 which add several accounts in one YubiKey session.
 

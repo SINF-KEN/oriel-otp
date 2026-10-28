@@ -123,6 +123,12 @@ enum CredentialTemplateError: Error, LocalizedError {
 
 extension YubiKitOATHSession.CredentialTemplate {
 
+    /// The issuer and account name, e.g. "GitHub (alice)", for listing the account in a message.
+    var displayName: String {
+        guard let issuer, !issuer.isEmpty else { return name }
+        return name.isEmpty ? issuer : "\(issuer) (\(name))"
+    }
+
     struct Validation: OptionSet, Sendable {
         let rawValue: Int
         static let label = Validation(rawValue: 1 << 0)
