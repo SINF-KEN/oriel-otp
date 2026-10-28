@@ -112,6 +112,51 @@ enum EnteCodeParser {
     }
 }
 
+enum EnteCodeExporter {
+
+    /// The otpauth URL for an account, in the form Ente's apps store it.
+    ///
+    /// The secret may differ from the one the account was created with: YubiKit pads short secrets with zeros and
+    /// hashes long ones, which gives the same HMAC and so the same codes. Steam accounts get Ente's `steam` type so
+    /// Ente shows them as 5 character codes.
+    static func otpauthURL(for template: YubiKitOATHSession.CredentialTemplate) -> URL? {
+        let isSteam = template.type.period != nil && template.issuer?.lowercased() == "steam"
+        var components = URLComponents()
+        components.scheme = "otpauth"
+        switch template.type {
+        case .totp: components.host = isSteam ? "steam" : "totp"
+        case .hotp: components.host = "hotp"
+        }
+        let issuer = template.issuer.flatMap { $0.isEmpty ? nil : $0 }
+        components.path = "/" + [issuer, template.name].compactMap { $0 }.joined(separator: ":")
+
+        let algorithm: String
+        switch template.algorithm {
+        case .sha1: algorithm = "SHA1"
+        case .sha256: algorithm = "SHA256"
+        case .sha512: algorithm = "SHA512"
+        }
+        var items = [URLQueryItem(name: "secret", value: template.secret.base32EncodedString)]
+        if let issuer {
+            items.append(URLQueryItem(name: "issuer", value: issuer))
+        }
+        items.append(URLQueryItem(name: "algorithm", value: algorithm))
+        items.append(URLQueryItem(name: "digits", value: String(isSteam ? 5 : template.digits)))
+        switch template.type {
+        case .totp(let period): items.append(URLQueryItem(name: "period", value: String(Int(period))))
+        case .hotp(let counter): items.append(URLQueryItem(name: "counter", value: String(counter)))
+        }
+        components.queryItems = items
+        return components.url
+    }
+
+    /// The plain text of an authenticator entity: the otpauth URL as a JSON string, like Ente's apps store it.
+    static func rawData(for template: YubiKitOATHSession.CredentialTemplate) throws -> Data {
+        guard let url = otpauthURL(for: template) else { throw CredentialTemplateError.type }
+        return try JSONEncoder().encode(url.absoluteString)
+    }
+}
+
 enum EnteAuthenticatorSyncError: Error, LocalizedError {
     case invalidKey
     case signedOut
@@ -126,7 +171,7 @@ enum EnteAuthenticatorSyncError: Error, LocalizedError {
     }
 }
 
-/// Reads the accounts stored in Ente Auth. This is read only, nothing is changed on Ente's server.
+/// Reads the accounts stored in Ente Auth and adds new ones. Nothing is ever changed or deleted on Ente's server.
 nonisolated enum EnteAuthenticatorSync {
 
     static let pageSize = 500
@@ -182,6 +227,27 @@ nonisolated enum EnteAuthenticatorSync {
             sinceTime = maxUpdatedAt
         }
         return latest.values.filter { !$0.isDeleted }
+    }
+
+    enum AddResult: Equatable {
+        case added
+        case alreadyPresent
+    }
+
+    /// Encrypts the account with the authenticator key and adds it to Ente Auth, unless Ente already has an
+    /// account with the same name.
+    @MainActor static func add(_ template: YubiKitOATHSession.CredentialTemplate, api: EnteAPIClient, token: String,
+                               authenticatorKey: Data) async throws -> AddResult {
+        let existing = try await codes(api: api, token: token, authenticatorKey: authenticatorKey)
+        let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
+                                                period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
+        guard !existing.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
+        let (header, encryptedData) = try EnteCrypto.secretStreamEncrypt(try EnteCodeExporter.rawData(for: template), key: authenticatorKey)
+        try await signedIn {
+            try await api.createAuthenticatorEntity(token: token, encryptedData: encryptedData.base64EncodedString(),
+                                                    header: header.base64EncodedString())
+        }
+        return .added
     }
 
     private static func signedIn<T>(_ operation: () async throws -> T) async throws -> T {
