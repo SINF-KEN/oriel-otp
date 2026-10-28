@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "indentation": {
+    "spaces": 4
+  },
+  "lineLength": 140,
+  "multiElementCollectionTrailingCommas": false,
+  "rules": {
+    "NoBlockComments": false
+  }
+}

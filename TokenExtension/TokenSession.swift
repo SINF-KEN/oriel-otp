@@ -56,12 +56,20 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
 
     func tokenSession(_ session: TKTokenSession, supports operation: TKTokenOperation, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm) -> Bool {
         Logger.ctk.yubilog("Extension: supports operation: \(String(describing: operation)), keyObjectID: \(String(describing: keyObjectID))")
+        let policyOperation: TokenSessionOperation
         switch operation {
-            case .readData, .signData, .decryptData, .performKeyExchange:
-                return true
-            default:
-                return false
+        case .readData:
+            policyOperation = .readData
+        case .signData:
+            policyOperation = .signData
+        case .decryptData:
+            policyOperation = .decryptData
+        case .performKeyExchange:
+            policyOperation = .performKeyExchange
+        default:
+            policyOperation = .unsupported
         }
+        return TokenSessionPolicy.supports(policyOperation)
     }
     
     func tokenSession(_ session: TKTokenSession, sign dataToSign: Data, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm) throws -> Data {
@@ -115,13 +123,13 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: polling tick \(tick)...")
-            if let signedData = readTokenResponse(named: "signedData") {
+            if let signedData = readTokenResponse(.signed) {
                 Logger.ctk.yubilog("Extension: Got signedData from shared container")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3) // Set in future to block duplicate requests from CryptoTokenKit
                 reset()
                 return signedData
             }
-            if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP"), let _ = userDefaults.value(forKey: "canceledByUser") {
+            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: "canceledByUser") {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -184,13 +192,13 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: decrypt polling tick \(tick)...")
-            if let decryptedData = readTokenResponse(named: "decryptedData") {
+            if let decryptedData = readTokenResponse(.decrypted) {
                 Logger.ctk.yubilog("Extension: Got decryptedData from shared container")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: -10)
                 reset()
                 return decryptedData
             }
-            if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP"), let _ = userDefaults.value(forKey: "canceledByUser") {
+            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: "canceledByUser") {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -223,27 +231,26 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     
     private func reset() {
         cancelAllNotifications()
-        if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP") {
+        if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier) {
             userDefaults.removeObject(forKey: "canceledByUser")
             // Older versions handed the data over in UserDefaults; clear anything left behind.
             userDefaults.removeObject(forKey: "signedData")
             userDefaults.removeObject(forKey: "decryptedData")
         }
-        if let directory = tokenResponsesDirectory {
-            try? FileManager.default.removeItem(at: directory)
-        }
+        try? tokenResponseStore?.removeAll()
     }
 
     // The app writes signed and decrypted data to files with complete file protection in the
     // shared app group container, instead of the unencrypted UserDefaults plist.
-    private var tokenResponsesDirectory: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.github.sinf-ken.OrielOTP")?
-            .appendingPathComponent("TokenResponses", isDirectory: true)
+    private var tokenResponseStore: TokenResponseStore? {
+        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier) else {
+            return nil
+        }
+        return TokenResponseStore(containerURL: container)
     }
 
-    private func readTokenResponse(named name: String) -> Data? {
-        guard let url = tokenResponsesDirectory?.appendingPathComponent(name) else { return nil }
-        return try? Data(contentsOf: url)
+    private func readTokenResponse(_ kind: TokenResponseKind) -> Data? {
+        tokenResponseStore?.read(kind)
     }
     
     private func cancelAllNotifications() {
