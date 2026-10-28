@@ -30,7 +30,7 @@ struct MainView: View {
     @State var selectedAccountID: String? = nil
     @State var showAddAccount: Bool = false
     @State var addAccountCancellable: AnyCancellable?
-    @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool), Never>()
+    @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, Bool), Never>()
     @State var showConfiguration: Bool = false
     @State var showAbout: Bool = false
     @State var showEnteSync: Bool = false
@@ -62,7 +62,9 @@ struct MainView: View {
                         }
                     }
                     if !model.accountsLoaded {
-                        ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height)
+                        ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
+                            enteSyncButton
+                        }
                     } else if !searchText.isEmpty {
                         if searchResults.count > 0 {
                             ForEach(searchResults, id: \.id) { account in
@@ -95,7 +97,14 @@ struct MainView: View {
                             accountRow(account)
                         }
                     } else {
-                        ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height)
+                        ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
+                            Button(action: { showAddAccount.toggle() }) {
+                                Label("Add account", systemImage: "plus")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                            enteSyncButton
+                        }
                     }
                 }
             }
@@ -139,9 +148,7 @@ struct MainView: View {
 
                 // Secondary actions collapse into the system overflow menu.
                 ToolbarItemGroup(placement: .secondaryAction) {
-                    Button(action: { showEnteSync.toggle() }) {
-                        Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-                    }
+                    enteSyncButton
                     Button(action: { showConfiguration.toggle() }) {
                         Label("Configuration", systemImage: "switch.2")
                     }
@@ -181,6 +188,7 @@ struct MainView: View {
         }
         .sheet(isPresented: $showEnteSync) {
             EnteSyncView(existingCredentialIds: Set(model.accounts.map(\.accountId)),
+                         capacity: model.accountsLoaded ? model.credentialCapacity : nil,
                          canAddToYubiKey: DeviceCapabilities.supportsNFC || model.isKeyPluggedIn) { templates, requiresTouch in
                 importAccounts(templates, requiresTouch: requiresTouch)
             }
@@ -241,10 +249,14 @@ struct MainView: View {
             if ApplicationSettingsViewModel().isNFCOnAppLaunchEnabled {
                 model.updateAccountsOverNFC()
             }
-            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch) in
+            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, addToEnte) in
                 oathURL = nil
                 if let template {
-                    model.addAccount(template, requiresTouch: requiresTouch)
+                    model.addAccount(template, requiresTouch: requiresTouch) {
+                        if addToEnte {
+                            addAccountToEnte(template)
+                        }
+                    }
                 }
             }
         }
@@ -411,6 +423,12 @@ struct MainView: View {
         }
     }
 
+    private var enteSyncButton: some View {
+        Button(action: { showEnteSync.toggle() }) {
+            Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+        }
+    }
+
     private var addAccountToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showAddAccount.toggle() }) {
@@ -424,13 +442,34 @@ struct MainView: View {
         guard !templates.isEmpty else { return }
         model.addAccounts(templates, requiresTouch: requiresTouch) { result in
             if let error = result.error {
-                model.sessionError = error
+                if error.isOATHStorageFull {
+                    model.sessionError = OATHSessionError.storageFull(notAdded: result.notAdded.map(\.displayName))
+                } else {
+                    model.sessionError = error
+                }
             }
             var message = String(localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts.")
             if !result.alreadyPresent.isEmpty {
                 message += " " + String(localized: "\(result.alreadyPresent.count) were already on the YubiKey.", comment: "Import result. The placeholder is the number of accounts.")
             }
             toastPresenter.toast(message: message)
+        }
+    }
+
+    /// Adds an account that was just put on the YubiKey to Ente Auth too. The YubiKey can't give the secret back
+    /// later, so this is the only time it can be copied.
+    private func addAccountToEnte(_ template: YubiKitOATHSession.CredentialTemplate) {
+        Task {
+            do {
+                switch try await EnteSessionStore().add(template) {
+                case .added:
+                    toastPresenter.toast(message: String(localized: "Added to Ente Auth", comment: "Toast after adding an account to Ente Auth"))
+                case .alreadyPresent:
+                    toastPresenter.toast(message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
+                }
+            } catch {
+                model.sessionError = EnteSyncError(error)
+            }
         }
     }
 

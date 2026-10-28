@@ -34,8 +34,8 @@ struct EnteSyncView: View {
         case email, password, code, server
     }
 
-    init(existingCredentialIds: Set<String>, canAddToYubiKey: Bool, onImport: @escaping ([YubiKitOATHSession.CredentialTemplate], Bool) -> Void) {
-        _model = State(initialValue: EnteSyncViewModel(existingCredentialIds: existingCredentialIds))
+    init(existingCredentialIds: Set<String>, capacity: Int?, canAddToYubiKey: Bool, onImport: @escaping ([YubiKitOATHSession.CredentialTemplate], Bool) -> Void) {
+        _model = State(initialValue: EnteSyncViewModel(existingCredentialIds: existingCredentialIds, capacity: capacity))
         self.canAddToYubiKey = canAddToYubiKey
         self.onImport = onImport
     }
@@ -70,7 +70,7 @@ struct EnteSyncView: View {
                     if model.isBusy {
                         ProgressView()
                     } else if model.phase == .accounts {
-                        ConfirmButton(String(localized: "Add", comment: "Ente sync add selected accounts to YubiKey")) { importSelection() }
+                        ConfirmButton(addButtonTitle) { importSelection() }
                             .disabled(model.selection.isEmpty || !canAddToYubiKey)
                     }
                 }
@@ -139,7 +139,7 @@ struct EnteSyncView: View {
     private var emailCodeSection: some View {
         Section {
             codeField
-            Button(String(localized: "Verify", comment: "Ente verify code button")) { model.submitCode() }
+            Button(String(localized: "Verify code", comment: "Ente verify code button")) { model.submitCode() }
                 .disabled(model.code.isEmpty)
             Button(String(localized: "Resend code", comment: "Ente resend email code button")) { model.resendCode() }
             startOverButton
@@ -175,7 +175,7 @@ struct EnteSyncView: View {
             if totp {
                 Section {
                     codeField
-                    Button(String(localized: "Verify", comment: "Ente verify code button")) { model.submitCode() }
+                    Button(String(localized: "Verify code", comment: "Ente verify code button")) { model.submitCode() }
                         .disabled(model.code.isEmpty)
                 } header: {
                     Text(String(localized: "Two-factor authentication", comment: "Ente two factor header"))
@@ -221,6 +221,7 @@ struct EnteSyncView: View {
                     .foregroundStyle(.secondary)
             }
         } else {
+            storageSection
             Section {
                 ForEach(model.codes) { code in
                     EnteCodeRow(code: code,
@@ -233,10 +234,11 @@ struct EnteSyncView: View {
                 HStack {
                     Text(String(localized: "\(model.codes.count) accounts in Ente Auth", comment: "Ente sync accounts header. The placeholder is the number of accounts."))
                     Spacer()
-                    if model.selection.count == model.importableCodes.count && !model.selection.isEmpty {
+                    if !model.canSelectMore && !model.selection.isEmpty {
                         Button(String(localized: "Select none", comment: "Ente sync deselect all")) { model.selectNone() }
                     } else {
                         Button(String(localized: "Select all", comment: "Ente sync select all")) { model.selectAll() }
+                            .disabled(model.freeSpaces == 0)
                     }
                 }
             } footer: {
@@ -255,6 +257,34 @@ struct EnteSyncView: View {
                 LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: email)
             }
             Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
+        }
+    }
+
+    private var addButtonTitle: String {
+        if model.selection.isEmpty {
+            String(localized: "Add", comment: "Ente sync add selected accounts to YubiKey")
+        } else {
+            String(localized: "Add \(model.selection.count)", comment: "Ente sync add selected accounts to YubiKey. The placeholder is the number of selected accounts.")
+        }
+    }
+
+    /// How much room is left on the YubiKey, with a warning when the selection doesn't fit.
+    @ViewBuilder private var storageSection: some View {
+        if let freeSpaces = model.freeSpaces, let capacity = model.capacity {
+            Section {
+                LabeledContent(String(localized: "Space on YubiKey", comment: "Ente sync free space label"),
+                               value: String(localized: "\(freeSpaces) of \(capacity) free", comment: "Ente sync free space. The placeholders are the free and total number of accounts the YubiKey can hold."))
+            } footer: {
+                if freeSpaces == 0 {
+                    Text(String(localized: "The YubiKey is full. Delete accounts from it to make room.", comment: "Ente sync YubiKey full footer"))
+                } else if model.isSelectionTooLarge {
+                    Label(String(localized: "Too many accounts selected. Deselect \(model.selection.count - freeSpaces) so they all fit on the YubiKey.", comment: "Ente sync selection too large warning. The placeholder is how many accounts to deselect."),
+                          systemImage: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                } else if model.importableCodes.count > freeSpaces {
+                    Text(String(localized: "Not all accounts fit on the YubiKey, so only the first ones are selected. Pick the ones you need most.", comment: "Ente sync free space footer"))
+                }
+            }
         }
     }
 

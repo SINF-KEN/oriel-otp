@@ -31,6 +31,8 @@ import YubiKit
     var presentDisableOTP: Bool = false
     var passwordEntryMessage: String = ""
     var isKeyPluggedIn: Bool = false
+    /// The OATH version of the YubiKey whose accounts are shown, nil until one has been read.
+    var keyVersion: Version?
     var sessionError: Error?
     var connectionError: Error?
     
@@ -137,6 +139,7 @@ import YubiKit
                     self?.stopObservingPinnedState()
                     self?.accounts.removeAll()
                     self?.accountsLoaded = false
+                    self?.keyVersion = nil
                     self?.isKeyPluggedIn = false
                     self?.sessionError = error
                 }
@@ -172,6 +175,7 @@ import YubiKit
         stopObservingPinnedState()
         accounts.removeAll()
         accountsLoaded = false
+        keyVersion = nil
         isKeyPluggedIn = false
         sessionError = nil
         connectionError = nil
@@ -245,6 +249,7 @@ import YubiKit
                 }
             }
             
+            self.keyVersion = useSession.version
             self.accountsLoaded = true
             let message = SettingsConfig.showNFCSwipeHint ? String(localized: "Success!\nHint: swipe down to dismiss", comment: "iOS NFC alert success with hint") : String(localized: "Successfully read", comment: "iOS NFC alert successfully read")
             useSession.endNFC(message: message)
@@ -263,6 +268,11 @@ import YubiKit
         }
     }
 
+    /// How many accounts the YubiKey whose accounts are shown can hold, nil if that isn't known.
+    var credentialCapacity: Int? {
+        keyVersion.map(OATHSession.credentialCapacity(version:))
+    }
+
     func updateAccountsOverNFC() {
         Task {
             do {
@@ -277,14 +287,16 @@ import YubiKit
         }
     }
     
-    func addAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool) {
+    /// Adds an account to the YubiKey. The completion is called only if the account was added.
+    func addAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool, completion: (() -> Void)? = nil) {
         Task {
             do {
                 let session = try await OATHSessionHandler.shared.anySession()
                 try await session.addCredential(template: template, requiresTouch: requiresTouch)
                 await updateAccounts(using: session)
+                completion?()
             } catch {
-                handle(error: error, retry: { self.addAccount(template, requiresTouch: requiresTouch) })
+                handle(error: error, retry: { self.addAccount(template, requiresTouch: requiresTouch, completion: completion) })
             }
         }
     }

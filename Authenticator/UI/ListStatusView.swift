@@ -17,11 +17,13 @@
 
 import SwiftUI
 
-struct ListStatusView: View {
+struct ListStatusView<Actions: View>: View {
     
     let image: Image
     let message: String
     let height: CGFloat
+    /// Buttons for what to do next, shown below the message.
+    @ViewBuilder let actions: Actions
     @State var showWhatsNew = false
     
     var body: some View {
@@ -37,6 +39,11 @@ struct ListStatusView: View {
                     .font(.title3)
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 0, leading: 30, bottom: 0, trailing: 30))
+                // A button style other than plain, so each button gets its own taps rather than the whole row's.
+                VStack(spacing: 12) {
+                    actions
+                }
+                .buttonStyle(.bordered)
                 Spacer()
                 if SettingsConfig.showWhatsNewText {
                     WhatsNewView(showWhatsNew: $showWhatsNew)
@@ -83,4 +90,10 @@ struct WhatsNewView: View {
 
 #Preview {
     ListStatusView(image: Image(systemName: "figure.surfing"), message: "Gone surfing, will be back tomorrow", height: 300)
+}
+
+extension ListStatusView where Actions == EmptyView {
+    init(image: Image, message: String, height: CGFloat) {
+        self.init(image: image, message: message, height: height) { EmptyView() }
+    }
 }

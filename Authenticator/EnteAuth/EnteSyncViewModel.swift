@@ -45,6 +45,8 @@ import YubiKit
 
     /// The ids of the accounts on the YubiKey, so they can be shown as already added.
     let existingCredentialIds: Set<String>
+    /// How many accounts the YubiKey can hold, nil if that isn't known, e.g. no YubiKey has been read yet.
+    let capacity: Int?
 
     @ObservationIgnored private var flow: EnteLoginFlow?
     @ObservationIgnored private var api: EnteAPIClient?
@@ -53,8 +55,9 @@ import YubiKit
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let defaults: UserDefaults
 
-    init(existingCredentialIds: Set<String>, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard) {
+    init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard) {
         self.existingCredentialIds = existingCredentialIds
+        self.capacity = capacity
         self.store = store
         self.defaults = defaults
         self.server = defaults.string(forKey: Self.serverKey) ?? ""
@@ -71,6 +74,21 @@ import YubiKit
 
     var importableCodes: [EnteCode] {
         codes.filter { $0.template != nil && !isOnYubiKey($0) }
+    }
+
+    /// How many more accounts fit on the YubiKey, nil if that isn't known.
+    var freeSpaces: Int? {
+        capacity.map { max(0, $0 - existingCredentialIds.count) }
+    }
+
+    /// More accounts are selected than fit on the YubiKey, so the last ones wouldn't be added.
+    var isSelectionTooLarge: Bool {
+        freeSpaces.map { selection.count > $0 } ?? false
+    }
+
+    /// Whether Select all would select more, it stops when the YubiKey would be full.
+    var canSelectMore: Bool {
+        selection.count < min(importableCodes.count, freeSpaces ?? .max)
     }
 
     var selectedTemplates: [YubiKitOATHSession.CredentialTemplate] {
@@ -90,8 +108,10 @@ import YubiKit
         }
     }
 
+    /// Selects the importable accounts in list order, as many as fit on the YubiKey.
     func selectAll() {
-        selection = Set(importableCodes.map(\.id))
+        let ids = importableCodes.map(\.id)
+        selection = Set(ids.prefix(freeSpaces ?? ids.count))
     }
 
     func selectNone() {

@@ -84,7 +84,7 @@ nonisolated struct EnteAuthenticatorEntity: Decodable, Sendable, Equatable {
 
 // MARK: - Client
 
-/// The few endpoints of Ente's API needed to sign in and read authenticator codes.
+/// The few endpoints of Ente's API needed to sign in, read authenticator codes and add new ones.
 nonisolated struct EnteAPIClient: Sendable {
 
     static let defaultServer = URL(string: "https://api.ente.io")!
@@ -166,6 +166,11 @@ nonisolated struct EnteAPIClient: Sendable {
         let response: Response = try await send("GET", "/authenticator/entity/diff", token: token,
                                                 query: ["sinceTime": String(sinceTime), "limit": String(limit)])
         return response.diff
+    }
+
+    func createAuthenticatorEntity(token: String, encryptedData: String, header: String) async throws {
+        let _: Empty = try await send("POST", "/authenticator/entity", token: token,
+                                      body: ["encryptedData": encryptedData, "header": header])
     }
 
     // MARK: - Transport

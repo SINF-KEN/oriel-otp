@@ -22,7 +22,8 @@ import Combine
 struct AddAccountView: View {
 
     @Binding var showAddAccount: Bool
-    var accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool), Never>
+    /// The new account, whether it requires touch and whether to add it to Ente Auth too.
+    var accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, Bool), Never>
 
     private enum EntryMode {
         case scanning, manual, prefilled
@@ -53,9 +54,12 @@ struct AddAccountView: View {
     @State private var digits = 6
     @State private var period: TimeInterval = 30
     @State private var errorMessage: String?
+    @AppStorage("EnteAuth.AddNewAccounts") private var addToEnte = false
+    // Adding to Ente Auth uses the saved session, so it is only offered when there is one.
+    private let enteEmail = EnteSessionStore().savedEmail
     @FocusState private var focusedField: Field?
 
-    init(showAddCredential: Binding<Bool>, accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool), Never>, oathURL: URL?) {
+    init(showAddCredential: Binding<Bool>, accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, Bool), Never>, oathURL: URL?) {
         _showAddAccount = showAddCredential
         self.accountSubject = accountSubject
         let template = oathURL.flatMap { try? YubiKitOATHSession.CredentialTemplate(otpauthURL: $0) }
@@ -101,6 +105,18 @@ struct AddAccountView: View {
                     case .issuer: focusedField = .accountName
                     case .accountName where mode == .manual: focusedField = .secret
                     default: focusedField = nil
+                    }
+                }
+
+                Section {
+                    Toggle(String(localized: "Also add to Ente Auth", comment: "Add account toggle"),
+                           isOn: enteEmail == nil ? .constant(false) : $addToEnte)
+                        .disabled(enteEmail == nil)
+                } footer: {
+                    if let enteEmail {
+                        Text(String(localized: "Saves the account in Ente Auth for \(enteEmail) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.", comment: "Add account Ente Auth footer. The placeholder is an email address."))
+                    } else {
+                        Text(String(localized: "To use this, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on.", comment: "Add account Ente Auth footer without a saved Ente session"))
                     }
                 }
 
@@ -154,7 +170,7 @@ struct AddAccountView: View {
             }
         }
         .onDisappear {
-            accountSubject.send((nil, true))
+            accountSubject.send((nil, true, false))
         }
     }
 
@@ -210,7 +226,7 @@ struct AddAccountView: View {
             errorMessage = error.localizedDescription
             return
         }
-        accountSubject.send((credential, requiresTouch))
+        accountSubject.send((credential, requiresTouch, addToEnte && enteEmail != nil))
         showAddAccount = false
     }
 }
