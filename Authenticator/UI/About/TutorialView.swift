@@ -89,7 +89,7 @@ extension TutorialView {
         [TutorialPageModel(title: String(localized: "How it works"),
                            image: Image(.authAppImgLight),
                            text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey 5Ci or a compatible YubiKey with NFC to get started."),
-                           link: URL(string: "https://www.yubico.com/")!),
+                           link: nil),
         
          TutorialPageModel(title: String(localized: "YubiKey 5Ci authentication"),
                            image: Image(.authAppIntro2Yk5Ci),

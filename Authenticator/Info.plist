@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>Authenticator</string>
+	<string>Oriel OTP</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -24,10 +24,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.yubico.authenticator</string>
+			<string>io.github.sinf-ken.orielotp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>yubicoauthenticator</string>
+				<string>orielotp</string>
 				<string>otpauth</string>
 			</array>
 		</dict>
@@ -35,7 +35,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
@@ -43,7 +43,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Scan QR codes to add accounts to your YubiKey.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Use Face ID to unlock the YubiKey passwords saved on this device.</string>
+	<string>Use Face ID to unlock the YubiKey passwords and the optional Ente Auth session saved on this device.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>

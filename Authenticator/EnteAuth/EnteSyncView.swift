@@ -100,7 +100,7 @@ struct EnteSyncView: View {
             } header: {
                 Text(String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
-                Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device and only stored on your YubiKey. Your password never leaves this device and nothing is changed in Ente Auth.", comment: "Ente sign in footer"))
+                Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records.", comment: "Ente sign in footer"))
             }
 
             Section {
@@ -117,7 +117,7 @@ struct EnteSyncView: View {
                 Text(String(localized: "Options", comment: "Ente sign in options header"))
             } footer: {
                 if model.canSaveSession {
-                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Face ID, Touch ID or your passcode, so you can sync again without your password.", comment: "Ente sign in options footer"))
+                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Face ID or Touch ID, so you can sync again without your password.", comment: "Ente sign in options footer"))
                 } else {
                     Text(String(localized: "Leave the server empty unless you host Ente yourself.", comment: "Ente sign in options footer without stay signed in"))
                 }

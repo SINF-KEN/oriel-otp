@@ -145,7 +145,7 @@ final class EnteLoginFlow {
         }
         components.queryItems = [URLQueryItem(name: "clientPackage", value: EnteAPIClient.clientPackage),
                                  URLQueryItem(name: "passkeySessionID", value: sessionID),
-                                 URLQueryItem(name: "redirect", value: "enteauth://passkey")]
+                                 URLQueryItem(name: "redirect", value: "orielotp://passkey")]
         return components.url
     }
 
