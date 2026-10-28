@@ -1,0 +1,61 @@
+name: Screenshots
+
+# Regenerates the README screenshots in docs/screenshots when the app changes. On pull requests they are uploaded as
+# an artifact to look at. On main, changed screenshots are pushed to the bot/screenshots branch, ready for a pull
+# request: main only takes pull requests, and Actions isn't allowed to open them in this repository.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Authenticator/**"
+      - "Authenticator.xcodeproj/**"
+      - "AuthenticatorUITests/**"
+      - "tools/screenshots.sh"
+      - ".github/workflows/screenshots.yml"
+  pull_request:
+    paths:
+      - "Authenticator/**"
+      - "Authenticator.xcodeproj/**"
+      - "AuthenticatorUITests/**"
+      - "tools/screenshots.sh"
+      - ".github/workflows/screenshots.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: xcode-27
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Take screenshots
+        run: tools/screenshots.sh
+      - name: Upload screenshots
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: docs/screenshots
+      - name: Push changed screenshots
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          # The script only rewrites screenshots whose bytes changed, so this is empty unless the UI did.
+          if [[ -z "$(git status --porcelain docs/screenshots)" ]]; then
+            echo "Screenshots are up to date" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots
+          git commit -m "Update the README screenshots"
+          git push --force origin HEAD:refs/heads/bot/screenshots
+          url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/compare/main...bot/screenshots?expand=1"
+          echo "::notice::The screenshots changed. Open a pull request: $url"
+          echo "The screenshots changed. [Open a pull request]($url) to update them." >> "$GITHUB_STEP_SUMMARY"
