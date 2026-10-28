@@ -181,7 +181,7 @@ final class TokenRequestViewModel {
             ConnectionManager.shared.closeNFC(message: String(localized: "Successfully signed data", comment: "PIV extension NFC successfully signed data"))
 
             Logger.ctk.yubilog("Writing signedData to shared container")
-            guard writeTokenResponse(signature, named: "signedData") else { throw .cancelled }
+            guard writeTokenResponse(signature, for: .signed) else { throw .cancelled }
             Logger.ctk.yubilog("signedData written, operationCompleted = true")
             self.operationCompleted = true
         case .decryptData:
@@ -201,7 +201,7 @@ final class TokenRequestViewModel {
             ConnectionManager.shared.closeNFC(message: String(localized: "Successfully decrypted cipher data", comment: "PIV extension NFC successfully decrypted cipher data"))
 
             Logger.ctk.yubilog("Writing decryptedData to shared container")
-            guard writeTokenResponse(decryptedData, named: "decryptedData") else { throw .cancelled }
+            guard writeTokenResponse(decryptedData, for: .decrypted) else { throw .cancelled }
             Logger.ctk.yubilog("decryptedData written, operationCompleted = true")
             self.operationCompleted = true
         }
@@ -212,7 +212,7 @@ final class TokenRequestViewModel {
             Logger.ctk.yubilog("Skipping cancel - operation already completed")
             return
         }
-        if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP") {
+        if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier) {
             Logger.ctk.yubilog("Saving canceledByUser to userDefaults")
             userDefaults.setValue(true, forKey: "canceledByUser")
         }
@@ -221,15 +221,14 @@ final class TokenRequestViewModel {
     // Signed and decrypted data is handed to the TokenExtension through a file in the shared
     // app group container. Complete file protection keeps it encrypted while the device is locked,
     // and the extension deletes the file as soon as it has read it.
-    private func writeTokenResponse(_ data: Data, named name: String) -> Bool {
-        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.github.sinf-ken.OrielOTP") else { return false }
-        let directory = container.appendingPathComponent("TokenResponses", isDirectory: true)
+    private func writeTokenResponse(_ data: Data, for kind: TokenResponseKind) -> Bool {
+        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier) else { return false }
+        let store = TokenResponseStore(containerURL: container)
         do {
-            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-            try data.write(to: directory.appendingPathComponent(name), options: [.atomic, .completeFileProtection])
+            try store.write(data, for: kind)
             return true
         } catch {
-            Logger.ctk.error("Failed to write \(name): \(error)")
+            Logger.ctk.error("Failed to write \(kind.rawValue): \(error)")
             return false
         }
     }
