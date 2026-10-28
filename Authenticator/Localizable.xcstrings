@@ -380,6 +380,35 @@
         }
       }
     },
+    "Done" : {
+      "comment" : "PIV extension close button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fertig"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完了"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hotovo"
+          }
+        }
+      }
+    },
     "Enter the PIN, then tap a NFC enabled YubiKey against the iPhone to access the certificate." : {
       "comment" : "PIV extension NFC message",
       "localizations" : {
@@ -405,6 +434,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zadajte PIN a potom priložte YubiKey s funkciou NFC na iPhone, aby ste získali prístup k certifikátu."
+          }
+        }
+      }
+    },
+    "Go back to the app that asked for the certificate." : {
+      "comment" : "PIV extension completed message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kehre zu der App zurück, die das Zertifikat angefordert hat."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revenez à l’app qui a demandé le certificat."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "証明書を要求したアプリに戻ってください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vráťte sa do aplikácie, ktorá si vyžiadala certifikát."
+          }
+        }
+      }
+    },
+    "Help" : {
+      "comment" : "Smart card extension help button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ヘルプ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pomocník"
           }
         }
       }
@@ -579,6 +666,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jednorazové heslo"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "comment" : "Scan QR code settings button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Réglages"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定を開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvoriť Nastavenia"
           }
         }
       }
@@ -844,31 +960,31 @@
         }
       }
     },
-    "Tap the back button to continue" : {
-      "comment" : "PIV extension completed message",
+    "To scan a QR code, allow Oriel OTP to use the camera in Settings." : {
+      "comment" : "Scan QR code camera error message",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klicke auf \"Zurück\", um fortzufahren."
+            "value" : "Um einen QR-Code zu scannen, erlaube Oriel OTP in den Einstellungen den Zugriff auf die Kamera."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Appuyer sur Retour pour continuer"
+            "value" : "Pour scanner un code QR, autorisez Oriel OTP à utiliser l’appareil photo dans Réglages."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "戻るボタンをタップして続行します"
+            "value" : "QRコードをスキャンするには、設定でOriel OTPにカメラへのアクセスを許可してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pokračujte ťuknutím na tlačidlo späť"
+            "value" : "Ak chcete naskenovať QR kód, povoľte aplikácii Oriel OTP v Nastaveniach prístup ku kamere."
           }
         }
       }
@@ -3870,35 +3986,6 @@
         }
       }
     },
-    "No QR code?" : {
-      "comment" : "Scan QR code no QR code message",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kein QR-Code?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pas de code QR ?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "QRコードがありませんか？"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Žiadny QR kód?"
-          }
-        }
-      }
-    },
     "Not Enabled" : {
       "comment" : "PIV extension not enabled message",
       "localizations" : {
@@ -4182,35 +4269,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
-          }
-        }
-      }
-    },
-    "Open iOS Settings app" : {
-      "comment" : "Scan QR code settings button",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Öffne die iOS-Einstellungs-App"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrez l'application Réglages iOS"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iOS設定アプリを開く"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otvoriť aplikáciu Nastavenia iOS"
           }
         }
       }
@@ -6920,35 +6978,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aby sa zabránilo neoprávnenému prístupu, je tento kľúč YubiKey chránený heslom."
-          }
-        }
-      }
-    },
-    "To scan a QR code you need to enable camera permissions for the Authenticator app." : {
-      "comment" : "Scan QR code camera error message",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um einen QR-Code zu scannen, musst Du Zugriffsrechte zur Kameranutzung für die Authenticator-App aktivieren."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pour scanner un code QR, vous devez activer les autorisations de caméra pour l'application Authenticator."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "QRコードをスキャンするには、Authenticatorアプリのカメラ権限を有効にする必要があります。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ak chcete naskenovať QR kód, musíte zapnúť povolenia kamery pre aplikáciu Authenticator."
           }
         }
       }

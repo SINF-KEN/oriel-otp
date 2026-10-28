@@ -190,12 +190,13 @@ import YubiKit
                 self.showTouchToast = true
                 let generator = UINotificationFeedbackGenerator()
                 generator.notificationOccurred(.error)
-                // Ignore cancellation here so a shown toast is always hidden again.
-                try? await Task.sleep(for: .milliseconds(100))
-                self.showTouchToast = false
             }
             
-            defer { showTouchAlert.cancel() }
+            // The prompt stays up until the YubiKey has been touched, or the calculation failed.
+            defer {
+                showTouchAlert.cancel()
+                showTouchToast = false
+            }
             let otp = try await session.calculate(credential: account.credential)
             
             if let account = (accounts.filter { $0.accountId == account.accountId }).first {

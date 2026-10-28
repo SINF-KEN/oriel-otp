@@ -22,13 +22,9 @@ import YubiKit
 
 class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDelegate {
     
-    enum ScanResult {
-        case cancel, manuelEntry, account(YubiKitOATHSession.CredentialTemplate)
-    }
-    
     private static let scanMessage = String(localized: "Point your camera at a QR code to scan it", comment: "Scan QR code message")
 
-    private let completionHandler: (ScanResult) -> ()
+    private let completionHandler: (YubiKitOATHSession.CredentialTemplate) -> ()
     private let captureSession = AVCaptureSession()
     private lazy var previewLayer: AVCaptureVideoPreviewLayer = {
         let previewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
@@ -38,37 +34,9 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     private let metadataOutput = AVCaptureMetadataOutput()
     private var lastScanDate = Date(timeIntervalSince1970: 0)
 
-    private let closeButton: UIButton = {
-        let button = UIButton()
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle(String(localized: "Close", comment: "View close button"), for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.titleLabel?.font = .preferredFont(forTextStyle: .body)
-        return button
-    }()
-    
-    private let addManuallyButton: UIButton = {
-        var configuration = UIButton.Configuration.plain()
-        configuration.title = String(localized: "Enter manually", comment: "Scan QR code add manually button")
-        configuration.baseForegroundColor = .white
-        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 15, bottom: 8, trailing: 15)
-        configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
-            var attributes = attributes
-            attributes.font = .preferredFont(forTextStyle: .body)
-            return attributes
-        }
-        let button = UIButton(configuration: configuration)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setContentHuggingPriority(.required, for: .horizontal)
-        button.layer.cornerRadius = 20
-        button.layer.borderColor = UIColor.lightGray.cgColor
-        button.layer.borderWidth = 2
-        return button
-    }()
-    
     private let openSettingsButton: UIButton = {
         var configuration = UIButton.Configuration.plain()
-        configuration.title = String(localized: "Open iOS Settings app", comment: "Scan QR code settings button")
+        configuration.title = String(localized: "Open Settings", comment: "Scan QR code settings button")
         configuration.baseForegroundColor = .white
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 15, bottom: 8, trailing: 15)
         configuration.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { attributes in
@@ -82,24 +50,6 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         button.layer.borderColor = UIColor.lightGray.cgColor
         button.layer.borderWidth = 2
         return button
-    }()
-    
-    private let addAccountLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = String(localized: "Add account", comment: "Scan QR code add account label")
-        label.textColor = .white
-        label.font = .preferredFont(forTextStyle: .body).withSymbolicTraits(.traitBold)
-        return label
-    }()
-    
-    private let noQRCodeLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = String(localized: "No QR code?", comment: "Scan QR code no QR code message")
-        label.textColor = .white
-        label.font = .preferredFont(forTextStyle: .footnote).withSymbolicTraits(.traitBold)
-        return label
     }()
     
     private let textLabel: UILabel = {
@@ -110,6 +60,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         label.textAlignment = .center
         label.numberOfLines = 0
         label.font = .preferredFont(forTextStyle: .footnote).withSymbolicTraits(.traitBold)
+        label.adjustsFontForContentSizeCategory = true
         return label
     }()
     
@@ -134,15 +85,17 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         title.translatesAutoresizingMaskIntoConstraints = false
         title.numberOfLines = 0
         title.font = .preferredFont(forTextStyle: .title2)
+        title.adjustsFontForContentSizeCategory = true
         title.textAlignment = .center
         title.text = String(localized: "No camera permissions", comment: "Scan QR code camera error title")
         title.textColor = .white
         view.addArrangedSubview(title)
         let text = UILabel()
         text.font = .preferredFont(forTextStyle: .body)
+        text.adjustsFontForContentSizeCategory = true
         text.translatesAutoresizingMaskIntoConstraints = false
         text.numberOfLines = 0
-        text.text = String(localized: "To scan a QR code you need to enable camera permissions for the Authenticator app.", comment: "Scan QR code camera error message")
+        text.text = String(localized: "To scan a QR code, allow Oriel OTP to use the camera in Settings.", comment: "Scan QR code camera error message")
         text.textColor = .lightGray
         text.textAlignment = .center
         view.addArrangedSubview(text)
@@ -169,11 +122,10 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     // An AVCaptureDeviceDirectionCoordinator on iOS 27.1 and later.
     private var directionCoordinator: AnyObject?
 
-    init(frame: CGRect, completionHandler: @escaping (ScanResult) -> ()) {
+    // Calls the handler with the account from the first valid QR code. Closing and manual entry are up to the toolbar of the view that shows the scanner.
+    init(frame: CGRect, completionHandler: @escaping (YubiKitOATHSession.CredentialTemplate) -> ()) {
         self.completionHandler = completionHandler
         super.init(frame: frame)
-        
-        self.accessibilityViewIsModal = true
         
         previewLayer.frame = layer.bounds
         layer.addSublayer(previewLayer)
@@ -189,15 +141,6 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
 
         layoutOverlays()
 
-        closeButton.addAction(UIAction { [weak self] _ in
-            self?.completionHandler(.cancel)
-        }, for: .primaryActionTriggered)
-
-        addManuallyButton.addAction(UIAction { [weak self] _ in
-            self?.completionHandler(.manuelEntry)
-            self?.removeFromSuperview()
-        }, for: .primaryActionTriggered)
-
         openSettingsButton.addAction(UIAction { _ in
             guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                 return
@@ -205,25 +148,13 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
             UIApplication.shared.open(settingsUrl)
         }, for: .primaryActionTriggered)
         
-        addSubview(closeButton)
-        addSubview(addAccountLabel)
         addSubview(textLabel)
-        addSubview(noQRCodeLabel)
-        addSubview(addManuallyButton)
         addSubview(permissionView)
         
         let textLabelTopConstraint = textLabel.topAnchor.constraint(equalTo: topAnchor, constant: captureRect().maxY + 16)
         self.textLabelTopConstraint = textLabelTopConstraint
 
         NSLayoutConstraint.activate([
-            closeButton.topAnchor.constraint(equalTo: contentGuide.topAnchor, constant: 10),
-            closeButton.trailingAnchor.constraint(equalTo: contentGuide.trailingAnchor, constant: -20),
-            addAccountLabel.topAnchor.constraint(equalTo: contentGuide.topAnchor, constant: 15),
-            addAccountLabel.centerXAnchor.constraint(equalTo: contentGuide.centerXAnchor),
-            noQRCodeLabel.bottomAnchor.constraint(equalTo: addManuallyButton.topAnchor, constant: -15),
-            noQRCodeLabel.centerXAnchor.constraint(equalTo: addManuallyButton.centerXAnchor),
-            addManuallyButton.centerXAnchor.constraint(equalTo: contentGuide.centerXAnchor),
-            addManuallyButton.bottomAnchor.constraint(equalTo: contentGuide.bottomAnchor, constant: -55),
             textLabel.leadingAnchor.constraint(equalTo: contentGuide.leadingAnchor, constant: 10),
             textLabel.trailingAnchor.constraint(equalTo: contentGuide.trailingAnchor, constant: -10),
             textLabelTopConstraint,
@@ -480,7 +411,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         Task {
             try? await Task.sleep(for: .seconds(1))
             self.captureSession.stopRunning()
-            self.completionHandler(.account(credential))
+            self.completionHandler(credential)
             self.removeFromSuperview()
         }
     }

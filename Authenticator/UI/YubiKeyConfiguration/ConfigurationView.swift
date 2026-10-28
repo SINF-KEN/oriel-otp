@@ -22,14 +22,16 @@ struct ConfigurationView: View {
     @State var model = ConfigurationViewModel()
     @Binding var showConfiguration: Bool
     @State var showInsertYubiKey: Bool = false
+    @Environment(\.accessibilityVoiceOverEnabled) var isVoiceOverEnabled
     
-    var insertYubiKeyMessage = {
+    // Computed so it follows VoiceOver being turned on or off while the app runs.
+    var insertYubiKeyMessage: String {
         if DeviceCapabilities.supportsNFC {
-            String(localized: "Insert YubiKey") + " " + "\(!UIAccessibility.isVoiceOverRunning ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
+            String(localized: "Insert YubiKey") + " " + "\(!isVoiceOverEnabled ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
         } else {
             String(localized: "Insert YubiKey")
         }
-    }()
+    }
     
     var body: some View {
         NavigationStack {
@@ -53,7 +55,7 @@ struct ConfigurationView: View {
                 }
                 
                 if let deviceInfo = model.deviceInfo {
-                    Section(" ") {
+                    Section {
                         VStack(alignment: .center) {
                             if let image = deviceInfo.deviceImage {
                                 image
@@ -64,24 +66,28 @@ struct ConfigurationView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        if let deviceInfo = model.deviceInfo {
+                        LabeledContent {
+                            Text(deviceInfo.deviceName)
+                        } label: {
                             HStack {
                                 ListIconView(image: Image("securitykey"), color: Color(.systemGray))
                                 Text("Device type")
-                                Spacer()
-                                Text(deviceInfo.deviceName).foregroundStyle(.secondary)
                             }
+                        }
+                        LabeledContent {
+                            Text(String(deviceInfo.serialNumber))
+                        } label: {
                             HStack {
                                 ListIconView(image: Image(systemName: "number"), color: Color(.systemGray), padding: 7)
                                 Text("Serial number")
-                                Spacer()
-                                Text(String(deviceInfo.serialNumber)).foregroundStyle(.secondary)
                             }
+                        }
+                        LabeledContent {
+                            Text(deviceInfo.version.description)
+                        } label: {
                             HStack {
                                 ListIconView(image: Image(systemName: "cpu"), color: Color(.systemGray), padding: 5)
                                 Text("Firmware version")
-                                Spacer()
-                                Text(deviceInfo.version.description).foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -178,7 +184,8 @@ struct ConfigurationView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { showConfiguration.toggle() }
                 }
-                if UIAccessibility.isVoiceOverRunning {
+                // Always there, so scanning doesn't depend on discovering pull to refresh.
+                if DeviceCapabilities.supportsNFC {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
                             model.scanNFC()

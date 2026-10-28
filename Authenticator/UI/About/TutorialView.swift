@@ -59,11 +59,14 @@ struct TutorialView: View {
         .tabViewStyle(.page(indexDisplayMode: .always))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Next") {
+                Button {
                     withAnimation {
                         page += 1
                     }
-                }.disabled(page >= self.tutorialPages.count - 1)
+                } label: {
+                    Label("Next", systemImage: "chevron.forward")
+                }
+                .disabled(page >= self.tutorialPages.count - 1)
             }
         }
     }
