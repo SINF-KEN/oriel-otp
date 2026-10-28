@@ -58,7 +58,12 @@ struct ToastModifier: ViewModifier {
     
     @ViewBuilder public func body(content: Content) -> some View {
         content
-            .overlay(main(), alignment: .top)
+            .overlay(alignment: .top) {
+                // In the largest region clear of the fold, so a toast isn't split across the halves of an iPhone Duo.
+                main()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .avoidingReservedRegions()
+            }
             .animation(.spring(), value: isPresenting)
     }
 }

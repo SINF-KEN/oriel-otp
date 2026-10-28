@@ -180,7 +180,8 @@ struct MainView: View {
                 importAccounts(templates, requiresTouch: requiresTouch)
             }
         }
-        .fullScreenCover(isPresented: $showConfiguration) {
+        // Sheets rather than full-screen covers, so they read as a task on top of the account list and can be swiped away.
+        .sheet(isPresented: $showConfiguration) {
             ConfigurationView(showConfiguration: $showConfiguration)
                 .onAppear {
                     model.stop()
@@ -188,7 +189,7 @@ struct MainView: View {
                     model.start()
                 }
         }
-        .fullScreenCover(isPresented: $showAbout) {
+        .sheet(isPresented: $showAbout) {
             AboutView()
                 .onAppear {
                     model.stop()
