@@ -1208,8 +1208,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/attaswift/BigInt";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 6.0.1;
+				kind = revision;
+				revision = 96fb3b174cb919b57de3edbb6ab7bb4a775137af;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
