@@ -153,6 +153,10 @@ struct MainView: View {
                         Label("Configuration", systemImage: "switch.2")
                     }
                     .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                    #if DEBUG && targetEnvironment(simulator)
+                    SimulatedYubiKeyMenu()
+                    SimulatedYubicoOTPButton()
+                    #endif
                     Button(action: { showAbout.toggle() }) {
                         Label("About", systemImage: "questionmark.circle")
                     }
@@ -268,6 +272,11 @@ struct MainView: View {
                 model.updateAccountsOverNFC()
             }
         })
+        #if DEBUG && targetEnvironment(simulator)
+        .onReceive(NotificationCenter.default.publisher(for: .simulatedYubicoOTP)) { notification in
+            otp = notification.object as? String
+        }
+        #endif
         .onChange(of: otp) { _, otp in
             if let otp, SettingsConfig.isCopyOTPEnabled {
                 toastPresenter.copyToClipboard(otp)
