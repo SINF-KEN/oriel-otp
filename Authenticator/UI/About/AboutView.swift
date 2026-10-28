@@ -129,7 +129,7 @@ struct AboutLanguageView: View {
     
     var body: some View {
         if shouldShowLanguageNote {
-            Text("This translation is a community effort, please visit [crowdin.com](https://crowdin.com/project/yubico-authenticator-ios) to contribute.")
+            Text("This translation is a community effort. To suggest a correction, [open an issue on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).")
                 .multilineTextAlignment(.center)
                 .font(.footnote)
                 .foregroundStyle(.secondary)

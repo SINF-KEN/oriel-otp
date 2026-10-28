@@ -71,7 +71,7 @@ struct TokenRequestView: View {
             }
         }
         .alert(error?.message.title ?? "", isPresented: .constant(error != nil), presenting: error) { _ in
-            Button(String(localized: "Ok")) { error = nil }
+            Button(String(localized: "OK")) { error = nil }
         } message: { error in
             if let text = error.message.text {
                 Text(text)

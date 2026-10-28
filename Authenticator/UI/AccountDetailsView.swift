@@ -59,6 +59,7 @@ struct AccountDetailView: View {
                     // Scales with Dynamic Type, and shrinks rather than truncating or wrapping in a narrow column such as
                     // Slide Over or half of a folded iPhone Duo.
                     Text(account.formattedCode ?? "*** ***")
+                        .privacySensitive()
                         .font(.system(size: codeFontSize, weight: .bold))
                         .monospacedDigit()
                         .lineLimit(1)
@@ -120,7 +121,7 @@ struct AccountDetailView: View {
                 }
             }
         } message: {
-            Text("This will permanently delete the account from the YubiKey, and your ability to generate codes for it!")
+            Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
         }
     }
 

@@ -52,7 +52,7 @@ struct OTPConfigurationView: View {
             .disabled(isToggleDisabled)
         }
         .alert(alert?.title ?? "", isPresented: .constant(alert != nil), presenting: alert) { _ in
-            Button(String(localized: "Ok")) {
+            Button(String(localized: "OK")) {
                 alert = nil
                 dismiss()
             }
