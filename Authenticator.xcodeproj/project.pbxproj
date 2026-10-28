@@ -70,6 +70,7 @@
 		B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B16298AA6E7006CDAEA /* MainView.swift */; };
 		B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */; };
 		B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B1A298AB641006CDAEA /* MainViewModel.swift */; };
+		1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56319DE11C4A1A730E920128 /* QuickActions.swift */; };
 		B4719B2C29914051006CDAEA /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B2B29914051006CDAEA /* AccountRowView.swift */; };
 		B4719B322993EFEE006CDAEA /* AccountDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */; };
 		B474865C2CEB7A000031A504 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B474865B2CEB79FD0031A504 /* AboutView.swift */; };
@@ -211,6 +212,7 @@
 		B4719B16298AA6E7006CDAEA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorApp.swift; sourceTree = "<group>"; };
 		B4719B1A298AB641006CDAEA /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		56319DE11C4A1A730E920128 /* QuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
 		B4719B2B29914051006CDAEA /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailsView.swift; sourceTree = "<group>"; };
 		B474865B2CEB79FD0031A504 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -501,6 +503,7 @@
 				B4DB2289299BC373003110ED /* OATHSession.swift */,
 				B4C93E62299FB51A00C2A8B8 /* Account.swift */,
 				B4719B1A298AB641006CDAEA /* MainViewModel.swift */,
+				56319DE11C4A1A730E920128 /* QuickActions.swift */,
 				B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */,
 				B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */,
 				B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */,
@@ -780,6 +783,7 @@
 				B4BB02E22C81A82300B72904 /* FIDOPINViewModel.swift in Sources */,
 				B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */,
 				B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */,
+				1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */,
 				B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */,
 				816C685023440D2200209342 /* SecureStoreError.swift in Sources */,
 				5180974326DE185100A122C1 /* OATHResetViewModel.swift in Sources */,
