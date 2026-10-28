@@ -39,7 +39,7 @@ jobs:
         run: tools/screenshots.sh
       - name: Upload screenshots
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: screenshots
           path: docs/screenshots
