@@ -152,31 +152,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mit Face ID entsperrst Du die auf diesem Gerät gespeicherten YubiKey-Passwörter."
+            "value" : "Mit Face ID entsperrst Du gespeicherte YubiKey-Passwörter und Deine optionale Ente-Auth-Sitzung."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Use Face ID to unlock the YubiKey passwords saved on this device."
+            "value" : "Use Face ID to unlock saved YubiKey passwords and your optional Ente Auth session."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Utilisez Face ID pour déverrouiller les mots de passe YubiKey enregistrés sur cet appareil."
+            "value" : "Utilisez Face ID pour déverrouiller les mots de passe YubiKey enregistrés et votre session Ente Auth facultative."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Face IDを使用して、このデバイスに保存されているYubiKeyのパスワードのロックを解除します。"
+            "value" : "Face IDを使って、保存したYubiKeyのパスワードと任意のEnte Authセッションをロック解除します。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pomocou Face ID odomknete heslá k YubiKey uložené v tomto zariadení."
+            "value" : "Pomocou Face ID odomknete uložené heslá YubiKey a voliteľnú reláciu Ente Auth."
           }
         }
       }
