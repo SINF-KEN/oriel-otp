@@ -24,12 +24,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v4
-        with:
-          languages: swift
-          build-mode: manual
-
       - name: Resolve pinned Swift packages
         run: |
           set -euo pipefail
@@ -39,6 +33,12 @@ jobs:
             -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
             -disableAutomaticPackageResolution \
             -onlyUsePackageVersionsFromResolvedFile
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: swift
+          build-mode: manual
 
       - name: Build app for CodeQL
         run: |
