@@ -32,6 +32,7 @@ struct MainView: View {
     @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool), Never>()
     @State var showConfiguration: Bool = false
     @State var showAbout: Bool = false
+    @State var showEnteSync: Bool = false
     @State var password: String = ""
     @State var searchText: String = ""
     @State var didEnterBackground = true
@@ -151,6 +152,9 @@ struct MainView: View {
 
                 // Secondary actions collapse into the system overflow menu.
                 ToolbarItemGroup(placement: .secondaryAction) {
+                    Button(action: { showEnteSync.toggle() }) {
+                        Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+                    }
                     Button(action: { showConfiguration.toggle() }) {
                         Label("Configuration", systemImage: "switch.2")
                     }
@@ -183,6 +187,12 @@ struct MainView: View {
         }
         .sheet(isPresented: $showAddAccount) {
             AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL)
+        }
+        .sheet(isPresented: $showEnteSync) {
+            EnteSyncView(existingCredentialIds: Set(model.accounts.map(\.accountId)),
+                         canAddToYubiKey: DeviceCapabilities.supportsNFC || model.isKeyPluggedIn) { templates, requiresTouch in
+                importAccounts(templates, requiresTouch: requiresTouch)
+            }
         }
         .fullScreenCover(isPresented: $showConfiguration) {
             ConfigurationView(showConfiguration: $showConfiguration)
@@ -285,6 +295,7 @@ struct MainView: View {
         .onChange(of: notificationsViewModel.showPIVTokenView) { _, showPIVTokenview in
             if showPIVTokenview {
                 showAddAccount = false
+                showEnteSync = false
                 showConfiguration = false
                 showAbout = false
                 selectedAccountID = nil
@@ -293,6 +304,7 @@ struct MainView: View {
         .onChange(of: model.presentDisableOTP) { _, presentDisableOTP in
             if presentDisableOTP {
                 showAddAccount = false
+                showEnteSync = false
                 showConfiguration = false
                 showAbout = false
                 selectedAccountID = nil
@@ -319,6 +331,20 @@ struct MainView: View {
                 Label("Add account", systemImage: "qrcode")
             }
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+        }
+    }
+
+    private func importAccounts(_ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool) {
+        guard !templates.isEmpty else { return }
+        model.addAccounts(templates, requiresTouch: requiresTouch) { result in
+            if let error = result.error {
+                model.sessionError = error
+            }
+            var message = String(localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts.")
+            if !result.alreadyPresent.isEmpty {
+                message += " " + String(localized: "\(result.alreadyPresent.count) were already on the YubiKey.", comment: "Import result. The placeholder is the number of accounts.")
+            }
+            toastPresenter.toast(message: message)
         }
     }
 
