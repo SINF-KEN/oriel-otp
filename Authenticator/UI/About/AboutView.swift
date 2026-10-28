@@ -67,7 +67,7 @@ struct AboutView: View {
                         Text("App icon")
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios/blob/main/LICENSE")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
@@ -75,7 +75,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios/blob/main/PRIVACY.md")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/PRIVACY.md")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.secondaryLabel))
@@ -93,7 +93,7 @@ struct AboutView: View {
                 }
                 Section("Support") {
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios#readme")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp#readme")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "book"), color: Color(.systemPink))
@@ -101,7 +101,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios/issues")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/issues")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)

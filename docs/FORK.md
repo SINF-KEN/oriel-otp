@@ -9,6 +9,25 @@ fork.
 | `feature/ente-auth-sync` | `main` | Batch add API and Ente Auth sync, with Yubico branding | Yubico, as a pull request |
 | `fork/oriel-otp` | `feature/ente-auth-sync` | Only the rebranding commits | The Oriel OTP app |
 
+## Repositories
+
+| Remote | Repository | Holds |
+| --- | --- | --- |
+| `origin` | [Yubico/yubioath-ios](https://github.com/Yubico/yubioath-ios) | Upstream |
+| `fork` | [SINF-KEN/yubioath-ios](https://github.com/SINF-KEN/yubioath-ios) | `main` and `feature/ente-auth-sync`, for pull requests to Yubico |
+| `oriel` | [SINF-KEN/oriel-otp](https://github.com/SINF-KEN/oriel-otp) | `fork/oriel-otp` as `main`, `feature/ente-auth-sync`, and `simulator-demo` |
+
+`simulator-demo` is `main` plus debug-only tooling for the simulator: a simulated YubiKey, a fake Ente server
+at `https://demo.ente.test` (any email, password `demo`) and a menu item that acts like scanning a YubiKey's NFC
+OTP. It is all inside `#if DEBUG && targetEnvironment(simulator)` and never goes into `main`. Rebase it onto
+`main` after updating the app.
+
+Publishing the app branch:
+
+```bash
+git push oriel fork/oriel-otp:main
+```
+
 The rebranding is a few commits that touch identifiers, assets and a handful of strings, so it rebases with few
 conflicts:
 

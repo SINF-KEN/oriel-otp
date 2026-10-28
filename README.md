@@ -44,4 +44,4 @@ the build button.
 ## Issues
 
 Please report app issues in
-[the issue tracker on GitHub](https://github.com/SINF-KEN/yubioath-ios/issues).
+[the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).

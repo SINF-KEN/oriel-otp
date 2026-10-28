@@ -10,4 +10,4 @@ Oriel OTP collects no personal data and contains no analytics or tracking.
   own privacy policy applies to your Ente account.
 - The camera is only used to scan QR codes, and NFC only to talk to your YubiKey.
 
-Questions: https://github.com/SINF-KEN/yubioath-ios/issues
+Questions: https://github.com/SINF-KEN/oriel-otp/issues
