@@ -35,7 +35,7 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
@@ -43,7 +43,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Scan QR codes to add accounts to your YubiKey.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Use Face ID to unlock the YubiKey passwords saved on this device.</string>
+	<string>Use Face ID to unlock the YubiKey passwords and the optional Ente Auth session saved on this device.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
