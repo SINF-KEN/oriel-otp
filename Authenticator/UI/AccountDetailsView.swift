@@ -132,12 +132,6 @@ struct AccountDetailView: View {
     }
 
     private func copyCode() {
-        if account.state != .expired, let otp = account.otp?.code {
-            toastPresenter.copyToClipboard(otp)
-        } else {
-            account.calculate { otp in
-                toastPresenter.copyToClipboard(otp.code)
-            }
-        }
+        toastPresenter.copyCode(of: account)
     }
 }
