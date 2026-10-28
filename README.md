@@ -21,12 +21,13 @@ the key to the iPhone, to show the codes.
 ## Sync from Ente Auth
 
 Accounts stored in [Ente Auth](https://ente.io/auth) can be copied onto a YubiKey by tapping the menu icon and
-selecting `Sync from Ente Auth`. Sign in, pick the accounts and tap `Add`. Everything is decrypted on the device
+selecting `Sync from Ente Auth`, or the same button in the empty account list. Sign in, pick the accounts and tap
+`Add`. The sheet shows how much room is left on the YubiKey and only selects as many accounts as fit. Everything is decrypted on the device
 and nothing is changed in Ente Auth. See [docs/ente-auth.md](docs/ente-auth.md) for how it works.
 
-## CryptTokenKit extension
+## CryptoTokenKit extension
 
-Besides the OATH functionality this app also support authetication using the CTK extension
+Besides the OATH functionality this app also supports authentication using the CTK extension
 functionality provided by Apple. The authentication is handled using certificates stored 
 in the Smart card application on the YubiKey.
 
