@@ -28,7 +28,7 @@ struct TokenCertificateStorage {
 
     // There is one driver configuration for each token extension the app ships, keyed by the
     // com.apple.ctk.class-id in the extension's Info.plist. The app only ships TokenExtension.
-    private static let driverClassID = "io.github.sinf-ken.KeyOTP.TokenExtension"
+    private static let driverClassID = "io.github.sinf-ken.OrielOTP.TokenExtension"
 
     private static var driverConfiguration: TKTokenDriver.Configuration? {
         let configurations = TKTokenDriver.Configuration.driverConfigurations

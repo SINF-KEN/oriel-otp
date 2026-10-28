@@ -1,6 +1,6 @@
 # Privacy policy
 
-KeyOTP collects no personal data and contains no analytics or tracking.
+Oriel OTP collects no personal data and contains no analytics or tracking.
 
 - OATH accounts are stored on your YubiKey, not on the device or on any server.
 - YubiKey passwords are only saved, in the device keychain, if you choose to save them.

@@ -7,7 +7,7 @@ fork.
 | --- | --- | --- | --- |
 | `main` | Yubico's `main` | Upstream plus general improvements | Yubico |
 | `feature/ente-auth-sync` | `main` | Batch add API and Ente Auth sync, with Yubico branding | Yubico, as a pull request |
-| `fork/keyotp` | `feature/ente-auth-sync` | Only the rebranding commits | The KeyOTP app |
+| `fork/oriel-otp` | `feature/ente-auth-sync` | Only the rebranding commits | The Oriel OTP app |
 
 The rebranding is a few commits that touch identifiers, assets and a handful of strings, so it rebases with few
 conflicts:
@@ -16,18 +16,18 @@ conflicts:
 git fetch origin
 git rebase origin/main main
 git rebase main feature/ente-auth-sync
-git rebase --onto feature/ente-auth-sync feature/ente-auth-sync@{1} fork/keyotp
+git rebase --onto feature/ente-auth-sync feature/ente-auth-sync@{1} fork/oriel-otp
 ```
 
 The last step uses `--onto` with the feature branch's previous position (`@{1}`, from the reflog), so only the
-fork's own commits move. A plain `git rebase feature/ente-auth-sync fork/keyotp` would also replay the old copies
+fork's own commits move. A plain `git rebase feature/ente-auth-sync fork/oriel-otp` would also replay the old copies
 of the feature commits once they have been rewritten, and conflict with the new ones.
 
-Put new features and fixes on `main` or a feature branch, never on `fork/keyotp`, so they stay upstreamable.
+Put new features and fixes on `main` or a feature branch, never on `fork/oriel-otp`, so they stay upstreamable.
 
 ## What the rebranding changes
 
-- Name: KeyOTP, on the home screen, in About and in the version history.
+- Name: Oriel OTP, on the home screen, in About and in the version history.
 - Identifiers: bundle ids, app group, keychain group and URL scheme under `io.github.sinf-ken`. The Yubico team
   ids are removed, so set your own team in Xcode before running on a device.
 - `applinks:my.yubico.com` is removed, since only Yubico's app can claim that domain. Tapping a YubiKey's NFC
@@ -50,4 +50,4 @@ Put new features and fixes on `main` or a feature branch, never on `fork/keyotp`
 - `com.yubico.ylp`, the accessory protocol of Lightning YubiKeys, which the app needs to talk to them.
 - Release notes of earlier Yubico versions in `VersionHistory.plist`.
 
-To pick another name, search for `KeyOTP` and `sinf-ken`.
+To pick another name, search for `Oriel OTP`, `OrielOTP`, `orielotp` and `sinf-ken`.

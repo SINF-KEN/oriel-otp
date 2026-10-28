@@ -1,9 +1,9 @@
-# KeyOTP
+# Oriel OTP
 
 An iOS authenticator for OATH codes stored on a YubiKey, with syncing from
 [Ente Auth](https://ente.io/auth).
 
-KeyOTP is a fork of [Yubico Authenticator for iOS](https://github.com/Yubico/yubioath-ios). It is not affiliated
+Oriel OTP is a fork of [Yubico Authenticator for iOS](https://github.com/Yubico/yubioath-ios). It is not affiliated
 with or endorsed by Yubico or Ente; see [NOTICE](NOTICE). See the file LICENSE for copyright and license
 information, and [docs/FORK.md](docs/FORK.md) for how the fork is kept in step with upstream.
 

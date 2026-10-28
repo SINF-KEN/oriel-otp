@@ -34,7 +34,7 @@ struct AboutView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                         .padding(15)
                         .accessibilityHidden(true)
-                    Text(verbatim: "KeyOTP")
+                    Text(verbatim: "Oriel OTP")
                         .font(.title)
                         .multilineTextAlignment(.center)
                     Text("\(UIApplication.appVersion) (build \(UIApplication.appBuildNumber))")

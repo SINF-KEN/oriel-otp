@@ -133,7 +133,7 @@ struct MainView: View {
                 if !model.accountsLoaded && !UIAccessibility.isVoiceOverRunning {
                     ToolbarItem(placement: .principal) {
                         // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
-                        Text(verbatim: "KeyOTP")
+                        Text(verbatim: "Oriel OTP")
                             .font(.headline)
                             .foregroundStyle(Color("YubiGreen"))
                             .accessibilityHidden(true)

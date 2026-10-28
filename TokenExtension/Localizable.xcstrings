@@ -1,30 +1,30 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Launch KeyOTP" : {
+    "Launch Oriel OTP" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "KeyOTP starten"
+            "value" : "Oriel OTP starten"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lancer KeyOTP"
+            "value" : "Lancer Oriel OTP"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "KeyOTPを起動"
+            "value" : "Oriel OTPを起動"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Spustiť KeyOTP"
+            "value" : "Spustiť Oriel OTP"
           }
         }
       }
