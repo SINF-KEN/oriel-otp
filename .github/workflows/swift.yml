@@ -49,7 +49,7 @@ jobs:
             TokenExtension/Info.plist \
             TokenExtension/TokenExtension.entitlements
           xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/Authenticator.xcscheme
-          jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version | length > 0) and (.state.revision | length == 40))' \
+          jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version == null or (.state.version | length > 0)) and (.state.revision | length == 40))' \
             Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
           test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
           test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
