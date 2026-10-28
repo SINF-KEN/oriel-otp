@@ -20,7 +20,7 @@ import UserNotifications
 import OSLog
 
 extension Logger {
-    private static let subsystem = "com.yubico.Authenticator.TokenExtension"
+    private static let subsystem = "io.github.sinf-ken.OrielOTP.TokenExtension"
     static let ctk = Logger(subsystem: subsystem, category: "CTK")
 
     func yubilog(_ message: String) {
@@ -121,7 +121,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
                 reset()
                 return signedData
             }
-            if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator"), let _ = userDefaults.value(forKey: "canceledByUser") {
+            if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP"), let _ = userDefaults.value(forKey: "canceledByUser") {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -190,7 +190,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
                 reset()
                 return decryptedData
             }
-            if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator"), let _ = userDefaults.value(forKey: "canceledByUser") {
+            if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP"), let _ = userDefaults.value(forKey: "canceledByUser") {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -223,7 +223,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     
     private func reset() {
         cancelAllNotifications()
-        if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator") {
+        if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.OrielOTP") {
             userDefaults.removeObject(forKey: "canceledByUser")
             // Older versions handed the data over in UserDefaults; clear anything left behind.
             userDefaults.removeObject(forKey: "signedData")
@@ -237,7 +237,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     // The app writes signed and decrypted data to files with complete file protection in the
     // shared app group container, instead of the unencrypted UserDefaults plist.
     private var tokenResponsesDirectory: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.yubico.Authenticator")?
+        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.github.sinf-ken.OrielOTP")?
             .appendingPathComponent("TokenResponses", isDirectory: true)
     }
 
@@ -264,7 +264,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         
-        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Yubico Authenticator"), options: .foreground)
+        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Oriel OTP"), options: .foreground)
         let category = UNNotificationCategory(identifier: categoryID, actions: [show], intentIdentifiers: [])
 
         let center = UNUserNotificationCenter.current()
@@ -285,7 +285,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         
-        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Yubico Authenticator"), options: .foreground)
+        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Oriel OTP"), options: .foreground)
         let category = UNNotificationCategory(identifier: categoryID, actions: [show], intentIdentifiers: [])
 
         let center = UNUserNotificationCenter.current()

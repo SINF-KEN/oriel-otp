@@ -612,6 +612,35 @@
         }
       }
     },
+    "Pink" : {
+      "comment" : "App icon name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rose"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピンク"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ružová"
+          }
+        }
+      }
+    },
     "or" : {
       "comment" : "PIV extension separator between the USB and NFC instructions",
       "localizations" : {
@@ -2925,35 +2954,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey 5Ci alebo kompatibilný kľúč YubiKey s funkciou NFC."
-          }
-        }
-      }
-    },
-    "Green" : {
-      "comment" : "App icon name",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grün"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vert"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "グリーン"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zelená"
           }
         }
       }
@@ -6413,31 +6413,31 @@
         }
       }
     },
-    "The smart card extension requires notifications to be enabled for Yubico Authenticator. Enable it in the iOS Settings." : {
+    "The smart card extension requires notifications to be enabled for Oriel OTP. Enable it in the iOS Settings." : {
       "comment" : "PIV extensions notifications alert message",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Für die Smartcard Erweiterung müssen Benachrichtigungen für Yubico Authenticator aktiviert sein. Aktiviere diese bitte in den iOS-Einstellungen."
+            "value" : "Für die Smartcard Erweiterung müssen Benachrichtigungen für Oriel OTP aktiviert sein. Aktiviere diese bitte in den iOS-Einstellungen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'extension de la carte à puce nécessite que les notifications soient activées pour Yubico Authenticator. Activez-les dans les paramètres iOS."
+            "value" : "L'extension de la carte à puce nécessite que les notifications soient activées pour Oriel OTP. Activez-les dans les paramètres iOS."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スマートカード拡張機能では、Yubico Authenticatorの通知を有効にする必要があります。iOS設定で有効にしてください。"
+            "value" : "スマートカード拡張機能では、Oriel OTPの通知を有効にする必要があります。iOS設定で有効にしてください。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rozšírenie čipovej karty vyžaduje, aby boli pre Yubico Authenticator povolené oznámenia. Povoľte ich v nastaveniach iOS."
+            "value" : "Rozšírenie čipovej karty vyžaduje, aby boli pre Oriel OTP povolené oznámenia. Povoľte ich v nastaveniach iOS."
           }
         }
       }
