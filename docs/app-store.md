@@ -28,8 +28,9 @@ settings, and `1C8F.1` for the app group the app shares with the smart card exte
 Recommended App Store Connect answer, based on the developer's confirmation: **Data Not Collected**. Oriel OTP
 does not use analytics, advertising, crash reporting, diagnostics reporting, or a developer-operated server.
 Ente sync is optional and started by the user. When used, the user enters their email and sign-in or verification
-information, which the app sends to Ente or to the self-hosted server address the user chose. The developer does
-not receive or retain that information.
+information, which the app sends to Ente or to the self-hosted server address the user chose. If the user turns on
+*Also add to Ente Auth*, the new account is encrypted on the device and added to their Ente account. The developer
+does not receive or retain that information.
 
 This recommendation assumes Ente (or a self-hosted endpoint) is an independent service used for the user's own
 account, not a vendor or partner collecting data on Oriel OTP's behalf. Apple's definition of collection covers
@@ -79,7 +80,8 @@ market app. Answer the questions in App Store Connect to match, and add the Fran
 
 > Oriel OTP is a fork of Yubico Authenticator for iOS (Apache 2.0), published with a new name, icon and artwork. It is
 > not affiliated with Yubico or Ente. It adds one feature: copying TOTP and HOTP accounts from the person's own
-> Ente Auth account onto a YubiKey. The sync is read only for Ente; nothing is changed there.
+> Ente Auth account onto a YubiKey. Nothing is changed in Ente during that sync. When adding a new account, the
+> person can optionally save it to their Ente Auth account as well.
 >
 > The app needs a YubiKey (NFC, Lightning or USB-C) to show codes. A video of the app on a device is attached,
 > showing NFC and USB-C, adding an account by QR code, Ente sync from sign-in to writing to the key, and the smart

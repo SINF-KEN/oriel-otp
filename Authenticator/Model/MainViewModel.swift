@@ -287,14 +287,16 @@ import YubiKit
         }
     }
     
-    func addAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool) {
+    /// Adds an account to the YubiKey. The completion is called only if the account was added.
+    func addAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool, completion: (() -> Void)? = nil) {
         Task {
             do {
                 let session = try await OATHSessionHandler.shared.anySession()
                 try await session.addCredential(template: template, requiresTouch: requiresTouch)
                 await updateAccounts(using: session)
+                completion?()
             } catch {
-                handle(error: error, retry: { self.addAccount(template, requiresTouch: requiresTouch) })
+                handle(error: error, retry: { self.addAccount(template, requiresTouch: requiresTouch, completion: completion) })
             }
         }
     }
