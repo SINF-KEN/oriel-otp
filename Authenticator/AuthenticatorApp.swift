@@ -25,6 +25,12 @@ struct AuthenticatorApp: App {
     @State var toastPresenter = ToastPresenter()
     @State var notificationsViewModel = NotificationsViewModel()
     @State var mainViewModel = MainViewModel()
+
+    #if DEBUG && targetEnvironment(simulator)
+    init() {
+        FakeEnteServer.install()
+    }
+    #endif
     
     var body: some Scene {
         WindowGroup {

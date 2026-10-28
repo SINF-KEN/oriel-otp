@@ -52,8 +52,11 @@ final class ConnectionManager {
     private var pendingNFCConnection: Task<NFCSmartCardConnection, Error>?
 
     nonisolated private convenience init() {
-        #if targetEnvironment(simulator)
-        // There are no USB smart card slots in the simulator and YubiKit asserts when it can't find any.
+        #if DEBUG && targetEnvironment(simulator)
+        // There are no USB smart card slots in the simulator and YubiKit asserts when it can't find any,
+        // so debug builds connect to a simulated YubiKey instead.
+        self.init(makeWiredConnection: { await SimulatedYubiKey.nextConnection() })
+        #elseif targetEnvironment(simulator)
         self.init(makeWiredConnection: nil)
         #else
         self.init(makeWiredConnection: { try await WiredSmartCardConnection.makeConnection() })

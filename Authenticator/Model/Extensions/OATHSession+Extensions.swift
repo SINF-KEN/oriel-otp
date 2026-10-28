@@ -22,7 +22,7 @@ import YubiKit
 
 extension YubiKitOATHSession {
     func calculateSteamTOTP(credential: Credential) async throws -> (code: String, validity: DateInterval) {
-        let timestamp = Date().addingTimeInterval(10)
+        let timestamp = AppClock.now.addingTimeInterval(10)
         let period = credential.type.period ?? 30
         let value = UInt64(timestamp.timeIntervalSince1970 / period)
         let challenge = withUnsafeBytes(of: value.bigEndian) { Data($0) }

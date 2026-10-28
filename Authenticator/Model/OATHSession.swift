@@ -283,11 +283,11 @@ final class OATHSession: Sendable {
         try await session.listCredentials().map { Credential(yubiKitCredential: $0) }
     }
 
-    func calculateAll(timestamp: Date = Date().addingTimeInterval(10)) async throws -> [(Credential, OTP?)] {
+    func calculateAll(timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> [(Credential, OTP?)] {
         try await session.calculateCredentialCodes(timestamp: timestamp).map { (Credential(yubiKitCredential: $0), $1?.otp) }
     }
 
-    func calculate(credential: Credential, timestamp: Date = Date().addingTimeInterval(10)) async throws -> OTP {
+    func calculate(credential: Credential, timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> OTP {
         if credential.isSteam {
             let (code, validity) = try await session.calculateSteamTOTP(credential: credential.yubiKitCredential)
             return OTP(code: code, validity: validity)
