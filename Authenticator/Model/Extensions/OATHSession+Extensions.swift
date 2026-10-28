@@ -28,19 +28,27 @@ extension YubiKitOATHSession {
         let challenge = withUnsafeBytes(of: value.bigEndian) { Data($0) }
 
         let response = try await calculateCredentialResponse(for: credential.id, challenge: challenge)
+        guard let steamCode = Self.steamCode(fromResponse: response) else { throw KeySessionError.noResponse }
+        let startDate = Date(timeIntervalSince1970: TimeInterval(Int(timestamp.timeIntervalSince1970) - Int(timestamp.timeIntervalSince1970) % 30))
+        let validity = DateInterval(start: startDate, duration: 30)
+        return (steamCode, validity)
+    }
 
-        let offset = Int(response.last! & 0x0F)
-        let subdata = response.subdata(in: offset..<Int(offset + 4))
+    /// Truncates an HMAC response to a 5 character Steam code. Returns nil if the response is too short.
+    static func steamCode(fromResponse response: Data) -> String? {
+        // YubiKit returns a slice that doesn't start at index 0, while the offset counts from the first byte.
+        let response = Data(response)
+        guard let last = response.last else { return nil }
+        let offset = Int(last & 0x0F)
+        guard response.count >= offset + 4 else { return nil }
         let steamChars = Array("23456789BCDFGHJKMNPQRTVWXY")
-        var number = UInt32(bigEndian: subdata.uint32 ?? 0) & 0x7fffffff
+        var number = UInt32(bigEndian: response.subdata(in: offset..<offset + 4).uint32 ?? 0) & 0x7fffffff
         var steamCode = ""
         for _ in 0...4 {
             steamCode.append(steamChars[Int(number) % steamChars.count])
             number /= UInt32(steamChars.count)
         }
-        let startDate = Date(timeIntervalSince1970: TimeInterval(Int(timestamp.timeIntervalSince1970) - Int(timestamp.timeIntervalSince1970) % 30))
-        let validity = DateInterval(start: startDate, duration: 30)
-        return (steamCode, validity)
+        return steamCode
     }
 }
 
