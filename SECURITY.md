@@ -15,7 +15,7 @@ Security fixes are provided for the latest version of Oriel OTP. Older releases 
 
 Use GitHub's private vulnerability reporting for this repository:
 
-[**Report a vulnerability privately**](https://github.com/SINF-KEN/oriel-otp/security/advisories/new)
+[Report a vulnerability privately](https://github.com/SINF-KEN/oriel-otp/security/advisories/new)
 
 If private reporting is unavailable, open a public issue asking for a private security contact. Do not include exploit details, credentials, OTP seeds, recovery codes, or other sensitive information in that issue.
 
@@ -24,7 +24,7 @@ When reporting a vulnerability, please include as much of the following as you c
 - A clear description of the vulnerability and its potential impact.
 - The affected version, platform, and relevant configuration.
 - Steps to reproduce the issue, including a minimal proof of concept where possible.
-- Any relevant logs or screenshots, after removing secrets and personal data.
+- Relevant logs or screenshots, after removing secrets and personal data.
 - Whether the issue is known to be actively exploited, if you have evidence of this.
 
 Please avoid accessing, modifying, or deleting other people's data, disrupting services, or testing against accounts or devices you do not own or have permission to assess. Use test accounts and test credentials wherever possible.
