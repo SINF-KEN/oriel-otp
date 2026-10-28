@@ -4,6 +4,18 @@
 <array>
 	<dict>
 		<key>version</key>
+		<string>1.14.0</string>
+		<key>date</key>
+		<date>2026-10-28T09:00:00Z</date>
+		<key>shouldPromptUser</key>
+		<true/>
+		<key>changes</key>
+		<string>
+            This version brings a redesigned app, rebuilt in SwiftUI with the new Liquid Glass look on iOS 26 and later. The app now adapts to iPhone Duo, supports landscape on iPhone, and shows your accounts beside their details on wider screens. Under the hood, the app now uses the new YubiKit Swift SDK to talk to your YubiKey over NFC, Lightning and USB-C. This version also includes clearer wording throughout the app.
+        </string>
+	</dict>
+	<dict>
+		<key>version</key>
 		<string>1.13.0</string>
 		<key>date</key>
 		<date>2025-11-18T09:00:00Z</date>
