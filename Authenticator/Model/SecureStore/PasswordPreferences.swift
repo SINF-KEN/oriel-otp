@@ -65,11 +65,11 @@ class PasswordPreferences {
         let hasBiometricAuthentication = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &errorBiometricPolicy)
         
         if let error = errorPolicy {
-            Logger.system.error("PasswordPreferences, authentication policy error: \(String(describing: error.localizedDescription))")
+            logAuthenticationPolicyError(error, policy: "authentication")
         }
         
         if let error = errorBiometricPolicy {
-            Logger.system.error("PasswordPreferences, biometric policy error: \(String(describing: error.localizedDescription))")
+            logAuthenticationPolicyError(error, policy: "biometric")
         }
         
         if !hasAuthentication {
@@ -81,6 +81,16 @@ class PasswordPreferences {
         }
 
         return context.biometryType == .faceID ? .faceId : .touchId
+    }
+
+    private static func logAuthenticationPolicyError(_ error: NSError, policy: String) {
+        if error.domain == LAError.errorDomain,
+           let code = LAError.Code(rawValue: error.code),
+           [.biometryNotAvailable, .biometryNotEnrolled, .passcodeNotSet].contains(code) {
+            return
+        }
+
+        Logger.system.error("PasswordPreferences, \(policy) policy error: \(String(describing: error.localizedDescription))")
     }
     
     func migrate(fromKeyIdentifier: String, toKeyIdentifier: String) {

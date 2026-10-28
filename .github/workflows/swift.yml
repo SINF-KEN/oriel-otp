@@ -1,6 +1,11 @@
 name: AuthenticatorTests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+    # Release builds are tagged; testing the tag push avoids a duplicate release-event run.
+    tags: ['**']
+  pull_request:
 
 permissions:
   contents: read
@@ -13,12 +18,191 @@ concurrency:
 jobs:
   build:
     runs-on: xcode-27
+    timeout-minutes: 60
+    # Checkout initializes its temporary repository before any step runs.
+    # Set its default branch explicitly to avoid Git's platform-specific "master" hint.
+    env:
+      GIT_CONFIG_COUNT: 1
+      GIT_CONFIG_KEY_0: init.defaultBranch
+      GIT_CONFIG_VALUE_0: main
     steps:
       - uses: actions/checkout@v5
-      - name: Test on simulator
+
+      - name: Review dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate
+          license-check: false
+
+      - name: Lint new Swift code
+        run: xcrun swift-format lint --configuration .swift-format --strict Authenticator/Model/TokenResponseStore.swift AuthenticatorTests/EnteAuth/CIBehaviorTests.swift
+
+      - name: Validate project metadata
         run: |
-          set -o pipefail
-          # Hardcoded device names go stale as runner images update, so use whatever iPhone is installed.
-          DEVICE_ID=$(xcrun simctl list devices available -j | jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[] | select(.name | startswith("iPhone"))][0].udid')
-          echo "Testing on simulator $DEVICE_ID"
-          xcodebuild clean test -disablePackageRepositoryCache -project Authenticator.xcodeproj -scheme Authenticator -destination "id=$DEVICE_ID" | xcbeautify --renderer github-actions
+          set -euo pipefail
+          plutil -lint \
+            Authenticator.xcodeproj/project.pbxproj \
+            Authenticator/Info.plist \
+            Authenticator/Authenticator.entitlements \
+            AuthenticatorTests/Info.plist \
+            TokenExtension/Info.plist \
+            TokenExtension/TokenExtension.entitlements
+          xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/Authenticator.xcscheme
+          jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version | length > 0) and (.state.revision | length == 40))' \
+            Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
+          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
+          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
+
+      - name: Select simulator
+        id: simulator
+        run: |
+          set -euo pipefail
+          SIMULATOR_NAME="iPhone 17"
+          if ! DEVICE_ID=$(xcrun simctl list devices available -j | jq -er --arg name "$SIMULATOR_NAME" '
+            [.devices | to_entries[] as $runtime
+             | select($runtime.key | startswith("com.apple.CoreSimulator.SimRuntime.iOS-"))
+             | $runtime.value[]
+             | select(.name == $name)
+             | {udid, runtime: $runtime.key}]
+            | if length == 0 then error("No available iOS simulator named \($name)")
+              else sort_by((.runtime | capture("iOS-(?<major>[0-9]+)(-(?<minor>[0-9]+))?")) as $version
+                | [$version.major | tonumber, ($version.minor // "0" | tonumber)]) | last | .udid
+              end
+          '); then
+            echo "::error::Could not select the required $SIMULATOR_NAME simulator. Available devices:"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Selected $SIMULATOR_NAME simulator ($DEVICE_ID)"
+          echo "id=$DEVICE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Start selected simulator
+        run: |
+          set -euo pipefail
+          DEVICE_ID="${{ steps.simulator.outputs.id }}"
+          DEVICE_STATE=$(xcrun simctl list devices available -j | jq -er --arg id "$DEVICE_ID" '[.devices[][] | select(.udid == $id) | .state][0]')
+          case "$DEVICE_STATE" in
+            Booted|Booting)
+              echo "Simulator is already $DEVICE_STATE"
+              ;;
+            Shutdown)
+              xcrun simctl boot "$DEVICE_ID"
+              echo "Simulator boot started before package resolution and analysis"
+              ;;
+            *)
+              echo "::error::Unexpected state '$DEVICE_STATE' for simulator $DEVICE_ID"
+              xcrun simctl list devices available
+              exit 1
+              ;;
+          esac
+
+      - name: Compute Swift package cache key
+        id: spm-cache-key
+        run: |
+          set -euo pipefail
+          PACKAGE_RESOLVED="Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+          FILE_HASH=$(shasum -a 256 "$PACKAGE_RESOLVED" | awk '{print $1}')
+          CACHE_HASH=$(printf '%s' "$FILE_HASH" | xxd -r -p | shasum -a 256 | awk '{print $1}')
+          echo "hash=$CACHE_HASH" >> "$GITHUB_OUTPUT"
+
+      # Source packages are portable; DerivedData and simulator products are runner-specific.
+      - name: Cache Swift packages
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/SourcePackages
+          key: ${{ runner.os }}-spm-${{ steps.spm-cache-key.outputs.hash }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Resolve pinned Swift packages
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          xcodebuild -resolvePackageDependencies \
+            -project Authenticator.xcodeproj \
+            -scheme Authenticator \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            2>&1 | tee "$RUNNER_TEMP/resolve-packages.log"
+
+      - name: Analyze app and extension
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          xcodebuild analyze \
+            -project Authenticator.xcodeproj \
+            -scheme Authenticator \
+            -destination "id=${{ steps.simulator.outputs.id }}" \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-analyze.log"
+
+      - name: Test on simulator
+        timeout-minutes: 30
+        run: |
+          set -euo pipefail
+          xcodebuild test \
+            -project Authenticator.xcodeproj \
+            -scheme Authenticator \
+            -destination "id=${{ steps.simulator.outputs.id }}" \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -enableCodeCoverage YES \
+            -resultBundlePath "$RUNNER_TEMP/Authenticator.xcresult" \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-test.log"
+
+      - name: Summarize test results
+        if: always()
+        run: |
+          set -euo pipefail
+          RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
+          if [ -d "$RESULT_BUNDLE" ]; then
+            xcrun xcresulttool get test-results summary --path "$RESULT_BUNDLE" \
+              | tee "$RUNNER_TEMP/test-summary.json" \
+              | jq -r '"Result: \(.result); passed: \(.passedTests); failed: \(.failedTests); skipped: \(.skippedTests)"'
+            xcrun xccov view --report --only-targets "$RESULT_BUNDLE" || true
+          elif [ -f "$RUNNER_TEMP/xcodebuild-test.log" ]; then
+            echo "::warning::Xcode did not produce a result bundle; see the uploaded xcodebuild log."
+          else
+            printf '{"result":"not run","reason":"An earlier workflow step failed before simulator testing started."}\n' \
+              | tee "$RUNNER_TEMP/test-summary.json"
+            echo "::notice::Simulator tests did not run because an earlier workflow step failed."
+          fi
+
+      - name: Enforce core coverage baselines
+        if: success()
+        run: |
+          set -euo pipefail
+          RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
+          xcrun xccov view --report --files-for-target Authenticator.app --json "$RESULT_BUNDLE" \
+            > "$RUNNER_TEMP/app-file-coverage.json"
+          check_coverage() {
+            local file_name="$1"
+            local minimum="$2"
+            local actual
+            actual=$(jq -er --arg name "$file_name" '.[0].files[] | select(.name == $name) | .lineCoverage' \
+              "$RUNNER_TEMP/app-file-coverage.json")
+            awk -v file_name="$file_name" -v actual="$actual" -v minimum="$minimum" \
+              'BEGIN { printf "%s coverage: %.1f%% (minimum %.0f%%)\n", file_name, actual * 100, minimum * 100; exit !(actual >= minimum) }'
+          }
+          check_coverage EnteLoginFlow.swift 0.50
+          check_coverage TokenResponseStore.swift 0.90
+
+      - name: Upload test results and logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: Authenticator-test-results
+          path: |
+            ${{ runner.temp }}/Authenticator.xcresult
+            ${{ runner.temp }}/resolve-packages.log
+            ${{ runner.temp }}/xcodebuild-analyze.log
+            ${{ runner.temp }}/xcodebuild-test.log
+            ${{ runner.temp }}/test-summary.json
+          if-no-files-found: ignore
+          retention-days: 7
