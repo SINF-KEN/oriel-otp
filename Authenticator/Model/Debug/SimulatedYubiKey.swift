@@ -151,14 +151,15 @@ nonisolated final class SimulatedYubiKeyStorage: @unchecked Sendable {
         }
     }
 
-    // All demo accounts use the secret JBSWY3DPEHPK3PXP, so their codes can be checked against another authenticator.
+    // Each demo account's secret is the first 10 bytes of the SHA-256 of its name, so the accounts show different
+    // codes. The salt and serial number are fixed so the README screenshots are the same on every run.
     private static func demoState() -> State {
-        let secret = Data([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x21, 0xde, 0xad, 0xbe, 0xef])
         func credential(_ name: String, type: UInt8 = 0x20, algorithm: UInt8 = 0x01, digits: UInt8 = 6, touch: Bool = false) -> Credential {
-            Credential(name: Data(name.utf8), typeAndAlgorithm: type | algorithm, digits: digits, secret: secret, requiresTouch: touch, counter: 0)
+            let secret = Data(SHA256.hash(data: Data(name.utf8)).prefix(10))
+            return Credential(name: Data(name.utf8), typeAndAlgorithm: type | algorithm, digits: digits, secret: secret, requiresTouch: touch, counter: 0)
         }
         return State(
-            salt: Data((0..<8).map { _ in UInt8.random(in: 0...255) }),
+            salt: Data([0x0d, 0xe0, 0x0d, 0xe0, 0x0d, 0xe0, 0x0d, 0xe0]),
             accessKey: nil,
             credentials: [
                 credential("GitHub:alice@example.com"),
@@ -170,7 +171,7 @@ nonisolated final class SimulatedYubiKeyStorage: @unchecked Sendable {
                 credential("Example HOTP:alice", type: 0x10),
                 credential("Server root"),
             ],
-            serialNumber: UInt32.random(in: 10_000_000...39_999_999),
+            serialNumber: 31_415_926,
             usbEnabled: 0x023b,
             nfcEnabled: 0x023b
         )

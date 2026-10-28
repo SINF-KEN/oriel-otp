@@ -105,6 +105,7 @@
 		C1A0000000000000000000B7 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000A7 /* AppIconView.swift */; };
 		C1A0000000000000000000E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */; };
 		C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */; };
+		5C3E0000000000000000000D /* AppClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3E0000000000000000000C /* AppClock.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +117,13 @@
 			remoteInfo = TokenExtension;
 		};
 		818866CA22DFD72C006BC0A8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 818866B222DFD729006BC0A8;
+			remoteInfo = Authenticator;
+		};
+		5C3E00000000000000000008 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
 			proxyType = 1;
@@ -243,6 +251,8 @@
 		C1A0000000000000000000A7 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 		C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		5C3E00000000000000000002 /* AuthenticatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuthenticatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C3E0000000000000000000C /* AppClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -254,6 +264,11 @@
 		E17E0000000000000000C002 /* EnteAuth */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = EnteAuth;
+			sourceTree = "<group>";
+		};
+		5C3E00000000000000000003 /* AuthenticatorUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AuthenticatorUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -280,6 +295,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		818866C622DFD72C006BC0A8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C3E00000000000000000005 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -412,6 +434,7 @@
 				B4E9D45928B65A6E00D51FFC /* Packages */,
 				818866B522DFD729006BC0A8 /* Authenticator */,
 				818866CC22DFD72C006BC0A8 /* AuthenticatorTests */,
+				5C3E00000000000000000003 /* AuthenticatorUITests */,
 				515542732656706F00B19C59 /* TokenExtension */,
 				515542702656706F00B19C59 /* Frameworks */,
 				818866B422DFD729006BC0A8 /* Products */,
@@ -423,6 +446,7 @@
 			children = (
 				818866B322DFD729006BC0A8 /* Authenticator.app */,
 				818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */,
+				5C3E00000000000000000002 /* AuthenticatorUITests.xctest */,
 				5155426F2656706F00B19C59 /* TokenExtension.appex */,
 			);
 			name = Products;
@@ -502,6 +526,7 @@
 				51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */,
 				A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */,
 				B4DB2289299BC373003110ED /* OATHSession.swift */,
+				5C3E0000000000000000000C /* AppClock.swift */,
 				B4C93E62299FB51A00C2A8B8 /* Account.swift */,
 				B4719B1A298AB641006CDAEA /* MainViewModel.swift */,
 				B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */,
@@ -612,6 +637,27 @@
 			productReference = 818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		5C3E00000000000000000001 /* AuthenticatorUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "AuthenticatorUITests" */;
+			buildPhases = (
+				5C3E00000000000000000004 /* Sources */,
+				5C3E00000000000000000005 /* Frameworks */,
+				5C3E00000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5C3E00000000000000000007 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5C3E00000000000000000003 /* AuthenticatorUITests */,
+			);
+			name = AuthenticatorUITests;
+			productName = AuthenticatorUITests;
+			productReference = 5C3E00000000000000000002 /* AuthenticatorUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -636,6 +682,10 @@
 					};
 					818866C822DFD72C006BC0A8 = {
 						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = 818866B222DFD729006BC0A8;
+					};
+					5C3E00000000000000000001 = {
+						CreatedOnToolsVersion = 27.1;
 						TestTargetID = 818866B222DFD729006BC0A8;
 					};
 				};
@@ -665,6 +715,7 @@
 				818866B222DFD729006BC0A8 /* Authenticator */,
 				818866C822DFD72C006BC0A8 /* AuthenticatorTests */,
 				5155426E2656706F00B19C59 /* TokenExtension */,
+				5C3E00000000000000000001 /* AuthenticatorUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -703,6 +754,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5C3E00000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -721,6 +779,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C3E0000000000000000000D /* AppClock.swift in Sources */,
 				B43751A42CA440E7004017A4 /* NFCSettingsView.swift in Sources */,
 				51AFD4D62716FCDB008F2630 /* ApplicationSettingsViewModel.swift in Sources */,
 				B4BB02E42C81B21D00B72904 /* FIDOPINView.swift in Sources */,
@@ -806,6 +865,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5C3E00000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -818,6 +884,11 @@
 			isa = PBXTargetDependency;
 			target = 818866B222DFD729006BC0A8 /* Authenticator */;
 			targetProxy = 818866CA22DFD72C006BC0A8 /* PBXContainerItemProxy */;
+		};
+		5C3E00000000000000000007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 818866B222DFD729006BC0A8 /* Authenticator */;
+			targetProxy = 5C3E00000000000000000008 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1126,6 +1197,40 @@
 			};
 			name = Release;
 		};
+		5C3E0000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTPUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Authenticator;
+			};
+			name = Debug;
+		};
+		5C3E0000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTPUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Authenticator;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1161,6 +1266,15 @@
 			buildConfigurations = (
 				818866E122DFD72C006BC0A8 /* Debug */,
 				818866E222DFD72C006BC0A8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "AuthenticatorUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C3E0000000000000000000A /* Debug */,
+				5C3E0000000000000000000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
