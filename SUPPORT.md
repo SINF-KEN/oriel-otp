@@ -35,6 +35,11 @@ Accounts in Ente's trash are left out, and accounts with the same name as one al
 Accounts the app can't read are listed with the reason. See [Syncing accounts from Ente Auth](docs/ente-auth.md)
 for details. The sync never changes anything in Ente.
 
+**Copying accounts from the YubiKey to Ente.**
+A YubiKey never gives its secrets back, so accounts already on it can't be copied. Turn on **Also add to Ente Auth**
+when adding an account. It needs **Stay signed in** from **Sync from Ente Auth**. For accounts already on the key,
+set up two-factor authentication again in the service's settings with the toggle on.
+
 **Another app can't use the certificate on my YubiKey.**
 Under **Configuration > Smart card extension**, add the certificate to the device and allow notifications. When an
 app asks for the certificate, tap the notification and enter the YubiKey's PIN.

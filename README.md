@@ -18,11 +18,15 @@ Add a credential with the `+` button in the account list, then scan its QR code 
 Once credentials have been added, plug in the YubiKey, or tap `Scan NFC YubiKey` (or pull the list down) and hold
 the key to the iPhone, to show the codes.
 
-## Sync from Ente Auth
+## Sync with Ente Auth
 
 Accounts stored in [Ente Auth](https://ente.io/auth) can be copied onto a YubiKey by tapping the menu icon and
 selecting `Sync from Ente Auth`. Sign in, pick the accounts and tap `Add`. Everything is decrypted on the device
-and nothing is changed in Ente Auth. See [docs/ente-auth.md](docs/ente-auth.md) for how it works.
+and nothing is changed in Ente Auth.
+
+The other way, turn on `Also add to Ente Auth` when adding an account to save it in Ente Auth too. A YubiKey never
+gives its secrets back, so this works only while an account is added. See [docs/ente-auth.md](docs/ente-auth.md)
+for how it works.
 
 ## CryptTokenKit extension
 

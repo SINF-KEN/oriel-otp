@@ -240,3 +240,25 @@ extension Data {
         self.init(bytes)
     }
 }
+
+extension Data {
+    /// Encodes as RFC 4648 Base32 without padding, the form otpauth URLs use for secrets.
+    var base32EncodedString: String {
+        let alphabet = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567")
+        var result = ""
+        var buffer: UInt32 = 0
+        var bits = 0
+        for byte in self {
+            buffer = (buffer << 8) | UInt32(byte)
+            bits += 8
+            while bits >= 5 {
+                bits -= 5
+                result.append(alphabet[Int((buffer >> UInt32(bits)) & 0x1f)])
+            }
+        }
+        if bits > 0 {
+            result.append(alphabet[Int((buffer << UInt32(5 - bits)) & 0x1f)])
+        }
+        return result
+    }
+}

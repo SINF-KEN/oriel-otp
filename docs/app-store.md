@@ -28,8 +28,9 @@ settings, and `1C8F.1` for the app group the app shares with the smart card exte
 Recommended App Store Connect answer, based on the developer's confirmation: **Data Not Collected**. Oriel OTP
 does not use analytics, advertising, crash reporting, diagnostics reporting, or a developer-operated server.
 Ente sync is optional and started by the user. When used, the user enters their email and sign-in or verification
-information, which the app sends to Ente or to the self-hosted server address the user chose. The developer does
-not receive or retain that information.
+information, which the app sends to Ente or to the self-hosted server address the user chose. If the user turns on
+*Also add to Ente Auth*, the new account is encrypted on the device and added to their Ente account. The developer
+does not receive or retain that information.
 
 This recommendation assumes Ente (or a self-hosted endpoint) is an independent service used for the user's own
 account, not a vendor or partner collecting data on Oriel OTP's behalf. Apple's definition of collection covers
