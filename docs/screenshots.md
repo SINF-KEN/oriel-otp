@@ -40,8 +40,11 @@ call `save("name")`, then add `docs/screenshots/name.png` to the README.
 
 - On pull requests, the screenshots are uploaded as the `screenshots` artifact of the run, so UI changes can be
   looked at before merging.
-- On `main`, changed screenshots are committed back as "Update the README screenshots". When nothing changed,
-  nothing is committed. It can also be started by hand from the Actions tab.
+- On `main`, changed screenshots are committed as "Update the README screenshots" and force-pushed to the
+  `bot/screenshots` branch, and the run's summary links to a new pull request from it. `main` only takes pull
+  requests and Actions isn't allowed to open them here, so a maintainer opens it, which also runs the required
+  `build` check. When nothing changed, nothing is pushed. The workflow can also be started by hand from the
+  Actions tab.
 
 Different simulator models and iOS versions render slightly differently, so CI's screenshots are the reference. A
 screenshot committed from a different simulator may be replaced by CI's once.
