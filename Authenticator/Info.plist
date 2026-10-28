@@ -24,10 +24,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.yubico.authenticator</string>
+			<string>io.github.sinf-ken.keyotp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>yubicoauthenticator</string>
+				<string>keyotp</string>
 				<string>otpauth</string>
 			</array>
 		</dict>

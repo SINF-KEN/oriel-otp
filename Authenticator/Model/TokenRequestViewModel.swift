@@ -212,7 +212,7 @@ final class TokenRequestViewModel {
             Logger.ctk.yubilog("Skipping cancel - operation already completed")
             return
         }
-        if let userDefaults = UserDefaults(suiteName: "group.com.yubico.Authenticator") {
+        if let userDefaults = UserDefaults(suiteName: "group.io.github.sinf-ken.KeyOTP") {
             Logger.ctk.yubilog("Saving canceledByUser to userDefaults")
             userDefaults.setValue(true, forKey: "canceledByUser")
         }
@@ -222,7 +222,7 @@ final class TokenRequestViewModel {
     // app group container. Complete file protection keeps it encrypted while the device is locked,
     // and the extension deletes the file as soon as it has read it.
     private func writeTokenResponse(_ data: Data, named name: String) -> Bool {
-        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.yubico.Authenticator") else { return false }
+        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.github.sinf-ken.KeyOTP") else { return false }
         let directory = container.appendingPathComponent("TokenResponses", isDirectory: true)
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

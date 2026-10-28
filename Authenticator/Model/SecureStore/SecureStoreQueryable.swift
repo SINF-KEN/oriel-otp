@@ -35,7 +35,8 @@ import LocalAuthentication
 /*!
  APP ID prefix required in case if we want to share storage with our other applications
  */
-let APP_ID = "LQA3CS5MM7"
+// The Team ID of the keychain access group. Set it to your own team when sharing the keychain with another app.
+let APP_ID = ""
 
 nonisolated protocol SecureStoreQueryable: Sendable {
     func setUpQuery(useAuthentication: Bool) -> [String: Any]
