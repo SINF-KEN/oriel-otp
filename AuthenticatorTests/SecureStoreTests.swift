@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+import Foundation
 import Testing
 
 @testable import Authenticator
@@ -40,6 +41,13 @@ final class SecureStoreTests {
         try secureStoreWithGenericPwd.setValue("pwd_1234", useAuthentication: false, for: "genericPassword")
         let password = await getPassword(for: "genericPassword")
         #expect(password == "pwd_1234")
+    }
+
+    @Test func storesOpaqueTokenDataWithoutTextConversion() async throws {
+        let token = Data([0x00, 0xff, 0x10, 0x80, 0x2a])
+        try secureStoreWithGenericPwd.setValue(token, useAuthentication: false, for: "opaqueToken")
+
+        #expect(try await secureStoreWithGenericPwd.getValue(for: "opaqueToken") == token)
     }
 
     @Test func updateGenericPassword() async throws {
