@@ -58,7 +58,7 @@ struct MainView: View {
                         }
                     }
                     if !model.accountsLoaded {
-                        ListStatusView(image: Image("yubikey"), message: insertYubiKeyMessage, height: reader.size.height)
+                        ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height)
                     } else if !searchText.isEmpty {
                         if searchResults.count > 0 {
                             ForEach(searchResults, id: \.id) { account in

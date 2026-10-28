@@ -2930,30 +2930,30 @@
         }
       }
     },
-    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey 5Ci or a compatible YubiKey with NFC to get started." : {
+    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC, Lightning or USB-C to get started." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Besorge Dir ein shared Secret/Seed von jedem Dienst, den Du mit Deinem YubiKey absichern möchtest, speichere es auf Deinem YubiKey und verwende es, um OTP Codes zu generieren.\n\nDu benötigst einen YubiKey 5Ci oder einen YubiKey mit NFC Funktionalität um loszulegen."
+            "state" : "needs_review",
+            "value" : "Besorge Dir ein shared Secret/Seed von jedem Dienst, den Du mit Deinem YubiKey absichern möchtest, speichere es auf Deinem YubiKey und verwende es, um OTP Codes zu generieren.\n\nDu benötigst einen YubiKey mit NFC, Lightning oder USB-C um loszulegen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obtenez un secret partagé de tout service que vous souhaitez sécuriser, stockez-le sur la YubiKey et utilisez-le pour générer vos codes de sécurité.\n\nVous aurez besoin d'une YubiKey 5Ci ou d'une YubiKey compatible avec NFC pour commencer."
+            "state" : "needs_review",
+            "value" : "Obtenez un secret partagé de tout service que vous souhaitez sécuriser, stockez-le sur la YubiKey et utilisez-le pour générer vos codes de sécurité.\n\nVous aurez besoin d'une YubiKey avec NFC, Lightning ou USB-C pour commencer."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "セキュリティを確保したいサービスから共有シークレットを取得し、YubiKeyに保存してセキュリティコードの生成に使用します。\n\n利用開始にはYubiKey 5CiまたはNFC搭載の互換性のあるYubiKeyが必要です。"
+            "state" : "needs_review",
+            "value" : "セキュリティを確保したいサービスから共有シークレットを取得し、YubiKeyに保存してセキュリティコードの生成に使用します。\n\n利用開始にはNFC、LightningまたはUSB-C対応のYubiKeyが必要です。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey 5Ci alebo kompatibilný kľúč YubiKey s funkciou NFC."
+            "state" : "needs_review",
+            "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey s NFC, Lightning alebo USB-C."
           }
         }
       }
@@ -3070,30 +3070,30 @@
         }
       }
     },
-    "If you have a YubiKey 5Ci, plug it in.\n\nTouch the contacts on the sides when prompted." : {
+    "If your YubiKey has a Lightning or USB-C connector, plug it in.\n\nTouch the YubiKey when prompted." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Falls Du einen YubiKey 5Ci besitzt schließe ihn jetzt bitte an.\n\nBerühre bitte die Kontakte des YubiKeys sobald Du dazu aufgefordert wirst."
+            "state" : "needs_review",
+            "value" : "Falls Dein YubiKey einen Lightning- oder USB-C-Anschluss hat, schließe ihn an.\n\nBerühre den YubiKey, sobald Du dazu aufgefordert wirst."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Si vous avez une YubiKey 5Ci, branchez-la.\n\nTouchez les contacts sur les côtés lorsque vous y êtes invité."
+            "state" : "needs_review",
+            "value" : "Si votre YubiKey a un connecteur Lightning ou USB-C, branchez-la.\n\nTouchez la YubiKey lorsque vous y êtes invité."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey 5Ciをお持ちの場合は、接続してください。\n\nプロンプトが表示されたら、側面の接点をタッチします。"
+            "state" : "needs_review",
+            "value" : "YubiKeyにLightningまたはUSB-Cコネクタがある場合は、接続してください。\n\nプロンプトが表示されたら、YubiKeyにタッチします。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ak máte YubiKey 5Ci, pripojte ho.\n\nPo výzve sa dotknite kontaktov po stranách."
+            "state" : "needs_review",
+            "value" : "Ak má váš YubiKey konektor Lightning alebo USB-C, pripojte ho.\n\nPo výzve sa dotknite YubiKey."
           }
         }
       }
@@ -3102,8 +3102,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Falls Du einen YubiKey mit NFC Funktionalität besitzt, ziehe bitte in der Hauptansicht der App nach unten um das NFC Scanning zu aktivieren.\n\nHalte den YubiKey an den NFC Leser Deine iPhones.\n\nBerühre die Mitte Deines YubiKeys (goldene Kontaktfläche) während Du ihn weiterhin an den Rand Deines iPhones hälst."
+            "state" : "needs_review",
+            "value" : "Falls Du einen YubiKey mit NFC Funktionalität besitzt, ziehe bitte in der Hauptansicht der App nach unten um das NFC Scanning zu aktivieren.\n\nHalte den YubiKey waagerecht und neige das iPhone zum YubiKey.\n\nBerühre mit der Mitte des YubiKeys den Rand Deines iPhones."
           }
         },
         "fr" : {
@@ -7724,34 +7724,6 @@
         }
       }
     },
-    "Yubico Authenticator" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yubico Authenticator"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yubico Authenticator"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yubico Authenticator"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yubico Authenticator"
-          }
-        }
-      }
-    },
     "Yubico OTP" : {
       "localizations" : {
         "de" : {
@@ -7809,58 +7781,58 @@
         }
       }
     },
-    "YubiKey 5 Series NFC authentication" : {
+    "Scan your YubiKey over NFC" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey 5 Serie NFC-Authentifizierung"
+            "state" : "needs_review",
+            "value" : "YubiKey per NFC scannen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentification NFC YubiKey 5 Series"
+            "state" : "needs_review",
+            "value" : "Scannez votre YubiKey par NFC"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey 5シリーズ NFC認証"
+            "state" : "needs_review",
+            "value" : "NFCでYubiKeyをスキャンする"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overovanie série YubiKey 5 NFC"
+            "state" : "needs_review",
+            "value" : "Naskenujte svoj YubiKey cez NFC"
           }
         }
       }
     },
-    "YubiKey 5Ci authentication" : {
+    "Plug in your YubiKey" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey 5Ci Authentifizierung"
+            "state" : "needs_review",
+            "value" : "Schließe Deinen YubiKey an"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentification YubiKey 5Ci"
+            "state" : "needs_review",
+            "value" : "Branchez votre YubiKey"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey 5Ci 認証"
+            "state" : "needs_review",
+            "value" : "YubiKeyを接続する"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Overovanie YubiKey 5Ci"
+            "state" : "needs_review",
+            "value" : "Pripojte svoj YubiKey"
           }
         }
       }
