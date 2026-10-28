@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import YubiKit
 
 /// What's needed to read the accounts again without signing in: the auth token and the authenticator key.
 /// The master key and the password are never stored.
@@ -68,5 +69,18 @@ struct EnteSessionStore {
     func remove() {
         try? secureStore.removeValue(for: Self.account)
         defaults.removeObject(forKey: Self.emailKey)
+    }
+
+    /// Adds an account to Ente Auth with the saved session, after asking for Face ID, Touch ID or the passcode.
+    /// A session that was revoked, e.g. from another device, is forgotten.
+    @MainActor func add(_ template: YubiKitOATHSession.CredentialTemplate) async throws -> EnteAuthenticatorSync.AddResult {
+        let saved = try await load()
+        do {
+            return try await EnteAuthenticatorSync.add(template, api: try EnteAPIClient(server: saved.server), token: saved.token,
+                                                       authenticatorKey: saved.authenticatorKey)
+        } catch EnteAuthenticatorSyncError.signedOut {
+            remove()
+            throw EnteAuthenticatorSyncError.signedOut
+        }
     }
 }

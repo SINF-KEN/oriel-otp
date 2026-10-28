@@ -30,7 +30,7 @@ struct MainView: View {
     @State var selectedAccountID: String? = nil
     @State var showAddAccount: Bool = false
     @State var addAccountCancellable: AnyCancellable?
-    @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool), Never>()
+    @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, Bool), Never>()
     @State var showConfiguration: Bool = false
     @State var showAbout: Bool = false
     @State var showEnteSync: Bool = false
@@ -249,10 +249,14 @@ struct MainView: View {
             if ApplicationSettingsViewModel().isNFCOnAppLaunchEnabled {
                 model.updateAccountsOverNFC()
             }
-            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch) in
+            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, addToEnte) in
                 oathURL = nil
                 if let template {
-                    model.addAccount(template, requiresTouch: requiresTouch)
+                    model.addAccount(template, requiresTouch: requiresTouch) {
+                        if addToEnte {
+                            addAccountToEnte(template)
+                        }
+                    }
                 }
             }
         }
@@ -449,6 +453,23 @@ struct MainView: View {
                 message += " " + String(localized: "\(result.alreadyPresent.count) were already on the YubiKey.", comment: "Import result. The placeholder is the number of accounts.")
             }
             toastPresenter.toast(message: message)
+        }
+    }
+
+    /// Adds an account that was just put on the YubiKey to Ente Auth too. The YubiKey can't give the secret back
+    /// later, so this is the only time it can be copied.
+    private func addAccountToEnte(_ template: YubiKitOATHSession.CredentialTemplate) {
+        Task {
+            do {
+                switch try await EnteSessionStore().add(template) {
+                case .added:
+                    toastPresenter.toast(message: String(localized: "Added to Ente Auth", comment: "Toast after adding an account to Ente Auth"))
+                case .alreadyPresent:
+                    toastPresenter.toast(message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
+                }
+            } catch {
+                model.sessionError = EnteSyncError(error)
+            }
         }
     }
 
