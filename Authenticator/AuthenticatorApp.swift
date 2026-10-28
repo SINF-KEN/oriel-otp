@@ -20,6 +20,7 @@ import SwiftUI
 @main
 struct AuthenticatorApp: App {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) var scenePhase
     @State var toastPresenter = ToastPresenter()
     @State var notificationsViewModel = NotificationsViewModel()

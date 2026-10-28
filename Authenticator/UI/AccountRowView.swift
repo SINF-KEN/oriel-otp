@@ -118,6 +118,7 @@ struct AccountRowView: View {
             ZStack {
                 if let otp = account.formattedCode {
                     Text(otp)
+                        .privacySensitive()
                         .padding(.trailing, 4)
                 } else {
                     Text("*** *** ")
