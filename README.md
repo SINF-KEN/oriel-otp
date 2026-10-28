@@ -9,17 +9,14 @@ information, and [docs/FORK.md](docs/FORK.md) for how the fork is kept in step w
 
 ## OATH functionality
 
-This is an authenticator app compatible with the OATH standard for time and
-counter based numeric OTPs, as used by many online services. To store these
-credentials and generate the codes, it uses a compatible YubiKey, connected
-either via NFC or the Lightning port.
+This is an authenticator app compatible with the OATH standard for time and counter based numeric OTPs, as used
+by many online services. The credentials are stored on a YubiKey, which generates the codes. The key connects over
+NFC, Lightning or USB-C.
 
-Add credentials by tapping the menu icon, selecting `Add account` and then
-either add a credential by scanning a QR code, or by tapping the `Enter manually`
-button.
+Add a credential with the `+` button in the account list, then scan its QR code or tap `Enter manually`.
 
-Once credentials have been added, simply tap or connect your YubiKey to display
-codes.
+Once credentials have been added, plug in the YubiKey, or tap `Scan NFC YubiKey` (or pull the list down) and hold
+the key to the iPhone, to show the codes.
 
 ## Sync from Ente Auth
 
@@ -41,7 +38,8 @@ This app is developed in Xcode and depends on the
 [BigInt](https://github.com/attaswift/BigInt), all added using the Swift Package Manager. To build the app simply open the project file and hit
 the build button.
 
-## Issues
+## Support and privacy
 
-Please report app issues in
-[the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).
+See [SUPPORT.md](SUPPORT.md) for help, and report app issues in
+[the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues). The privacy policy is in
+[PRIVACY.md](PRIVACY.md).

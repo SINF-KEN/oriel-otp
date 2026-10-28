@@ -101,7 +101,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/issues")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/SUPPORT.md")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)
