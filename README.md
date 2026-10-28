@@ -21,6 +21,7 @@ The screenshots are taken from the app in the simulator, with made-up demo accou
   The secrets are stored on the YubiKey and the codes are calculated there; the app doesn't keep a copy.
 - **Ente Auth import.** Sign in to Ente Auth, pick accounts and add them to the YubiKey. Accounts already on the
   key are skipped, and accounts the key can't store are listed with the reason.
+  New accounts can be saved in Ente Auth as well when they are added to the YubiKey.
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
 - **Everyday use.** Search, pin favorites, copy codes, rename and delete accounts, Steam codes, and an optional
@@ -38,15 +39,18 @@ The screenshots are taken from the app in the simulator, with made-up demo accou
 | USB-C | On iPhones and iPads with a USB-C port, e.g. with a YubiKey 5C NFC |
 | Lightning | On iPhones and iPads with a Lightning port, with a YubiKey 5Ci |
 
-## Importing from Ente Auth
+## Ente Auth
 
 Open the menu in the account list and choose **Sync from Ente Auth**, or tap the same button shown when the list is
 empty. Pick the accounts and tap **Add**. A YubiKey holds a fixed number of accounts, so the sheet shows how much
 room is left, only selects as many accounts as fit, and warns when the selection is too big.
 
-The import works in one direction only: accounts are read from Ente Auth and copied onto the YubiKey. Nothing is
-created, changed or deleted in your Ente vault, and accounts you later remove from Ente stay on the YubiKey until you
-delete them there.
+The import reads accounts from Ente Auth and copies them onto the YubiKey. Nothing is changed or deleted in your
+Ente vault, and accounts you later remove from Ente stay on the YubiKey until you delete them there.
+
+The other way, turn on **Also add to Ente Auth** when adding an account to save it in Ente Auth too. This needs a
+saved session (**Stay signed in**). A YubiKey never gives its secrets back, so this works only while an account is
+added; accounts already on the key can't be copied to Ente.
 
 Everything is decrypted on the device. Your Ente password never leaves it, and by default nothing is stored once
 the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
@@ -58,7 +62,8 @@ the sign in and decryption work.
 - OATH secrets live on the YubiKey. The app only writes them to the key when you add an account.
 - A YubiKey password is only saved in the keychain if you choose to. Staying signed in to Ente Auth is optional,
   and the saved session is protected by Face ID, Touch ID or the device passcode.
-- The only network connections are to Ente's server, or your own, during an Ente Auth import.
+- The only network connections are to Ente's server, or your own, during an Ente Auth import or when you choose
+  to add a new account to Ente Auth.
 
 See the [privacy policy](PRIVACY.md) for the details.
 

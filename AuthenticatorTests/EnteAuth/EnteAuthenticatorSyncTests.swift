@@ -78,17 +78,62 @@ struct EnteCodeParserTests {
         let unreadable = try #require(EnteCodeParser.parse(id: "2", rawData: "not json"))
         #expect(unreadable.template == nil)
     }
+
+    @Test func exportedAccountsParseBack() throws {
+        let totp = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 60), algorithm: .sha256,
+                                                             secret: Data(base32Encoded: "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP")!,
+                                                             issuer: "Team#1", accountName: "alice@example.com", digits: 8)
+        let hotp = try YubiKitOATHSession.CredentialTemplate(type: .hotp(counter: 7), algorithm: .sha1,
+                                                             secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+                                                             issuer: nil, accountName: "bob", digits: 6)
+        for template in [totp, hotp] {
+            let rawData = try #require(String(data: try EnteCodeExporter.rawData(for: template), encoding: .utf8))
+            let code = try #require(EnteCodeParser.parse(id: "1", rawData: rawData))
+            let parsed = try #require(code.template)
+            #expect(parsed.issuer == template.issuer)
+            #expect(parsed.name == template.name)
+            #expect(parsed.secret == template.secret)
+            #expect(parsed.algorithm == template.algorithm)
+            #expect(parsed.digits == template.digits)
+            #expect(parsed.type.period == template.type.period)
+            #expect(parsed.type.counter == template.type.counter)
+        }
+    }
+
+    @Test func exportsSteamAccountsAsSteam() throws {
+        let template = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1,
+                                                                 secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+                                                                 issuer: "Steam", accountName: "gamer", digits: 6)
+        let url = try #require(EnteCodeExporter.otpauthURL(for: template))
+        #expect(url.host == "steam")
+        #expect(url.query?.contains("digits=5") == true)
+        let rawData = try #require(String(data: try EnteCodeExporter.rawData(for: template), encoding: .utf8))
+        #expect(EnteCodeParser.parse(id: "1", rawData: rawData)?.credentialId == "Steam:gamer")
+    }
+
+    @Test(arguments: ["", "f", "fo", "foo", "foob", "fooba", "foobar"])
+    func base32RoundTrip(_ text: String) {
+        let data = Data(text.utf8)
+        #expect(Data(base32Encoded: data.base32EncodedString) == data)
+    }
+
+    @Test func base32MatchesRFC4648() {
+        #expect(Data("foobar".utf8).base32EncodedString == "MZXW6YTBOI")
+    }
 }
 
 // Serves canned responses to EnteAPIClient. The tests using it run serialized.
 nonisolated final class EnteMockURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var handler: ((URLRequest) -> (Int, Data))?
     nonisolated(unsafe) static var requests: [URLRequest] = []
+    /// The body of each request, in the order of `requests`.
+    nonisolated(unsafe) static var bodies: [Data?] = []
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
     override func startLoading() {
         Self.requests.append(request)
+        Self.bodies.append(Self.body(of: request))
         let (status, data) = Self.handler?(request) ?? (500, Data())
         let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
@@ -96,6 +141,21 @@ nonisolated final class EnteMockURLProtocol: URLProtocol, @unchecked Sendable {
         client?.urlProtocolDidFinishLoading(self)
     }
     override func stopLoading() {}
+
+    /// URLSession hands the body to URLProtocol as a stream.
+    private static func body(of request: URLRequest) -> Data? {
+        guard let stream = request.httpBodyStream else { return request.httpBody }
+        stream.open()
+        defer { stream.close() }
+        var body = Data()
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        while stream.hasBytesAvailable {
+            let count = stream.read(&buffer, maxLength: buffer.count)
+            guard count > 0 else { break }
+            body.append(contentsOf: buffer.prefix(count))
+        }
+        return body
+    }
 
     static func makeAPI() throws -> EnteAPIClient {
         let configuration = URLSessionConfiguration.ephemeral
@@ -199,6 +259,43 @@ struct EnteAuthenticatorSyncTests {
         }
         let (_, step) = try await EnteLoginFlow.start(api: try EnteMockURLProtocol.makeAPI(), email: "a@b.c")
         #expect(step == .password)
+    }
+
+    @Test func addsEncryptedAccount() async throws {
+        let authenticatorKey = EnteCrypto.randomBytes(32)
+        let existing = [try entity("a", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP", key: authenticatorKey, updatedAt: 1)]
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.bodies = []
+        EnteMockURLProtocol.handler = { request in
+            switch (request.httpMethod, request.url?.path) {
+            case ("GET", "/authenticator/entity/diff"):
+                return (200, try! JSONSerialization.data(withJSONObject: ["diff": existing]))
+            case ("POST", "/authenticator/entity"):
+                return (200, Data(#"{"id":"b"}"#.utf8))
+            default:
+                return (404, Data())
+            }
+        }
+        let api = try EnteMockURLProtocol.makeAPI()
+        let secret = Data(base32Encoded: "JBSWY3DPEHPK3PXP")!
+
+        let duplicate = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1, secret: secret,
+                                                                  issuer: "GitHub", accountName: "alice", digits: 6)
+        #expect(try await EnteAuthenticatorSync.add(duplicate, api: api, token: "t", authenticatorKey: authenticatorKey) == .alreadyPresent)
+        #expect(!EnteMockURLProtocol.requests.contains { $0.httpMethod == "POST" })
+
+        let template = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1, secret: secret,
+                                                                 issuer: "GitLab", accountName: "alice", digits: 6)
+        #expect(try await EnteAuthenticatorSync.add(template, api: api, token: "t", authenticatorKey: authenticatorKey) == .added)
+        let post = try #require(EnteMockURLProtocol.requests.last)
+        #expect(post.httpMethod == "POST")
+        #expect(post.value(forHTTPHeaderField: "X-Auth-Token") == "t")
+        let body = try JSONDecoder().decode([String: String].self, from: try #require(EnteMockURLProtocol.bodies.last ?? nil))
+        let cipherText = try #require(body["encryptedData"].flatMap { Data(base64Encoded: $0) })
+        let header = try #require(body["header"].flatMap { Data(base64Encoded: $0) })
+        let plain = try EnteCrypto.secretStreamDecrypt(cipherText, header: header, key: authenticatorKey)
+        let code = try #require(EnteCodeParser.parse(id: "b", rawData: String(decoding: plain, as: UTF8.self)))
+        #expect(code.credentialId == "GitLab:alice")
     }
 
     @Test func rejectsInsecureServers() {
