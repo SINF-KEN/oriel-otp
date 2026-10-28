@@ -26,7 +26,7 @@ jobs:
       GIT_CONFIG_KEY_0: init.defaultBranch
       GIT_CONFIG_VALUE_0: main
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Review dependency changes
         if: github.event_name == 'pull_request'
@@ -108,7 +108,7 @@ jobs:
 
       # Source packages are portable; DerivedData and simulator products are runner-specific.
       - name: Cache Swift packages
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ runner.temp }}/SourcePackages
           key: ${{ runner.os }}-spm-${{ steps.spm-cache-key.outputs.hash }}
@@ -195,7 +195,7 @@ jobs:
 
       - name: Upload test results and logs
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: Authenticator-test-results
           path: |
