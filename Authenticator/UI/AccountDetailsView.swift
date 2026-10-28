@@ -81,11 +81,14 @@ struct AccountDetailView: View {
         .avoidingReservedRegions()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            // Copy is what people come here for, so it's the last to move into the overflow menu when the bar is narrow.
+            if #available(iOS 27.0, *) {
+                copyToolbarItem
+                    .visibilityPriority(.high)
+            } else {
+                copyToolbarItem
+            }
             ToolbarItemGroup(placement: .primaryAction) {
-                Button(action: copyCode) {
-                    Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
-                }
-                .disabled(account.state == .expired || account.otp == nil)
                 Button(action: { account.calculate() }) {
                     Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
                 }
@@ -121,6 +124,15 @@ struct AccountDetailView: View {
         }
     }
 
+    private var copyToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: copyCode) {
+                Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
+            }
+            .disabled(account.state == .expired || account.otp == nil)
+        }
+    }
+
     @ViewBuilder private var statusIcon: some View {
         switch account.state {
         case .requiresCalculation, .expired:
@@ -132,12 +144,6 @@ struct AccountDetailView: View {
     }
 
     private func copyCode() {
-        if account.state != .expired, let otp = account.otp?.code {
-            toastPresenter.copyToClipboard(otp)
-        } else {
-            account.calculate { otp in
-                toastPresenter.copyToClipboard(otp.code)
-            }
-        }
+        toastPresenter.copyCode(of: account)
     }
 }

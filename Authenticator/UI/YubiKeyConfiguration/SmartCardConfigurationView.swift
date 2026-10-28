@@ -75,11 +75,11 @@ struct SmartCardConfigurationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationTitle("Smart card extension")
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItem(placement: .primaryAction) {
                 Button {
                     presentHelpAlert.toggle()
                 } label: {
-                    Image(systemName: "questionmark.circle")
+                    Label(String(localized: "Help", comment: "Smart card extension help button"), systemImage: "questionmark.circle")
                 }
             }
         }

@@ -30,95 +30,45 @@ struct TokenRequestView: View {
     @State private var accessoryText = String(localized: "Insert a YubiKey and enter its PIN to access the certificate.")
     @State private var accessoryOpacity = 1.0
     @State private var nfcOpacity = DeviceCapabilities.supportsNFC ? 1.0 : 0.0
-    @State private var overlayOpacity = 0.0
-    @State private var checkmarkOpacity = 0.0
-    @State private var arrowHintOpacity = 0.0
-    @State private var arrowHintScale = 1.0
+    @State private var isCompleted = false
     @State private var presentYubiOTP = false
     @State private var error: TokenRequestViewModel.TokenError? = nil
+
+    @ScaledMetric(relativeTo: .body) private var iconColumnWidth: CGFloat = 35
     
     init(userInfo: [AnyHashable: Any]?) {
         self.userInfo = userInfo
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            // We need to tighten the vertical spacing to make room for the keyboard on smaller screens
-            let isCompact = geometry.size.width <= 320
-            VStack(spacing: 0) {
-                Text("Unlock YubiKey")
-                    .font(.system(size: 22))
-                    .padding(.top, isCompact ? 40 : 70)
-                
-                HStack(spacing: 0) {
-                    Image("InsertKey")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 8)
-                        .padding(.leading, 3)
-                        .frame(width: 35, alignment: .leading)
-                        .accessibilityHidden(true)
-                    Text(accessoryText)
-                        .font(.system(size: 16))
-                        .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+        NavigationStack {
+            // Scrolls on short displays, such as the outer display of iPhone Duo with the keyboard up.
+            ScrollView {
+                if isCompleted {
+                    completedView
+                } else {
+                    unlockForm
                 }
-                .opacity(accessoryOpacity)
-                .padding(.top, isCompact ? 35 : 40)
-                .padding(.horizontal, 30)
-                
-                Group {
-                    HStack(spacing: 0) {
-                        separator
-                        Text("or")
-                            .font(.system(size: 16))
-                            .foregroundStyle(Color(.separator))
-                            .frame(minWidth: 35)
-                        separator
-                    }
-                    .frame(height: 30)
-                    .padding(.top, isCompact ? 5 : 15)
-                    .padding(.horizontal, 20)
-                    
-                    HStack(spacing: 0) {
-                        Image(systemName: "dot.radiowaves.forward")
-                            .frame(width: 16)
-                            .frame(width: 35, alignment: .leading)
-                            .accessibilityHidden(true)
-                        Text("Enter the PIN, then tap a NFC enabled YubiKey against the iPhone to access the certificate.")
-                            .font(.system(size: 16))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(.top, isCompact ? 5 : 15)
-                    .padding(.horizontal, 30)
-                }
-                .opacity(nfcOpacity)
-                
-                VStack(spacing: 0) {
-                    SecureField(String(localized: "Smart card (PIV) PIN"), text: $pin)
-                        .font(.system(size: 18))
-                        .multilineTextAlignment(.center)
-                        .keyboardType(.numbersAndPunctuation)
-                        .textContentType(.oneTimeCode)
-                        .submitLabel(.go)
-                        .focused($isPINFocused)
-                        .onSubmit(submitPIN)
-                        .onChange(of: pin) { _, pin in
-                            if pin.count > 8 { self.pin = String(pin.prefix(8)) }
-                        }
-                        .frame(minWidth: 170, maxHeight: .infinity)
-                    separator
-                }
-                .frame(height: 50)
-                .padding(.top, isCompact ? 35 : 60)
-                .padding(.horizontal, 20)
-                
-                Spacer()
             }
-            .frame(maxWidth: .infinity)
-        }
-        .background(Color(.systemBackground))
-        .overlay {
-            completedOverlay
+            .scrollBounceBehavior(.basedOnSize)
+            // Keeps the PIN field and the instructions in one half of a half-folded iPhone Duo.
+            .avoidingReservedRegions()
+            .navigationTitle(String(localized: "Unlock YubiKey"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                if isCompleted {
+                    ToolbarItem(placement: .confirmationAction) {
+                        ConfirmButton(String(localized: "Done", comment: "PIV extension close button")) { dismiss() }
+                    }
+                } else {
+                    ToolbarItem(placement: .cancellationAction) {
+                        CancelButton {
+                            model.cancel()
+                            dismiss()
+                        }
+                    }
+                }
+            }
         }
         .alert(error?.message.title ?? "", isPresented: .constant(error != nil), presenting: error) { _ in
             Button(String(localized: "Ok")) { error = nil }
@@ -149,37 +99,85 @@ struct TokenRequestView: View {
             model.stop()
         }
     }
-    
+
+    private var unlockForm: some View {
+        VStack(spacing: 20) {
+            HStack(spacing: 0) {
+                Image("InsertKey")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 8)
+                    .padding(.leading, 3)
+                    .frame(width: iconColumnWidth, alignment: .leading)
+                    .accessibilityHidden(true)
+                Text(accessoryText)
+                    .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+            }
+            .opacity(accessoryOpacity)
+
+            Group {
+                HStack(spacing: 0) {
+                    separator
+                    Text("or")
+                        .foregroundStyle(.secondary)
+                        .frame(minWidth: iconColumnWidth)
+                    separator
+                }
+
+                HStack(spacing: 0) {
+                    Image(systemName: "dot.radiowaves.forward")
+                        .frame(width: iconColumnWidth, alignment: .leading)
+                        .accessibilityHidden(true)
+                    Text("Enter the PIN, then tap a NFC enabled YubiKey against the iPhone to access the certificate.")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .opacity(nfcOpacity)
+
+            VStack(spacing: 8) {
+                SecureField(String(localized: "Smart card (PIV) PIN"), text: $pin)
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+                    .keyboardType(.numbersAndPunctuation)
+                    .textContentType(.oneTimeCode)
+                    .submitLabel(.go)
+                    .focused($isPINFocused)
+                    .onSubmit(submitPIN)
+                    .onChange(of: pin) { _, pin in
+                        if pin.count > 8 { self.pin = String(pin.prefix(8)) }
+                    }
+                    .frame(minHeight: 44)
+                separator
+            }
+            .padding(.top, 20)
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 24)
+        // Keeps the lines readable on wide displays.
+        .frame(maxWidth: 500)
+        .frame(maxWidth: .infinity)
+    }
+
     private var separator: some View {
         Color(.separator).frame(height: 1)
     }
     
-    private var completedOverlay: some View {
-        ZStack(alignment: .topLeading) {
-            Color(.systemBackground)
-            VStack(spacing: 17) {
-                Image(systemName: "checkmark.circle")
-                    .font(.system(size: 64))
-                    .foregroundStyle(Color(.color11))
-                    .accessibilityHidden(true)
-                Text("Tap the back button to continue")
-                    .font(.system(size: 16))
-            }
-            .opacity(checkmarkOpacity)
-            .frame(maxWidth: .infinity)
-            .padding(.top, 240)
-            Image(systemName: "arrow.turn.left.up")
-                .font(.system(size: 22))
-                .scaleEffect(arrowHintScale)
-                .opacity(arrowHintOpacity)
-                .padding(.leading, 18)
-                .padding(.top, 53)
+    private var completedView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.circle")
+                .font(.system(size: 64))
+                .foregroundStyle(Color(.color11))
                 .accessibilityHidden(true)
+            Text(Self.completedMessage)
+                .multilineTextAlignment(.center)
         }
-        .ignoresSafeArea()
-        .opacity(overlayOpacity)
-        .allowsHitTesting(overlayOpacity > 0)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 48)
+        .frame(maxWidth: .infinity)
+        .transition(.opacity)
     }
+
+    private static let completedMessage = String(localized: "Go back to the app that asked for the certificate.", comment: "PIV extension completed message")
     
     private func wiredKeyDidChange(connected: Bool) {
         if !connected && nfcOpacity == 1 { return }
@@ -221,30 +219,10 @@ struct TokenRequestView: View {
                 return
             }
             withAnimation(.easeInOut(duration: 0.5)) {
-                overlayOpacity = 1
-            }
-            withAnimation(.easeInOut(duration: 2)) {
-                checkmarkOpacity = 1
+                isCompleted = true
             }
             isPINFocused = false
-            await animateHint()
-        }
-    }
-    
-    // Pulses the arrow pointing at the system back button in the status bar a few times.
-    private func animateHint() async {
-        try? await Task.sleep(for: .seconds(4))
-        for step in 0..<7 {
-            let isExpanded = step.isMultiple(of: 2)
-            withAnimation(.easeInOut(duration: 1)) {
-                arrowHintOpacity = isExpanded ? 1 : 0
-                arrowHintScale = isExpanded ? 1.8 : 1
-            }
-            try? await Task.sleep(for: .seconds(1))
-        }
-        withAnimation(.easeInOut(duration: 0.6)) {
-            arrowHintOpacity = 1
-            arrowHintScale = 1
+            AccessibilityNotification.Announcement(Self.completedMessage).post()
         }
     }
 }

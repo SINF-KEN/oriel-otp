@@ -22,6 +22,7 @@ import YubiKit
 struct MainView: View {
     
     @Environment(\.scenePhase) var scenePhase
+    @Environment(\.accessibilityVoiceOverEnabled) var isVoiceOverEnabled
     @Environment(ToastPresenter.self) var toastPresenter
     @Environment(NotificationsViewModel.self) var notificationsViewModel
     
@@ -38,14 +39,16 @@ struct MainView: View {
     @State var didEnterBackground = true
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
+    @State var accountToDelete: Account? = nil
     
-    var insertYubiKeyMessage = {
+    // Computed so it follows VoiceOver being turned on or off while the app runs.
+    var insertYubiKeyMessage: String {
         if DeviceCapabilities.supportsNFC {
-            String(localized: "Insert YubiKey") + " " + "\(!UIAccessibility.isVoiceOverRunning ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
+            String(localized: "Insert YubiKey") + " " + "\(!isVoiceOverEnabled ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
         } else {
             String(localized: "Insert YubiKey")
         }
-    }()
+    }
     
     var body: some View {
         @Bindable var model = model
@@ -62,10 +65,7 @@ struct MainView: View {
                     } else if !searchText.isEmpty {
                         if searchResults.count > 0 {
                             ForEach(searchResults, id: \.id) { account in
-                                NavigationLink(value: account.accountId) {
-                                    AccountRowView(account: account)
-                                }
-                                .listRowSeparator(.hidden)
+                                accountRow(account)
                             }
                         } else {
                             ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"), message: String(localized: "No matching accounts on YubiKey"), height: reader.size.height)
@@ -73,37 +73,25 @@ struct MainView: View {
                     } else if model.pinnedAccounts.count > 0 {
                         Section("Pinned") {
                             ForEach(model.pinnedAccounts, id: \.id) { account in
-                                NavigationLink(value: account.accountId) {
-                                    AccountRowView(account: account)
-                                }
-                                .listRowSeparator(.hidden)
+                                accountRow(account)
                             }
                         }
                         if model.otherAccounts.count > 0 {
                             Section("Other") {
                                 ForEach(model.otherAccounts, id: \.id) { account in
-                                    NavigationLink(value: account.accountId) {
-                                        AccountRowView(account: account)
-                                    }
-                                    .listRowSeparator(.hidden)
+                                    accountRow(account)
                                 }
                             }
                         }
                     } else if model.accounts.count > 0 && otp != nil {
                         Section("Accounts") {
                             ForEach(model.otherAccounts, id: \.id) { account in
-                                NavigationLink(value: account.accountId) {
-                                    AccountRowView(account: account)
-                                }
-                                .listRowSeparator(.hidden)
+                                accountRow(account)
                             }
                         }
                     } else if model.accounts.count > 0 {
                         ForEach(model.accounts, id: \.id) { account in
-                            NavigationLink(value: account.accountId) {
-                                AccountRowView(account: account)
-                            }
-                            .listRowSeparator(.hidden)
+                            accountRow(account)
                         }
                     } else {
                         ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height)
@@ -119,7 +107,8 @@ struct MainView: View {
                 model.updateAccountsOverNFC()
             }
             .toolbar {
-                if UIAccessibility.isVoiceOverRunning {
+                // Always there, so scanning doesn't depend on discovering pull to refresh.
+                if DeviceCapabilities.supportsNFC {
                     ToolbarItem(placement: .topBarLeading) {
                         Button {
                             otp = nil
@@ -130,7 +119,7 @@ struct MainView: View {
                     }
                 }
 
-                if !model.accountsLoaded && !UIAccessibility.isVoiceOverRunning {
+                if !model.accountsLoaded {
                     ToolbarItem(placement: .principal) {
                         // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
                         Text(verbatim: "Oriel OTP")
@@ -191,7 +180,8 @@ struct MainView: View {
                 importAccounts(templates, requiresTouch: requiresTouch)
             }
         }
-        .fullScreenCover(isPresented: $showConfiguration) {
+        // Sheets rather than full-screen covers, so they read as a task on top of the account list and can be swiped away.
+        .sheet(isPresented: $showConfiguration) {
             ConfigurationView(showConfiguration: $showConfiguration)
                 .onAppear {
                     model.stop()
@@ -199,7 +189,7 @@ struct MainView: View {
                     model.start()
                 }
         }
-        .fullScreenCover(isPresented: $showAbout) {
+        .sheet(isPresented: $showAbout) {
             AboutView()
                 .onAppear {
                     model.stop()
@@ -228,6 +218,14 @@ struct MainView: View {
             }
             Button(String(localized: "Never for this YubiKey", comment: "Save password alert.")) { model.selectPasswordSaveType(.never) }
             Button(String(localized: "Not now", comment: "Save passsword alert"), role: .cancel) { model.selectPasswordSaveType(nil) }
+        }
+        .alert("Delete account?", isPresented: Binding(get: { accountToDelete != nil }, set: { if !$0 { accountToDelete = nil } }), presenting: accountToDelete) { account in
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                model.deleteAccount(account) {}
+            }
+        } message: { _ in
+            Text("This will permanently delete the account from the YubiKey, and your ability to generate codes for it!")
         }
         .errorAlert(error: $model.sessionError)
         .errorAlert(error: $model.connectionError) { model.start() }
@@ -285,8 +283,11 @@ struct MainView: View {
             }
         }
         .onChange(of: model.showTouchToast) { _, showToast in
+            let message = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
             if showToast {
-                toastPresenter.toast(message: String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey"))
+                toastPresenter.toast(message: message, duration: nil)
+            } else {
+                toastPresenter.dismiss(message: message)
             }
         }
         .onChange(of: notificationsViewModel.showPIVTokenView) { _, showPIVTokenview in
@@ -296,6 +297,9 @@ struct MainView: View {
                 showConfiguration = false
                 showAbout = false
                 selectedAccountID = nil
+            } else if scenePhase == .active {
+                // Closed with Cancel or Done. Becoming active skipped starting while the PIV view was up.
+                model.start()
             }
         }
         .onChange(of: model.presentDisableOTP) { _, presentDisableOTP in
@@ -322,6 +326,50 @@ struct MainView: View {
         }
     }
     
+    private func accountRow(_ account: Account) -> some View {
+        NavigationLink(value: account.accountId) {
+            AccountRowView(account: account)
+        }
+        .listRowSeparator(.hidden)
+        // The same actions as the detail view, without having to open it. VoiceOver lists them as the row's actions.
+        .swipeActions(edge: .leading) {
+            pinButton(account)
+                .tint(Color("Favorite"))
+        }
+        .swipeActions(edge: .trailing) {
+            // Not a destructive role, which would remove the row before the deletion is confirmed.
+            deleteButton(account)
+                .tint(.red)
+            copyButton(account)
+                .tint(.blue)
+        }
+        .contextMenu {
+            copyButton(account)
+            pinButton(account)
+            Divider()
+            deleteButton(account)
+        }
+    }
+
+    private func copyButton(_ account: Account) -> some View {
+        Button(action: { toastPresenter.copyCode(of: account) }) {
+            Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
+        }
+    }
+
+    private func pinButton(_ account: Account) -> some View {
+        Button(action: { account.isPinned.toggle() }) {
+            Label(account.isPinned ? String(localized: "Unpin", comment: "Menu") : String(localized: "Pin", comment: "Menu"),
+                  systemImage: account.isPinned ? "pin.slash" : "pin")
+        }
+    }
+
+    private func deleteButton(_ account: Account) -> some View {
+        Button(action: { accountToDelete = account }) {
+            Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
+        }
+    }
+
     private var addAccountToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showAddAccount.toggle() }) {
