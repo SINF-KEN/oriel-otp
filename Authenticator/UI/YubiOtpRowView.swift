@@ -26,6 +26,8 @@ struct YubiOtpRowView: View {
     var body: some View {
         HStack {
             Image("yubikey")
+                // The accent is dark in light mode and light in dark mode, the background color is the opposite.
+                .foregroundStyle(Color(.systemBackground))
                 .frame(width:40, height: 40)
                 .background(Color.accentColor)
                 .clipShape(.circle)
