@@ -40,6 +40,7 @@ struct MainView: View {
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
     @State var accountToDelete: Account? = nil
+    @State var quickActions = QuickActionCenter.shared
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
     var insertYubiKeyMessage: String {
@@ -203,7 +204,7 @@ struct MainView: View {
                 model.cancelPasswordEntry()
                 password = ""
             }
-            Button(String(localized: "Ok", comment: "Password alert")) {
+            Button(String(localized: "OK", comment: "Password alert")) {
                 model.submitPassword(password)
                 password = ""
             }
@@ -225,8 +226,11 @@ struct MainView: View {
                 model.deleteAccount(account) {}
             }
         } message: { _ in
-            Text("This will permanently delete the account from the YubiKey, and your ability to generate codes for it!")
+            Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
         }
+        // Blanks the codes, which are privacy sensitive, whenever the scene isn't active, so they don't show in the
+        // app switcher or its snapshot. Only the codes, so the screen still makes sense behind the NFC and Face ID sheets.
+        .redacted(reason: scenePhase == .active ? [] : .privacy)
         .errorAlert(error: $model.sessionError)
         .errorAlert(error: $model.connectionError) { model.start() }
         .onAppear {
@@ -270,6 +274,9 @@ struct MainView: View {
 
                 guard !notificationsViewModel.showPIVTokenView else { return }
                 model.start() // This is called when app becomes active
+                performPendingQuickAction()
+            } else if phase == .active {
+                performPendingQuickAction()
             } else if phase == .background {
                 didEnterBackground = true
 
@@ -281,6 +288,10 @@ struct MainView: View {
                     UIApplication.shared.endBackgroundTask(backgroundTask)
                 }
             }
+        }
+        // Quick actions and the Scan NFC YubiKey intent wait for the scene to be active, as NFC can't start before that.
+        .onChange(of: quickActions.pending, initial: true) { _, _ in
+            performPendingQuickAction()
         }
         .onChange(of: model.showTouchToast) { _, showToast in
             let message = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
@@ -326,6 +337,27 @@ struct MainView: View {
         }
     }
     
+    private func performPendingQuickAction() {
+        guard scenePhase == .active, let action = quickActions.pending else { return }
+        quickActions.pending = nil
+        guard !notificationsViewModel.showPIVTokenView && !notificationsViewModel.presentDisableOTP else { return }
+        switch action {
+        case .scanNFC:
+            guard DeviceCapabilities.supportsNFC else { return }
+            showConfiguration = false
+            showAbout = false
+            otp = nil
+            model.updateAccountsOverNFC()
+        case .addAccount:
+            guard DeviceCapabilities.supportsNFC || model.isKeyPluggedIn else { return }
+            showConfiguration = false
+            showAbout = false
+            showEnteSync = false
+            oathURL = nil
+            showAddAccount = true
+        }
+    }
+
     private func accountRow(_ account: Account) -> some View {
         NavigationLink(value: account.accountId) {
             AccountRowView(account: account)
@@ -373,7 +405,7 @@ struct MainView: View {
     private var addAccountToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showAddAccount.toggle() }) {
-                Label("Add account", systemImage: "qrcode")
+                Label("Add account", systemImage: "plus")
             }
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
         }

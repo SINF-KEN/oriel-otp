@@ -8,31 +8,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Token Extension"
+            "value" : "Oriel OTP Smartcard"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "TokenExtension"
+            "state" : "translated",
+            "value" : "Oriel OTP Smart Card"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TokenExtension"
+            "value" : "Carte à puce Oriel OTP"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TokenExtension"
+            "value" : "Oriel OTP スマートカード"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TokenExtension"
+            "value" : "Čipová karta Oriel OTP"
           }
         }
       }
@@ -44,31 +44,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Token Extension"
+            "value" : "Oriel OTP Smartcard"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "TokenExtension"
+            "state" : "translated",
+            "value" : "Oriel OTP Smart Card"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TokenExtension"
+            "value" : "Carte à puce Oriel OTP"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TokenExtension"
+            "value" : "Oriel OTP スマートカード"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "TokenExtension"
+            "value" : "Čipová karta Oriel OTP"
           }
         }
       }
