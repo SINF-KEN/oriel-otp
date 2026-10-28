@@ -25,10 +25,18 @@ Both privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/P
 tracking and no collected data types. The only required-reason API is `UserDefaults`: `CA92.1` for the app's own
 settings, and `1C8F.1` for the app group the app shares with the smart card extension.
 
-Suggested answer: **Data Not Collected**. The developer runs no server, analytics or crash reporting. Ente sync
-sends the email and sign-in data the person enters to their own Ente account (or their own server), at their
-request, to sign in to that service; the developer never receives it. Revisit this answer if Apple asks, or if
-anything is ever sent to a service the developer runs.
+Recommended App Store Connect answer, based on the developer's confirmation: **Data Not Collected**. Oriel OTP
+does not use analytics, advertising, crash reporting, diagnostics reporting, or a developer-operated server.
+Ente sync is optional and started by the user. When used, the user enters their email and sign-in or verification
+information, which the app sends to Ente or to the self-hosted server address the user chose. The developer does
+not receive or retain that information.
+
+This recommendation assumes Ente (or a self-hosted endpoint) is an independent service used for the user's own
+account, not a vendor or partner collecting data on Oriel OTP's behalf. Apple's definition of collection covers
+off-device transmission that lets the developer or a third-party partner access data beyond servicing the request
+in real time. If Ente is considered Oriel OTP's partner for this feature, disclose the data types it can access;
+the optional-disclosure exception is limited to infrequent submissions outside the app's primary functionality.
+See [Apple's App Privacy Details guidance](https://developer.apple.com/app-store/app-privacy-details/).
 
 ## Export compliance
 
