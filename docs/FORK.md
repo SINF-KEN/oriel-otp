@@ -33,8 +33,11 @@ Put new features and fixes on `main` or a feature branch, never on `fork/keyotp`
 - `applinks:my.yubico.com` is removed, since only Yubico's app can claim that domain. Tapping a YubiKey's NFC
   OTP link opens Safari instead of the app.
 - App icons: a lock on a shield, in pink or dark, instead of the Yubico logo, and the Yubico wordmark in the navigation bar is
-  replaced by the app name. The brand colors `YubiBlue` and `YubiGreen` keep their names, to keep the diff
-  small, but are indigo.
+  replaced by the app name.
+- Colors: taken from the icon. The accent, `YubiBlue` and `YubiGreen` (names kept to keep the diff small) are
+  crimson `#B2001F` in light mode and blush `#FFBFCB` in dark mode. The 16 account avatar colors are soft
+  rose-centred pastels in light mode, where the letter is black, and deep jewel tones in dark mode, where it is
+  white, all at the same perceived lightness so none stands out. Every pair keeps at least 7.9:1 contrast.
 - About: terms, privacy policy, user guide and support point to this repository.
 
 ## What stays, and why
