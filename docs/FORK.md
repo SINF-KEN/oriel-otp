@@ -58,15 +58,16 @@ Put new features and fixes on `main` or a feature branch, never on `fork/oriel-o
   rose-centred pastels in light mode, where the letter is black, and deep jewel tones in dark mode, where it is
   white, all at the same perceived lightness so none stands out. Every pair keeps at least 7.9:1 contrast.
 - About: terms, privacy policy, user guide and support point to this repository.
+- Artwork: the YubiKey photos and drawings, the tutorial images and the key symbol are replaced by the app's own
+  drawings, made by `tools/generate_artwork.py`. Yubico's release notes are removed and the version starts at 1.0.
 
 ## What stays, and why
 
 - The Apache 2.0 `LICENSE` and the `Copyright (C) Yubico` headers. The license requires keeping them, and
   modified files carry an additional copyright line.
-- "YubiKey" and "Yubico OTP" where they name the hardware or its OTP protocol, the drawings of YubiKey models
-  and the link to Yubico's smart card documentation. These describe what the app works with; [NOTICE](../NOTICE)
+- "YubiKey" and "Yubico OTP" where they name the hardware or its OTP protocol, and the link to Yubico's smart
+  card documentation. These describe what the app works with; [NOTICE](../NOTICE)
   states there is no affiliation.
 - `com.yubico.ylp`, the accessory protocol of Lightning YubiKeys, which the app needs to talk to them.
-- Release notes of earlier Yubico versions in `VersionHistory.plist`.
 
 To pick another name, search for `Oriel OTP`, `OrielOTP`, `orielotp` and `sinf-ken`.

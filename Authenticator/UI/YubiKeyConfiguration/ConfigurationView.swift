@@ -36,7 +36,7 @@ struct ConfigurationView: View {
             List {
                 if model.deviceInfo == nil {
                     VStack(alignment: .center) {
-                        Image("yubikey")
+                        Image("securitykey")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 100, height: 100)
@@ -66,7 +66,7 @@ struct ConfigurationView: View {
                         .padding()
                         if let deviceInfo = model.deviceInfo {
                             HStack {
-                                ListIconView(image: Image("yubikey"), color: Color(.systemGray))
+                                ListIconView(image: Image("securitykey"), color: Color(.systemGray))
                                 Text("Device type")
                                 Spacer()
                                 Text(deviceInfo.deviceName).foregroundStyle(.secondary)
@@ -260,15 +260,15 @@ extension DeviceInfo {
     var deviceImage: Image? {
         switch formFactor {
         case .usbAKeychain:
-            return Image("yk5nfc")
+            return Image("key-usba")
         case .usbCKeychain:
-            return Image("yk5cnfc")
+            return Image("key-usbc")
         case .usbCLightning:
-            return Image("yk5ci")
+            return Image("key-usbc-lightning")
         case .usbCBio:
-            return Image("ykbioc")
+            return Image("key-bio-usbc")
         case .usbABio:
-            return Image("ykbioa")
+            return Image("key-bio-usba")
         default:
             return nil
         }
