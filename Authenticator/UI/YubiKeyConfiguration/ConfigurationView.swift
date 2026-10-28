@@ -55,7 +55,7 @@ struct ConfigurationView: View {
                 }
                 
                 if let deviceInfo = model.deviceInfo {
-                    Section(" ") {
+                    Section {
                         VStack(alignment: .center) {
                             if let image = deviceInfo.deviceImage {
                                 image
@@ -66,24 +66,28 @@ struct ConfigurationView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        if let deviceInfo = model.deviceInfo {
+                        LabeledContent {
+                            Text(deviceInfo.deviceName)
+                        } label: {
                             HStack {
                                 ListIconView(image: Image("securitykey"), color: Color(.systemGray))
                                 Text("Device type")
-                                Spacer()
-                                Text(deviceInfo.deviceName).foregroundStyle(.secondary)
                             }
+                        }
+                        LabeledContent {
+                            Text(String(deviceInfo.serialNumber))
+                        } label: {
                             HStack {
                                 ListIconView(image: Image(systemName: "number"), color: Color(.systemGray), padding: 7)
                                 Text("Serial number")
-                                Spacer()
-                                Text(String(deviceInfo.serialNumber)).foregroundStyle(.secondary)
                             }
+                        }
+                        LabeledContent {
+                            Text(deviceInfo.version.description)
+                        } label: {
                             HStack {
                                 ListIconView(image: Image(systemName: "cpu"), color: Color(.systemGray), padding: 5)
                                 Text("Firmware version")
-                                Spacer()
-                                Text(deviceInfo.version.description).foregroundStyle(.secondary)
                             }
                         }
                     }
