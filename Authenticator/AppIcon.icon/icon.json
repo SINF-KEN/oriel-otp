@@ -2,19 +2,19 @@
   "fill-specializations": [
     {
       "value": {
-        "solid": "srgb:0.23922,0.22745,0.60000,1.00000"
+        "automatic-gradient": "srgb:1.00000,0.72157,0.76863,1.00000"
       }
     },
     {
       "appearance": "dark",
       "value": {
-        "solid": "srgb:0.10980,0.10588,0.22745,1.00000"
+        "automatic-gradient": "srgb:0.23922,0.07059,0.10196,1.00000"
       }
     },
     {
       "appearance": "tinted",
       "value": {
-        "solid": "srgb:0.10980,0.10588,0.22745,1.00000"
+        "automatic-gradient": "srgb:0.23922,0.07059,0.10196,1.00000"
       }
     }
   ],
@@ -25,27 +25,63 @@
           "fill-specializations": [
             {
               "value": {
-                "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+                "solid": "srgb:0.98431,0.95686,0.96078,1.00000"
               }
             },
             {
               "appearance": "dark",
               "value": {
-                "solid": "srgb:0.66275,0.65098,0.94902,1.00000"
+                "solid": "srgb:0.09412,0.04706,0.05490,1.00000"
               }
             },
             {
               "appearance": "tinted",
               "value": {
-                "solid": "srgb:0.66275,0.65098,0.94902,1.00000"
+                "solid": "srgb:0.09412,0.04706,0.05490,1.00000"
               }
             }
           ],
-          "image-name": "key.svg",
-          "name": "key"
+          "image-name": "lock.svg",
+          "name": "lock"
         }
       ],
-      "name": "Key",
+      "name": "Lock",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      }
+    },
+    {
+      "layers": [
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.69804,0.00000,0.12157,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:1.00000,0.74902,0.79608,1.00000"
+              }
+            },
+            {
+              "appearance": "tinted",
+              "value": {
+                "solid": "srgb:1.00000,0.74902,0.79608,1.00000"
+              }
+            }
+          ],
+          "image-name": "shield.svg",
+          "name": "shield"
+        }
+      ],
+      "name": "Shield",
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5

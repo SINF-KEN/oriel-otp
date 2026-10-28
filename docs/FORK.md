@@ -32,7 +32,7 @@ Put new features and fixes on `main` or a feature branch, never on `fork/keyotp`
   ids are removed, so set your own team in Xcode before running on a device.
 - `applinks:my.yubico.com` is removed, since only Yubico's app can claim that domain. Tapping a YubiKey's NFC
   OTP link opens Safari instead of the app.
-- App icons: a key on indigo instead of the Yubico logo, and the Yubico wordmark in the navigation bar is
+- App icons: a lock on a shield, in pink or dark, instead of the Yubico logo, and the Yubico wordmark in the navigation bar is
   replaced by the app name. The brand colors `YubiBlue` and `YubiGreen` keep their names, to keep the diff
   small, but are indigo.
 - About: terms, privacy policy, user guide and support point to this repository.

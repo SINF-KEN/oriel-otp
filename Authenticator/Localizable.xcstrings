@@ -612,6 +612,35 @@
         }
       }
     },
+    "Pink" : {
+      "comment" : "App icon name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rosa"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rose"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ピンク"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ružová"
+          }
+        }
+      }
+    },
     "or" : {
       "comment" : "PIV extension separator between the USB and NFC instructions",
       "localizations" : {
@@ -2925,35 +2954,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey 5Ci alebo kompatibilný kľúč YubiKey s funkciou NFC."
-          }
-        }
-      }
-    },
-    "Green" : {
-      "comment" : "App icon name",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grün"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vert"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "グリーン"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zelená"
           }
         }
       }
