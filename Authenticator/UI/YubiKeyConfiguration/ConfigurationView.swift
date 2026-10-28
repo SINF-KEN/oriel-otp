@@ -22,14 +22,16 @@ struct ConfigurationView: View {
     @State var model = ConfigurationViewModel()
     @Binding var showConfiguration: Bool
     @State var showInsertYubiKey: Bool = false
+    @Environment(\.accessibilityVoiceOverEnabled) var isVoiceOverEnabled
     
-    var insertYubiKeyMessage = {
+    // Computed so it follows VoiceOver being turned on or off while the app runs.
+    var insertYubiKeyMessage: String {
         if DeviceCapabilities.supportsNFC {
-            String(localized: "Insert YubiKey") + " " + "\(!UIAccessibility.isVoiceOverRunning ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
+            String(localized: "Insert YubiKey") + " " + "\(!isVoiceOverEnabled ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
         } else {
             String(localized: "Insert YubiKey")
         }
-    }()
+    }
     
     var body: some View {
         NavigationStack {
@@ -178,7 +180,8 @@ struct ConfigurationView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { showConfiguration.toggle() }
                 }
-                if UIAccessibility.isVoiceOverRunning {
+                // Always there, so scanning doesn't depend on discovering pull to refresh.
+                if DeviceCapabilities.supportsNFC {
                     ToolbarItem(placement: .primaryAction) {
                         Button {
                             model.scanNFC()

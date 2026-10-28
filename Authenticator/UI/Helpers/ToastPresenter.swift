@@ -24,28 +24,44 @@ import SwiftUI
     
     @ObservationIgnored private var presentTask: Task<Void, any Error>?
     @ObservationIgnored private var dismissTask: Task<Void, any Error>?
+    // The latest message asked for, which may still be waiting for the previous toast to go away.
+    @ObservationIgnored private var requestedMessage: String?
 
-    func toast(message: String) {
+    /// Shows the message, and hides it after `duration`, or only when `dismiss(message:)` is called if `duration` is nil.
+    func toast(message: String, duration: Duration? = .seconds(4)) {
         presentTask?.cancel()
         dismissTask?.cancel()
+        requestedMessage = message
 
         if isPresenting {
             isPresenting = false
             presentTask = Task { [weak self] in
                 try await Task.sleep(for: .milliseconds(300))
-                self?.present(message)
+                self?.present(message, duration: duration)
             }
         } else {
-            present(message)
+            present(message, duration: duration)
         }
     }
 
-    private func present(_ message: String) {
+    /// Hides the toast if it shows, or is about to show, this message.
+    func dismiss(message: String) {
+        guard requestedMessage == message else { return }
+        presentTask?.cancel()
+        dismissTask?.cancel()
+        requestedMessage = nil
+        isPresenting = false
+    }
+
+    private func present(_ message: String, duration: Duration?) {
         self.message = message
         isPresenting = true
+        AccessibilityNotification.Announcement(message).post()
+        guard let duration else { return }
         dismissTask = Task { [weak self] in
-            try await Task.sleep(for: .seconds(4))
+            try await Task.sleep(for: duration)
             self?.isPresenting = false
+            self?.requestedMessage = nil
             self?.dismissTask = nil
         }
     }
@@ -58,5 +74,16 @@ extension ToastPresenter {
         toast(message: String(localized: "Copied to clipboard", comment: "Toast copied to clipboard message"))
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
+    }
+
+    /// Copies the account's code, calculating a new one first if there's none or it has expired.
+    func copyCode(of account: Account) {
+        if account.state != .expired, let otp = account.otp?.code {
+            copyToClipboard(otp)
+        } else {
+            account.calculate { [weak self] otp in
+                self?.copyToClipboard(otp.code)
+            }
+        }
     }
 }
