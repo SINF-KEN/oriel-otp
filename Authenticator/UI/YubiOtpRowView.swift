@@ -34,6 +34,7 @@ struct YubiOtpRowView: View {
                 .padding(.trailing, 5)
             VStack(alignment: .leading) {
                 Text(otp)
+                    .privacySensitive()
                     .font(.subheadline.weight(.medium))
                     .lineLimit(1)
                     .minimumScaleFactor(0.1)

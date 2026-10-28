@@ -27,6 +27,7 @@ struct SmartCardConfigurationView: View {
     @State private var tokens = [SecCertificate]()
     @State private var presentHelpAlert = false
     @State private var presentNotificationsAlert = false
+    @State private var presentNotificationsExplanation = false
     @State private var storeError: Error? = nil
     
     var body: some View {
@@ -99,6 +100,17 @@ struct SmartCardConfigurationView: View {
         }, message: {
             Text("Other applications can use client certificates on your YubiKey for authentication and signing purposes.")
         })
+        // Says why before iOS asks, so the request isn't a surprise and is less likely to be turned down.
+        .alert(String(localized: "Allow notifications", comment: "PIV extension notifications explanation title"), isPresented: $presentNotificationsExplanation, actions: {
+            Button(String(localized: "Not now", comment: "PIV extension notifications explanation button"), role: .cancel) {
+                dismiss()
+            }
+            Button(String(localized: "Continue", comment: "PIV extension notifications explanation button")) {
+                Task { await requestNotifications() }
+            }
+        }, message: {
+            Text(String(localized: "When an app asks to use a certificate on your YubiKey, Oriel OTP sends a notification. Tap it to enter the PIN and unlock the YubiKey.", comment: "PIV extension notifications explanation message"))
+        })
         .alert(String(localized: "Notifications disabled", comment: "PIV extension notifications alert title"), isPresented: $presentNotificationsAlert, actions: {
             Button(String(localized: "Cancel")) {
                 dismiss()
@@ -114,7 +126,7 @@ struct SmartCardConfigurationView: View {
             Text(String(localized: "The smart card extension requires notifications to be enabled for Oriel OTP. Enable it in the iOS Settings.", comment: "PIV extensions notifications alert message"))
         })
         .alert(String(localized: "Failed storing certificate", comment: "PIV extension storing error alert title"), isPresented: .constant(storeError != nil), presenting: storeError) { _ in
-            Button(String(localized: "Ok")) { storeError = nil }
+            Button(String(localized: "OK")) { storeError = nil }
         } message: { error in
             Text(verbatim: "Error: \(error)")
         }
@@ -122,9 +134,13 @@ struct SmartCardConfigurationView: View {
             model.startNFC()
         }
         .task {
-            let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])) ?? false
-            if !granted {
+            switch await UNUserNotificationCenter.current().notificationSettings().authorizationStatus {
+            case .notDetermined:
+                presentNotificationsExplanation = true
+            case .denied:
                 presentNotificationsAlert = true
+            default:
+                break
             }
         }
         .onAppear {
@@ -158,6 +174,13 @@ struct SmartCardConfigurationView: View {
             storeError = error
         }
         model.update()
+    }
+
+    private func requestNotifications() async {
+        let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])) ?? false
+        if !granted {
+            presentNotificationsAlert = true
+        }
     }
 }
 

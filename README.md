@@ -67,7 +67,8 @@ the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth im
 
 Debug builds in the simulator connect to a simulated YubiKey with demo accounts and can sign in to a fake Ente
 server at `https://demo.ente.test` with any email and the password `demo`. None of this is compiled into release
-builds. [docs/screenshots.md](docs/screenshots.md) explains how the README screenshots are regenerated.
+builds. [docs/screenshots.md](docs/screenshots.md) explains how the README screenshots are regenerated, and
+[docs/ci.md](docs/ci.md) what CI checks.
 
 ## About this fork
 
@@ -80,6 +81,7 @@ kept in step with upstream and what the rebranding changes.
 Oriel OTP is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for the copyright and license
 information, and [NOTICE](NOTICE) for attribution.
 
-## Issues
+## Support
 
-Please report problems in [the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).
+See [SUPPORT.md](SUPPORT.md) for help, and report problems in
+[the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).

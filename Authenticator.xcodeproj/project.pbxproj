@@ -14,6 +14,8 @@
 		515542752656706F00B19C59 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542742656706F00B19C59 /* Token.swift */; };
 		515542772656707000B19C59 /* TokenDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542762656707000B19C59 /* TokenDriver.swift */; };
 		515542792656707000B19C59 /* TokenSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542782656707000B19C59 /* TokenSession.swift */; };
+		D1A600000000000000000001 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
+		D1A600000000000000000002 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
 		5155427D2656707000B19C59 /* TokenExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5155426F2656706F00B19C59 /* TokenExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		515542882656F64100B19C59 /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542872656F64100B19C59 /* Data+Extensions.swift */; };
 		5155428A2656F79500B19C59 /* SecCertificate+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542892656F79500B19C59 /* SecCertificate+Extensions.swift */; };
@@ -71,6 +73,7 @@
 		B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B16298AA6E7006CDAEA /* MainView.swift */; };
 		B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */; };
 		B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B1A298AB641006CDAEA /* MainViewModel.swift */; };
+		1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56319DE11C4A1A730E920128 /* QuickActions.swift */; };
 		B4719B2C29914051006CDAEA /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B2B29914051006CDAEA /* AccountRowView.swift */; };
 		B4719B322993EFEE006CDAEA /* AccountDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */; };
 		B474865C2CEB7A000031A504 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B474865B2CEB79FD0031A504 /* AboutView.swift */; };
@@ -155,6 +158,7 @@
 		515542742656706F00B19C59 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		515542762656707000B19C59 /* TokenDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenDriver.swift; sourceTree = "<group>"; };
 		515542782656707000B19C59 /* TokenSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenSession.swift; sourceTree = "<group>"; };
+		D1A600000000000000000003 /* TokenResponseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenResponseStore.swift; sourceTree = "<group>"; };
 		5155427A2656707000B19C59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		515542862656F52000B19C59 /* TokenExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenExtension.entitlements; sourceTree = "<group>"; };
 		515542872656F64100B19C59 /* Data+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extensions.swift"; sourceTree = "<group>"; };
@@ -221,6 +225,7 @@
 		B4719B16298AA6E7006CDAEA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorApp.swift; sourceTree = "<group>"; };
 		B4719B1A298AB641006CDAEA /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
+		56319DE11C4A1A730E920128 /* QuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
 		B4719B2B29914051006CDAEA /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailsView.swift; sourceTree = "<group>"; };
 		B474865B2CEB79FD0031A504 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -529,6 +534,7 @@
 				5C3E0000000000000000000C /* AppClock.swift */,
 				B4C93E62299FB51A00C2A8B8 /* Account.swift */,
 				B4719B1A298AB641006CDAEA /* MainViewModel.swift */,
+				56319DE11C4A1A730E920128 /* QuickActions.swift */,
 				B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */,
 				B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */,
 				B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */,
@@ -537,6 +543,7 @@
 				B4BB02DD2C80BC8500B72904 /* OATHSavedPasswordsViewModel.swift */,
 				B4BB02E12C81A82300B72904 /* FIDOPINViewModel.swift */,
 				B4BB02E52C81C75D00B72904 /* FIDOResetViewModel.swift */,
+				D1A600000000000000000003 /* TokenResponseStore.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -769,6 +776,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				515542792656707000B19C59 /* TokenSession.swift in Sources */,
+				D1A600000000000000000001 /* TokenResponseStore.swift in Sources */,
 				515542752656706F00B19C59 /* Token.swift in Sources */,
 				5156D05B265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift in Sources */,
 				515542772656707000B19C59 /* TokenDriver.swift in Sources */,
@@ -843,10 +851,12 @@
 				B4BB02E22C81A82300B72904 /* FIDOPINViewModel.swift in Sources */,
 				B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */,
 				B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */,
+				1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */,
 				B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */,
 				816C685023440D2200209342 /* SecureStoreError.swift in Sources */,
 				5180974326DE185100A122C1 /* OATHResetViewModel.swift in Sources */,
 				B4BB02E02C80BEBD00B72904 /* OATHSavedPasswordsView.swift in Sources */,
+				D1A600000000000000000002 /* TokenResponseStore.swift in Sources */,
 				816C684623430E0700209342 /* SecureStore.swift in Sources */,
 				B4A597BA2D9D7BFE00444D97 /* SmartCardConnection+Extensions.swift in Sources */,
 				B4C93E63299FB51A00C2A8B8 /* Account.swift in Sources */,
@@ -925,6 +935,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -950,6 +962,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1106,9 +1120,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				YKF_ENABLE_VERBOSE_LOGGING = YES;
@@ -1136,9 +1153,12 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				YKF_ENABLE_VERBOSE_LOGGING = NO;
@@ -1165,6 +1185,8 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4,6,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Authenticator.app/Authenticator";
@@ -1191,6 +1213,8 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4,6,7";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Authenticator.app/Authenticator";
