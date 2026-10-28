@@ -145,6 +145,9 @@ struct MainView: View {
                         Label("Configuration", systemImage: "switch.2")
                     }
                     .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                    #if DEBUG && targetEnvironment(simulator)
+                    SimulatedYubiKeyMenu()
+                    #endif
                     Button(action: { showAbout.toggle() }) {
                         Label("About", systemImage: "questionmark.circle")
                     }

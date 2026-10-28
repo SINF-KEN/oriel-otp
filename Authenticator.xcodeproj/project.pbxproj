@@ -67,6 +67,7 @@
 		B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */; };
 		B46E378729C348F100CA0B67 /* EditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46E378629C348F100CA0B67 /* EditAccountView.swift */; };
 		B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */; };
+		A1C1EA0000000000000000B3 /* SimulatedYubiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F3 /* SimulatedYubiKey.swift */; };
 		B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B16298AA6E7006CDAEA /* MainView.swift */; };
 		B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */; };
 		B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B1A298AB641006CDAEA /* MainViewModel.swift */; };
@@ -208,6 +209,7 @@
 		B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewModel.swift; sourceTree = "<group>"; };
 		B46E378629C348F100CA0B67 /* EditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAccountView.swift; sourceTree = "<group>"; };
 		B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessKeyCache.swift; sourceTree = "<group>"; };
+		A1C1EA0000000000000000F3 /* SimulatedYubiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/SimulatedYubiKey.swift; sourceTree = "<group>"; };
 		B4719B16298AA6E7006CDAEA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorApp.swift; sourceTree = "<group>"; };
 		B4719B1A298AB641006CDAEA /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
@@ -494,6 +496,7 @@
 				81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */,
 				51F8E3BC263847BD0010686B /* ManagementViewModel.swift */,
 				B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */,
+				A1C1EA0000000000000000F3 /* SimulatedYubiKey.swift */,
 				5155426926554CAB00B19C59 /* SmartCardViewModel.swift */,
 				5156D05E265D3CEF007A94F8 /* TokenRequestViewModel.swift */,
 				51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */,
@@ -744,6 +747,7 @@
 				B46E378729C348F100CA0B67 /* EditAccountView.swift in Sources */,
 				B4696F3F2CB6CE5800604F6F /* ConfigurationView.swift in Sources */,
 				B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */,
+				A1C1EA0000000000000000B3 /* SimulatedYubiKey.swift in Sources */,
 				B47486642CECC2F50031A504 /* LicensingView.swift in Sources */,
 				513F34DC246B144300FCE030 /* UIViewAdditions.swift in Sources */,
 				B47486662CECE36A0031A504 /* UIFont+Extensions.swift in Sources */,
