@@ -297,6 +297,9 @@ struct MainView: View {
                 showConfiguration = false
                 showAbout = false
                 selectedAccountID = nil
+            } else if scenePhase == .active {
+                // Closed with Cancel or Done. Becoming active skipped starting while the PIV view was up.
+                model.start()
             }
         }
         .onChange(of: model.presentDisableOTP) { _, presentDisableOTP in
