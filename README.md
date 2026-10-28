@@ -19,6 +19,12 @@ button.
 Once credentials have been added, simply tap or connect your YubiKey to display
 codes.
 
+## Sync from Ente Auth
+
+Accounts stored in [Ente Auth](https://ente.io/auth) can be copied onto a YubiKey by tapping the menu icon and
+selecting `Sync from Ente Auth`. Sign in, pick the accounts and tap `Add`. Everything is decrypted on the device
+and nothing is changed in Ente Auth. See [docs/ente-auth.md](docs/ente-auth.md) for how it works.
+
 ## CryptTokenKit extension
 
 Besides the OATH functionality this app also support authetication using the CTK extension
@@ -27,9 +33,10 @@ in the Smart card application on the YubiKey.
 
 ## Development
 
-This app is developed in Xcode and the only external dependency is the
-[YubiKit iOS SDK](https://github.com/Yubico/yubikit-ios) which is added using
-the Swift Package Manager. To build the app simply open the project file and hit
+This app is developed in Xcode and depends on the
+[YubiKit iOS SDK](https://github.com/Yubico/yubikit-ios), and for Ente Auth sync on
+[swift-sodium](https://github.com/jedisct1/swift-sodium) (libsodium) and
+[BigInt](https://github.com/attaswift/BigInt), all added using the Swift Package Manager. To build the app simply open the project file and hit
 the build button.
 
 ## Issues
