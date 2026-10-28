@@ -20,13 +20,15 @@ import SwiftUI
 
 struct AccountRowView: View {
 
-    @Environment(ToastPresenter.self) var toastPresenter
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     var account: Account
 
-    @State private var pillScaling: CGFloat = 1.0
     @State private var pillOpacity: Double
 
     @State private var animate: Bool = true
+
+    @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 40
+    @ScaledMetric(relativeTo: .body) private var statusSize: CGFloat = 22
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
@@ -40,10 +42,16 @@ struct AccountRowView: View {
         }
     }
 
+    // At accessibility sizes the code goes below the name, so neither has to shrink or truncate to share one line.
+    private var isStacked: Bool { dynamicTypeSize.isAccessibilitySize }
+
     var body: some View {
+        let layout = isStacked ? AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout())
+        layout {
             HStack {
                 Text(String(account.title.first ?? "?"))
-                    .frame(width:40, height: 40)
+                    // Grows with the text, but not so much that it crowds the name out.
+                    .frame(width: min(iconSize, 64), height: min(iconSize, 64))
                     .background(account.iconColor)
                     .clipShape(.circle)
                     .padding(.trailing, 5)
@@ -51,116 +59,89 @@ struct AccountRowView: View {
                 VStack(alignment: .leading) {
                     Text(account.title)
                         .font(.subheadline.weight(.medium))
-                        .lineLimit(1)
+                        .lineLimit(isStacked ? 3 : 1)
                         .minimumScaleFactor(0.9)
                         .truncationMode(.tail)
                     account.subTitle.map {
                         Text($0)
                             .font(.footnote)
-                            .lineLimit(1)
+                            .lineLimit(isStacked ? 3 : 1)
                             .minimumScaleFactor(0.9)
                             .truncationMode(.tail)
                             .foregroundStyle(.secondary)
                     }
                 }
+            }
+            if !isStacked {
                 Spacer()
-                HStack {
-                    switch(account.state) {
-                    case .requiresCalculation, .expired:
-                        if !account.requiresTouch {
-                            Image(systemName: "arrow.clockwise.circle.fill")
-                                .font(.system(size: 22))
-                                .frame(width: 22.0, height: 22.0)
-                                .padding(1)
-                                .accessibilityHidden(true)
-                        } else {
-                            Image(systemName: "hand.tap.fill")
-                                .font(.system(size: 18))
-                                .frame(width: 22.0, height: 22.0)
-                                .padding(1)
-                                .accessibilityHidden(true)
-                        }
-                    case .countingdown(let remaining):
-                        PieProgressView(progress: remaining,
-                                        color: pillColor,
-                                        animate: animate)
-                            .frame(width: 22, height: 22)
-                            .padding(1)
-                            .accessibilityHidden(true)
-                    }
-                    ZStack {
-                        if let otp = account.formattedCode {
-                            Text(otp)
-                                .font(.system(size: 17))
-                                .bold()
-                                .padding(.trailing, 4)
-                        } else {
-                            Text("*** *** ")
-                                .font(.system(size: 17))
-                                .bold()
-                                .padding(.trailing, 4)
-                                .padding(.top, 3.5)
-                                .padding(.bottom, -3.5)
-                        }
-                        Text("888 888") // reserves the code width so the pill doesn't resize
-                            .font(.system(size: 17))
-                            .bold()
-                            .foregroundStyle(.clear)
-                            .padding(.trailing, 4)
-                    }
-                }
-                .padding(.all, 4)
-                .fixedSize() // keep the code on one line in a narrow sidebar; the title truncates instead
-                .foregroundStyle(pillColor)
-                .accessibilityAddTraits(.isButton)
-                .overlay {
-                    Capsule()
-                        .stroke(pillColor, lineWidth: 1)
-                }
-                .accessibilityElement()
-                .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
-                .opacity(pillOpacity)
-                .scaleEffect(pillScaling)
             }
-            .contentShape(Rectangle())
-            .onChange(of: account.state) { _, state in
-                // Not sure why we have to schedule this in the next runloop
-                Task {
-                    withAnimation {
-                        if state == .expired || account.otp == nil {
-                            pillOpacity = 0.5
-                        } else {
-                            pillOpacity = 1.0
-                        }
+            codePill
+        }
+        .contentShape(Rectangle())
+        .onChange(of: account.state) { _, state in
+            // Not sure why we have to schedule this in the next runloop
+            Task {
+                withAnimation {
+                    if state == .expired || account.otp == nil {
+                        pillOpacity = 0.5
+                    } else {
+                        pillOpacity = 1.0
                     }
                 }
             }
-            // Simultaneous so a tap still reaches the list and selects the row.
-            .simultaneousGesture(LongPressGesture().onEnded { _ in
-                Task {
-                    withAnimation(.easeOut(duration: 0.1)) {
-                        pillScaling = 1.4
-                    }
-                    try? await Task.sleep(for: .milliseconds(100))
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        pillScaling = 1.0
-                    }
-                }
+        }
+        .onAppear() {
+            animate = true
+        }
+        .onDisappear {
+            animate = false
+        }
+    }
 
-                if account.state != .expired, let otp = account.otp?.code {
-                    toastPresenter.copyToClipboard(otp)
+    private var codePill: some View {
+        HStack {
+            switch(account.state) {
+            case .requiresCalculation, .expired:
+                Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
+                    .font(.system(size: account.requiresTouch ? statusSize * 18 / 22 : statusSize))
+                    .frame(width: statusSize, height: statusSize)
+                    .padding(1)
+                    .accessibilityHidden(true)
+            case .countingdown(let remaining):
+                PieProgressView(progress: remaining,
+                                color: pillColor,
+                                animate: animate)
+                    .frame(width: statusSize, height: statusSize)
+                    .padding(1)
+                    .accessibilityHidden(true)
+            }
+            ZStack {
+                if let otp = account.formattedCode {
+                    Text(otp)
+                        .padding(.trailing, 4)
                 } else {
-                    account.calculate { otp in
-                        toastPresenter.copyToClipboard(otp.code)
-                    }
+                    Text("*** *** ")
+                        .padding(.trailing, 4)
+                        .padding(.top, 3.5)
+                        .padding(.bottom, -3.5)
                 }
-            })
-            .onAppear() {
-                animate = true
+                Text("888 888") // reserves the code width so the pill doesn't resize
+                    .foregroundStyle(.clear)
+                    .padding(.trailing, 4)
             }
-            .onDisappear {
-                animate = false
-            }
+            .font(.body.monospacedDigit().bold())
+        }
+        .padding(.all, 4)
+        .fixedSize() // keep the code on one line in a narrow sidebar; the title truncates instead
+        .foregroundStyle(pillColor)
+        .overlay {
+            Capsule()
+                .stroke(pillColor, lineWidth: 1)
+        }
+        // Not a button: copying is one of the row's actions, in its context menu and swipe actions.
+        .accessibilityElement()
+        .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
+        .opacity(pillOpacity)
     }
 }
 

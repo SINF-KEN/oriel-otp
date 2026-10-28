@@ -27,14 +27,17 @@ struct ToastView: View {
         ZStack(alignment: .leading) {
             Text(message)
                 .font(.body)
+                .multilineTextAlignment(.center)
                 // YubiBlue is a light green in dark mode, so white text would lose its contrast there.
                 .foregroundStyle(Color(.systemBackground))
-                .fixedSize(horizontal: true, vertical: true)
+                // Wraps onto more lines instead of running off a narrow screen or at large text sizes.
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
                 .background(Color(.yubiBlue))
                 .clipShape(.rect(cornerRadius: 20))
                 .shadow(radius: 5)
         }
+        .padding(.horizontal)
     }
 }
 
