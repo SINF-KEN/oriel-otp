@@ -29,7 +29,9 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
     case invalidDeviceInfo
     case nfcNotSupported
     case fipsKeyWithoutPassword
-    
+    /// The YubiKey filled up while adding accounts. Holds the names of the accounts that weren't added.
+    case storageFull(notAdded: [String])
+
     public var errorDescription: String? {
         switch self {
         case .credentialAlreadyPresent(let issuer, let accountName):
@@ -49,6 +51,9 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
             return String(localized: "NFC not supported on this device", comment: "Internal error message not to be displayed to the user.")
         case .fipsKeyWithoutPassword:
             return String(localized: "To add an account to a FIPS key, you must first set a password for the OATH application.", comment: "Error message when trying to add and OATH account to a FIPS key without a password.")
+        case .storageFull(let notAdded):
+            let names = notAdded.formatted(.list(type: .and))
+            return String(localized: "The YubiKey is full. These accounts weren't added: \(names).", comment: "Import error. The placeholder is a list of account names.")
         }
     }
 }
@@ -229,10 +234,25 @@ final class OATHSession: Sendable {
         }
     }
 
+    /// How many accounts the OATH application can hold. Firmware 5.7 doubled the storage, and the
+    /// YubiKey NEO, whose OATH application reports a version below 4, has room for fewer.
+    /// The YubiKey has the final say: adding still stops if it reports that it is full.
+    static func credentialCapacity(version: Version) -> Int {
+        if version >= Version("5.7.0")! {
+            return 64
+        } else if version >= Version("4.0.0")! {
+            return 32
+        } else {
+            return 28
+        }
+    }
+
     struct AddCredentialsResult {
         var added: [YubiKitOATHSession.CredentialTemplate] = []
         var alreadyPresent: [YubiKitOATHSession.CredentialTemplate] = []
-        /// Set when adding stopped early, e.g. because the YubiKey is full. The templates after it weren't added.
+        /// The templates that weren't added because adding stopped early.
+        var notAdded: [YubiKitOATHSession.CredentialTemplate] = []
+        /// Set when adding stopped early, e.g. because the YubiKey is full.
         var error: Error?
     }
 
@@ -242,7 +262,7 @@ final class OATHSession: Sendable {
         let credentials = try await session.listCredentials()
         var keys = Set(credentials.compactMap { String(data: $0.id, encoding: .utf8) })
         var result = AddCredentialsResult()
-        for template in templates {
+        for (index, template) in templates.enumerated() {
             guard keys.insert(template.identifier).inserted else {
                 result.alreadyPresent.append(template)
                 continue
@@ -258,6 +278,7 @@ final class OATHSession: Sendable {
                     throw OATHSessionError.fipsKeyWithoutPassword
                 }
                 result.error = error
+                result.notAdded = Array(templates[index...])
                 break
             }
         }
@@ -283,11 +304,11 @@ final class OATHSession: Sendable {
         try await session.listCredentials().map { Credential(yubiKitCredential: $0) }
     }
 
-    func calculateAll(timestamp: Date = Date().addingTimeInterval(10)) async throws -> [(Credential, OTP?)] {
+    func calculateAll(timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> [(Credential, OTP?)] {
         try await session.calculateCredentialCodes(timestamp: timestamp).map { (Credential(yubiKitCredential: $0), $1?.otp) }
     }
 
-    func calculate(credential: Credential, timestamp: Date = Date().addingTimeInterval(10)) async throws -> OTP {
+    func calculate(credential: Credential, timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> OTP {
         if credential.isSteam {
             let (code, validity) = try await session.calculateSteamTOTP(credential: credential.yubiKitCredential)
             return OTP(code: code, validity: validity)

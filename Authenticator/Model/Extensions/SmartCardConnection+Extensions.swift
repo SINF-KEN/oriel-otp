@@ -104,6 +104,11 @@ nonisolated extension Error {
         responseStatus == .securityConditionNotSatisfied
     }
 
+    /// The YubiKey has no room for another OATH account.
+    var isOATHStorageFull: Bool {
+        responseStatus == .noSpace
+    }
+
     /// The password used to unlock the OATH application was wrong.
     var isOATHWrongPassword: Bool {
         if case .invalidPassword = self as? YubiKitOATHSessionError { return true }

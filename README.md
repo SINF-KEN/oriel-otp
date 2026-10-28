@@ -1,49 +1,96 @@
 # Oriel OTP
 
-An iOS authenticator for OATH codes stored on a YubiKey, with syncing from
-[Ente Auth](https://ente.io/auth).
+Oriel OTP is an iOS and iPadOS authenticator that keeps your one-time password accounts on a YubiKey instead of
+on your phone. It can also **import your accounts from [Ente Auth](https://ente.io/auth)**, so moving them onto a
+hardware key takes a few taps instead of re-scanning every QR code.
 
-Oriel OTP is a fork of [Yubico Authenticator for iOS](https://github.com/Yubico/yubioath-ios). It is not affiliated
-with or endorsed by Yubico or Ente; see [NOTICE](NOTICE). See the file LICENSE for copyright and license
-information, and [docs/FORK.md](docs/FORK.md) for how the fork is kept in step with upstream.
+<p align="center">
+  <img src="docs/screenshots/accounts.png" width="250" alt="The account list with codes from a YubiKey">
+  &nbsp;
+  <img src="docs/screenshots/account-details.png" width="250" alt="The details of one account">
+  &nbsp;
+  <img src="docs/screenshots/ente-accounts.png" width="250" alt="Choosing which Ente Auth accounts to add to the YubiKey">
+</p>
 
-## OATH functionality
+The screenshots are taken from the app in the simulator, with made-up demo accounts. See
+[docs/screenshots.md](docs/screenshots.md).
 
-This is an authenticator app compatible with the OATH standard for time and counter based numeric OTPs, as used
-by many online services. The credentials are stored on a YubiKey, which generates the codes. The key connects over
-NFC, Lightning or USB-C.
+## Features
 
-Add a credential with the `+` button in the account list, then scan its QR code or tap `Enter manually`.
+- **OATH codes on a YubiKey.** Time-based (TOTP) and counter-based (HOTP) codes, as used by most online services.
+  The secrets are stored on the YubiKey and the codes are calculated there; the app doesn't keep a copy.
+- **Ente Auth import.** Sign in to Ente Auth, pick accounts and add them to the YubiKey. Accounts already on the
+  key are skipped, and accounts the key can't store are listed with the reason.
+  New accounts can be saved in Ente Auth as well when they are added to the YubiKey.
+- **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
+  before a code is shown.
+- **Everyday use.** Search, pin favorites, copy codes, rename and delete accounts, Steam codes, and an optional
+  password for the YubiKey's OATH application.
+- **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps
+  and websites through iOS, in the same way as other smart cards.
 
-Once credentials have been added, plug in the YubiKey, or tap `Scan NFC YubiKey` (or pull the list down) and hold
-the key to the iPhone, to show the codes.
+## Compatibility
 
-## Sync with Ente Auth
+| | |
+| --- | --- |
+| System | iOS and iPadOS 17 or later, on iPhone and iPad |
+| YubiKey | A YubiKey with the OATH application, such as the YubiKey 5 Series. The Security Key Series and YubiKey Bio don't have it. |
+| NFC | On iPhone, by holding an NFC YubiKey (e.g. YubiKey 5 NFC) to the top of the phone |
+| USB-C | On iPhones and iPads with a USB-C port, e.g. with a YubiKey 5C NFC |
+| Lightning | On iPhones and iPads with a Lightning port, with a YubiKey 5Ci |
 
-Accounts stored in [Ente Auth](https://ente.io/auth) can be copied onto a YubiKey by tapping the menu icon and
-selecting `Sync from Ente Auth`. Sign in, pick the accounts and tap `Add`. Everything is decrypted on the device
-and nothing is changed in Ente Auth.
+## Ente Auth
 
-The other way, turn on `Also add to Ente Auth` when adding an account to save it in Ente Auth too. A YubiKey never
-gives its secrets back, so this works only while an account is added. See [docs/ente-auth.md](docs/ente-auth.md)
-for how it works.
+Open the menu in the account list and choose **Sync from Ente Auth**, or tap the same button shown when the list is
+empty. Pick the accounts and tap **Add**. A YubiKey holds a fixed number of accounts, so the sheet shows how much
+room is left, only selects as many accounts as fit, and warns when the selection is too big.
 
-## CryptTokenKit extension
+The import reads accounts from Ente Auth and copies them onto the YubiKey. Nothing is changed or deleted in your
+Ente vault, and accounts you later remove from Ente stay on the YubiKey until you delete them there.
 
-Besides the OATH functionality this app also support authetication using the CTK extension
-functionality provided by Apple. The authentication is handled using certificates stored 
-in the Smart card application on the YubiKey.
+The other way, turn on **Also add to Ente Auth** when adding an account to save it in Ente Auth too. This needs a
+saved session (**Stay signed in**). A YubiKey never gives its secrets back, so this works only while an account is
+added; accounts already on the key can't be copied to Ente.
+
+Everything is decrypted on the device. Your Ente password never leaves it, and by default nothing is stored once
+the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
+the sign in and decryption work.
+
+## Security and privacy
+
+- The app has no analytics or advertising and doesn't send your data to the developer.
+- OATH secrets live on the YubiKey. The app only writes them to the key when you add an account.
+- A YubiKey password is only saved in the keychain if you choose to. Staying signed in to Ente Auth is optional,
+  and the saved session is protected by Face ID, Touch ID or the device passcode.
+- The only network connections are to Ente's server, or your own, during an Ente Auth import or when you choose
+  to add a new account to Ente Auth.
+
+See the [privacy policy](PRIVACY.md) for the details.
 
 ## Development
 
-This app is developed in Xcode and depends on the
-[YubiKit iOS SDK](https://github.com/Yubico/yubikit-ios), and for Ente Auth sync on
+The app is developed in Xcode. Open `Authenticator.xcodeproj` and run the `Authenticator` scheme. It depends on
+the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth import on
 [swift-sodium](https://github.com/jedisct1/swift-sodium) (libsodium) and
-[BigInt](https://github.com/attaswift/BigInt), all added using the Swift Package Manager. To build the app simply open the project file and hit
-the build button.
+[BigInt](https://github.com/attaswift/BigInt), all added with the Swift Package Manager.
 
-## Support and privacy
+Debug builds in the simulator connect to a simulated YubiKey with demo accounts and can sign in to a fake Ente
+server at `https://demo.ente.test` with any email and the password `demo`. None of this is compiled into release
+builds. [docs/screenshots.md](docs/screenshots.md) explains how the README screenshots are regenerated, and
+[docs/ci.md](docs/ci.md) what CI checks.
 
-See [SUPPORT.md](SUPPORT.md) for help, and report app issues in
-[the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues). The privacy policy is in
-[PRIVACY.md](PRIVACY.md).
+## About this fork
+
+Oriel OTP is a fork of [Yubico Authenticator for iOS](https://github.com/Yubico/yubioath-ios). It is not affiliated
+with or endorsed by Yubico or Ente; see [NOTICE](NOTICE). [docs/FORK.md](docs/FORK.md) describes how the fork is
+kept in step with upstream and what the rebranding changes.
+
+## License
+
+Oriel OTP is licensed under the Apache License 2.0. See [LICENSE](LICENSE) for the copyright and license
+information, and [NOTICE](NOTICE) for attribution.
+
+## Support
+
+See [SUPPORT.md](SUPPORT.md) for help, and report problems in
+[the issue tracker on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).

@@ -62,7 +62,9 @@ struct MainView: View {
                         }
                     }
                     if !model.accountsLoaded {
-                        ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height)
+                        ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
+                            enteSyncButton
+                        }
                     } else if !searchText.isEmpty {
                         if searchResults.count > 0 {
                             ForEach(searchResults, id: \.id) { account in
@@ -95,7 +97,14 @@ struct MainView: View {
                             accountRow(account)
                         }
                     } else {
-                        ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height)
+                        ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
+                            Button(action: { showAddAccount.toggle() }) {
+                                Label("Add account", systemImage: "plus")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                            enteSyncButton
+                        }
                     }
                 }
             }
@@ -139,13 +148,15 @@ struct MainView: View {
 
                 // Secondary actions collapse into the system overflow menu.
                 ToolbarItemGroup(placement: .secondaryAction) {
-                    Button(action: { showEnteSync.toggle() }) {
-                        Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
-                    }
+                    enteSyncButton
                     Button(action: { showConfiguration.toggle() }) {
                         Label("Configuration", systemImage: "switch.2")
                     }
                     .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                    #if DEBUG && targetEnvironment(simulator)
+                    SimulatedYubiKeyMenu()
+                    SimulatedYubicoOTPButton()
+                    #endif
                     Button(action: { showAbout.toggle() }) {
                         Label("About", systemImage: "questionmark.circle")
                     }
@@ -177,6 +188,7 @@ struct MainView: View {
         }
         .sheet(isPresented: $showEnteSync) {
             EnteSyncView(existingCredentialIds: Set(model.accounts.map(\.accountId)),
+                         capacity: model.accountsLoaded ? model.credentialCapacity : nil,
                          canAddToYubiKey: DeviceCapabilities.supportsNFC || model.isKeyPluggedIn) { templates, requiresTouch in
                 importAccounts(templates, requiresTouch: requiresTouch)
             }
@@ -264,6 +276,11 @@ struct MainView: View {
                 model.updateAccountsOverNFC()
             }
         })
+        #if DEBUG && targetEnvironment(simulator)
+        .onReceive(NotificationCenter.default.publisher(for: .simulatedYubicoOTP)) { notification in
+            otp = notification.object as? String
+        }
+        #endif
         .onChange(of: otp) { _, otp in
             if let otp, SettingsConfig.isCopyOTPEnabled {
                 toastPresenter.copyToClipboard(otp)
@@ -406,6 +423,12 @@ struct MainView: View {
         }
     }
 
+    private var enteSyncButton: some View {
+        Button(action: { showEnteSync.toggle() }) {
+            Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
+        }
+    }
+
     private var addAccountToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showAddAccount.toggle() }) {
@@ -419,7 +442,11 @@ struct MainView: View {
         guard !templates.isEmpty else { return }
         model.addAccounts(templates, requiresTouch: requiresTouch) { result in
             if let error = result.error {
-                model.sessionError = error
+                if error.isOATHStorageFull {
+                    model.sessionError = OATHSessionError.storageFull(notAdded: result.notAdded.map(\.displayName))
+                } else {
+                    model.sessionError = error
+                }
             }
             var message = String(localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts.")
             if !result.alreadyPresent.isEmpty {
