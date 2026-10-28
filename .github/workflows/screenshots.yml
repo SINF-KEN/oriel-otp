@@ -1,0 +1,59 @@
+name: Screenshots
+
+# Regenerates the README screenshots in docs/screenshots when the app changes. On main the changed screenshots are
+# committed back; on pull requests they are uploaded as an artifact to look at.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Authenticator/**"
+      - "Authenticator.xcodeproj/**"
+      - "AuthenticatorUITests/**"
+      - "tools/screenshots.sh"
+      - ".github/workflows/screenshots.yml"
+  pull_request:
+    paths:
+      - "Authenticator/**"
+      - "Authenticator.xcodeproj/**"
+      - "AuthenticatorUITests/**"
+      - "tools/screenshots.sh"
+      - ".github/workflows/screenshots.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    runs-on: xcode-27
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Take screenshots
+        run: tools/screenshots.sh
+      - name: Upload screenshots
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: docs/screenshots
+      - name: Commit changed screenshots
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          # The script only rewrites screenshots whose bytes changed, so this is empty unless the UI did.
+          if [[ -z "$(git status --porcelain docs/screenshots)" ]]; then
+            echo "Screenshots are up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots
+          git commit -m "Update the README screenshots"
+          # Pushes made with GITHUB_TOKEN don't start new workflow runs, so this doesn't loop.
+          git pull --rebase
+          git push
