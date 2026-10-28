@@ -15,12 +15,13 @@ fork.
 | --- | --- | --- |
 | `origin` | [Yubico/yubioath-ios](https://github.com/Yubico/yubioath-ios) | Upstream |
 | `fork` | [SINF-KEN/yubioath-ios](https://github.com/SINF-KEN/yubioath-ios) | `main` and `feature/ente-auth-sync`, for pull requests to Yubico |
-| `oriel` | [SINF-KEN/oriel-otp](https://github.com/SINF-KEN/oriel-otp) | `fork/oriel-otp` as `main`, `feature/ente-auth-sync`, and `simulator-demo` |
+| `oriel` | [SINF-KEN/oriel-otp](https://github.com/SINF-KEN/oriel-otp) | `fork/oriel-otp` as `main` and `feature/ente-auth-sync` |
 
-`simulator-demo` is `main` plus debug-only tooling for the simulator: a simulated YubiKey, a fake Ente server
-at `https://demo.ente.test` (any email, password `demo`) and a menu item that acts like scanning a YubiKey's NFC
-OTP. It is all inside `#if DEBUG && targetEnvironment(simulator)` and never goes into `main`. Rebase it onto
-`main` after updating the app.
+`main` on `oriel` also has debug-only tooling for the simulator: a simulated YubiKey, a fake Ente server at
+`https://demo.ente.test` (any email, password `demo`), a menu item that acts like scanning a YubiKey's NFC OTP,
+and a clock that can be frozen. It is all inside `#if DEBUG && targetEnvironment(simulator)` and is used to take the
+README screenshots (see [screenshots.md](screenshots.md)). It used to live on a separate `simulator-demo` branch.
+Like the rebranding, it isn't meant for Yubico.
 
 Publishing the app branch:
 
