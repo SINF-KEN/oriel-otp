@@ -264,7 +264,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         
-        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Yubico Authenticator"), options: .foreground)
+        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch KeyOTP"), options: .foreground)
         let category = UNNotificationCategory(identifier: categoryID, actions: [show], intentIdentifiers: [])
 
         let center = UNUserNotificationCenter.current()
@@ -285,7 +285,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         
-        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Yubico Authenticator"), options: .foreground)
+        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch KeyOTP"), options: .foreground)
         let category = UNNotificationCategory(identifier: categoryID, actions: [show], intentIdentifiers: [])
 
         let center = UNUserNotificationCenter.current()

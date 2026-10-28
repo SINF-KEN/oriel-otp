@@ -35,7 +35,7 @@ struct VersionHistoryView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                         .padding(15)
                         .accessibilityHidden(true)
-                    Text("Yubico Authenticator")
+                    Text(verbatim: "KeyOTP")
                         .font(.title)
                         .multilineTextAlignment(.center)
                     Text("\(UIApplication.appVersion) (build \(UIApplication.appBuildNumber))")

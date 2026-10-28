@@ -34,7 +34,7 @@ struct AboutView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
                         .padding(15)
                         .accessibilityHidden(true)
-                    Text("Yubico Authenticator")
+                    Text(verbatim: "KeyOTP")
                         .font(.title)
                         .multilineTextAlignment(.center)
                     Text("\(UIApplication.appVersion) (build \(UIApplication.appBuildNumber))")
@@ -67,7 +67,7 @@ struct AboutView: View {
                         Text("App icon")
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://www.yubico.com/support/terms-conditions/yubico-license-agreement/")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios/blob/main/LICENSE")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
@@ -75,7 +75,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://www.yubico.com/support/terms-conditions/privacy-notice/")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios/blob/main/PRIVACY.md")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.secondaryLabel))
@@ -93,7 +93,7 @@ struct AboutView: View {
                 }
                 Section("Support") {
                     Button {
-                        UIApplication.shared.open(URL(string: "https://docs.yubico.com/software/yubikey/tools/authenticator/auth-guide/index.html")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios#readme")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "book"), color: Color(.systemPink))
@@ -101,7 +101,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://support.yubico.com/support/tickets/new")!)
+                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/yubioath-ios/issues")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)

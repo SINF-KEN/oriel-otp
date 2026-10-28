@@ -28,7 +28,7 @@ struct AppIconView: View {
     }
 
     private let icons = [
-        AppIcon(iconName: nil, preview: "icon", title: String(localized: "Green", comment: "App icon name")),
+        AppIcon(iconName: nil, preview: "icon", title: String(localized: "Default", comment: "App icon name")),
         AppIcon(iconName: "AppIcon-Dark", preview: "icon-dark", title: String(localized: "Dark", comment: "App icon name"))
     ]
 

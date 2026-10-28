@@ -6413,31 +6413,31 @@
         }
       }
     },
-    "The smart card extension requires notifications to be enabled for Yubico Authenticator. Enable it in the iOS Settings." : {
+    "The smart card extension requires notifications to be enabled for KeyOTP. Enable it in the iOS Settings." : {
       "comment" : "PIV extensions notifications alert message",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Für die Smartcard Erweiterung müssen Benachrichtigungen für Yubico Authenticator aktiviert sein. Aktiviere diese bitte in den iOS-Einstellungen."
+            "value" : "Für die Smartcard Erweiterung müssen Benachrichtigungen für KeyOTP aktiviert sein. Aktiviere diese bitte in den iOS-Einstellungen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "L'extension de la carte à puce nécessite que les notifications soient activées pour Yubico Authenticator. Activez-les dans les paramètres iOS."
+            "value" : "L'extension de la carte à puce nécessite que les notifications soient activées pour KeyOTP. Activez-les dans les paramètres iOS."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "スマートカード拡張機能では、Yubico Authenticatorの通知を有効にする必要があります。iOS設定で有効にしてください。"
+            "value" : "スマートカード拡張機能では、KeyOTPの通知を有効にする必要があります。iOS設定で有効にしてください。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Rozšírenie čipovej karty vyžaduje, aby boli pre Yubico Authenticator povolené oznámenia. Povoľte ich v nastaveniach iOS."
+            "value" : "Rozšírenie čipovej karty vyžaduje, aby boli pre KeyOTP povolené oznámenia. Povoľte ich v nastaveniach iOS."
           }
         }
       }

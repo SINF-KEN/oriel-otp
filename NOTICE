@@ -1,0 +1,17 @@
+KeyOTP
+Copyright (C) 2026 Kenzi Voyer
+
+This product is a fork of Yubico Authenticator for iOS
+(https://github.com/Yubico/yubioath-ios), Copyright (C) Yubico, licensed under
+the Apache License, Version 2.0. See LICENSE.
+
+Changes from the original: syncing accounts from Ente Auth, a new name, app
+icons and identifiers, and the changes listed in the git history.
+
+KeyOTP is not affiliated with, endorsed by or sponsored by Yubico AB or Ente
+Technologies. Yubico and YubiKey are trademarks of Yubico AB, and Ente is a
+trademark of Ente Technologies. These names are only used to describe the
+hardware and services the app works with.
+
+This product includes third-party software, whose licenses are listed in
+Authenticator/Licensing.md and shown in the app under About > Licensing.

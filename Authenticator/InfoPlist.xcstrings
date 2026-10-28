@@ -8,31 +8,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autentifikátor"
+            "value" : "KeyOTP"
           }
         }
       }
@@ -44,31 +44,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Authenticator"
+            "value" : "KeyOTP"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Autentifikátor"
+            "value" : "KeyOTP"
           }
         }
       }

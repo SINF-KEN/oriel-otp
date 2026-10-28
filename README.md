@@ -1,9 +1,11 @@
-# iOS application for OATH with YubiKeys
+# KeyOTP
 
-This app is hosted on the iOS App Store as 
-[Yubico Authenticator](https://apps.apple.com/se/app/yubico-authenticator/id1476679808).
+An iOS authenticator for OATH codes stored on a YubiKey, with syncing from
+[Ente Auth](https://ente.io/auth).
 
-See the file LICENSE for copyright and license information.
+KeyOTP is a fork of [Yubico Authenticator for iOS](https://github.com/Yubico/yubioath-ios). It is not affiliated
+with or endorsed by Yubico or Ente; see [NOTICE](NOTICE). See the file LICENSE for copyright and license
+information, and [docs/FORK.md](docs/FORK.md) for how the fork is kept in step with upstream.
 
 ## OATH functionality
 
@@ -42,4 +44,4 @@ the build button.
 ## Issues
 
 Please report app issues in
-[the issue tracker on GitHub](https://github.com/Yubico/yubioath-ios).
+[the issue tracker on GitHub](https://github.com/SINF-KEN/yubioath-ios/issues).

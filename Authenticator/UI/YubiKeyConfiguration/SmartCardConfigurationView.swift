@@ -111,7 +111,7 @@ struct SmartCardConfigurationView: View {
                 }
             }
         }, message: {
-            Text(String(localized: "The smart card extension requires notifications to be enabled for Yubico Authenticator. Enable it in the iOS Settings.", comment: "PIV extensions notifications alert message"))
+            Text(String(localized: "The smart card extension requires notifications to be enabled for KeyOTP. Enable it in the iOS Settings.", comment: "PIV extensions notifications alert message"))
         })
         .alert(String(localized: "Failed storing certificate", comment: "PIV extension storing error alert title"), isPresented: .constant(storeError != nil), presenting: storeError) { _ in
             Button(String(localized: "Ok")) { storeError = nil }
