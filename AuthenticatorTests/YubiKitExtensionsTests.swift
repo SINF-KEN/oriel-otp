@@ -39,6 +39,22 @@ struct YubiKitExtensionsTests {
         #expect(Version("4.1.4") != version)
     }
 
+    @Test func steamCodeFromHMAC() {
+        // The HMAC of RFC 4226's first test vector, with offset 10.
+        let hmac = Data([0x1f, 0x86, 0x98, 0x69, 0x0e, 0x02, 0xca, 0x16, 0x61, 0x85,
+                         0x50, 0xef, 0x7f, 0x19, 0xda, 0x8e, 0x94, 0x5b, 0x55, 0x5a])
+        #expect(YubiKitOATHSession.steamCode(fromResponse: hmac) == "KQ7F9")
+    }
+
+    @Test func steamCodeFromSliceWithOffsetZero() {
+        // YubiKit hands back a slice that starts at index 1, which used to trap when the offset was 0.
+        let response = Data([0x75, 0x8a, 0x1b, 0x2c, 0x3d, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+                             0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xf0]).dropFirst()
+        #expect(YubiKitOATHSession.steamCode(fromResponse: response) == "KYT29")
+        #expect(YubiKitOATHSession.steamCode(fromResponse: Data()) == nil)
+        #expect(YubiKitOATHSession.steamCode(fromResponse: Data([0x01, 0x0f])) == nil)
+    }
+
     struct CredentialKeyCase: Sendable, CustomTestStringConvertible {
         let accountName: String
         let issuer: String?
