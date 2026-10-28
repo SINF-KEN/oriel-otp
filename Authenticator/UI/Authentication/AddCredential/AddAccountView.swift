@@ -146,27 +146,42 @@ struct AddAccountView: View {
                 Text(errorMessage ?? "")
             }
         }
+        // Covered by the scanner, so VoiceOver shouldn't reach it either.
+        .accessibilityHidden(mode == .scanning)
         .overlay {
             if mode == .scanning {
-                ScanAccountRepresentable { result in
-                    switch result {
-                    case .cancel:
-                        showAddAccount = false
-                    case .manuelEntry:
-                        mode = .manual
-                    case .account(let account):
-                        template = account
-                        issuer = account.issuer ?? ""
-                        accountName = account.name
-                        mode = .prefilled
-                    }
-                }
-                .ignoresSafeArea()
+                scanner
             }
         }
         .onDisappear {
             accountSubject.send((nil, true))
         }
+    }
+
+    private var scanner: some View {
+        NavigationStack {
+            ScanAccountRepresentable { account in
+                template = account
+                issuer = account.issuer ?? ""
+                accountName = account.name
+                mode = .prefilled
+            }
+            .ignoresSafeArea()
+            .navigationTitle(String(localized: "Add account", comment: "Add account navigation title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    CloseButton { showAddAccount = false }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Button { mode = .manual } label: {
+                        Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
+                    }
+                }
+            }
+        }
+        // The camera preview is dark in both appearances.
+        .environment(\.colorScheme, .dark)
     }
 
     private func save() {
@@ -203,7 +218,7 @@ struct AddAccountView: View {
 // Hosts the QR scanner. It sits in a container because it removes itself from its superview when it finishes.
 private struct ScanAccountRepresentable: UIViewRepresentable {
 
-    let completion: (ScanAccountView.ScanResult) -> Void
+    let completion: (YubiKitOATHSession.CredentialTemplate) -> Void
 
     func makeUIView(context: Context) -> UIView {
         let container = UIView()
