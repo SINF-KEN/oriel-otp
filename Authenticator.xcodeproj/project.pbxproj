@@ -95,6 +95,8 @@
 		B4C93E63299FB51A00C2A8B8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E62299FB51A00C2A8B8 /* Account.swift */; };
 		B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E64299FC67800C2A8B8 /* View+Extensions.swift */; };
 		B4C93E9529C1B90900C2A8B8 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E9429C1B90900C2A8B8 /* AddAccountView.swift */; };
+		E17E0000000000000000A003 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000A002 /* Clibsodium */; };
+		E17E0000000000000000B003 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000B002 /* BigInt */; };
 		B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = B4D71E802CE4E6E6004D4C29 /* YubiKit */; };
 		B4DB228A299BC373003110ED /* OATHSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4DB2289299BC373003110ED /* OATHSession.swift */; };
 		B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */; };
@@ -241,6 +243,19 @@
 		C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E17E0000000000000000C001 /* EnteAuth */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EnteAuth;
+			sourceTree = "<group>";
+		};
+		E17E0000000000000000C002 /* EnteAuth */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = EnteAuth;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		5155426C2656706F00B19C59 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -255,6 +270,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */,
+				E17E0000000000000000A003 /* Clibsodium in Frameworks */,
+				E17E0000000000000000B003 /* BigInt in Frameworks */,
 				B9F0FF11F842A39183974083 /* (null) in Frameworks */,
 				51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */,
 			);
@@ -425,6 +442,7 @@
 				C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */,
 				51AFD4D727196AB6008F2630 /* VersionHistory.plist */,
 				B40327752847AE0A00DF4DB0 /* Licensing.md */,
+				E17E0000000000000000C001 /* EnteAuth */,
 			);
 			path = Authenticator;
 			sourceTree = "<group>";
@@ -438,6 +456,7 @@
 				A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */,
 				51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */,
 				818866CF22DFD72C006BC0A8 /* Info.plist */,
+				E17E0000000000000000C002 /* EnteAuth */,
 			);
 			path = AuthenticatorTests;
 			sourceTree = "<group>";
@@ -556,9 +575,14 @@
 			dependencies = (
 				5155427C2656707000B19C59 /* PBXTargetDependency */,
 			);
+			fileSystemSynchronizedGroups = (
+				E17E0000000000000000C001 /* EnteAuth */,
+			);
 			name = Authenticator;
 			packageProductDependencies = (
 				B4D71E802CE4E6E6004D4C29 /* YubiKit */,
+				E17E0000000000000000A002 /* Clibsodium */,
+				E17E0000000000000000B002 /* BigInt */,
 			);
 			productName = Authenticator;
 			productReference = 818866B322DFD729006BC0A8 /* Authenticator.app */;
@@ -576,6 +600,9 @@
 			);
 			dependencies = (
 				818866CB22DFD72C006BC0A8 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E17E0000000000000000C002 /* EnteAuth */,
 			);
 			name = AuthenticatorTests;
 			productName = AuthenticatorTests;
@@ -624,6 +651,8 @@
 			mainGroup = 818866AA22DFD729006BC0A8;
 			packageReferences = (
 				B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-swift" */,
+				E17E0000000000000000A001 /* XCRemoteSwiftPackageReference "swift-sodium" */,
+				E17E0000000000000000B001 /* XCRemoteSwiftPackageReference "BigInt" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 818866B422DFD729006BC0A8 /* Products */;
@@ -1149,6 +1178,22 @@
 				minimumVersion = 1.4.0;
 			};
 		};
+		E17E0000000000000000A001 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/jedisct1/swift-sodium";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.11.0;
+			};
+		};
+		E17E0000000000000000B001 /* XCRemoteSwiftPackageReference "BigInt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/attaswift/BigInt";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1156,6 +1201,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = B4D71E7F2CE4E6E6004D4C29 /* XCRemoteSwiftPackageReference "yubikit-swift" */;
 			productName = YubiKit;
+		};
+		E17E0000000000000000A002 /* Clibsodium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E17E0000000000000000A001 /* XCRemoteSwiftPackageReference "swift-sodium" */;
+			productName = Clibsodium;
+		};
+		E17E0000000000000000B002 /* BigInt */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E17E0000000000000000B001 /* XCRemoteSwiftPackageReference "BigInt" */;
+			productName = BigInt;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

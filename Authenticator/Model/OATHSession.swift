@@ -229,6 +229,41 @@ final class OATHSession: Sendable {
         }
     }
 
+    struct AddCredentialsResult {
+        var added: [YubiKitOATHSession.CredentialTemplate] = []
+        var alreadyPresent: [YubiKitOATHSession.CredentialTemplate] = []
+        /// Set when adding stopped early, e.g. because the YubiKey is full. The templates after it weren't added.
+        var error: Error?
+    }
+
+    /// Adds several credentials, listing the credentials on the YubiKey only once.
+    /// Credentials with the same name as one on the YubiKey are skipped and adding stops at the first failure.
+    func addCredentials(templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool) async throws -> AddCredentialsResult {
+        let credentials = try await session.listCredentials()
+        var keys = Set(credentials.compactMap { String(data: $0.id, encoding: .utf8) })
+        var result = AddCredentialsResult()
+        for template in templates {
+            guard keys.insert(template.identifier).inserted else {
+                result.alreadyPresent.append(template)
+                continue
+            }
+            var template = template
+            template.requiresTouch = requiresTouch
+            do {
+                try await session.addCredential(template: template)
+                result.added.append(template)
+            } catch {
+                // If yubikey is a fips enabled key a password has to be set before you can add a new account
+                if isFipsKey, error.statusCode == 0x6985 {
+                    throw OATHSessionError.fipsKeyWithoutPassword
+                }
+                result.error = error
+                break
+            }
+        }
+        return result
+    }
+
     func deleteCredential(_ credential: Credential) async throws {
         try await session.deleteCredential(credential.yubiKitCredential)
     }

@@ -288,6 +288,20 @@ import YubiKit
         }
     }
     
+    /// Adds several accounts in one YubiKey session, e.g. when importing. Accounts already on the YubiKey are skipped.
+    func addAccounts(_ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool, completion: @escaping (OATHSession.AddCredentialsResult) -> Void) {
+        Task {
+            do {
+                let session = try await OATHSessionHandler.shared.anySession()
+                let result = try await session.addCredentials(templates: templates, requiresTouch: requiresTouch)
+                await updateAccounts(using: session)
+                completion(result)
+            } catch {
+                handle(error: error, retry: { self.addAccounts(templates, requiresTouch: requiresTouch, completion: completion) })
+            }
+        }
+    }
+
     func renameAccount(_ account: Account, issuer: String, accountName: String, completion: @escaping () -> Void) {
         Task {
             do {
