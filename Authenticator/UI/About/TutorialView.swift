@@ -87,22 +87,22 @@ struct TutorialPageModel: Hashable, Identifiable {
 extension TutorialView {
     var tutorialPages: [TutorialPageModel] {
         [TutorialPageModel(title: String(localized: "How it works"),
-                           image: Image(.authAppImgLight),
-                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey 5Ci or a compatible YubiKey with NFC to get started."),
+                           image: Image(.tutorialAccounts),
+                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC, Lightning or USB-C to get started."),
                            link: nil),
         
-         TutorialPageModel(title: String(localized: "YubiKey 5Ci authentication"),
-                           image: Image(.authAppIntro2Yk5Ci),
-                            text: String(localized: "If you have a YubiKey 5Ci, plug it in.\n\nTouch the contacts on the sides when prompted."),
+         TutorialPageModel(title: String(localized: "Plug in your YubiKey"),
+                           image: Image(.tutorialPlugIn),
+                            text: String(localized: "If your YubiKey has a Lightning or USB-C connector, plug it in.\n\nTouch the YubiKey when prompted."),
                             link: nil),
         
-         TutorialPageModel(title: String(localized: "YubiKey 5 Series NFC authentication"),
-                           image: Image(.authAppIntro3YkNfc),
+         TutorialPageModel(title: String(localized: "Scan your YubiKey over NFC"),
+                           image: Image(.tutorialNfc),
                             text: String(localized: "If you have a YubiKey with NFC, pull down the main view to activate NFC.\n\nHold the key horizontally and tilt the iPhone towards the key.\n\nTouch the center of the key to the edge of the phone."),
                             link: nil),
          
          TutorialPageModel(title: String(localized: "Where to get QR codes"),
-                           image: Image(.authAppIntro4QrCode),
+                           image: Image(.tutorialQrCode),
                             text: String(localized: "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add your YubiKey and generate your own security codes."),
                             link: nil)
         ]

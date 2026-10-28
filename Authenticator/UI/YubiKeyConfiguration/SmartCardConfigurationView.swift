@@ -214,7 +214,7 @@ private struct SmartCardHeaderRow: View {
     
     private var image: Image {
         switch type {
-        case .onYubiKey: Image("yubikey")
+        case .onYubiKey: Image("securitykey")
         case .onDevice: Image(systemName: "iphone")
         }
     }
