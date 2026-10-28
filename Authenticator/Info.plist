@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>Authenticator</string>
+	<string>Oriel OTP</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
@@ -24,10 +24,10 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>io.github.sinf-ken.keyotp</string>
+			<string>io.github.sinf-ken.orielotp</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>keyotp</string>
+				<string>orielotp</string>
 				<string>otpauth</string>
 			</array>
 		</dict>

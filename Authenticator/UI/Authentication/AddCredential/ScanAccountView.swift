@@ -161,7 +161,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     private var contentGuideConstraints = [NSLayoutConstraint]()
 
     // Serializes starting the session and switching cameras off the main thread.
-    private let sessionQueue = DispatchQueue(label: "io.github.sinf-ken.keyotp.scan-session")
+    private let sessionQueue = DispatchQueue(label: "io.github.sinf-ken.orielotp.scan-session")
     private var activeCameraID: String?
     private var switchingToCameraID: String?
     private var rotationCoordinator: AVCaptureDevice.RotationCoordinator?
