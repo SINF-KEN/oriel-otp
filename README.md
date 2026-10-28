@@ -40,9 +40,13 @@ The screenshots are taken from the app in the simulator, with made-up demo accou
 
 ## Importing from Ente Auth
 
-Open the menu in the account list and choose **Sync from Ente Auth**. The import works in one direction only:
-accounts are read from Ente Auth and copied onto the YubiKey. Nothing is created, changed or deleted in your Ente
-vault, and accounts you later remove from Ente stay on the YubiKey until you delete them there.
+Open the menu in the account list and choose **Sync from Ente Auth**, or tap the same button shown when the list is
+empty. Pick the accounts and tap **Add**. A YubiKey holds a fixed number of accounts, so the sheet shows how much
+room is left, only selects as many accounts as fit, and warns when the selection is too big.
+
+The import works in one direction only: accounts are read from Ente Auth and copied onto the YubiKey. Nothing is
+created, changed or deleted in your Ente vault, and accounts you later remove from Ente stay on the YubiKey until you
+delete them there.
 
 Everything is decrypted on the device. Your Ente password never leaves it, and by default nothing is stored once
 the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
