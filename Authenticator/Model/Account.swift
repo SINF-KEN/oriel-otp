@@ -90,7 +90,7 @@ import YubiKit
         self.calculateCompletion = nil
         
         if self.credential.type == .totp {
-            self.timeLeft = otp.validity.end.timeIntervalSinceNow
+            self.timeLeft = otp.validity.end.timeIntervalSince(AppClock.now)
             
             // Schedule refresh if connection is wired
             if let timeLeft, connectionType == .wired {
@@ -144,7 +144,7 @@ import YubiKit
         }
 
         if let validInterval = otp?.validity {
-            let timeLeft = validInterval.end.timeIntervalSince(Date())
+            let timeLeft = validInterval.end.timeIntervalSince(AppClock.now)
             self.timeLeft = timeLeft
             if timeLeft > 0 {
                 self.state = .countingdown(timeLeft / validInterval.duration)
