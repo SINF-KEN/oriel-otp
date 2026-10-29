@@ -107,7 +107,7 @@ struct EnteSyncView: View {
                 Text(String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
                 if model.isDerivingKeys {
-                    Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
+                    derivingKeysText
                 } else {
                     Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records.", comment: "Ente sign in footer"))
                 }
@@ -173,7 +173,11 @@ struct EnteSyncView: View {
         } header: {
             Text(String(localized: "Check your email", comment: "Ente email code header"))
         } footer: {
-            Text(String(localized: "Enter the verification code Ente sent to \(model.email).", comment: "Ente email code footer. The placeholder is the email address."))
+            if model.isDerivingKeys {
+                derivingKeysText
+            } else {
+                Text(String(localized: "Enter the verification code Ente sent to \(model.email).", comment: "Ente email code footer. The placeholder is the email address."))
+            }
         }
     }
 
@@ -187,7 +191,11 @@ struct EnteSyncView: View {
                 } header: {
                     Text(String(localized: "Two-factor authentication", comment: "Ente two factor header"))
                 } footer: {
-                    Text(String(localized: "Enter the code from your authenticator app.", comment: "Ente two factor footer"))
+                    if model.isDerivingKeys {
+                        derivingKeysText
+                    } else {
+                        Text(String(localized: "Enter the code from your authenticator app.", comment: "Ente two factor footer"))
+                    }
                 }
             }
             if passkey {
@@ -200,7 +208,11 @@ struct EnteSyncView: View {
                 } header: {
                     Text(String(localized: "Passkey", comment: "Ente passkey header"))
                 } footer: {
-                    Text(String(localized: "Verify your passkey on Ente's website, then come back here.", comment: "Ente passkey footer"))
+                    if model.isDerivingKeys {
+                        derivingKeysText
+                    } else {
+                        Text(String(localized: "Verify your passkey on Ente's website, then come back here.", comment: "Ente passkey footer"))
+                    }
                 }
             }
             Section { startOverButton }
@@ -213,6 +225,11 @@ struct EnteSyncView: View {
             .keyboardType(.numberPad)
             .focused($focusedField, equals: .code)
             .onAppear { focusedField = .code }
+    }
+
+    /// Replaces a section's footer while the password is turned into keys, after signing in or verifying a code or passkey.
+    private var derivingKeysText: some View {
+        Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
     }
 
     private var startOverButton: some View {
