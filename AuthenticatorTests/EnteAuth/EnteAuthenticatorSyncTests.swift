@@ -246,19 +246,9 @@ struct EnteAuthenticatorSyncTests {
                 return (404, Data())
             }
         }
-        let (_, step) = try await EnteLoginFlow.start(api: try EnteMockURLProtocol.makeAPI(), email: "a@b.c")
+        let (_, step) = try await EnteLoginFlow.start(api: try EnteMockURLProtocol.makeAPI(), email: "a@b.c", password: "password")
         #expect(step == .emailCode)
         #expect(EnteMockURLProtocol.requests.map(\.url?.path) == ["/users/srp/attributes", "/users/ott"])
-    }
-
-    @Test func srpAccountsStartWithPassword() async throws {
-        EnteMockURLProtocol.handler = { _ in
-            let attributes: [String: Any] = ["srpUserID": "id", "srpSalt": "AA==", "memLimit": 1, "opsLimit": 1,
-                                             "kekSalt": "AA==", "isEmailMFAEnabled": false]
-            return (200, try! JSONSerialization.data(withJSONObject: ["attributes": attributes]))
-        }
-        let (_, step) = try await EnteLoginFlow.start(api: try EnteMockURLProtocol.makeAPI(), email: "a@b.c")
-        #expect(step == .password)
     }
 
     @Test func addsEncryptedAccount() async throws {

@@ -11,7 +11,7 @@ accounts in Ente Auth.
 
 ## Sign in
 
-The sign in follows Ente's own apps:
+The sign in follows Ente's own apps, with the email and password entered together on one screen:
 
 1. `GET /users/srp/attributes` tells whether the account uses SRP and whether email verification is on.
 2. Accounts with SRP and without email verification sign in with
@@ -19,8 +19,8 @@ The sign in follows Ente's own apps:
    `/users/srp/verify-session`). The password never leaves the device: it is stretched with Argon2id into the
    key encryption key (KEK), and the SRP password is a 16 byte subkey of the KEK. The client also checks the
    server's proof (M2), so a server that doesn't know the account's verifier can't complete the sign in.
-3. Other accounts verify a code sent by email (`/users/ott`, `/users/verify-email`) and then enter the password,
-   which is used locally to derive the KEK.
+3. Other accounts verify a code sent by email (`/users/ott`, `/users/verify-email`). The password entered with
+   the email is then used locally to derive the KEK, so it isn't asked for again unless it was wrong.
 4. A TOTP second factor (`/users/two-factor/verify`) or a passkey, verified on Ente's accounts site and then
    polled with `/users/two-factor/passkeys/get-token`, may follow.
 

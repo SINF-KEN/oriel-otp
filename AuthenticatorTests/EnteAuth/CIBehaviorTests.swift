@@ -86,7 +86,7 @@ struct EnteLoginFlowTests {
             }
         }
 
-        let (flow, step) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c")
+        let (flow, step) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c", password: "password")
         #expect(step == .emailCode)
         return flow
     }
@@ -113,10 +113,13 @@ struct EnteLoginFlowTests {
             }
         }
 
-        let (flow, initialStep) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c")
+        let (flow, initialStep) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c", password: "password")
         #expect(initialStep == .emailCode)
         #expect(try await flow.submitCode("123 456") == .secondFactor(totp: true, passkey: false))
-        #expect(try await flow.submitCode("987 654") == .password)
+        // The responses carry no key attributes, so the password entered at the start can't decrypt anything.
+        await #expect(throws: EnteLoginError.invalidAccountData) {
+            try await flow.submitCode("987 654")
+        }
 
         let requests = EnteLoginURLProtocol.requests
         let emailRequest = try #require(requests.first { $0.url?.path == "/users/verify-email" })
@@ -169,7 +172,7 @@ struct EnteLoginFlowTests {
             }
         }
 
-        let (flow, _) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c")
+        let (flow, _) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c", password: "password")
         #expect(try await flow.submitCode("email-code") == .secondFactor(totp: false, passkey: true))
         let passkeyURL = try #require(flow.passkeyURL)
         let components = try #require(URLComponents(url: passkeyURL, resolvingAgainstBaseURL: false))
@@ -184,7 +187,9 @@ struct EnteLoginFlowTests {
                 "redirect": "orielotp://passkey"
             ])
         #expect(try await flow.checkPasskey() == nil)
-        #expect(try await flow.checkPasskey() == .password)
+        await #expect(throws: EnteLoginError.invalidAccountData) {
+            try await flow.checkPasskey()
+        }
         #expect(flow.passkeyURL == nil)
     }
 
@@ -205,7 +210,7 @@ struct EnteLoginFlowTests {
             }
         }
 
-        let (flow, _) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c")
+        let (flow, _) = try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c", password: "password")
         _ = try await flow.submitCode("email-code")
         await #expect(throws: EnteLoginError.sessionExpired) {
             try await flow.checkPasskey()
