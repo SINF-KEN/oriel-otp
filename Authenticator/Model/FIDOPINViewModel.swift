@@ -28,7 +28,7 @@ enum FidoViewModelError: Error, LocalizedError {
         case .pinsDoNotMatch:
             return String(localized: "PINs don't match")
         case .usbNotSupported:
-            return String(localized: "FIDO management over USB-C is not supported by iOS. Use NFC or the desktop Yubico Authenticator instead.")
+            return String(localized: "FIDO management over USB-C is not supported by iOS. Use NFC instead, or manage FIDO on a computer.")
         case .locked:
             return String(localized: "PIN is permanently blocked. Factory reset FIDO application to continue.")
         }

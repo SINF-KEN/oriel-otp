@@ -44,6 +44,20 @@ set up two-factor authentication again in the service's settings with the toggle
 Under **Configuration > Smart card extension**, add the certificate to the device and allow notifications. When an
 app asks for the certificate, tap the notification and enter the YubiKey's PIN.
 
+## Smart card extension
+
+Certificates in the YubiKey's smart card (PIV) application can be used by other apps on the iPhone or iPad to sign
+in and to sign, like any other smart card. The private keys stay on the YubiKey.
+
+1. Open **Configuration > Smart card extension**, and plug in the YubiKey or pull down to scan it over NFC.
+2. Tap a certificate under the YubiKey to add it to the device. Certificates already added are listed below it,
+   and can be removed there.
+3. Allow notifications when asked.
+4. When an app asks for the certificate, tap the Oriel OTP notification, enter the YubiKey's PIN and plug in or
+   scan the YubiKey. Then go back to the app.
+
+The certificates have to be on the YubiKey already: Oriel OTP doesn't create or import them.
+
 ## Privacy
 
 See the [privacy policy](PRIVACY.md).
