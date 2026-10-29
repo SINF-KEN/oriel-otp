@@ -108,7 +108,7 @@ See the [privacy policy](PRIVACY.md) for the details.
 
 ## Development
 
-The app is developed in Xcode. Open `Authenticator.xcodeproj` and run the `Authenticator` scheme. It depends on
+The app is developed in Xcode. Open `OrielOTP.xcodeproj` and run the `OrielOTP` scheme. It depends on
 the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth import on
 [swift-sodium](https://github.com/jedisct1/swift-sodium) (libsodium) and
 [BigInt](https://github.com/attaswift/BigInt), all added with the Swift Package Manager.

@@ -2,7 +2,7 @@
 
 ## Triggers and required checks
 
-The `AuthenticatorTests` workflow runs for every pull request, pushes to `main`, and every tag push. Release automation publishes from tags, so the workflow does not also subscribe to the `release` event. There are no path filters: documentation-only changes still produce the required check. A newer run for the same branch or pull request cancels the older run. Job-level Git configuration sets `init.defaultBranch=main` to avoid an irrelevant default-branch hint from checkout's temporary repository.
+The `OrielOTPTests` workflow runs for every pull request, pushes to `main`, and every tag push. Release automation publishes from tags, so the workflow does not also subscribe to the `release` event. There are no path filters: documentation-only changes still produce the required check. A newer run for the same branch or pull request cancels the older run. Job-level Git configuration sets `init.defaultBranch=main` to avoid an irrelevant default-branch hint from checkout's temporary repository.
 
 GitHub branch protection for `main` requires a pull request and the Actions `build` status check, requires the branch to be current with its base, and applies to administrators. No approval count is required. This keeps the workflow's sole job as the merge gate; dependency review runs inside that job for pull requests.
 

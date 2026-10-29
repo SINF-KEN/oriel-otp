@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "818866B222DFD729006BC0A8"
-               BuildableName = "Authenticator.app"
-               BlueprintName = "Authenticator"
-               ReferencedContainer = "container:Authenticator.xcodeproj">
+               BuildableName = "OrielOTP.app"
+               BlueprintName = "OrielOTP"
+               ReferencedContainer = "container:OrielOTP.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,9 +31,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "818866B222DFD729006BC0A8"
-            BuildableName = "Authenticator.app"
-            BlueprintName = "Authenticator"
-            ReferencedContainer = "container:Authenticator.xcodeproj">
+            BuildableName = "OrielOTP.app"
+            BlueprintName = "OrielOTP"
+            ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -42,9 +42,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "818866C822DFD72C006BC0A8"
-               BuildableName = "AuthenticatorTests.xctest"
-               BlueprintName = "AuthenticatorTests"
-               ReferencedContainer = "container:Authenticator.xcodeproj">
+               BuildableName = "OrielOTPTests.xctest"
+               BlueprintName = "OrielOTPTests"
+               ReferencedContainer = "container:OrielOTP.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -64,9 +64,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "818866B222DFD729006BC0A8"
-            BuildableName = "Authenticator.app"
-            BlueprintName = "Authenticator"
-            ReferencedContainer = "container:Authenticator.xcodeproj">
+            BuildableName = "OrielOTP.app"
+            BlueprintName = "OrielOTP"
+            ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -81,9 +81,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "818866B222DFD729006BC0A8"
-            BuildableName = "Authenticator.app"
-            BlueprintName = "Authenticator"
-            ReferencedContainer = "container:Authenticator.xcodeproj">
+            BuildableName = "OrielOTP.app"
+            BlueprintName = "OrielOTP"
+            ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

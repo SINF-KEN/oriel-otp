@@ -41,7 +41,7 @@ echo "Taking screenshots on $DEVICE_TYPE ($runtime)"
 xcrun simctl boot "$udid"
 xcrun simctl bootstatus "$udid" >/dev/null
 
-xcodebuild build -project Authenticator.xcodeproj -scheme OrielOTPWatch -destination "id=$udid" \
+xcodebuild build -project OrielOTP.xcodeproj -scheme OrielOTPWatch -destination "id=$udid" \
     -derivedDataPath "$work/DerivedData" -quiet
 xcrun simctl install "$udid" "$work/DerivedData/Build/Products/Debug-watchsimulator/OrielOTPWatch.app"
 

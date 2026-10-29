@@ -28,7 +28,7 @@ tools/screenshots.sh
 ```
 
 This needs Xcode and `jq`. The script creates a simulator for the newest iPhone Pro (set `DEVICE_TYPE`, e.g.
-`DEVICE_TYPE="iPhone 17 Pro"`, to pick another one), runs `AuthenticatorUITests` with the `Screenshots` scheme and
+`DEVICE_TYPE="iPhone 17 Pro"`, to pick another one), runs `OrielOTPUITests` with the `Screenshots` scheme and
 deletes the simulator again. Screenshots whose bytes changed are copied to `docs/screenshots/`; the others are left
 alone.
 

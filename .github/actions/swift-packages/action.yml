@@ -24,7 +24,7 @@ runs:
         xcode=$(xcodebuild -version | awk '/Build version/ { print $3 }')
         echo "path=$RUNNER_TEMP/SourcePackages" >> "$GITHUB_OUTPUT"
         # hashFiles() runs in a helper process with a fixed two-minute limit, which a busy runner has exceeded.
-        resolved=$(shasum -a 256 Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+        resolved=$(shasum -a 256 OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
           | awk '{ print $1 }')
         echo "key=spm-checkouts-$RUNNER_OS-$xcode-$resolved" >> "$GITHUB_OUTPUT"
 
@@ -43,8 +43,8 @@ runs:
       run: |
         set -euo pipefail
         xcodebuild -resolvePackageDependencies \
-          -project Authenticator.xcodeproj \
-          -scheme Authenticator \
+          -project OrielOTP.xcodeproj \
+          -scheme OrielOTP \
           -clonedSourcePackagesDirPath "${{ steps.paths.outputs.path }}" \
           -disableAutomaticPackageResolution \
           -onlyUsePackageVersionsFromResolvedFile \
@@ -57,7 +57,7 @@ runs:
         set -euo pipefail
         pins() { jq -cS "$1" "$2"; }
         expected=$(pins '[.pins[] | {identity, revision: .state.revision}] | sort_by(.identity)' \
-          Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+          OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
         actual=$(pins '[.object.dependencies[] | {identity: .packageRef.identity, revision: .state.checkoutState.revision}] | sort_by(.identity)' \
           "${{ steps.paths.outputs.path }}/workspace-state.json")
         if [[ "$expected" != "$actual" ]]; then
