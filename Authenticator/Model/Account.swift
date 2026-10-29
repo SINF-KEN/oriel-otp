@@ -132,8 +132,8 @@ import YubiKit
             break
         }
 #endif
-        let value = abs(accountId.hash) % UIColor.colorSetForAccountIcons.count
-        return Color(UIColor.colorSetForAccountIcons[value] ?? .label)
+        let value = abs(accountId.hash) % Color.colorSetForAccountIcons.count
+        return Color.colorSetForAccountIcons[value]
     }
 
     func updateState() {

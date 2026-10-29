@@ -1,0 +1,50 @@
+/*
+ * Copyright (C) 2026 Kenzi Voyer.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#if os(macOS)
+
+import AppKit
+import UserNotifications
+
+/// Asks for a touch of the YubiKey with a notification when the code was asked for from outside the window, e.g. from
+/// the menu bar or Shortcuts, where the in-window prompt can't be seen. The notification is removed once the YubiKey
+/// has been touched.
+enum TouchPrompt {
+
+    private static let identifier = "io.github.sinf-ken.OrielOTP.touch"
+
+    static func show(for accountTitle: String) {
+        guard !NSApp.isActive else { return }
+        let center = UNUserNotificationCenter.current()
+        Task {
+            // Asked the first time it's needed, so the request comes with a reason.
+            guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true else { return }
+            let content = UNMutableNotificationContent()
+            content.title = String(localized: "Touch your YubiKey", comment: "Mac notification title")
+            content.body = String(localized: "Touch the button on the YubiKey to get the code for \(accountTitle).", comment: "Mac notification. The placeholder is the account name.")
+            content.interruptionLevel = .timeSensitive
+            try? await center.add(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
+        }
+    }
+
+    static func hide() {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [identifier])
+        center.removeDeliveredNotifications(withIdentifiers: [identifier])
+    }
+}
+
+#endif

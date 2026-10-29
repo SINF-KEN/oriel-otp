@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#if DEBUG && targetEnvironment(simulator)
+#if DEBUG && (targetEnvironment(simulator) || os(macOS))
 
 import CryptoKit
 import Foundation
@@ -33,6 +33,16 @@ import YubiKit
 @MainActor @Observable final class SimulatedYubiKey {
 
     static let shared = SimulatedYubiKey()
+
+    /// Always in the simulator. On the Mac only when launched with `-SimulatedYubiKey YES`, so debug builds still
+    /// use a real YubiKey by default. The fake Ente server comes with it.
+    nonisolated static var isEnabled: Bool {
+        #if targetEnvironment(simulator)
+        return true
+        #else
+        return UserDefaults.standard.bool(forKey: "SimulatedYubiKey")
+        #endif
+    }
 
     /// Whether the key is plugged in. Unplugging closes the connection like pulling out a real key.
     var isInserted = true {

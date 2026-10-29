@@ -19,8 +19,8 @@ fork.
 
 `main` on `oriel` also has debug-only tooling for the simulator: a simulated YubiKey, a fake Ente server at
 `https://demo.ente.test` (any email, password `demo`), a menu item that acts like scanning a YubiKey's NFC OTP,
-and a clock that can be frozen. It is all inside `#if DEBUG && targetEnvironment(simulator)` and is used to take the
-README screenshots (see [screenshots.md](screenshots.md)). It used to live on a separate `simulator-demo` branch.
+and a clock that can be frozen. It is all inside `#if DEBUG && (targetEnvironment(simulator) || os(macOS))`, and on
+the Mac only switched on with the `-SimulatedYubiKey YES` launch argument. It is used to take the README screenshots (see [screenshots.md](screenshots.md)). It used to live on a separate `simulator-demo` branch.
 Like the rebranding, it isn't meant for Yubico.
 
 Publishing the app branch:
