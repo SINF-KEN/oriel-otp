@@ -57,6 +57,10 @@ struct EnteSessionStore {
     private static let account = "session"
     private static let emailKey = "EnteAuth.SavedSessionEmail"
     private static let serverKey = "EnteAuth.SavedSessionServer"
+    /// Set when the session was saved with the current access control. Earlier versions protected it on the Mac
+    /// with Touch ID only, and updating an item keeps its access control.
+    private static let versionKey = "EnteAuth.SavedSessionVersion"
+    private static let version = 2
 
     private let keychain: EnteSessionKeychain
     private let defaults: UserDefaults
@@ -103,17 +107,31 @@ struct EnteSessionStore {
         return savedAccount.email
     }
 
+    /// Replaces any saved session. The keychain item is deleted and added again, as updating it would keep the
+    /// access control it was first saved with.
     func save(_ session: EnteSavedSession) throws {
         let data = try JSONEncoder().encode(session)
+        try keychain.removeValue(for: Self.account)
         try keychain.setValue(data, useAuthentication: true, for: Self.account)
         defaults.set(session.email, forKey: Self.emailKey)
         defaults.set(session.server.absoluteString, forKey: Self.serverKey)
+        defaults.set(Self.version, forKey: Self.versionKey)
     }
 
     /// Returns the token and the authenticator key after asking for Face ID, Touch ID or the Mac's password.
     /// Throws `EnteAuthenticatorSyncError.signedOut` when there's no session to unlock, e.g. because Face ID or
-    /// Touch ID changed since it was saved.
+    /// Touch ID changed since it was saved. A session saved by an earlier version is saved again with the current
+    /// access control.
     func unlock() async throws -> EnteSavedSession {
+        let session = try await read()
+        if defaults.integer(forKey: Self.versionKey) < Self.version {
+            // If this fails the old item is kept, or the password is asked for on the next launch.
+            try? save(session)
+        }
+        return session
+    }
+
+    private func read() async throws -> EnteSavedSession {
         let data: Data
         do {
             data = try await keychain.getValue(for: Self.account)
@@ -126,6 +144,7 @@ struct EnteSessionStore {
     /// Forgets the token and the key but keeps the account, for when the server no longer accepts the token.
     func forgetSession() {
         try? keychain.removeValue(for: Self.account)
+        defaults.removeObject(forKey: Self.versionKey)
     }
 
     /// Forgets the account, the token and the key.
@@ -139,7 +158,7 @@ struct EnteSessionStore {
     /// unlocked first so the session can be ended; if that's cancelled the account is still forgotten here. Returns
     /// once nothing is left on the device, without waiting for the server, which only ever sees the old token.
     @MainActor func signOut(watch: WatchAccountSync = .shared) async {
-        let saved = savedAccount?.hasSession == true ? try? await unlock() : nil
+        let saved = savedAccount?.hasSession == true ? try? await read() : nil
         remove()
         watch.disable()
         guard let saved, let api = try? EnteAPIClient(server: saved.server) else { return }

@@ -19,11 +19,21 @@ import Testing
 
 @testable import OrielOTP
 
-/// Stands in for the keychain. It remembers which items would be protected by Face ID or Touch ID.
+/// Stands in for the keychain. It remembers which items would be protected by Face ID or Touch ID, and how each
+/// item was written: an update keeps the access control an item was added with.
 nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendable {
+    enum Write: Equatable {
+        case add, update, remove
+    }
+
     private let lock = NSLock()
     private var items: [String: Data] = [:]
     private var protectedItems: Set<String> = []
+    private var _writes: [Write] = []
+
+    var writes: [Write] {
+        lock.withLock { _writes }
+    }
 
     func hasValue(for userAccount: String) -> Bool {
         lock.withLock { items[userAccount] != nil }
@@ -35,6 +45,7 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
 
     func setValue(_ value: Data, useAuthentication: Bool, for userAccount: String) throws {
         lock.withLock {
+            _writes.append(items[userAccount] == nil ? .add : .update)
             items[userAccount] = value
             if useAuthentication {
                 protectedItems.insert(userAccount)
@@ -51,6 +62,9 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
 
     func removeValue(for userAccount: String) throws {
         lock.withLock {
+            if items[userAccount] != nil {
+                _writes.append(.remove)
+            }
             items[userAccount] = nil
             protectedItems.remove(userAccount)
         }
@@ -115,6 +129,23 @@ func makeTestDefaults() -> UserDefaults {
         try store.save(session)
         #expect(keychain.isProtected("session"))
         #expect(try await store.unlock() == session)
+    }
+
+    @Test func saveReplacesTheItemSoItGetsTheCurrentAccessControl() throws {
+        try store.save(session)
+        try store.save(session)
+        #expect(keychain.writes == [.add, .remove, .add])
+        #expect(keychain.isProtected("session"))
+    }
+
+    @Test func aSessionSavedByAnEarlierVersionIsSavedAgainAfterUnlocking() async throws {
+        // Earlier versions protected the item with Touch ID only on the Mac, and wrote no version.
+        try keychain.setValue(try JSONEncoder().encode(session), useAuthentication: true, for: "session")
+        defaults.set("alice@example.com", forKey: "EnteAuth.SavedSessionEmail")
+        #expect(try await store.unlock() == session)
+        #expect(keychain.writes == [.add, .remove, .add])
+        #expect(try await store.unlock() == session)
+        #expect(keychain.writes == [.add, .remove, .add])
     }
 
     @Test func signOutForgetsTheSessionWithoutWaitingForTheServer() async throws {
@@ -198,9 +229,9 @@ struct EnteSavedAccountTests {
         #expect(!model.isBusy)
     }
 
-    private func signIn(_ model: EnteSyncViewModel) async throws {
+    private func signIn(_ model: EnteSyncViewModel, server: URL = FakeEnteServer.server) async throws {
         model.email = "alice@example.com"
-        model.server = FakeEnteServer.server.absoluteString
+        model.server = server.absoluteString
         model.signIn()
         try await settle(model)
         #expect(model.phase == .password)
@@ -231,6 +262,31 @@ struct EnteSavedAccountTests {
         #expect(relaunched.phase == .accounts)
         #expect(!relaunched.codes.isEmpty)
         #expect(relaunched.password.isEmpty)
+    }
+
+    @Test func aNewAccountGetsAnAuthenticatorKeyAndStaysSignedIn() async throws {
+        let server = FakeEnteServer.newAccountServer()
+        let model = makeModel()
+        try await signIn(model, server: server)
+        #expect(model.codes.isEmpty)
+        #expect(FakeEnteServer.hasAuthenticatorKey(server))
+        #expect(try await EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true).unlock().server == server)
+
+        let relaunched = makeModel()
+        #expect(relaunched.phase == .savedSession(email: "alice@example.com"))
+        relaunched.useSavedSession()
+        try await settle(relaunched)
+        #expect(relaunched.error == nil)
+        #expect(relaunched.phase == .accounts)
+    }
+
+    @Test func notStayingSignedInCreatesNoAuthenticatorKey() async throws {
+        let server = FakeEnteServer.newAccountServer()
+        let model = makeModel()
+        model.staySignedIn = false
+        try await signIn(model, server: server)
+        #expect(!FakeEnteServer.hasAuthenticatorKey(server))
+        model.close()
     }
 
     @Test func aRejectedTokenAsksForThePasswordAndKeepsTheAccount() async throws {

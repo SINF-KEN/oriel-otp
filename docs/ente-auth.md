@@ -92,6 +92,10 @@ master key (secretbox) and stored with `POST /authenticator/key` (`encryptedKey`
 another Ente app created the key in the meantime, the server answers `409` and that key is fetched and used. So a
 new account stays signed in too. Without **Stay signed in** no key is created.
 
+Saving deletes any earlier keychain item and adds a new one, because updating an item keeps the access control it
+was added with. Sessions saved by earlier versions, protected by Touch ID only on the Mac, are saved again with
+the current access control the first time they are unlocked.
+
 The email and server are kept in the app's preferences, so the account is shown without unlocking: in the sheet,
 and with **Sign out** in the settings (the YubiKey configuration on iPhone and iPad, Settings ▸ General on the
 Mac). **Sign out** asks for the unlock to read the token, deletes the token, the key and the account right away,
