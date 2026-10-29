@@ -109,6 +109,22 @@ CI signs the Mac build ad hoc without it, and the keychain tests skip themselves
 - A real YubiKey, Touch ID, the screen recording prompt, Continuity Camera and the notification can only be checked
   by hand.
 
+## App icon
+
+The Mac build uses the same `Authenticator/AppIcon.icon` and `AppIcon-Dark.icon` as iOS; Xcode compiles them into
+`AppIcon.icns` and `Assets.car`. To check how they look on the Mac, render them with Icon Composer's `ictool`:
+
+```sh
+ICTOOL="/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool"
+for rendition in Default Dark ClearLight; do
+  "$ICTOOL" Authenticator/AppIcon.icon --export-image --output-file "/tmp/AppIcon-$rendition.png" \
+    --platform macOS --rendition "$rendition" --width 512 --height 512 --scale 1
+done
+```
+
+Use `--width 16 --height 16 --scale 2` for the smallest Finder size. Both icons were checked this way in light, dark
+and clear, down to 16 pt.
+
 ## Not in the Mac version
 
 - The smart card extension and its screens: macOS reads the YubiKey's PIV certificates with its own driver.
