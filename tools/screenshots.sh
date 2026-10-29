@@ -9,6 +9,7 @@
 # Usage: tools/screenshots.sh
 #   DEVICE_TYPE  simulator device type, e.g. "iPhone 17 Pro" (default: the newest iPhone Pro)
 #   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
+#   RESULT_BUNDLE_PATH  where to keep the test's result bundle, e.g. to look at a failure (default: not kept)
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -48,10 +49,14 @@ if [[ -n "${SOURCE_PACKAGES_DIR:-}" ]]; then
     packages=(-clonedSourcePackagesDirPath "$SOURCE_PACKAGES_DIR" -disableAutomaticPackageResolution
         -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates)
 fi
+result=()
+if [[ -n "${RESULT_BUNDLE_PATH:-}" ]]; then
+    result=(-resultBundlePath "$RESULT_BUNDLE_PATH")
+fi
 # xcodebuild passes TEST_RUNNER_ variables to the test without the prefix.
 TEST_RUNNER_SCREENSHOT_DIR="$work/screenshots" xcodebuild test \
     -project OrielOTP.xcodeproj -scheme Screenshots -destination "id=$udid" \
-    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} | "${formatter[@]}"
+    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} ${result[@]+"${result[@]}"} | "${formatter[@]}"
 
 mkdir -p "$output"
 for new in "$work"/screenshots/*.png; do

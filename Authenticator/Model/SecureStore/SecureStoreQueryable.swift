@@ -51,10 +51,13 @@ nonisolated protocol SecureStoreQueryable: Sendable {
 nonisolated public struct PasswordQueryable {
     let service: String
     let accessGroup: String?
+    /// Who may read a protected item: by default only the currently enrolled Face ID or Touch ID.
+    let accessControl: SecAccessControlCreateFlags
 
-    init(service: String, accessGroup: String? = nil) {
+    init(service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet) {
         self.service = service
         self.accessGroup = accessGroup
+        self.accessControl = accessControl
     }
 }
 
@@ -77,7 +80,7 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
         if useAuthentication {
             query[String(kSecAttrAccessControl)] = SecAccessControlCreateWithFlags(nil, // use the default allocator
                                                                                    kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                                                                   .biometryCurrentSet,
+                                                                                   accessControl,
                                                                                    nil) // ignore any error
             let context = LAContext()
             // Number of seconds to wait between a device unlock with biometric and another biometric authentication request.

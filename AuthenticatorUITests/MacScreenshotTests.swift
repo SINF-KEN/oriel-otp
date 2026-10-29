@@ -66,6 +66,12 @@ final class MacScreenshotTests: XCTestCase {
         email.typeText("alice@example.com\r")
         let password = window.sheets.secureTextFields.firstMatch
         XCTAssertTrue(password.waitForExistence(timeout: 10))
+        // The ad-hoc signed build has no keychain access group, so it can't keep the session in the keychain.
+        let staySignedIn = window.sheets.switches.firstMatch
+        XCTAssertTrue(staySignedIn.waitForExistence(timeout: 5))
+        if staySignedIn.value as? Int == 1 {
+            staySignedIn.click()
+        }
         password.click()
         password.typeText("demo\r")
         let alreadyOnYubiKey = window.sheets.buttons.matching(NSPredicate(format: "label ENDSWITH 'Already on YubiKey'")).firstMatch

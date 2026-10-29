@@ -161,6 +161,13 @@ nonisolated struct EnteAPIClient: Sendable {
         }
     }
 
+    /// Stores a new authenticator key for an account that has never used Ente Auth. Throws `http(statusCode: 409)`
+    /// when the account already has one.
+    func createAuthenticatorKey(token: String, encryptedKey: String, header: String) async throws {
+        let _: Empty = try await send("POST", "/authenticator/key", token: token,
+                                      body: ["encryptedKey": encryptedKey, "header": header])
+    }
+
     func authenticatorDiff(token: String, sinceTime: Int64, limit: Int) async throws -> [EnteAuthenticatorEntity] {
         struct Response: Decodable { let diff: [EnteAuthenticatorEntity] }
         let response: Response = try await send("GET", "/authenticator/entity/diff", token: token,

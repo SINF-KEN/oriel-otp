@@ -224,6 +224,56 @@ struct EnteAuthenticatorSyncTests {
         #expect(try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys) == nil)
     }
 
+    @Test func createsTheAuthenticatorKeyForANewAccount() async throws {
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.bodies = []
+        EnteMockURLProtocol.handler = { request in
+            switch (request.httpMethod, request.url?.path) {
+            case ("POST", "/authenticator/key"):
+                return (200, Data("{}".utf8))
+            default:
+                return (404, Data())
+            }
+        }
+        let api = try EnteMockURLProtocol.makeAPI()
+        let keys = EnteAccountKeys(userID: 1, token: "t", masterKey: EnteCrypto.randomBytes(32))
+
+        let key = try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
+        #expect(key.count == 32)
+        #expect(EnteMockURLProtocol.requests.map { "\($0.httpMethod ?? "") \($0.url?.path ?? "")" }
+                == ["GET /authenticator/key", "POST /authenticator/key"])
+        #expect(EnteMockURLProtocol.requests.last?.value(forHTTPHeaderField: "X-Auth-Token") == "t")
+        // The key is stored encrypted with the master key, like Ente Auth stores it.
+        let body = try JSONDecoder().decode([String: String].self, from: try #require(EnteMockURLProtocol.bodies.last ?? nil))
+        let encryptedKey = try #require(body["encryptedKey"].flatMap { Data(base64Encoded: $0) })
+        let nonce = try #require(body["header"].flatMap { Data(base64Encoded: $0) })
+        #expect(try EnteCrypto.secretBoxOpen(encryptedKey, nonce: nonce, key: keys.masterKey) == key)
+    }
+
+    @Test func usesTheAuthenticatorKeyAnotherAppCreatedMeanwhile() async throws {
+        let masterKey = EnteCrypto.randomBytes(32)
+        let otherKey = EnteCrypto.randomBytes(32)
+        let encryptedOtherKey = try EnteCrypto.secretBox(otherKey, key: masterKey)
+        var created = false
+        EnteMockURLProtocol.handler = { request in
+            switch (request.httpMethod, request.url?.path) {
+            case ("GET", "/authenticator/key") where created:
+                let body = ["encryptedKey": encryptedOtherKey.cipherText.base64EncodedString(),
+                            "header": encryptedOtherKey.nonce.base64EncodedString()]
+                return (200, try! JSONSerialization.data(withJSONObject: body))
+            case ("POST", "/authenticator/key"):
+                // Another app created the key after this one found none.
+                created = true
+                return (409, Data())
+            default:
+                return (404, Data())
+            }
+        }
+        let api = try EnteMockURLProtocol.makeAPI()
+        let keys = EnteAccountKeys(userID: 1, token: "t", masterKey: masterKey)
+        #expect(try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys) == otherKey)
+    }
+
     @Test func revokedTokenIsReportedAsSignedOut() async throws {
         EnteMockURLProtocol.handler = { _ in (401, Data()) }
         let api = try EnteMockURLProtocol.makeAPI()

@@ -76,7 +76,7 @@ final class EnteLoginFlow {
     /// Kept until the keys are decrypted when the email code has to be verified first.
     private var password: String?
     private var state: State
-    /// Called with true while the password is turned into keys and the keys are decrypted, and with false after.
+    /// Called with true while the password is turned into keys, and with false after.
     private let onDerivingKeys: (Bool) -> Void
 
     var keys: EnteAccountKeys? {
@@ -170,8 +170,6 @@ final class EnteLoginFlow {
         }
         // Verified, so a wrong password can be retried with submitPassword(_:).
         state = .password(verified: response)
-        onDerivingKeys(true)
-        defer { onDerivingKeys(false) }
         let keyEncryptionKey = if let keyEncryptionKey { keyEncryptionKey } else { try await deriveKeyEncryptionKey(for: response) }
         state = .complete(try await Self.decryptKeys(response, keyEncryptionKey: keyEncryptionKey))
         password = nil
@@ -182,6 +180,8 @@ final class EnteLoginFlow {
     private func deriveKeyEncryptionKey(for response: EnteAuthResponse) async throws -> Data {
         guard let password, let attributes = response.keyAttributes,
               let salt = Data(enteBase64: attributes.kekSalt) else { throw EnteLoginError.invalidAccountData }
+        onDerivingKeys(true)
+        defer { onDerivingKeys(false) }
         return try await Self.deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: attributes.opsLimit, memLimit: attributes.memLimit)
     }
 

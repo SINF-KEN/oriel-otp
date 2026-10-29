@@ -11,6 +11,7 @@
 #
 # Usage: tools/screenshots-macos.sh
 #   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
+#   RESULT_BUNDLE_PATH  where to keep the test's result bundle, e.g. to look at a failure (default: not kept)
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -18,6 +19,7 @@ cd "$(dirname "$0")/.."
 output=docs/screenshots
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
+result=${RESULT_BUNDLE_PATH:-$work/Screenshots.xcresult}
 
 entitlements="$work/Authenticator-macOS.entitlements"
 cp Authenticator/Authenticator-macOS.entitlements "$entitlements"
@@ -35,12 +37,12 @@ fi
 xcodebuild test \
     -project OrielOTP.xcodeproj -scheme Screenshots -destination 'platform=macOS' \
     -only-testing:OrielOTPUITests/MacScreenshotTests/testScreenshots \
-    -derivedDataPath "$work/DerivedData" -resultBundlePath "$work/Screenshots.xcresult" ${packages[@]+"${packages[@]}"} \
+    -derivedDataPath "$work/DerivedData" -resultBundlePath "$result" ${packages[@]+"${packages[@]}"} \
     CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$entitlements" \
     | "${formatter[@]}"
 
 # The test attaches the screenshots to its result, named "<name>_0_<UUID>.png".
-xcrun xcresulttool export attachments --path "$work/Screenshots.xcresult" --output-path "$work/attachments" >/dev/null
+xcrun xcresulttool export attachments --path "$result" --output-path "$work/attachments" >/dev/null
 mkdir -p "$output"
 jq -r '.[].attachments[] | select(.suggestedHumanReadableName | startswith("mac-")) | "\(.exportedFileName) \(.suggestedHumanReadableName)"' \
     "$work/attachments/manifest.json" |

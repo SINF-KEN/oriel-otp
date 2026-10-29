@@ -148,6 +148,27 @@ nonisolated enum EnteAuthenticatorSync {
 
     static let pageSize = 500
 
+    /// Fetches and decrypts the authenticator key, creating it like Ente Auth does when the account has never used
+    /// Ente Auth: a random key, encrypted with the master key. If another app created the key in the meantime, that
+    /// key is used.
+    static func authenticatorKeyCreatingIfNeeded(api: EnteAPIClient, keys: EnteAccountKeys) async throws -> Data {
+        if let key = try await authenticatorKey(api: api, keys: keys) {
+            return key
+        }
+        let key = EnteCrypto.randomBytes(EnteCrypto.keyLength)
+        let encrypted = try EnteCrypto.secretBox(key, key: keys.masterKey)
+        do {
+            try await signedIn {
+                try await api.createAuthenticatorKey(token: keys.token, encryptedKey: encrypted.cipherText.base64EncodedString(),
+                                                     header: encrypted.nonce.base64EncodedString())
+            }
+            return key
+        } catch EnteAPIError.http(statusCode: 409) {
+            guard let key = try await authenticatorKey(api: api, keys: keys) else { throw EnteAuthenticatorSyncError.invalidKey }
+            return key
+        }
+    }
+
     /// Fetches and decrypts the key that the authenticator entities are encrypted with.
     /// Returns nil when the account has never stored codes in Ente Auth.
     static func authenticatorKey(api: EnteAPIClient, keys: EnteAccountKeys) async throws -> Data? {

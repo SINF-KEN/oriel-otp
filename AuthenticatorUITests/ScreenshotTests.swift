@@ -53,7 +53,8 @@ final class ScreenshotTests: XCTestCase {
         let email = app.textFields["Email"]
         XCTAssertTrue(email.waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
         email.tap()
-        // Return submits, like the Continue and Sign in buttons, whose names the keyboard's return key shares.
+        // Return moves on to the password, where it signs in. Typing it avoids tapping the Sign in button, whose name
+        // the keyboard's return key shares.
         email.typeText("alice@example.com\n")
         let password = app.secureTextFields["Password"]
         XCTAssertTrue(password.waitForExistence(timeout: 20), "The Ente password field didn't show")
