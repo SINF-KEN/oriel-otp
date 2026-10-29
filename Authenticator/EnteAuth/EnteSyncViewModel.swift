@@ -161,8 +161,6 @@ import YubiKit
                 let (flow, step) = try await EnteLoginFlow.start(api: api, email: email, password: password) {
                     self.isDerivingKeys = $0
                 }
-                // The view went away while signing in.
-                try Task.checkCancellation()
                 self.api = api
                 self.flow = flow
                 return step
@@ -212,6 +210,15 @@ import YubiKit
             phase = .signIn
             throw EnteLoginError.incorrectPassword
         }
+        if case .complete = step, let keys = flow?.keys {
+            // Known before anything else is awaited, so close() can end the session.
+            token = keys.token
+        }
+        // The view went away while signing in.
+        guard !Task.isCancelled else {
+            abandonSignIn()
+            throw CancellationError()
+        }
         switch step {
         case .emailCode:
             phase = .emailCode
@@ -224,10 +231,16 @@ import YubiKit
             let saveSession = staySignedIn && canSaveSession
             // Only the authenticator key is kept, the master key goes away with the flow. An account that has never
             // used Ente Auth gets its key now, while the master key is there, so it stays signed in too.
-            let authenticatorKey = saveSession
-                ? try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
-                : try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
-            token = keys.token
+            let authenticatorKey: Data?
+            do {
+                authenticatorKey = saveSession
+                    ? try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
+                    : try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
+                try Task.checkCancellation()
+            } catch _ where Task.isCancelled {
+                abandonSignIn()
+                throw CancellationError()
+            }
             signedInEmail = flow.email
             if saveSession, let authenticatorKey {
                 try store.save(EnteSavedSession(server: api.server, email: flow.email, token: keys.token, authenticatorKey: authenticatorKey))
@@ -331,6 +344,10 @@ import YubiKit
     /// that wasn't saved is ended so no token is left behind.
     func close() {
         task?.cancel()
+        abandonSignIn()
+    }
+
+    private func abandonSignIn() {
         flow = nil
         password = ""
         code = ""
@@ -378,6 +395,8 @@ import YubiKit
             do {
                 try await operation()
             } catch {
+                // Cancelled by close(), the view is gone.
+                guard !Task.isCancelled else { return }
                 self.error = EnteSyncError(error)
             }
         }
