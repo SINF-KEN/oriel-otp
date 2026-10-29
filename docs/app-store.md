@@ -17,6 +17,8 @@ The app links to the same privacy policy and support page under **About**.
 
 - iPhone, iPad and Mac. The Mac version is a native macOS build of the same target (see [macos.md](macos.md)), not
   the iPad app: "Designed for iPad" stays turned off (`SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO`).
+- A companion Apple Watch app (watchOS 10 or later) is embedded in the iPhone app. The watch app needs the iPhone app
+  (`WKRunsIndependentlyOfCompanionApp = NO`). The Mac app has no watch app.
 - Add the macOS platform to the same app record in App Store Connect, so it's a universal purchase with one bundle
   id (`io.github.sinf-ken.OrielOTP`). The Mac needs its own provisioning profile for the keychain access group.
 - Mac screenshots: `docs/screenshots/mac-accounts.png`, `mac-add-account.png` and `mac-ente-accounts.png` are
@@ -25,11 +27,13 @@ The app links to the same privacy policy and support page under **About**.
 
 ## App Privacy
 
-Both privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/PrivacyInfo.xcprivacy`) declare no
-tracking and no collected data types. The only required-reason API is `UserDefaults`: `CA92.1` for the app's own
-settings, and `1C8F.1` for the app group the app shares with the smart card extension. The Mac app uses the same
-manifest; it adds no other required-reason APIs (the pasteboard, ScreenCaptureKit, notifications and login item
-aren't on the list). Reading a QR code from the screen happens on the Mac and the picture isn't kept or sent.
+The privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/PrivacyInfo.xcprivacy`,
+`OrielOTPWatch/PrivacyInfo.xcprivacy`) declare no tracking and no collected data types. The only required-reason API
+is `UserDefaults`: `CA92.1` for the app's own settings, and `1C8F.1` for the app group the app shares with the smart
+card extension. The watch app uses only the keychain and WatchConnectivity, so its manifest lists no APIs. The Mac
+app uses the same manifest as the iOS app; it adds no other required-reason APIs (the pasteboard, ScreenCaptureKit,
+notifications and login item aren't on the list). Reading a QR code from the screen happens on the Mac and the
+picture isn't kept or sent.
 
 Recommended App Store Connect answer, based on the developer's confirmation: **Data Not Collected**. Oriel OTP
 does not use analytics, advertising, crash reporting, diagnostics reporting, or a developer-operated server.
@@ -94,8 +98,22 @@ market app. Answer the questions in App Store Connect to match, and add the Fran
 > card extension. We can send a YubiKey on request.
 >
 > Ente demo account (no two-factor or email codes): email `…`, password `…`.
+>
+> Apple Watch: the watch app shows codes for the Ente Auth accounts only; it doesn't use the YubiKey. To test it,
+> on the iPhone choose **Sync from Ente Auth** in the account list menu, turn on **Stay signed in**, sign in with
+> the demo account, then turn on **Show Ente Auth accounts on Apple Watch** (shown when a watch with the app is
+> paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
+> watch.
 
-Fill in the demo account and attach the video before submitting.
+Fill in the demo account and attach the video before submitting. Add watch screenshots to the Apple Watch section
+of the listing. App Store Connect takes one size and scales it for the others, so make them on the largest, the
+Ultra (422 × 514 pixels):
+
+```bash
+DEVICE_TYPE="Apple Watch Ultra 3 (49mm)" OUTPUT=build/app-store/watch tools/watch-screenshots.sh
+```
+
+Upload `watch-accounts.png` and `watch-wrist-down.png`. The time in the corner is the time the script ran.
 
 Mac review notes (draft):
 

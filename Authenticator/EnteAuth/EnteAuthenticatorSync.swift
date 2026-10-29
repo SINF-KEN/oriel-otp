@@ -26,6 +26,8 @@ struct EnteCode: Identifiable, Sendable {
     let template: YubiKitOATHSession.CredentialTemplate?
     /// Why the account can't be stored on the YubiKey.
     let unsupportedReason: String?
+    /// The account for the Apple Watch, nil for counter based accounts and ones that can't be read.
+    var otpAccount: OTPAccount? = nil
 
     var title: String {
         if let issuer, !issuer.isEmpty { return issuer }
@@ -48,38 +50,16 @@ struct EnteCode: Identifiable, Sendable {
 enum EnteCodeParser {
 
     /// Parses the decrypted data of an authenticator entity. Returns nil for accounts that are in Ente's trash.
-    ///
-    /// Ente Auth stores either a JSON string holding an otpauth URL, with Ente's display settings in a
-    /// `codeDisplay` query parameter, or a JSON object with the URL in `rawData` and the settings in `display`.
     static func parse(id: String, rawData: String) -> EnteCode? {
-        var urlString: String?
-        var isTrashed = false
-        if let json = try? JSONSerialization.jsonObject(with: Data(rawData.utf8), options: .fragmentsAllowed) {
-            if let string = json as? String {
-                urlString = string
-            } else if let object = json as? [String: Any] {
-                urlString = object["rawData"] as? String
-                isTrashed = (object["display"] as? [String: Any])?["trashed"] as? Bool ?? false
-            }
-        } else if rawData.hasPrefix("otpauth://") {
-            urlString = rawData
-        }
-
-        // Ente's apps escape '#' the same way before parsing, it is common in issuers and account names.
-        guard let urlString, var components = URLComponents(string: urlString.replacingOccurrences(of: "#", with: "%23")),
-              components.scheme?.lowercased() == "otpauth" else {
+        let entry = EnteEntry(rawData: rawData)
+        guard var components = entry.components else {
             return EnteCode(id: id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
                             template: nil, unsupportedReason: String(localized: "This account could not be read.", comment: "Ente import unreadable account"))
         }
+        guard !entry.isTrashed else { return nil }
 
-        if let codeDisplay = components.queryItems?.first(where: { $0.name == "codeDisplay" })?.value,
-           let display = try? JSONSerialization.jsonObject(with: Data(codeDisplay.utf8)) as? [String: Any],
-           display["trashed"] as? Bool == true {
-            isTrashed = true
-        }
-        guard !isTrashed else { return nil }
-
-        let (issuer, accountName) = label(of: components)
+        let otpAccount = OTPAuthURLParser.account(id: id, components: components, isPinned: entry.isPinned)
+        let (issuer, accountName) = OTPAuthURLParser.label(of: components)
         do {
             let template: YubiKitOATHSession.CredentialTemplate
             if components.host?.lowercased() == "steam" {
@@ -95,20 +75,12 @@ enum EnteCodeParser {
                 guard let url = components.url else { throw CredentialTemplateError.type }
                 template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
             }
-            return EnteCode(id: id, issuer: template.issuer, accountName: template.name, template: template, unsupportedReason: nil)
+            return EnteCode(id: id, issuer: template.issuer, accountName: template.name, template: template, unsupportedReason: nil,
+                            otpAccount: otpAccount)
         } catch {
-            return EnteCode(id: id, issuer: issuer, accountName: accountName, template: nil, unsupportedReason: error.localizedDescription)
+            return EnteCode(id: id, issuer: issuer, accountName: accountName, template: nil, unsupportedReason: error.localizedDescription,
+                            otpAccount: otpAccount)
         }
-    }
-
-    private static func label(of components: URLComponents) -> (issuer: String?, accountName: String) {
-        var name = String(components.path.dropFirst())
-        var issuer = components.queryItems?.first { $0.name == "issuer" }?.value
-        if let colon = name.firstIndex(of: ":") {
-            issuer = String(name[..<colon])
-            name = String(name[name.index(after: colon)...]).trimmingCharacters(in: .whitespaces)
-        }
-        return (issuer, name)
     }
 }
 
