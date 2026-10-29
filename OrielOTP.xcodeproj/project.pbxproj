@@ -135,14 +135,14 @@
 			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 818866B222DFD729006BC0A8;
-			remoteInfo = Authenticator;
+			remoteInfo = OrielOTP;
 		};
 		5C3E00000000000000000008 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 818866B222DFD729006BC0A8;
-			remoteInfo = Authenticator;
+			remoteInfo = OrielOTP;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -212,13 +212,13 @@
 		816C685D234697BE00209342 /* PasswordPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPreferences.swift; sourceTree = "<group>"; };
 		817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorAdditions.swift; sourceTree = "<group>"; };
 		A1C1EA0000000000000000F4 /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
-		818866B322DFD729006BC0A8 /* Authenticator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Authenticator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		818866B322DFD729006BC0A8 /* OrielOTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTP.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		818866BF22DFD72C006BC0A8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C1A0000000000000000000C1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		C1A0000000000000000000C2 /* AppIcon-Dark.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-Dark.icon"; sourceTree = "<group>"; };
 		818866C222DFD72C006BC0A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		818866C422DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuthenticatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		818866CF22DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866F622E7A877006BC0A8 /* Authenticator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Authenticator.entitlements; sourceTree = "<group>"; };
 		81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySessionError.swift; sourceTree = "<group>"; };
@@ -281,7 +281,7 @@
 		C1A0000000000000000000A7 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
 		C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		5C3E00000000000000000002 /* AuthenticatorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AuthenticatorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C3E00000000000000000002 /* OrielOTPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C3E0000000000000000000C /* AppClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -499,9 +499,9 @@
 		818866B422DFD729006BC0A8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				818866B322DFD729006BC0A8 /* Authenticator.app */,
-				818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */,
-				5C3E00000000000000000002 /* AuthenticatorUITests.xctest */,
+				818866B322DFD729006BC0A8 /* OrielOTP.app */,
+				818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */,
+				5C3E00000000000000000002 /* OrielOTPUITests.xctest */,
 				5155426F2656706F00B19C59 /* TokenExtension.appex */,
 				A7C400000000000000000003 /* OrielOTPWatch.app */,
 			);
@@ -670,9 +670,9 @@
 			productReference = 5155426F2656706F00B19C59 /* TokenExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		818866B222DFD729006BC0A8 /* Authenticator */ = {
+		818866B222DFD729006BC0A8 /* OrielOTP */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 818866DD22DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "Authenticator" */;
+			buildConfigurationList = 818866DD22DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "OrielOTP" */;
 			buildPhases = (
 				818866AF22DFD729006BC0A8 /* Sources */,
 				818866B022DFD729006BC0A8 /* Frameworks */,
@@ -691,19 +691,19 @@
 				A7C400000000000000000001 /* Shared */,
 				E17E0000000000000000C003 /* Mac */,
 			);
-			name = Authenticator;
+			name = OrielOTP;
 			packageProductDependencies = (
 				B4D71E802CE4E6E6004D4C29 /* YubiKit */,
 				E17E0000000000000000A002 /* Clibsodium */,
 				E17E0000000000000000B002 /* BigInt */,
 			);
-			productName = Authenticator;
-			productReference = 818866B322DFD729006BC0A8 /* Authenticator.app */;
+			productName = OrielOTP;
+			productReference = 818866B322DFD729006BC0A8 /* OrielOTP.app */;
 			productType = "com.apple.product-type.application";
 		};
-		818866C822DFD72C006BC0A8 /* AuthenticatorTests */ = {
+		818866C822DFD72C006BC0A8 /* OrielOTPTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 818866E022DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "AuthenticatorTests" */;
+			buildConfigurationList = 818866E022DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "OrielOTPTests" */;
 			buildPhases = (
 				818866C522DFD72C006BC0A8 /* Sources */,
 				818866C622DFD72C006BC0A8 /* Frameworks */,
@@ -717,14 +717,14 @@
 			fileSystemSynchronizedGroups = (
 				E17E0000000000000000C002 /* EnteAuth */,
 			);
-			name = AuthenticatorTests;
-			productName = AuthenticatorTests;
-			productReference = 818866C922DFD72C006BC0A8 /* AuthenticatorTests.xctest */;
+			name = OrielOTPTests;
+			productName = OrielOTPTests;
+			productReference = 818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		5C3E00000000000000000001 /* AuthenticatorUITests */ = {
+		5C3E00000000000000000001 /* OrielOTPUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "AuthenticatorUITests" */;
+			buildConfigurationList = 5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "OrielOTPUITests" */;
 			buildPhases = (
 				5C3E00000000000000000004 /* Sources */,
 				5C3E00000000000000000005 /* Frameworks */,
@@ -738,9 +738,9 @@
 			fileSystemSynchronizedGroups = (
 				5C3E00000000000000000003 /* AuthenticatorUITests */,
 			);
-			name = AuthenticatorUITests;
-			productName = AuthenticatorUITests;
-			productReference = 5C3E00000000000000000002 /* AuthenticatorUITests.xctest */;
+			name = OrielOTPUITests;
+			productName = OrielOTPUITests;
+			productReference = 5C3E00000000000000000002 /* OrielOTPUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -778,7 +778,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 818866AE22DFD729006BC0A8 /* Build configuration list for PBXProject "Authenticator" */;
+			buildConfigurationList = 818866AE22DFD729006BC0A8 /* Build configuration list for PBXProject "OrielOTP" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -800,10 +800,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				818866B222DFD729006BC0A8 /* Authenticator */,
-				818866C822DFD72C006BC0A8 /* AuthenticatorTests */,
+				818866B222DFD729006BC0A8 /* OrielOTP */,
+				818866C822DFD72C006BC0A8 /* OrielOTPTests */,
 				5155426E2656706F00B19C59 /* TokenExtension */,
-				5C3E00000000000000000001 /* AuthenticatorUITests */,
+				5C3E00000000000000000001 /* OrielOTPUITests */,
 				A7C400000000000000000004 /* OrielOTPWatch */,
 			);
 		};
@@ -998,12 +998,12 @@
 		};
 		818866CB22DFD72C006BC0A8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 818866B222DFD729006BC0A8 /* Authenticator */;
+			target = 818866B222DFD729006BC0A8 /* OrielOTP */;
 			targetProxy = 818866CA22DFD72C006BC0A8 /* PBXContainerItemProxy */;
 		};
 		5C3E00000000000000000007 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 818866B222DFD729006BC0A8 /* Authenticator */;
+			target = 818866B222DFD729006BC0A8 /* OrielOTP */;
 			targetProxy = 5C3E00000000000000000008 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1297,7 +1297,7 @@
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP;
-				PRODUCT_MODULE_NAME = Authenticator;
+				PRODUCT_MODULE_NAME = OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PRODUCT_NAME[sdk=macosx*]" = "Oriel OTP";
 				SDKROOT = auto;
@@ -1343,7 +1343,7 @@
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP;
-				PRODUCT_MODULE_NAME = Authenticator;
+				PRODUCT_MODULE_NAME = OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PRODUCT_NAME[sdk=macosx*]" = "Oriel OTP";
 				SDKROOT = auto;
@@ -1387,7 +1387,7 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Authenticator.app/Authenticator";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OrielOTP.app/OrielOTP";
 				"TEST_HOST[sdk=macosx*]" = "$(BUILT_PRODUCTS_DIR)/Oriel OTP.app/Contents/MacOS/Oriel OTP";
 			};
 			name = Debug;
@@ -1418,7 +1418,7 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Authenticator.app/Authenticator";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OrielOTP.app/OrielOTP";
 				"TEST_HOST[sdk=macosx*]" = "$(BUILT_PRODUCTS_DIR)/Oriel OTP.app/Contents/MacOS/Oriel OTP";
 			};
 			name = Release;
@@ -1437,7 +1437,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Authenticator;
+				TEST_TARGET_NAME = OrielOTP;
 			};
 			name = Debug;
 		};
@@ -1455,7 +1455,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Authenticator;
+				TEST_TARGET_NAME = OrielOTP;
 			};
 			name = Release;
 		};
@@ -1480,7 +1480,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		818866AE22DFD729006BC0A8 /* Build configuration list for PBXProject "Authenticator" */ = {
+		818866AE22DFD729006BC0A8 /* Build configuration list for PBXProject "OrielOTP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				818866DB22DFD72C006BC0A8 /* Debug */,
@@ -1489,7 +1489,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		818866DD22DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "Authenticator" */ = {
+		818866DD22DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "OrielOTP" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				818866DE22DFD72C006BC0A8 /* Debug */,
@@ -1498,7 +1498,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		818866E022DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "AuthenticatorTests" */ = {
+		818866E022DFD72C006BC0A8 /* Build configuration list for PBXNativeTarget "OrielOTPTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				818866E122DFD72C006BC0A8 /* Debug */,
@@ -1507,7 +1507,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "AuthenticatorUITests" */ = {
+		5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "OrielOTPUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5C3E0000000000000000000A /* Debug */,

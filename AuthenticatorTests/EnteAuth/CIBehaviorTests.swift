@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Authenticator
+@testable import OrielOTP
 
 // A separate protocol keeps these state-machine tests independent of the existing sync-test mock.
 nonisolated final class EnteLoginURLProtocol: URLProtocol, @unchecked Sendable {

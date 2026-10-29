@@ -18,7 +18,7 @@
 import Foundation
 import Testing
 
-@testable import Authenticator
+@testable import OrielOTP
 
 #if os(macOS)
 // On the Mac the data protection keychain needs a provisioned keychain access group, which ad-hoc signed CI builds

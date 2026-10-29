@@ -16,7 +16,7 @@
 
 import Foundation
 import Testing
-@testable import Authenticator
+@testable import OrielOTP
 
 struct AccessKeyCacheTests {
 

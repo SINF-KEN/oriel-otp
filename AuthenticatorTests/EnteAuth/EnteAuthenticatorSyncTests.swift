@@ -18,7 +18,7 @@ import Foundation
 import Testing
 import YubiKit
 
-@testable import Authenticator
+@testable import OrielOTP
 
 struct EnteCodeParserTests {
 

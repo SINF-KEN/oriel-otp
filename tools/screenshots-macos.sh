@@ -33,8 +33,8 @@ if command -v xcbeautify >/dev/null; then
     formatter=(xcbeautify ${GITHUB_ACTIONS:+--renderer github-actions})
 fi
 xcodebuild test \
-    -project Authenticator.xcodeproj -scheme Screenshots -destination 'platform=macOS' \
-    -only-testing:AuthenticatorUITests/MacScreenshotTests/testScreenshots \
+    -project OrielOTP.xcodeproj -scheme Screenshots -destination 'platform=macOS' \
+    -only-testing:OrielOTPUITests/MacScreenshotTests/testScreenshots \
     -derivedDataPath "$work/DerivedData" -resultBundlePath "$work/Screenshots.xcresult" ${packages[@]+"${packages[@]}"} \
     CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$entitlements" \
     | "${formatter[@]}"
