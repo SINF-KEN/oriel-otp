@@ -94,8 +94,9 @@ new account stays signed in too. Without **Stay signed in** no key is created.
 
 The email and server are kept in the app's preferences, so the account is shown without unlocking: in the sheet,
 and with **Sign out** in the settings (the YubiKey configuration on iPhone and iPad, Settings ▸ General on the
-Mac). **Sign out** asks for the unlock to revoke the token with `POST /users/logout`, then deletes the token, the
-key and the account, even if the token couldn't be revoked.
+Mac). **Sign out** asks for the unlock to read the token, deletes the token, the key and the account right away,
+and then revokes the token with `POST /users/logout` without waiting for the answer. If the unlock is cancelled or
+the server can't be reached, the account is still deleted from the device.
 
 When the server rejects the token (`401`), e.g. because the session was ended from another device, or when Face ID
 or Touch ID changed and the keychain item can no longer be read, the token and key are deleted but the account is

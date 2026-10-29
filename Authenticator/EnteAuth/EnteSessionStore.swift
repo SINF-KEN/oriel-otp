@@ -135,14 +135,15 @@ struct EnteSessionStore {
         defaults.removeObject(forKey: Self.serverKey)
     }
 
-    /// Signs out: asks Ente's server to end the session and forgets the account on this device. The token is
-    /// unlocked to end the session; if that's cancelled or fails the account is still forgotten here.
+    /// Signs out: forgets the account on this device, then asks Ente's server to end the session. The token is
+    /// unlocked first so the session can be ended; if that's cancelled the account is still forgotten here. Returns
+    /// once nothing is left on the device, without waiting for the server, which only ever sees the old token.
     @MainActor func signOut(watch: WatchAccountSync = .shared) async {
-        if savedAccount?.hasSession == true, let saved = try? await unlock(), let api = try? EnteAPIClient(server: saved.server) {
-            try? await api.logout(token: saved.token)
-        }
+        let saved = savedAccount?.hasSession == true ? try? await unlock() : nil
         remove()
         watch.disable()
+        guard let saved, let api = try? EnteAPIClient(server: saved.server) else { return }
+        Task { try? await api.logout(token: saved.token) }
     }
 
     /// Adds an account to Ente Auth with the saved session, after asking for Face ID, Touch ID or the passcode.

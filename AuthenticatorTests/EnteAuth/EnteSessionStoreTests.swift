@@ -57,6 +57,43 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
     }
 }
 
+/// A server that doesn't answer `POST /users/logout` until told to fail it.
+nonisolated final class UnansweredLogoutServer: URLProtocol, @unchecked Sendable {
+    static let server = URL(string: "https://unanswered-logout.ente.test")!
+
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var pending: [UnansweredLogoutServer] = []
+    nonisolated(unsafe) private static var receivedTokens: [String] = []
+
+    /// The tokens of the logout requests received.
+    static var tokens: [String] {
+        lock.withLock { receivedTokens }
+    }
+
+    /// Answers the waiting requests with a server error.
+    static func fail() {
+        let requests = lock.withLock {
+            defer { pending = [] }
+            return pending
+        }
+        for request in requests {
+            let response = HTTPURLResponse(url: request.request.url!, statusCode: 500, httpVersion: nil, headerFields: nil)!
+            request.client?.urlProtocol(request, didReceive: response, cacheStoragePolicy: .notAllowed)
+            request.client?.urlProtocolDidFinishLoading(request)
+        }
+    }
+
+    override class func canInit(with request: URLRequest) -> Bool { request.url?.host == server.host }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        Self.lock.withLock {
+            Self.receivedTokens.append(request.value(forHTTPHeaderField: "X-Auth-Token") ?? "")
+            Self.pending.append(self)
+        }
+    }
+    override func stopLoading() {}
+}
+
 /// Preferences of their own for each test, so tests don't see each other's saved account.
 func makeTestDefaults() -> UserDefaults {
     let name = "EnteTests-\(UUID().uuidString)"
@@ -77,6 +114,28 @@ func makeTestDefaults() -> UserDefaults {
     @Test func savesTheTokenAndKeyBehindAuthentication() async throws {
         try store.save(session)
         #expect(keychain.isProtected("session"))
+        #expect(try await store.unlock() == session)
+    }
+
+    @Test func signOutForgetsTheSessionWithoutWaitingForTheServer() async throws {
+        URLProtocol.registerClass(UnansweredLogoutServer.self)
+        let watch = WatchAccountSync(defaults: defaults)
+        watch.enable()
+        try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
+                                        authenticatorKey: Data(repeating: 7, count: 32)))
+        await store.signOut(watch: watch)
+        #expect(store.savedAccount == nil)
+        #expect(!keychain.hasValue(for: "session"))
+        #expect(!watch.isEnabled)
+
+        // The server is still asked to end the old session. When it fails later, a new session is kept.
+        for _ in 0..<100 where UnansweredLogoutServer.tokens.isEmpty {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        #expect(UnansweredLogoutServer.tokens == ["old-token"])
+        try store.save(session)
+        UnansweredLogoutServer.fail()
+        try await Task.sleep(for: .milliseconds(100))
         #expect(try await store.unlock() == session)
     }
 

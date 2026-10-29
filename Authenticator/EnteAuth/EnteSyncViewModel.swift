@@ -306,10 +306,15 @@ import YubiKit
     /// Ends the session on Ente's server and forgets the account on this device.
     func signOut() {
         if token == nil {
-            // The saved session hasn't been unlocked, the store unlocks it to end it on the server.
+            // The saved session hasn't been unlocked, the store unlocks it to end it on the server. Signing in again
+            // waits for the unlock, so the account it saves isn't deleted with this one.
             let store = store
             let watch = watch
-            Task { await store.signOut(watch: watch) }
+            isBusy = true
+            Task {
+                await store.signOut(watch: watch)
+                isBusy = false
+            }
         } else {
             revokeSession()
             store.remove()

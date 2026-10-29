@@ -44,7 +44,7 @@ watch delete its copy. If the watch can't be reached at that moment, the iPhone 
 
 ## Retention, deletion, and revoking access
 
-- To remove a saved Ente session from this device and sign out, choose **Sign out** under **Sync from Ente Auth** or in the Ente Auth section of the settings. This clears the locally saved token, key, email and server and asks Ente to end the server session. If the server cannot be reached, the local session is still removed; you may also revoke the session from your Ente account.
+- To remove a saved Ente session from this device and sign out, choose **Sign out** under **Sync from Ente Auth** or in the Ente Auth section of the settings. This clears the locally saved token, key, email and server right away, then asks Ente to end the server session. If the server cannot be reached, the local session has already been removed; you may also revoke the session from your Ente account.
 - To remove the Ente Auth accounts from your Apple Watch, turn off **Show Ente Auth accounts on Apple Watch** or sign
   out of Ente. Deleting the watch app also removes them.
 - To remove a saved YubiKey password from this device, use **Clear saved passwords** in the YubiKey settings.
