@@ -236,7 +236,7 @@ nonisolated enum EnteAuthenticatorSync {
                                                 period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
         guard !existing.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
         let (header, encryptedData) = try EnteCrypto.secretStreamEncrypt(try EnteCodeExporter.rawData(for: template), key: authenticatorKey)
-        try await signedIn {
+        _ = try await signedIn {
             try await api.createAuthenticatorEntity(token: token, encryptedData: encryptedData.base64EncodedString(),
                                                     header: header.base64EncodedString())
         }

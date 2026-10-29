@@ -311,7 +311,7 @@ struct EnteAuthenticatorSyncTests {
             case ("GET", "/authenticator/entity/diff"):
                 return (200, try! JSONSerialization.data(withJSONObject: ["diff": existing]))
             case ("POST", "/authenticator/entity"):
-                return (200, Data(#"{"id":"b"}"#.utf8))
+                return (200, Data(#"{"id":"b","isDeleted":false,"updatedAt":2}"#.utf8))
             default:
                 return (404, Data())
             }
