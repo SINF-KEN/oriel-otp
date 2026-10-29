@@ -45,7 +45,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A7C400000000000000000004"
             BuildableName = "OrielOTPWatch.app"
-            BlueprintName = "OrielOTPWatch"
             ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,7 +61,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A7C400000000000000000004"
             BuildableName = "OrielOTPWatch.app"
-            BlueprintName = "OrielOTPWatch"
             ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "818866B222DFD729006BC0A8"
-               BuildableName = "OrielOTP.app"
+               BuildableName = "Oriel OTP.app"
                BlueprintName = "OrielOTP"
                ReferencedContainer = "container:OrielOTP.xcodeproj">
             </BuildableReference>
@@ -31,7 +31,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "818866B222DFD729006BC0A8"
-            BuildableName = "OrielOTP.app"
+            BuildableName = "Oriel OTP.app"
             BlueprintName = "OrielOTP"
             ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "818866B222DFD729006BC0A8"
-            BuildableName = "OrielOTP.app"
+            BuildableName = "Oriel OTP.app"
             BlueprintName = "OrielOTP"
             ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
@@ -81,7 +81,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "818866B222DFD729006BC0A8"
-            BuildableName = "OrielOTP.app"
+            BuildableName = "Oriel OTP.app"
             BlueprintName = "OrielOTP"
             ReferencedContainer = "container:OrielOTP.xcodeproj">
          </BuildableReference>
