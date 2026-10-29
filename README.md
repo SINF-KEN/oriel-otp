@@ -67,8 +67,10 @@ The other way, turn on **Also add to Ente Auth** when adding an account to save 
 saved session (**Stay signed in**). A YubiKey never gives its secrets back, so this works only while an account is
 added; accounts already on the key can't be copied to Ente.
 
-Everything is decrypted on the device. Your Ente password never leaves it, and by default nothing is stored once
-the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
+Everything is decrypted on the device and your Ente password never leaves it. Like Ente's own apps, the account
+stays signed in: the session and the key that decrypts your accounts are kept in the keychain behind Face ID or
+Touch ID (Touch ID or your password on the Mac), so later syncs need no password. The settings show the account
+and **Sign out**. Turn off **Stay signed in** to keep nothing once the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
 the sign in and decryption work.
 
 ## Apple Watch
@@ -99,8 +101,9 @@ you lower your wrist or the screen is in Always On, and there is no way to copy 
 - The app has no analytics or advertising and doesn't send your data to the developer.
 - OATH secrets live on the YubiKey. The app only writes them to the key when you add an account.
 - If you turn on Apple Watch, the watch keeps a copy of your time-based Ente Auth accounts. It's off by default.
-- A YubiKey password is only saved in the keychain if you choose to. Staying signed in to Ente Auth is optional,
-  and the saved session is protected by Face ID, Touch ID or the device passcode.
+- A YubiKey password is only saved in the keychain if you choose to. The Ente Auth session and authenticator key
+  stay on the device in the keychain, protected by Face ID or Touch ID (Touch ID or the password on the Mac), unless
+  you turn off **Stay signed in**. The Ente password is never stored.
 - The only network connections are to Ente's server, or your own, during an Ente Auth import or when you choose
   to add a new account to Ente Auth.
 

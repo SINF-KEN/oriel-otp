@@ -3206,6 +3206,35 @@
         }
       }
     },
+    "Ente ended this session. Open Sync from Ente Auth and enter your password to sync again." : {
+      "comment" : "Ente settings footer when the server rejected the session",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente hat diese Sitzung beendet. Öffnen Sie „Mit Ente Auth synchronisieren“ und geben Sie Ihr Passwort ein, um wieder zu synchronisieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente a mis fin à cette session. Ouvrez « Synchroniser depuis Ente Auth » et saisissez votre mot de passe pour synchroniser à nouveau."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enteがこのセッションを終了しました。「Ente Authから同期」を開き、パスワードを入力すると再び同期できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente ukončilo túto reláciu. Otvorte Synchronizovať z Ente Auth a zadajte heslo, aby ste mohli znova synchronizovať."
+          }
+        }
+      }
+    },
     "Ente's server sent an unexpected response." : {
       "comment" : "Ente sign in error",
       "localizations" : {
@@ -4613,60 +4642,60 @@
         }
       }
     },
-    "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Face ID or Touch ID, so you can sync again without your password." : {
+    "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored." : {
       "comment" : "Ente sign in options footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Lass das Serverfeld leer, außer du betreibst Ente selbst. Wenn du angemeldet bleibst, wird eine Sitzung im Schlüsselbund gespeichert, geschützt durch Face ID oder Touch ID, sodass du ohne Passwort erneut synchronisieren kannst."
+            "state" : "translated",
+            "value" : "Lassen Sie den Server leer, außer Sie betreiben Ente selbst. „Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Face ID oder Touch ID, damit Sie ohne Ihr Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Laissez le serveur vide, sauf si vous hébergez Ente vous-même. Rester connecté conserve une session dans le trousseau, protégée par Face ID ou Touch ID, pour que vous puissiez synchroniser à nouveau sans votre mot de passe."
+            "state" : "translated",
+            "value" : "Laissez le serveur vide sauf si vous hébergez Ente vous-même. Rester connecté conserve votre session et la clé qui déchiffre vos comptes dans le trousseau, protégées par Face ID ou Touch ID, pour synchroniser à nouveau sans votre mot de passe, qui n’est jamais enregistré."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ente をセルフホストしていない場合は、サーバーを空欄のままにしてください。ログインしたままにすると、Face ID または Touch ID で保護されたセッションがキーチェーンに保存され、パスワードなしで再度同期できます。"
+            "state" : "translated",
+            "value" : "Enteを自分でホストしていない限り、サーバは空欄のままにしてください。サインインしたままにすると、セッションとアカウントを復号する鍵がFace IDまたはTouch IDで保護されてキーチェーンに保存され、パスワードなしで再び同期できます。パスワード自体は保存されません。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ak Ente neprevádzkujete sami, nechajte server prázdny. Ak zostanete prihlásení, relácia sa uloží do kľúčenky chránenej pomocou Face ID alebo Touch ID, takže môžete znova synchronizovať bez hesla."
+            "state" : "translated",
+            "value" : "Server nechajte prázdny, pokiaľ si Ente neprevádzkujete sami. Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Face ID alebo Touch ID, takže môžete znova synchronizovať bez hesla. Samotné heslo sa nikdy neukladá."
           }
         }
       }
     },
-    "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password." : {
+    "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password, which is never stored." : {
       "comment" : "Mac Ente sign in options footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lassen Sie den Server leer, außer Sie betreiben Ente selbst. „Angemeldet bleiben“ speichert eine Sitzung im Schlüsselbund, geschützt durch Touch ID oder das Passwort Ihres Mac, damit Sie ohne Ihr Ente-Passwort erneut synchronisieren können."
+            "value" : "Lassen Sie den Server leer, außer Sie betreiben Ente selbst. „Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Touch ID oder das Passwort Ihres Mac, damit Sie ohne Ihr Ente-Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Laissez le serveur vide sauf si vous hébergez Ente vous-même. Rester connecté conserve une session dans le trousseau, protégée par Touch ID ou le mot de passe de votre Mac, pour synchroniser à nouveau sans votre mot de passe Ente."
+            "value" : "Laissez le serveur vide sauf si vous hébergez Ente vous-même. Rester connecté conserve votre session et la clé qui déchiffre vos comptes dans le trousseau, protégées par Touch ID ou le mot de passe de votre Mac, pour synchroniser à nouveau sans votre mot de passe Ente, qui n’est jamais enregistré."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enteを自分でホストしていない限り、サーバは空欄のままにしてください。サインインしたままにすると、Touch IDまたはMacのパスワードで保護されたセッションがキーチェーンに保存され、Enteのパスワードなしで再び同期できます。"
+            "value" : "Enteを自分でホストしていない限り、サーバは空欄のままにしてください。サインインしたままにすると、セッションとアカウントを復号する鍵がTouch IDまたはMacのパスワードで保護されてキーチェーンに保存され、Enteのパスワードなしで再び同期できます。パスワード自体は保存されません。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Server nechajte prázdny, pokiaľ si Ente neprevádzkujete sami. Pri zostaní prihlásený sa relácia uloží do kľúčenky, chránená Touch ID alebo heslom vášho Macu, takže môžete znova synchronizovať bez hesla k Ente."
+            "value" : "Server nechajte prázdny, pokiaľ si Ente neprevádzkujete sami. Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Touch ID alebo heslom vášho Macu, takže môžete znova synchronizovať bez hesla k Ente. Samotné heslo sa nikdy neukladá."
           }
         }
       }
@@ -5270,6 +5299,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teraz nie"
+          }
+        }
+      }
+    },
+    "Not signed in" : {
+      "comment" : "Ente settings without a saved account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht angemeldet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non connecté"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サインインしていません"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neprihlásený"
           }
         }
       }
@@ -7914,6 +7972,35 @@
         }
       }
     },
+    "Server" : {
+      "comment" : "Ente saved account server label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サーバ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server"
+          }
+        }
+      }
+    },
     "Set" : {
       "localizations" : {
         "de" : {
@@ -8201,6 +8288,35 @@
         }
       }
     },
+    "Sign in from Sync from Ente Auth to stay signed in on this device." : {
+      "comment" : "Ente settings footer without a saved account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Melden Sie sich über „Mit Ente Auth synchronisieren“ an, um auf diesem Gerät angemeldet zu bleiben."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connectez-vous depuis « Synchroniser depuis Ente Auth » pour rester connecté sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスでサインインしたままにするには、「Ente Authから同期」からサインインしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ak chcete zostať prihlásení na tomto zariadení, prihláste sa cez Synchronizovať z Ente Auth."
+          }
+        }
+      }
+    },
     "Sign in to Ente Auth" : {
       "comment" : "Ente sign in section header",
       "localizations" : {
@@ -8255,6 +8371,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Odhlásiť sa"
+          }
+        }
+      }
+    },
+    "Sign out of Ente?" : {
+      "comment" : "Ente sign out confirmation",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von Ente abmelden?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se déconnecter d’Ente ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enteからサインアウトしますか？"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odhlásiť sa z Ente?"
           }
         }
       }
@@ -9409,6 +9554,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Server nedokázal preukázať, že pozná vaše heslo. Skontrolujte adresu servera."
+          }
+        }
+      }
+    },
+    "The session and the key are deleted from this device. Your accounts stay in Ente Auth." : {
+      "comment" : "Ente sign out confirmation message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sitzung und der Schlüssel werden von diesem Gerät gelöscht. Ihre Konten bleiben in Ente Auth."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La session et la clé sont supprimées de cet appareil. Vos comptes restent dans Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションと鍵はこのデバイスから削除されます。アカウントはEnte Authに残ります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relácia a kľúč sa z tohto zariadenia odstránia. Vaše účty zostanú v Ente Auth."
           }
         }
       }
@@ -11185,6 +11359,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Vaše kľúče sa nepodarilo odvodiť. Zariadeniu možno chýba pamäť."
+          }
+        }
+      }
+    },
+    "Your session and the key that decrypts your Ente Auth accounts are kept in this Mac's keychain, protected by Touch ID or your Mac's password. Your Ente password is never stored." : {
+      "comment" : "Mac Ente settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Mac gespeichert, geschützt durch Touch ID oder das Passwort Ihres Mac. Ihr Ente-Passwort wird nie gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre session et la clé qui déchiffre vos comptes Ente Auth sont conservées dans le trousseau de ce Mac, protégées par Touch ID ou le mot de passe de votre Mac. Votre mot de passe Ente n’est jamais enregistré."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションとEnte Authのアカウントを復号する鍵は、Touch IDまたはMacのパスワードで保護されてこのMacのキーチェーンに保存されます。Enteのパスワードは保存されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaša relácia a kľúč, ktorý dešifruje vaše účty Ente Auth, sú uložené v kľúčenke tohto Macu, chránené Touch ID alebo heslom vášho Macu. Vaše heslo k Ente sa nikdy neukladá."
+          }
+        }
+      }
+    },
+    "Your session and the key that decrypts your Ente Auth accounts are kept in this device's keychain, protected by Face ID or Touch ID. Your Ente password is never stored." : {
+      "comment" : "Ente settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Geräts gespeichert, geschützt durch Face ID oder Touch ID. Ihr Ente-Passwort wird nie gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre session et la clé qui déchiffre vos comptes Ente Auth sont conservées dans le trousseau de cet appareil, protégées par Face ID ou Touch ID. Votre mot de passe Ente n’est jamais enregistré."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッションとEnte Authのアカウントを復号する鍵は、Face IDまたはTouch IDで保護されてこのデバイスのキーチェーンに保存されます。Enteのパスワードは保存されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaša relácia a kľúč, ktorý dešifruje vaše účty Ente Auth, sú uložené v kľúčenke tohto zariadenia, chránené Face ID alebo Touch ID. Vaše heslo k Ente sa nikdy neukladá."
           }
         }
       }

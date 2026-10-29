@@ -48,11 +48,20 @@ jobs:
       - name: Take screenshots
         env:
           SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
+          RESULT_BUNDLE_PATH: ${{ runner.temp }}/results/Screenshots.xcresult
         run: tools/screenshots.sh
       - name: Take Mac screenshots
         env:
           SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
+          RESULT_BUNDLE_PATH: ${{ runner.temp }}/results/MacScreenshots.xcresult
         run: tools/screenshots-macos.sh
+      # The result bundles have the failing test's log and a screenshot of where it stopped.
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshot-test-results
+          path: ${{ runner.temp }}/results
       - name: Upload screenshots
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v7
