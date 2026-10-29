@@ -10,6 +10,7 @@
 # screenshots don't use the keychain. The first run may ask to allow UI automation.
 #
 # Usage: tools/screenshots-macos.sh
+#   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -22,6 +23,11 @@ entitlements="$work/Authenticator-macOS.entitlements"
 cp Authenticator/Authenticator-macOS.entitlements "$entitlements"
 /usr/libexec/PlistBuddy -c 'Delete :keychain-access-groups' "$entitlements"
 
+packages=()
+if [[ -n "${SOURCE_PACKAGES_DIR:-}" ]]; then
+    packages=(-clonedSourcePackagesDirPath "$SOURCE_PACKAGES_DIR" -disableAutomaticPackageResolution
+        -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates)
+fi
 formatter=(cat)
 if command -v xcbeautify >/dev/null; then
     formatter=(xcbeautify ${GITHUB_ACTIONS:+--renderer github-actions})
@@ -29,7 +35,7 @@ fi
 xcodebuild test \
     -project Authenticator.xcodeproj -scheme Screenshots -destination 'platform=macOS' \
     -only-testing:AuthenticatorUITests/MacScreenshotTests/testScreenshots \
-    -derivedDataPath "$work/DerivedData" -resultBundlePath "$work/Screenshots.xcresult" \
+    -derivedDataPath "$work/DerivedData" -resultBundlePath "$work/Screenshots.xcresult" ${packages[@]+"${packages[@]}"} \
     CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= CODE_SIGN_ENTITLEMENTS="$entitlements" \
     | "${formatter[@]}"
 

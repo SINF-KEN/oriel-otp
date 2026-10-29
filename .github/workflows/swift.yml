@@ -214,9 +214,10 @@ jobs:
             -scheme Authenticator \
             -destination 'platform=macOS' \
             -only-testing:AuthenticatorTests \
-            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
             -disableAutomaticPackageResolution \
             -onlyUsePackageVersionsFromResolvedFile \
+            -skipPackageUpdates \
             -resultBundlePath "$RUNNER_TEMP/Authenticator-macOS.xcresult" \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGN_STYLE=Manual \

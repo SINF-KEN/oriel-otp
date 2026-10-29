@@ -50,6 +50,8 @@ jobs:
           SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
         run: tools/screenshots.sh
       - name: Take Mac screenshots
+        env:
+          SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
         run: tools/screenshots-macos.sh
       - name: Upload screenshots
         if: github.event_name == 'pull_request'
