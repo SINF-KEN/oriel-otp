@@ -46,14 +46,15 @@ private struct AccountRow: View {
 
     let account: OTPAccount
 
-    @Environment(\.isLuminanceReduced) private var isLuminanceReduced
+    @Environment(\.isLuminanceReduced) private var systemLuminanceReduced
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         // Ticks on whole seconds, so codes change together with the clock.
         TimelineView(.periodic(from: Date(timeIntervalSince1970: 0), by: 1)) { context in
-            let code = OTPGenerator.code(for: account, at: context.date)
-            let secondsLeft = OTPGenerator.secondsLeft(for: account, at: context.date)
+            let date = DemoMode.date ?? context.date
+            let code = OTPGenerator.code(for: account, at: date)
+            let secondsLeft = OTPGenerator.secondsLeft(for: account, at: date)
             VStack(alignment: .leading, spacing: 2) {
                 Text(account.title)
                     .font(.headline)
@@ -90,6 +91,11 @@ private struct AccountRow: View {
                     : Text(verbatim: code).speechSpellsOutCharacters() + Text(verbatim: ", ")
                         + Text("\(secondsLeft) seconds left", comment: "VoiceOver, time until the code changes"))
         }
+    }
+
+    /// Wrist down and in Always On. The simulator can't lower the wrist, so the screenshots fake it.
+    private var isLuminanceReduced: Bool {
+        systemLuminanceReduced || DemoMode.isLuminanceReduced
     }
 
     private var accessibilityLabel: Text {

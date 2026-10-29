@@ -27,12 +27,12 @@ import WatchConnectivity
 
     init(keychain: AccountKeychain = AccountKeychain()) {
         self.keychain = keychain
-        self.accounts = keychain.load().sorted(by: OTPAccount.listOrder)
+        self.accounts = (DemoMode.isEnabled ? DemoMode.accounts : keychain.load()).sorted(by: OTPAccount.listOrder)
         super.init()
     }
 
     func activate() {
-        guard WCSession.isSupported(), WCSession.default.delegate == nil else { return }
+        guard !DemoMode.isEnabled, WCSession.isSupported(), WCSession.default.delegate == nil else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
     }

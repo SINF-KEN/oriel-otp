@@ -60,6 +60,14 @@ the sign in and decryption work.
 
 ## Apple Watch
 
+<p align="center">
+  <img src="docs/screenshots/watch-accounts.png" width="180" alt="Codes for Ente Auth accounts on Apple Watch, with a countdown ring">
+  &nbsp;
+  <img src="docs/screenshots/watch-wrist-down.png" width="180" alt="Wrist down, the watch shows only the account names">
+  &nbsp;
+  <img src="docs/screenshots/watch-empty.png" width="180" alt="The watch app before it is turned on on the iPhone">
+</p>
+
 The watch app shows codes for the time-based accounts in your Ente Auth vault (TOTP and Steam). It can't use a
 YubiKey, since watchOS gives apps no NFC, USB or smart card access, and it can't add, edit or delete accounts.
 
