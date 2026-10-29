@@ -1,0 +1,78 @@
+name: Swift packages
+description: >-
+  Resolves the pinned Swift packages into $RUNNER_TEMP/SourcePackages, caching only the checkouts.
+
+# SwiftPM keeps a full mirror of each package's history next to its checkout. yubikit-swift's alone is about 580 MB,
+# so a cache of the whole directory took 3 to 6 minutes to restore, no faster than cloning. The checkouts and
+# workspace-state.json are about 45 MB, and with -skipPackageUpdates xcodebuild builds from them without the mirrors.
+# The key is exact, so a restored cache always matches Package.resolved; the verify step checks that anyway.
+
+outputs:
+  path:
+    description: The directory to pass to xcodebuild -clonedSourcePackagesDirPath.
+    value: ${{ steps.paths.outputs.path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compute Swift package cache key
+      id: paths
+      shell: bash
+      run: |
+        set -euo pipefail
+        # The checkouts' workspace-state.json format belongs to the Xcode that wrote it.
+        xcode=$(xcodebuild -version | awk '/Build version/ { print $3 }')
+        echo "path=$RUNNER_TEMP/SourcePackages" >> "$GITHUB_OUTPUT"
+        # hashFiles() runs in a helper process with a fixed two-minute limit, which a busy runner has exceeded.
+        resolved=$(shasum -a 256 Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+          | awk '{ print $1 }')
+        echo "key=spm-checkouts-$RUNNER_OS-$xcode-$resolved" >> "$GITHUB_OUTPUT"
+
+    - name: Restore Swift packages
+      id: restore
+      uses: actions/cache/restore@v6
+      with:
+        path: |
+          ${{ steps.paths.outputs.path }}/checkouts
+          ${{ steps.paths.outputs.path }}/artifacts
+          ${{ steps.paths.outputs.path }}/workspace-state.json
+        key: ${{ steps.paths.outputs.key }}
+
+    - name: Resolve pinned Swift packages
+      shell: bash
+      run: |
+        set -euo pipefail
+        xcodebuild -resolvePackageDependencies \
+          -project Authenticator.xcodeproj \
+          -scheme Authenticator \
+          -clonedSourcePackagesDirPath "${{ steps.paths.outputs.path }}" \
+          -disableAutomaticPackageResolution \
+          -onlyUsePackageVersionsFromResolvedFile \
+          -skipPackageUpdates \
+          2>&1 | tee "$RUNNER_TEMP/resolve-packages.log"
+
+    - name: Verify package checkouts
+      shell: bash
+      run: |
+        set -euo pipefail
+        pins() { jq -cS "$1" "$2"; }
+        expected=$(pins '[.pins[] | {identity, revision: .state.revision}] | sort_by(.identity)' \
+          Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        actual=$(pins '[.object.dependencies[] | {identity: .packageRef.identity, revision: .state.checkoutState.revision}] | sort_by(.identity)' \
+          "${{ steps.paths.outputs.path }}/workspace-state.json")
+        if [[ "$expected" != "$actual" ]]; then
+          echo "::error::The package checkouts don't match Package.resolved."
+          echo "Expected: $expected"
+          echo "Actual:   $actual"
+          exit 1
+        fi
+
+    - name: Save Swift packages
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: |
+          ${{ steps.paths.outputs.path }}/checkouts
+          ${{ steps.paths.outputs.path }}/artifacts
+          ${{ steps.paths.outputs.path }}/workspace-state.json
+        key: ${{ steps.paths.outputs.key }}

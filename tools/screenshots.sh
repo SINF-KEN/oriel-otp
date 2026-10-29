@@ -8,6 +8,7 @@
 #
 # Usage: tools/screenshots.sh
 #   DEVICE_TYPE  simulator device type, e.g. "iPhone 17 Pro" (default: the newest iPhone Pro)
+#   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -42,10 +43,15 @@ formatter=(cat)
 if command -v xcbeautify >/dev/null; then
     formatter=(xcbeautify ${GITHUB_ACTIONS:+--renderer github-actions})
 fi
+packages=()
+if [[ -n "${SOURCE_PACKAGES_DIR:-}" ]]; then
+    packages=(-clonedSourcePackagesDirPath "$SOURCE_PACKAGES_DIR" -disableAutomaticPackageResolution
+        -onlyUsePackageVersionsFromResolvedFile -skipPackageUpdates)
+fi
 # xcodebuild passes TEST_RUNNER_ variables to the test without the prefix.
 TEST_RUNNER_SCREENSHOT_DIR="$work/screenshots" xcodebuild test \
     -project Authenticator.xcodeproj -scheme Screenshots -destination "id=$udid" \
-    -derivedDataPath "$work/DerivedData" | "${formatter[@]}"
+    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} | "${formatter[@]}"
 
 mkdir -p "$output"
 for new in "$work"/screenshots/*.png; do

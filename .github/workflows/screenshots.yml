@@ -12,6 +12,7 @@ on:
       - "AuthenticatorUITests/**"
       - "tools/screenshots.sh"
       - ".github/workflows/screenshots.yml"
+      - ".github/actions/swift-packages/**"
   pull_request:
     paths:
       - "Authenticator/**"
@@ -19,11 +20,13 @@ on:
       - "AuthenticatorUITests/**"
       - "tools/screenshots.sh"
       - ".github/workflows/screenshots.yml"
+      - ".github/actions/swift-packages/**"
   workflow_dispatch:
 
 permissions:
   contents: read
 
+# Each run regenerates every screenshot, so a newer run on the same branch or pull request makes the older one moot.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -31,11 +34,18 @@ concurrency:
 jobs:
   screenshots:
     runs-on: xcode-27
+    timeout-minutes: 45
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v7
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
       - name: Take screenshots
+        env:
+          SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
         run: tools/screenshots.sh
       - name: Upload screenshots
         if: github.event_name == 'pull_request'
