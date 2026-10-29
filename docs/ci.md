@@ -8,7 +8,7 @@ GitHub branch protection for `main` requires a pull request and the Actions `bui
 
 ## Validation and diagnostics
 
-The job checks Swift formatting for the new CI helper and test files, validates the Xcode project, scheme, plists, entitlements, and `Package.resolved`, then runs `xcodebuild analyze` and simulator tests. Swift 6, complete strict concurrency checking, and warnings-as-errors are set for the app, test, and extension targets. The stock formatter reports many existing legacy-file issues, so formatting is scoped to the new files rather than causing a repository-wide formatting change.
+The job checks Swift formatting for the new CI helper and test files, validates the Xcode project, scheme, plists, entitlements, and `Package.resolved`, then builds the Apple Watch app for the watchOS simulator and runs the simulator tests. Swift 6, complete strict concurrency checking, and warnings-as-errors are set for the app, test, extension, and watch targets. The watch app is also embedded in the iPhone app, so the test build builds it again; the separate step reports watchOS failures on their own. The TOTP generator the watch uses is shared with the app (`Shared/`) and tested there against the RFC 4226 and RFC 6238 vectors. The stock formatter reports many existing legacy-file issues, so formatting is scoped to the new files rather than causing a repository-wide formatting change.
 
 After the simulator tests, the unit tests also run on macOS, for the Mac version of the app. CI has no provisioning profile, so that build is signed ad hoc with a copy of the Mac entitlements without `keychain-access-groups`, and `SecureStoreTests` skips itself when the entitlement is missing. The other tests run as on iOS. See [macos.md](macos.md).
 

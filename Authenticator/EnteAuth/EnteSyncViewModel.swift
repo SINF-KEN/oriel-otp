@@ -51,15 +51,19 @@ import YubiKit
     @ObservationIgnored private var flow: EnteLoginFlow?
     @ObservationIgnored private var api: EnteAPIClient?
     @ObservationIgnored private var token: String?
-    @ObservationIgnored private var isSessionSaved = false
+    /// Whether the session is saved in the keychain, needed to show the accounts on Apple Watch.
+    private(set) var isSessionSaved = false
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored let watch: WatchAccountSync
 
-    init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard) {
+    init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard,
+         watch: WatchAccountSync = .shared) {
         self.existingCredentialIds = existingCredentialIds
         self.capacity = capacity
         self.store = store
         self.defaults = defaults
+        self.watch = watch
         self.server = defaults.string(forKey: Self.serverKey) ?? ""
         if let email = store.savedEmail {
             phase = .savedSession(email: email)
@@ -201,23 +205,52 @@ import YubiKit
     // MARK: - Saved session
 
     func useSavedSession() {
+        loadSavedSession()
+    }
+
+    /// Turns showing the accounts on Apple Watch on or off. Turning it on sends the accounts right away, reading
+    /// them with the saved session first if they haven't been loaded.
+    func setShowsAccountsOnWatch(_ isOn: Bool) {
+        guard isOn else {
+            watch.disable()
+            return
+        }
+        watch.enable()
+        if phase == .accounts {
+            watch.send(codes)
+        } else {
+            loadSavedSession(onFailure: { self.watch.disable() })
+        }
+    }
+
+    private func loadSavedSession(onFailure: @escaping () -> Void = {}) {
         run {
-            let saved = try await self.store.load()
-            let api = try EnteAPIClient(server: saved.server)
-            self.api = api
-            self.token = saved.token
-            self.signedInEmail = saved.email
-            self.isSessionSaved = true
             do {
-                try await self.loadCodes(api: api, token: saved.token, authenticatorKey: saved.authenticatorKey)
-            } catch EnteAuthenticatorSyncError.signedOut {
-                // The session was revoked, e.g. from another device.
-                self.store.remove()
-                self.isSessionSaved = false
-                self.email = saved.email
-                self.phase = .signIn
-                throw EnteAuthenticatorSyncError.signedOut
+                try await self.loadSavedCodes()
+            } catch {
+                onFailure()
+                throw error
             }
+        }
+    }
+
+    private func loadSavedCodes() async throws {
+        let saved = try await store.load()
+        let api = try EnteAPIClient(server: saved.server)
+        self.api = api
+        token = saved.token
+        signedInEmail = saved.email
+        isSessionSaved = true
+        do {
+            try await loadCodes(api: api, token: saved.token, authenticatorKey: saved.authenticatorKey)
+        } catch EnteAuthenticatorSyncError.signedOut {
+            // The session was revoked, e.g. from another device.
+            store.remove()
+            watch.disable()
+            isSessionSaved = false
+            email = saved.email
+            phase = .signIn
+            throw EnteAuthenticatorSyncError.signedOut
         }
     }
 
@@ -230,6 +263,7 @@ import YubiKit
     func signOut() {
         revokeSession()
         store.remove()
+        watch.disable()
         isSessionSaved = false
         codes = []
         selection = []
@@ -257,6 +291,9 @@ import YubiKit
         }
         selectAll()
         phase = .accounts
+        if isSessionSaved {
+            watch.send(codes)
+        }
     }
 
     private func serverURL() throws -> URL {

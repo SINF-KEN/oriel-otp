@@ -32,8 +32,8 @@ struct AuthenticatorApp: App {
     @State var notificationsViewModel = NotificationsViewModel()
     @State var mainViewModel = MainViewModel()
 
-    #if DEBUG && (targetEnvironment(simulator) || os(macOS))
     init() {
+        #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         if SimulatedYubiKey.isEnabled {
             FakeEnteServer.install()
         }
@@ -41,8 +41,9 @@ struct AuthenticatorApp: App {
         WindowSnapshots.scheduleIfRequested()
         WindowSnapshots.resizeMainWindowIfRequested()
         #endif
+        #endif
+        WatchAccountSync.shared.activate()
     }
-    #endif
     
     var body: some Scene {
         #if os(iOS)

@@ -77,7 +77,14 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Lint new Swift code
-        run: xcrun swift-format lint --configuration .swift-format --strict Authenticator/Model/TokenResponseStore.swift AuthenticatorTests/EnteAuth/CIBehaviorTests.swift
+        run: |
+          xcrun swift-format lint --configuration .swift-format --strict \
+            Authenticator/Model/TokenResponseStore.swift \
+            AuthenticatorTests/EnteAuth/CIBehaviorTests.swift \
+            AuthenticatorTests/EnteAuth/OTPGeneratorTests.swift \
+            Authenticator/EnteAuth/WatchAccountSync.swift \
+            Shared/*.swift \
+            OrielOTPWatch/*.swift
 
       - name: Validate project metadata
         run: |
@@ -90,12 +97,14 @@ jobs:
             Authenticator/Authenticator-macOS.entitlements \
             AuthenticatorTests/Info.plist \
             TokenExtension/Info.plist \
-            TokenExtension/TokenExtension.entitlements
+            TokenExtension/TokenExtension.entitlements \
+            OrielOTPWatch/PrivacyInfo.xcprivacy
           xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/Authenticator.xcscheme
+          xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/OrielOTPWatch.xcscheme
           jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version == null or (.state.version | length > 0)) and (.state.revision | length == 40))' \
             Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
-          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
-          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
+          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 8
+          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 8
 
       - name: Select simulator
         id: simulator
@@ -145,6 +154,23 @@ jobs:
         timeout-minutes: 15
         uses: ./.github/actions/swift-packages
 
+      # The iPhone app embeds the watch app, so the test build below builds it too. This step builds it on its
+      # own first so a watchOS-only failure is reported as such.
+      - name: Build watch app
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project Authenticator.xcodeproj \
+            -scheme OrielOTPWatch \
+            -destination "generic/platform=watchOS Simulator" \
+            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -skipPackageUpdates \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-watch.log"
+
       # This builds the app and extension with warnings as errors. There's no separate analyze build: the sources
       # are all Swift, which the Clang static analyzer doesn't check.
       - name: Test on simulator
@@ -187,9 +213,10 @@ jobs:
           set -euo pipefail
           RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
           # The name xccov reports for the app target can change (it's "Oriel OTP.app" once the target also builds
-          # for macOS), so pick the one .app target instead of matching its name.
+          # for macOS), and the embedded watch app is a .app target too, so pick the .app target with the app's
+          # TokenResponseStore.swift instead of matching its name.
           xcrun xccov view --report --json "$RESULT_BUNDLE" \
-            | jq -e '[.targets[] | select(.name | endswith(".app"))]
+            | jq -e '[.targets[] | select((.name | endswith(".app")) and any(.files[]; .name == "TokenResponseStore.swift"))]
               | if length == 1 then .[0] else error("Expected one .app target, found \(length)") end' \
             > "$RUNNER_TEMP/app-file-coverage.json"
           check_coverage() {
@@ -237,6 +264,7 @@ jobs:
           path: |
             ${{ runner.temp }}/Authenticator.xcresult
             ${{ runner.temp }}/resolve-packages.log
+            ${{ runner.temp }}/xcodebuild-watch.log
             ${{ runner.temp }}/xcodebuild-test.log
             ${{ runner.temp }}/Authenticator-macOS.xcresult
             ${{ runner.temp }}/xcodebuild-test-macos.log
