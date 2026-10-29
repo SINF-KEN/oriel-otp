@@ -23,7 +23,10 @@ runs:
         # The checkouts' workspace-state.json format belongs to the Xcode that wrote it.
         xcode=$(xcodebuild -version | awk '/Build version/ { print $3 }')
         echo "path=$RUNNER_TEMP/SourcePackages" >> "$GITHUB_OUTPUT"
-        echo "key=spm-checkouts-$RUNNER_OS-$xcode-${{ hashFiles('Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}" >> "$GITHUB_OUTPUT"
+        # hashFiles() runs in a helper process with a fixed two-minute limit, which a busy runner has exceeded.
+        resolved=$(shasum -a 256 Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \
+          | awk '{ print $1 }')
+        echo "key=spm-checkouts-$RUNNER_OS-$xcode-$resolved" >> "$GITHUB_OUTPUT"
 
     - name: Restore Swift packages
       id: restore
