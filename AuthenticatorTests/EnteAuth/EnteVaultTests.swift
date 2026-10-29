@@ -300,7 +300,10 @@ struct EnteVaultTests {
         let bytes = try Data(contentsOf: url)
         #expect(bytes.range(of: Data("JBSWY3DPEHPK3PXP".utf8)) == nil)
         #expect(bytes.range(of: Data("alice".utf8)) == nil)
+        #if os(iOS)
+        // On the Mac this is Time Machine's, which the temporary folder of CI's runners doesn't keep.
         #expect(try url.resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup == true)
+        #endif
 
         // Without its key, e.g. after a restore on another device, the file can't be read.
         keychain.removeKey()
