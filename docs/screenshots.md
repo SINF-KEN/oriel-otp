@@ -54,6 +54,21 @@ script exports them from it. The first local run may ask to allow UI automation.
 (`-SnapshotDelay`), without any permission, for a quick look at a layout. It can't draw the system's glass
 materials, so it isn't used for the screenshots.
 
+## Apple Watch
+
+The watch screenshots (`watch-*.png`) are taken by `tools/watch-screenshots.sh`, which needs a watchOS simulator
+runtime (`xcodebuild -downloadPlatform watchOS`) and `jq`. It builds the watch app, installs it on a new, empty
+watch simulator (the newest 46mm Apple Watch Series, or `DEVICE_TYPE`), takes a screenshot of each state with
+`simctl io` and deletes the simulator again.
+
+The debug build in the simulator reads launch arguments from `OrielOTPWatch/DemoMode.swift`: `-DemoAccounts YES`
+shows made-up accounts instead of the keychain and doesn't talk to the iPhone, `-DemoDate` freezes the clock at the
+same moment as the iPhone screenshots, and `-DemoLuminanceReduced YES` shows the wrist down look, which the
+simulator can't produce on demand. None of it is compiled into release builds.
+
+The watch simulator doesn't support status bar overrides, so the time in the corner is the time the script ran.
+CI doesn't run this script yet.
+
 ## In CI
 
 `.github/workflows/screenshots.yml` runs both scripts when the app, the tests or the scripts change:
