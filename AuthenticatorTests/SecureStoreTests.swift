@@ -20,8 +20,19 @@ import Testing
 
 @testable import Authenticator
 
+#if os(macOS)
+// On the Mac the data protection keychain needs a provisioned keychain access group, which ad-hoc signed CI builds
+// don't have.
+nonisolated private let hasKeychainAccessGroup: Bool = {
+    guard let task = SecTaskCreateFromSelf(nil) else { return false }
+    return SecTaskCopyValueForEntitlement(task, "keychain-access-groups" as CFString, nil) != nil
+}()
+#else
+nonisolated private let hasKeychainAccessGroup = true
+#endif
+
 // The tests share one keychain service, so they must not run in parallel.
-@Suite(.serialized)
+@Suite(.serialized, .enabled(if: hasKeychainAccessGroup, "Needs a keychain access group"))
 final class SecureStoreTests {
     let secureStoreWithGenericPwd = SecureStore(secureStoreQueryable: PasswordQueryable(service: "someService"))
 

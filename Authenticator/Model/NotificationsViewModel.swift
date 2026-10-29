@@ -16,6 +16,7 @@
  */
 
 import SwiftUI
+import UserNotifications
 
 @Observable class NotificationsViewModel: NSObject, UNUserNotificationCenterDelegate {
 
@@ -29,8 +30,11 @@ import SwiftUI
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        #if os(iOS)
         userInfo = response.notification.request.content.userInfo
         showPIVTokenView = true
+        #endif
+        // On the Mac the only notification asks to touch the YubiKey, and clicking it just brings the app forward.
         completionHandler()
     }
 }
