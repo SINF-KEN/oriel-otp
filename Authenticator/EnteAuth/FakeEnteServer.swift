@@ -27,9 +27,9 @@ import SwiftUI
 /// attributes, a sealed auth token and secretstream-encrypted authenticator entities. Any email signs in with
 /// the password "demo". Tags in the email turn on the other ways of signing in: "+mfa" asks for an email code,
 /// "+2fa" for a TOTP code, "+passkey" for an email code and then a passkey, and "+nosrp" acts like an account without
-/// SRP, which also gets an email code. Both codes are 123456. The passkey counts as verified from the second check. The accounts cover the cases the sync handles: an account that is also on the demo
-/// YubiKey, a Steam account, a '#' in a name, Ente's export format, one in Ente's trash, a deleted one and one the
-/// YubiKey can't store.
+/// SRP, which also gets an email code. Both codes are 123456. The passkey counts as verified from the second check.
+/// The accounts cover the cases the sync handles: an account that is also on the demo YubiKey, a Steam account, a '#'
+/// in a name, Ente's export format, one in Ente's trash, a deleted one and one the YubiKey can't store.
 ///
 /// Entities can be added, changed and deleted like on Ente's server. Each change gets a later `updatedAt`, and the
 /// diff returns the entities changed after `sinceTime`, oldest first, so the app's incremental sync can be tried.
