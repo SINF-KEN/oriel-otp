@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A7C40000000000000000000B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
-		A7C40000000000000000000C /* OrielOTPWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A7C400000000000000000003 /* OrielOTPWatch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56319DE11C4A1A730E920128 /* QuickActions.swift */; };
+		39615BAB2A1BC69B0374FBCD /* Debug/WindowSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F018E4F892C7B4FEB1051FC9 /* Debug/WindowSnapshots.swift */; };
 		513F34DC246B144300FCE030 /* UIViewAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513F34DB246B144300FCE030 /* UIViewAdditions.swift */; };
 		515542682654413600B19C59 /* SmartCardConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542672654413600B19C59 /* SmartCardConfigurationView.swift */; };
 		5155426A26554CAB00B19C59 /* SmartCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155426926554CAB00B19C59 /* SmartCardViewModel.swift */; };
@@ -16,8 +16,6 @@
 		515542752656706F00B19C59 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542742656706F00B19C59 /* Token.swift */; };
 		515542772656707000B19C59 /* TokenDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542762656707000B19C59 /* TokenDriver.swift */; };
 		515542792656707000B19C59 /* TokenSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542782656707000B19C59 /* TokenSession.swift */; };
-		D1A600000000000000000001 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
-		D1A600000000000000000002 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
 		5155427D2656707000B19C59 /* TokenExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5155426F2656706F00B19C59 /* TokenExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		515542882656F64100B19C59 /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542872656F64100B19C59 /* Data+Extensions.swift */; };
 		5155428A2656F79500B19C59 /* SecCertificate+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542892656F79500B19C59 /* SecCertificate+Extensions.swift */; };
@@ -31,30 +29,31 @@
 		51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51AFD4D9271D4277008F2630 /* QuartzCore.framework */; };
 		51BBE37F273982D700DA47CC /* OATHSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */; };
 		51EEC532246D34ED00061A8F /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */; };
-		A1C1EA0000000000000000B1 /* LargestClearRectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */; };
-		C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */; };
 		51EEC536246D38B700061A8F /* YubiKitExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */; };
 		51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BC263847BD0010686B /* ManagementViewModel.swift */; };
 		51F8E3BF263848E30010686B /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BE263848E30010686B /* ConnectionManager.swift */; };
+		5C3E0000000000000000000D /* AppClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3E0000000000000000000C /* AppClock.swift */; };
 		816C684623430E0700209342 /* SecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684523430E0700209342 /* SecureStore.swift */; };
 		816C684823430F8E00209342 /* SecureStoreQueryable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684723430F8E00209342 /* SecureStoreQueryable.swift */; };
 		816C685023440D2200209342 /* SecureStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684F23440D2200209342 /* SecureStoreError.swift */; };
 		816C685223440EF900209342 /* SecureStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C685123440EF900209342 /* SecureStoreTests.swift */; };
-		A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */; };
 		816C685E234697BF00209342 /* PasswordPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C685D234697BE00209342 /* PasswordPreferences.swift */; };
 		817DBA0D2368B7B7001FC18D /* UIColorAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */; };
-		A1C1EA0000000000000000B4 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F4 /* Platform.swift */; };
 		818866C022DFD72C006BC0A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 818866BF22DFD72C006BC0A8 /* Assets.xcassets */; };
-		C1A0000000000000000000D1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
-		C1A0000000000000000000D2 /* AppIcon-Dark.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C2 /* AppIcon-Dark.icon */; };
 		818866C322DFD72C006BC0A8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */; platformFilter = ios; };
 		81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */; };
 		81DF8FD3237A090A00737268 /* ApplicationSessionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */; };
+		A1C1EA0000000000000000B1 /* LargestClearRectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */; };
+		A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */; };
+		A1C1EA0000000000000000B3 /* Debug/SimulatedYubiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */; };
+		A1C1EA0000000000000000B4 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F4 /* Platform.swift */; };
 		A5588BF9239B0A7F003E4CA5 /* FavoritesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */; };
 		A591411D23830EB800CCCF67 /* UIApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */; };
 		A591412123835F4600CCCF67 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591412023835F4600CCCF67 /* Constants.swift */; };
 		A5D4E86D24083CF300FD63A0 /* OTPConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */; };
 		A5E9DEB0237DE1660011FBF4 /* SettingsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */; };
+		A7C40000000000000000000B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
+		A7C40000000000000000000C /* OrielOTPWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A7C400000000000000000003 /* OrielOTPWatch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		B40327762847AE0A00DF4DB0 /* Licensing.md in Resources */ = {isa = PBXBuildFile; fileRef = B40327752847AE0A00DF4DB0 /* Licensing.md */; };
 		B40D61A02AE7F37900467AE9 /* DisableOTPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D619F2AE7F37900467AE9 /* DisableOTPView.swift */; };
 		B40D61A22AE7F89500467AE9 /* DisableOTPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */; };
@@ -72,12 +71,9 @@
 		B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */; };
 		B46E378729C348F100CA0B67 /* EditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46E378629C348F100CA0B67 /* EditAccountView.swift */; };
 		B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */; };
-		A1C1EA0000000000000000B3 /* SimulatedYubiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F3 /* SimulatedYubiKey.swift */; };
-		39615BAB2A1BC69B0374FBCD /* WindowSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F018E4F892C7B4FEB1051FC9 /* WindowSnapshots.swift */; };
 		B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B16298AA6E7006CDAEA /* MainView.swift */; };
 		B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */; };
 		B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B1A298AB641006CDAEA /* MainViewModel.swift */; };
-		1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56319DE11C4A1A730E920128 /* QuickActions.swift */; };
 		B4719B2C29914051006CDAEA /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B2B29914051006CDAEA /* AccountRowView.swift */; };
 		B4719B322993EFEE006CDAEA /* AccountDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */; };
 		B474865C2CEB7A000031A504 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B474865B2CEB79FD0031A504 /* AboutView.swift */; };
@@ -103,39 +99,29 @@
 		B4C93E63299FB51A00C2A8B8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E62299FB51A00C2A8B8 /* Account.swift */; };
 		B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E64299FC67800C2A8B8 /* View+Extensions.swift */; };
 		B4C93E9529C1B90900C2A8B8 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E9429C1B90900C2A8B8 /* AddAccountView.swift */; };
-		E17E0000000000000000A003 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000A002 /* Clibsodium */; };
-		E17E0000000000000000B003 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000B002 /* BigInt */; };
 		B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = B4D71E802CE4E6E6004D4C29 /* YubiKit */; };
 		B4DB228A299BC373003110ED /* OATHSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4DB2289299BC373003110ED /* OATHSession.swift */; };
 		B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */; };
 		B9F0FF11F842A39183974083 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */; };
 		C1A0000000000000000000B7 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000A7 /* AppIconView.swift */; };
+		C1A0000000000000000000D1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
+		C1A0000000000000000000D2 /* AppIcon-Dark.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C2 /* AppIcon-Dark.icon */; };
 		C1A0000000000000000000E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */; };
 		C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */; };
-		5C3E0000000000000000000D /* AppClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3E0000000000000000000C /* AppClock.swift */; };
+		D1A600000000000000000001 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
+		D1A600000000000000000002 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
+		E17E0000000000000000A003 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000A002 /* Clibsodium */; };
+		E17E0000000000000000B003 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000B002 /* BigInt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A7C40000000000000000000E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = A7C400000000000000000004;
-			remoteInfo = OrielOTPWatch;
-		};
 		5155427B2656707000B19C59 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 5155426E2656706F00B19C59;
 			remoteInfo = TokenExtension;
-		};
-		818866CA22DFD72C006BC0A8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 818866B222DFD729006BC0A8;
-			remoteInfo = OrielOTP;
 		};
 		5C3E00000000000000000008 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -144,20 +130,23 @@
 			remoteGlobalIDString = 818866B222DFD729006BC0A8;
 			remoteInfo = OrielOTP;
 		};
+		818866CA22DFD72C006BC0A8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 818866B222DFD729006BC0A8;
+			remoteInfo = OrielOTP;
+		};
+		A7C40000000000000000000E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A7C400000000000000000004;
+			remoteInfo = OrielOTPWatch;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A7C40000000000000000000D /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
-			files = (
-				A7C40000000000000000000C /* OrielOTPWatch.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		515542812656707000B19C59 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -169,10 +158,20 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A7C40000000000000000000D /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A7C40000000000000000000C /* OrielOTPWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A7C400000000000000000003 /* OrielOTPWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTPWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		513F34DB246B144300FCE030 /* UIViewAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewAdditions.swift; sourceTree = "<group>"; };
 		515542672654413600B19C59 /* SmartCardConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCardConfigurationView.swift; sourceTree = "<group>"; };
 		5155426926554CAB00B19C59 /* SmartCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCardViewModel.swift; sourceTree = "<group>"; };
@@ -181,7 +180,6 @@
 		515542742656706F00B19C59 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		515542762656707000B19C59 /* TokenDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenDriver.swift; sourceTree = "<group>"; };
 		515542782656707000B19C59 /* TokenSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenSession.swift; sourceTree = "<group>"; };
-		D1A600000000000000000003 /* TokenResponseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenResponseStore.swift; sourceTree = "<group>"; };
 		5155427A2656707000B19C59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		515542862656F52000B19C59 /* TokenExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenExtension.entitlements; sourceTree = "<group>"; };
 		515542872656F64100B19C59 /* Data+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extensions.swift"; sourceTree = "<group>"; };
@@ -199,23 +197,20 @@
 		51AFD4D9271D4277008F2630 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OATHSession+Extensions.swift"; sourceTree = "<group>"; };
 		51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCapabilities.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargestClearRectTests.swift; sourceTree = "<group>"; };
-		C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManagerTests.swift; sourceTree = "<group>"; };
 		51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKitExtensionsTests.swift; sourceTree = "<group>"; };
 		51F8E3BC263847BD0010686B /* ManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementViewModel.swift; sourceTree = "<group>"; };
 		51F8E3BE263848E30010686B /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
+		56319DE11C4A1A730E920128 /* QuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
+		5C3E00000000000000000002 /* OrielOTPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C3E0000000000000000000C /* AppClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
 		816C684523430E0700209342 /* SecureStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStore.swift; sourceTree = "<group>"; };
 		816C684723430F8E00209342 /* SecureStoreQueryable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreQueryable.swift; sourceTree = "<group>"; };
 		816C684F23440D2200209342 /* SecureStoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreError.swift; sourceTree = "<group>"; };
 		816C685123440EF900209342 /* SecureStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreTests.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredPreferencesTests.swift; sourceTree = "<group>"; };
 		816C685D234697BE00209342 /* PasswordPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPreferences.swift; sourceTree = "<group>"; };
 		817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorAdditions.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F4 /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
-		818866B322DFD729006BC0A8 /* OrielOTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTP.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		818866B322DFD729006BC0A8 /* Oriel OTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Oriel OTP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		818866BF22DFD72C006BC0A8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		C1A0000000000000000000C1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
-		C1A0000000000000000000C2 /* AppIcon-Dark.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-Dark.icon"; sourceTree = "<group>"; };
 		818866C222DFD72C006BC0A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		818866C422DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -223,11 +218,16 @@
 		818866F622E7A877006BC0A8 /* Authenticator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Authenticator.entitlements; sourceTree = "<group>"; };
 		81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySessionError.swift; sourceTree = "<group>"; };
 		81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSessionObserver.swift; sourceTree = "<group>"; };
+		A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargestClearRectTests.swift; sourceTree = "<group>"; };
+		A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredPreferencesTests.swift; sourceTree = "<group>"; };
+		A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/SimulatedYubiKey.swift; sourceTree = "<group>"; };
+		A1C1EA0000000000000000F4 /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
 		A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStorage.swift; sourceTree = "<group>"; };
 		A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplicationExtension.swift; sourceTree = "<group>"; };
 		A591412023835F4600CCCF67 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTPConfigurationView.swift; sourceTree = "<group>"; };
 		A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsConfig.swift; sourceTree = "<group>"; };
+		A7C400000000000000000003 /* OrielOTPWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTPWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B40327752847AE0A00DF4DB0 /* Licensing.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Licensing.md; sourceTree = "<group>"; };
 		B40D619F2AE7F37900467AE9 /* DisableOTPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisableOTPView.swift; sourceTree = "<group>"; };
 		B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisableOTPModel.swift; sourceTree = "<group>"; };
@@ -245,12 +245,9 @@
 		B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewModel.swift; sourceTree = "<group>"; };
 		B46E378629C348F100CA0B67 /* EditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAccountView.swift; sourceTree = "<group>"; };
 		B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessKeyCache.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F3 /* SimulatedYubiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/SimulatedYubiKey.swift; sourceTree = "<group>"; };
-		F018E4F892C7B4FEB1051FC9 /* WindowSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/WindowSnapshots.swift; sourceTree = "<group>"; };
 		B4719B16298AA6E7006CDAEA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorApp.swift; sourceTree = "<group>"; };
 		B4719B1A298AB641006CDAEA /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
-		56319DE11C4A1A730E920128 /* QuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
 		B4719B2B29914051006CDAEA /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
 		B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailsView.swift; sourceTree = "<group>"; };
 		B474865B2CEB79FD0031A504 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
@@ -278,14 +275,22 @@
 		B4C93E9429C1B90900C2A8B8 /* AddAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountView.swift; sourceTree = "<group>"; };
 		B4DB2289299BC373003110ED /* OATHSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHSession.swift; sourceTree = "<group>"; };
 		B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
+		C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManagerTests.swift; sourceTree = "<group>"; };
 		C1A0000000000000000000A7 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
+		C1A0000000000000000000C1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		C1A0000000000000000000C2 /* AppIcon-Dark.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-Dark.icon"; sourceTree = "<group>"; };
 		C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		5C3E00000000000000000002 /* OrielOTPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C3E0000000000000000000C /* AppClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
+		D1A600000000000000000003 /* TokenResponseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenResponseStore.swift; sourceTree = "<group>"; };
+		F018E4F892C7B4FEB1051FC9 /* Debug/WindowSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/WindowSnapshots.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5C3E00000000000000000003 /* AuthenticatorUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AuthenticatorUITests;
+			sourceTree = "<group>";
+		};
 		A7C400000000000000000001 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Shared;
@@ -301,36 +306,31 @@
 			path = EnteAuth;
 			sourceTree = "<group>";
 		};
-		E17E0000000000000000C003 /* Mac */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Mac;
-			sourceTree = "<group>";
-		};
 		E17E0000000000000000C002 /* EnteAuth */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = EnteAuth;
 			sourceTree = "<group>";
 		};
-		5C3E00000000000000000003 /* AuthenticatorUITests */ = {
+		E17E0000000000000000C003 /* Mac */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = AuthenticatorUITests;
+			path = Mac;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A7C400000000000000000006 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5155426C2656706F00B19C59 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				515542722656706F00B19C59 /* CryptoTokenKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C3E00000000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,7 +353,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5C3E00000000000000000005 /* Frameworks */ = {
+		A7C400000000000000000006 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -499,7 +499,7 @@
 		818866B422DFD729006BC0A8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				818866B322DFD729006BC0A8 /* OrielOTP.app */,
+				818866B322DFD729006BC0A8 /* Oriel OTP.app */,
 				818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */,
 				5C3E00000000000000000002 /* OrielOTPUITests.xctest */,
 				5155426F2656706F00B19C59 /* TokenExtension.appex */,
@@ -577,8 +577,8 @@
 				81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */,
 				51F8E3BC263847BD0010686B /* ManagementViewModel.swift */,
 				B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */,
-				A1C1EA0000000000000000F3 /* SimulatedYubiKey.swift */,
-				F018E4F892C7B4FEB1051FC9 /* WindowSnapshots.swift */,
+				A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */,
+				F018E4F892C7B4FEB1051FC9 /* Debug/WindowSnapshots.swift */,
 				5155426926554CAB00B19C59 /* SmartCardViewModel.swift */,
 				5156D05E265D3CEF007A94F8 /* TokenRequestViewModel.swift */,
 				51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */,
@@ -632,27 +632,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A7C400000000000000000004 /* OrielOTPWatch */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = A7C400000000000000000008 /* Build configuration list for PBXNativeTarget "OrielOTPWatch" */;
-			buildPhases = (
-				A7C400000000000000000005 /* Sources */,
-				A7C400000000000000000006 /* Frameworks */,
-				A7C400000000000000000007 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				A7C400000000000000000001 /* Shared */,
-				A7C400000000000000000002 /* OrielOTPWatch */,
-			);
-			name = OrielOTPWatch;
-			productName = OrielOTPWatch;
-			productReference = A7C400000000000000000003 /* OrielOTPWatch.app */;
-			productType = "com.apple.product-type.application";
-		};
 		5155426E2656706F00B19C59 /* TokenExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5155427E2656707000B19C59 /* Build configuration list for PBXNativeTarget "TokenExtension" */;
@@ -669,6 +648,27 @@
 			productName = TokenExtension;
 			productReference = 5155426F2656706F00B19C59 /* TokenExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		5C3E00000000000000000001 /* OrielOTPUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "OrielOTPUITests" */;
+			buildPhases = (
+				5C3E00000000000000000004 /* Sources */,
+				5C3E00000000000000000005 /* Frameworks */,
+				5C3E00000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5C3E00000000000000000007 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5C3E00000000000000000003 /* AuthenticatorUITests */,
+			);
+			name = OrielOTPUITests;
+			productName = OrielOTPUITests;
+			productReference = 5C3E00000000000000000002 /* OrielOTPUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		818866B222DFD729006BC0A8 /* OrielOTP */ = {
 			isa = PBXNativeTarget;
@@ -687,8 +687,8 @@
 				A7C40000000000000000000F /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E17E0000000000000000C001 /* EnteAuth */,
 				A7C400000000000000000001 /* Shared */,
+				E17E0000000000000000C001 /* EnteAuth */,
 				E17E0000000000000000C003 /* Mac */,
 			);
 			name = OrielOTP;
@@ -698,7 +698,7 @@
 				E17E0000000000000000B002 /* BigInt */,
 			);
 			productName = OrielOTP;
-			productReference = 818866B322DFD729006BC0A8 /* OrielOTP.app */;
+			productReference = 818866B322DFD729006BC0A8 /* Oriel OTP.app */;
 			productType = "com.apple.product-type.application";
 		};
 		818866C822DFD72C006BC0A8 /* OrielOTPTests */ = {
@@ -722,26 +722,26 @@
 			productReference = 818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		5C3E00000000000000000001 /* OrielOTPUITests */ = {
+		A7C400000000000000000004 /* OrielOTPWatch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "OrielOTPUITests" */;
+			buildConfigurationList = A7C400000000000000000008 /* Build configuration list for PBXNativeTarget "OrielOTPWatch" */;
 			buildPhases = (
-				5C3E00000000000000000004 /* Sources */,
-				5C3E00000000000000000005 /* Frameworks */,
-				5C3E00000000000000000006 /* Resources */,
+				A7C400000000000000000005 /* Sources */,
+				A7C400000000000000000006 /* Frameworks */,
+				A7C400000000000000000007 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				5C3E00000000000000000007 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				5C3E00000000000000000003 /* AuthenticatorUITests */,
+				A7C400000000000000000001 /* Shared */,
+				A7C400000000000000000002 /* OrielOTPWatch */,
 			);
-			name = OrielOTPUITests;
-			productName = OrielOTPUITests;
-			productReference = 5C3E00000000000000000002 /* OrielOTPUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
+			name = OrielOTPWatch;
+			productName = OrielOTPWatch;
+			productReference = A7C400000000000000000003 /* OrielOTPWatch.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -757,8 +757,9 @@
 					5155426E2656706F00B19C59 = {
 						CreatedOnToolsVersion = 12.5;
 					};
-					A7C400000000000000000004 = {
+					5C3E00000000000000000001 = {
 						CreatedOnToolsVersion = 27.1;
+						TestTargetID = 818866B222DFD729006BC0A8;
 					};
 					818866B222DFD729006BC0A8 = {
 						CreatedOnToolsVersion = 10.2.1;
@@ -772,9 +773,8 @@
 						CreatedOnToolsVersion = 10.2.1;
 						TestTargetID = 818866B222DFD729006BC0A8;
 					};
-					5C3E00000000000000000001 = {
+					A7C400000000000000000004 = {
 						CreatedOnToolsVersion = 27.1;
-						TestTargetID = 818866B222DFD729006BC0A8;
 					};
 				};
 			};
@@ -810,14 +810,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A7C400000000000000000007 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				A7C40000000000000000000B /* AppIcon.icon in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5155426D2656706F00B19C59 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -825,6 +817,13 @@
 				B43751972C9AD7D8004017A4 /* InfoPlist.xcstrings in Resources */,
 				C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */,
 				B4901AF42BD7DF960092E7A2 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C3E00000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -851,23 +850,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5C3E00000000000000000006 /* Resources */ = {
+		A7C400000000000000000007 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7C40000000000000000000B /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A7C400000000000000000005 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		5155426B2656706F00B19C59 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -877,6 +870,13 @@
 				515542752656706F00B19C59 /* Token.swift in Sources */,
 				5156D05B265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift in Sources */,
 				515542772656707000B19C59 /* TokenDriver.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C3E00000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -912,8 +912,8 @@
 				B46E378729C348F100CA0B67 /* EditAccountView.swift in Sources */,
 				B4696F3F2CB6CE5800604F6F /* ConfigurationView.swift in Sources */,
 				B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */,
-				A1C1EA0000000000000000B3 /* SimulatedYubiKey.swift in Sources */,
-				39615BAB2A1BC69B0374FBCD /* WindowSnapshots.swift in Sources */,
+				A1C1EA0000000000000000B3 /* Debug/SimulatedYubiKey.swift in Sources */,
+				39615BAB2A1BC69B0374FBCD /* Debug/WindowSnapshots.swift in Sources */,
 				B47486642CECC2F50031A504 /* LicensingView.swift in Sources */,
 				513F34DC246B144300FCE030 /* UIViewAdditions.swift in Sources */,
 				B47486662CECE36A0031A504 /* UIFont+Extensions.swift in Sources */,
@@ -974,7 +974,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5C3E00000000000000000004 /* Sources */ = {
+		A7C400000000000000000005 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -984,27 +984,27 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A7C40000000000000000000F /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			platformFilter = ios;
-			target = A7C400000000000000000004 /* OrielOTPWatch */;
-			targetProxy = A7C40000000000000000000E /* PBXContainerItemProxy */;
-		};
 		5155427C2656707000B19C59 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			platformFilter = ios;
 			target = 5155426E2656706F00B19C59 /* TokenExtension */;
 			targetProxy = 5155427B2656707000B19C59 /* PBXContainerItemProxy */;
 		};
+		5C3E00000000000000000007 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 818866B222DFD729006BC0A8 /* OrielOTP */;
+			targetProxy = 5C3E00000000000000000008 /* PBXContainerItemProxy */;
+		};
 		818866CB22DFD72C006BC0A8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 818866B222DFD729006BC0A8 /* OrielOTP */;
 			targetProxy = 818866CA22DFD72C006BC0A8 /* PBXContainerItemProxy */;
 		};
-		5C3E00000000000000000007 /* PBXTargetDependency */ = {
+		A7C40000000000000000000F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 818866B222DFD729006BC0A8 /* OrielOTP */;
-			targetProxy = 5C3E00000000000000000008 /* PBXContainerItemProxy */;
+			platformFilter = ios;
+			target = A7C400000000000000000004 /* OrielOTPWatch */;
+			targetProxy = A7C40000000000000000000E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1021,75 +1021,12 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		A7C400000000000000000009 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 205;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Oriel OTP";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "io.github.sinf-ken.OrielOTP";
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.watchkitapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Debug;
-		};
-		A7C40000000000000000000A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 205;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Oriel OTP";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "io.github.sinf-ken.OrielOTP";
-				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.watchkitapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 10.0;
-			};
-			name = Release;
-		};
 		5155427F2656707000B19C59 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TokenExtension/TokenExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XW69FY82W3;
 				CURRENT_PROJECT_VERSION = 205;
 				INFOPLIST_FILE = TokenExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1099,14 +1036,14 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP.TokenExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.TokenExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1117,6 +1054,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = TokenExtension/TokenExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XW69FY82W3;
 				CURRENT_PROJECT_VERSION = 205;
 				INFOPLIST_FILE = TokenExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
@@ -1126,16 +1064,52 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP.TokenExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.TokenExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5C3E0000000000000000000A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTPUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OrielOTP;
+			};
+			name = Debug;
+		};
+		5C3E0000000000000000000B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTPUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OrielOTP;
 			};
 			name = Release;
 		};
@@ -1273,13 +1247,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Dark";
+				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=macosx*]" = "";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=macosx*]" = "";
 				CODE_SIGN_ENTITLEMENTS = Authenticator/Authenticator.entitlements;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Authenticator/Authenticator-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 205;
+				DEVELOPMENT_TEAM = XW69FY82W3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Authenticator/Info.plist;
 				"INFOPLIST_FILE[sdk=macosx*]" = "Authenticator/Info-macOS.plist";
@@ -1292,11 +1267,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP";
 				PRODUCT_MODULE_NAME = OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PRODUCT_NAME[sdk=macosx*]" = "Oriel OTP";
@@ -1307,8 +1282,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				YKF_ENABLE_VERBOSE_LOGGING = YES;
@@ -1319,13 +1294,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-Dark";
+				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=macosx*]" = "";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				"ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES[sdk=macosx*]" = "";
 				CODE_SIGN_ENTITLEMENTS = Authenticator/Authenticator.entitlements;
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Authenticator/Authenticator-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 205;
+				DEVELOPMENT_TEAM = XW69FY82W3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Authenticator/Info.plist;
 				"INFOPLIST_FILE[sdk=macosx*]" = "Authenticator/Info-macOS.plist";
@@ -1338,11 +1314,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				LIBRARY_SEARCH_PATHS = "";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTP;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP";
 				PRODUCT_MODULE_NAME = OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PRODUCT_NAME[sdk=macosx*]" = "Oriel OTP";
@@ -1353,8 +1329,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				YKF_ENABLE_VERBOSE_LOGGING = NO;
@@ -1373,9 +1349,9 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTPTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
@@ -1383,8 +1359,8 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OrielOTP.app/OrielOTP";
@@ -1404,9 +1380,9 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTPTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTPTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SUPPORTS_MACCATALYST = NO;
@@ -1414,8 +1390,8 @@
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OrielOTP.app/OrielOTP";
@@ -1423,59 +1399,89 @@
 			};
 			name = Release;
 		};
-		5C3E0000000000000000000A /* Debug */ = {
+		A7C400000000000000000009 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XW69FY82W3;
+				CURRENT_PROJECT_VERSION = 205;
+				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTPUITests;
+				INFOPLIST_KEY_CFBundleDisplayName = "Oriel OTP";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "io.github.sinf-ken.OrielOTP";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = OrielOTP;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
-		5C3E0000000000000000000B /* Release */ = {
+		A7C40000000000000000000A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XW69FY82W3;
+				CURRENT_PROJECT_VERSION = 205;
+				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.sinf-ken.OrielOTPUITests;
+				INFOPLIST_KEY_CFBundleDisplayName = "Oriel OTP";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "io.github.sinf-ken.OrielOTP";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = OrielOTP;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A7C400000000000000000008 /* Build configuration list for PBXNativeTarget "OrielOTPWatch" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				A7C400000000000000000009 /* Debug */,
-				A7C40000000000000000000A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		5155427E2656707000B19C59 /* Build configuration list for PBXNativeTarget "TokenExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5155427F2656707000B19C59 /* Debug */,
 				515542802656707000B19C59 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "OrielOTPUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C3E0000000000000000000A /* Debug */,
+				5C3E0000000000000000000B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1507,11 +1513,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5C3E00000000000000000009 /* Build configuration list for PBXNativeTarget "OrielOTPUITests" */ = {
+		A7C400000000000000000008 /* Build configuration list for PBXNativeTarget "OrielOTPWatch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5C3E0000000000000000000A /* Debug */,
-				5C3E0000000000000000000B /* Release */,
+				A7C400000000000000000009 /* Debug */,
+				A7C40000000000000000000A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
