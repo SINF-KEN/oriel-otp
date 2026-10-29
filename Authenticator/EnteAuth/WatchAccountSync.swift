@@ -16,7 +16,7 @@
 
 import Foundation
 #if os(iOS)
-import WatchConnectivity
+    import WatchConnectivity
 #endif
 
 /// Sends the Ente Auth accounts to the Apple Watch app, which keeps them and calculates the codes itself.
@@ -38,30 +38,30 @@ import WatchConnectivity
     private(set) var isEnabled: Bool
 
     #if os(iOS)
-    @ObservationIgnored private let session: WCSession?
+        @ObservationIgnored private let session: WCSession?
     #endif
     @ObservationIgnored private let defaults: UserDefaults
 
     #if os(iOS)
-    init(session: WCSession? = WCSession.isSupported() ? .default : nil, defaults: UserDefaults = .standard) {
-        self.session = session
-        self.defaults = defaults
-        self.isEnabled = defaults.bool(forKey: Self.enabledKey)
-        super.init()
-    }
+        init(session: WCSession? = WCSession.isSupported() ? .default : nil, defaults: UserDefaults = .standard) {
+            self.session = session
+            self.defaults = defaults
+            self.isEnabled = defaults.bool(forKey: Self.enabledKey)
+            super.init()
+        }
     #else
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-        self.isEnabled = defaults.bool(forKey: Self.enabledKey)
-        super.init()
-    }
+        init(defaults: UserDefaults = .standard) {
+            self.defaults = defaults
+            self.isEnabled = defaults.bool(forKey: Self.enabledKey)
+            super.init()
+        }
     #endif
 
     func activate() {
         #if os(iOS)
-        guard let session, session.delegate == nil else { return }
-        session.delegate = self
-        session.activate()
+            guard let session, session.delegate == nil else { return }
+            session.delegate = self
+            session.activate()
         #endif
     }
 
@@ -102,47 +102,47 @@ import WatchConnectivity
 
     @discardableResult private func update(_ accounts: [OTPAccount]) -> Bool {
         #if os(iOS)
-        guard let session, session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else { return false }
-        do {
-            try session.updateApplicationContext(try WatchAccountsMessage.context(for: accounts))
-            return true
-        } catch {
-            return false
-        }
+            guard let session, session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else { return false }
+            do {
+                try session.updateApplicationContext(try WatchAccountsMessage.context(for: accounts))
+                return true
+            } catch {
+                return false
+            }
         #else
-        return false
+            return false
         #endif
     }
 
     #if os(iOS)
-    private func sessionStateChanged() {
-        guard let session else { return }
-        isWatchAvailable = session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
-        if !isEnabled && defaults.bool(forKey: Self.pendingClearKey) && update([]) {
-            defaults.removeObject(forKey: Self.pendingClearKey)
+        private func sessionStateChanged() {
+            guard let session else { return }
+            isWatchAvailable = session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
+            if !isEnabled && defaults.bool(forKey: Self.pendingClearKey) && update([]) {
+                defaults.removeObject(forKey: Self.pendingClearKey)
+            }
         }
-    }
     #endif
 }
 
 #if os(iOS)
-extension WatchAccountSync: WCSessionDelegate {
+    extension WatchAccountSync: WCSessionDelegate {
 
-    nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        Task { @MainActor in self.sessionStateChanged() }
-    }
+        nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+            Task { @MainActor in self.sessionStateChanged() }
+        }
 
-    nonisolated func sessionWatchStateDidChange(_ session: WCSession) {
-        Task { @MainActor in self.sessionStateChanged() }
-    }
+        nonisolated func sessionWatchStateDidChange(_ session: WCSession) {
+            Task { @MainActor in self.sessionStateChanged() }
+        }
 
-    nonisolated func sessionDidBecomeInactive(_ session: WCSession) {
-        Task { @MainActor in self.sessionStateChanged() }
-    }
+        nonisolated func sessionDidBecomeInactive(_ session: WCSession) {
+            Task { @MainActor in self.sessionStateChanged() }
+        }
 
-    /// Called when the user switches to another watch, activate again to talk to the new one.
-    nonisolated func sessionDidDeactivate(_ session: WCSession) {
-        session.activate()
+        /// Called when the user switches to another watch, activate again to talk to the new one.
+        nonisolated func sessionDidDeactivate(_ session: WCSession) {
+            session.activate()
+        }
     }
-}
 #endif
