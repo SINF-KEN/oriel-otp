@@ -25,7 +25,7 @@ struct MacSettingsView: View {
     var body: some View {
         TabView {
             GeneralSettingsView()
-                .frame(width: 520, height: 300)
+                .frame(width: 520, height: 480)
                 .tabItem { Label(String(localized: "General", comment: "Mac settings tab"), systemImage: "gearshape") }
             YubiKeySettingsView()
                 .frame(width: 520, height: 560)
@@ -81,6 +81,7 @@ private struct GeneralSettingsView: View {
             Section {
                 Toggle(String(localized: "Open at login", comment: "Mac setting"), isOn: $opensAtLogin)
             }
+            EnteAccountSection()
         }
         .formStyle(.grouped)
         .onChange(of: menuBarOnly) { MacPreferences.applyActivationPolicy() }

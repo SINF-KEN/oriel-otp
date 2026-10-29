@@ -24,7 +24,7 @@ If you choose **Sync from Ente Auth**, the app sends the email address and sign-
 
 Ente Auth data is end-to-end encrypted on Ente's service. The app downloads and decrypts it on your device so you can choose credentials to copy to your YubiKey. The app never changes or deletes your OTP records in Ente. If you turn on **Also add to Ente Auth** when adding an account, the app encrypts that account on your device with your Ente authenticator key and adds it to your Ente account, after reading your Ente accounts to check it isn't already there. Retrieved credentials are held in memory for the sync flow and are written to your YubiKey only when you choose **Add**. The app may send a sign-out request to Ente when you sign out.
 
-Staying signed in is optional. If enabled, the app stores an Ente session token and authenticator key in the device keychain, protected by the current Face ID or Touch ID enrollment. It also stores the account email in local app preferences so the saved session can be identified. If you enter a self-hosted server address, it is saved in local app preferences and remains after sign-out. The app never stores your Ente password.
+Staying signed in is on by default when the device can protect the session, and you can turn it off before signing in. When on, the app stores an Ente session token and your Ente authenticator key, which decrypts your Ente Auth accounts, in the device keychain. They stay on this device and can only be read after Face ID or Touch ID with the current enrollment on iPhone and iPad, or Touch ID or your Mac's password on the Mac. The app also stores the account email and server address in local app preferences so the saved account can be shown in the settings without unlocking. If Ente's server rejects the session, the token and key are deleted and the email and server are kept so you can enter your password again. If you enter a self-hosted server address, it is saved in local app preferences and remains after sign-out. The app never stores your Ente password or your Ente master key.
 
 ## Optional Apple Watch app
 
@@ -44,7 +44,7 @@ watch delete its copy. If the watch can't be reached at that moment, the iPhone 
 
 ## Retention, deletion, and revoking access
 
-- To remove a saved Ente session from this device and sign out, open **Sync from Ente Auth** and choose **Sign out**. This clears the locally saved token, key, and email and asks Ente to end the server session. If the server cannot be reached, the local session is still removed; you may also revoke the session from your Ente account.
+- To remove a saved Ente session from this device and sign out, choose **Sign out** under **Sync from Ente Auth** or in the Ente Auth section of the settings. This clears the locally saved token, key, email and server and asks Ente to end the server session. If the server cannot be reached, the local session is still removed; you may also revoke the session from your Ente account.
 - To remove the Ente Auth accounts from your Apple Watch, turn off **Show Ente Auth accounts on Apple Watch** or sign
   out of Ente. Deleting the watch app also removes them.
 - To remove a saved YubiKey password from this device, use **Clear saved passwords** in the YubiKey settings.
