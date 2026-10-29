@@ -114,7 +114,8 @@ the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth im
 [BigInt](https://github.com/attaswift/BigInt), all added with the Swift Package Manager.
 
 Debug builds in the simulator connect to a simulated YubiKey with demo accounts and can sign in to a fake Ente
-server at `https://demo.ente.test` with any email and the password `demo`. None of this is compiled into release
+server at `https://demo.ente.test` with any email and the password `demo` (add `+mfa`, `+2fa` or `+nosrp` to the
+email's name to be asked for the code `123456`). None of this is compiled into release
 builds. [docs/screenshots.md](docs/screenshots.md) explains how the README screenshots are regenerated, and
 [docs/ci.md](docs/ci.md) what CI checks.
 

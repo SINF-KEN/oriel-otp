@@ -50,8 +50,6 @@ struct EnteSyncView: View {
                     savedSessionSection(email: email)
                 case .emailCode:
                     emailCodeSection
-                case .password:
-                    passwordSection
                 case .secondFactor(let totp, let passkey):
                     secondFactorSection(totp: totp, passkey: passkey)
                 case .accounts:
@@ -95,15 +93,24 @@ struct EnteSyncView: View {
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .submitLabel(.continue)
+                    .submitLabel(.next)
                     .focused($focusedField, equals: .email)
+                    .onSubmit { focusedField = .password }
+                SecureField(String(localized: "Password", comment: "Ente sign in field"), text: $model.password)
+                    .textContentType(.password)
+                    .submitLabel(.go)
+                    .focused($focusedField, equals: .password)
                     .onSubmit { model.signIn() }
-                Button(String(localized: "Continue", comment: "Ente sign in button")) { model.signIn() }
-                    .disabled(model.email.trimmingCharacters(in: .whitespaces).isEmpty)
+                Button(String(localized: "Sign in", comment: "Ente sign in button")) { model.signIn() }
+                    .disabled(!model.canSignIn)
             } header: {
                 Text(String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
-                Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records.", comment: "Ente sign in footer"))
+                if model.isDerivingKeys {
+                    Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
+                } else {
+                    Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records.", comment: "Ente sign in footer"))
+                }
             }
 
             Section {
@@ -130,7 +137,7 @@ struct EnteSyncView: View {
                 }
             }
         }
-        .onAppear { focusedField = .email }
+        .onAppear { focusedField = model.email.isEmpty ? .email : .password }
     }
 
     @ViewBuilder private func savedSessionSection(email: String) -> some View {
@@ -168,26 +175,6 @@ struct EnteSyncView: View {
         } footer: {
             Text(String(localized: "Enter the verification code Ente sent to \(model.email).", comment: "Ente email code footer. The placeholder is the email address."))
         }
-    }
-
-    private var passwordSection: some View {
-        Section {
-            SecureField(String(localized: "Password", comment: "Ente sign in field"), text: $model.password)
-                .textContentType(.password)
-                .submitLabel(.go)
-                .focused($focusedField, equals: .password)
-                .onSubmit { model.submitPassword() }
-            Button(String(localized: "Sign in", comment: "Ente sign in button")) { model.submitPassword() }
-                .disabled(model.password.isEmpty)
-            startOverButton
-        } header: {
-            Text(model.email)
-        } footer: {
-            if model.isBusy {
-                Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
-            }
-        }
-        .onAppear { focusedField = .password }
     }
 
     private func secondFactorSection(totp: Bool, passkey: Bool) -> some View {
