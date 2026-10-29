@@ -16,6 +16,7 @@
  */
 
 
+#if os(iOS)
 import SwiftUI
 
 struct TokenRequestView: View {
@@ -226,3 +227,4 @@ struct TokenRequestView: View {
         }
     }
 }
+#endif

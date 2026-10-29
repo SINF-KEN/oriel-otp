@@ -1,7 +1,7 @@
 # README screenshots
 
-The screenshots in the README are taken from the app itself, by a UI test that runs in the iOS Simulator. Nobody
-has to capture them by hand, and they show the real UI.
+The screenshots in the README are taken from the app itself, by UI tests that run in the iOS Simulator and on the
+Mac. Nobody has to capture them by hand, and they show the real UI.
 
 ## What is in them
 
@@ -10,9 +10,10 @@ The test runs the debug build, which in the simulator connects to a simulated Yu
 (`Authenticator/EnteAuth/FakeEnteServer.swift`). All accounts, emails and secrets are made up. No real YubiKey,
 Ente account or network connection is used.
 
-Both are wrapped in `#if DEBUG && targetEnvironment(simulator)`, as is the `-DemoDate` launch argument that
-freezes the clock (`Authenticator/Model/AppClock.swift`). None of it is compiled into release builds or builds
-for a device.
+Both are wrapped in `#if DEBUG && (targetEnvironment(simulator) || os(macOS))`, as is the `-DemoDate` launch
+argument that freezes the clock (`Authenticator/Model/AppClock.swift`). None of it is compiled into release builds or
+builds for an iPhone or iPad. On the Mac a debug build only uses them when launched with `-SimulatedYubiKey YES`, so
+it works with a real YubiKey otherwise.
 
 To make the screenshots the same on every run:
 
@@ -34,9 +35,28 @@ alone.
 The test is `AuthenticatorUITests/ScreenshotTests.swift`. To add a screenshot, navigate to the screen there and
 call `save("name")`, then add `docs/screenshots/name.png` to the README.
 
+## The Mac screenshots
+
+```bash
+tools/screenshots-macos.sh
+```
+
+This runs `AuthenticatorUITests/MacScreenshotTests.swift` on the Mac and writes `docs/screenshots/mac-*.png`. The
+app is launched with the simulated YubiKey, a frozen clock, light appearance (`-DemoAppearance light`) and its window
+at 1280 × 800 points (`-DemoWindowSize 1280x800`), so the window screenshots are 2560 × 1600 pixels on a Retina
+display, a size the Mac App Store accepts. The menu bar and Settings screenshots are smaller and only for the README.
+
+The build is signed ad hoc without the keychain access group, which would need a provisioning profile. The test
+runner is sandboxed on the Mac and can't write files, so the test attaches the screenshots to its result and the
+script exports them from it. The first local run may ask to allow UI automation.
+
+`Authenticator/Model/Debug/WindowSnapshots.swift` can also save the app's windows to PNG files from inside the app
+(`-SnapshotDelay`), without any permission, for a quick look at a layout. It can't draw the system's glass
+materials, so it isn't used for the screenshots.
+
 ## In CI
 
-`.github/workflows/screenshots.yml` runs the script when the app, the test or the script changes:
+`.github/workflows/screenshots.yml` runs both scripts when the app, the tests or the scripts change:
 
 - On pull requests, the screenshots are uploaded as the `screenshots` artifact of the run, so UI changes can be
   looked at before merging.

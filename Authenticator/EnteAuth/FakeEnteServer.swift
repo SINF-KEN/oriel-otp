@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#if DEBUG && targetEnvironment(simulator)
+#if DEBUG && (targetEnvironment(simulator) || os(macOS))
 
 import BigInt
 import CryptoKit

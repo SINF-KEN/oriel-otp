@@ -18,23 +18,38 @@
 import SwiftUI
 
 
-struct AccountRowView: View {
+struct AccountRowView<Accessory: View>: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     var account: Account
+    // Shown before the code, e.g. buttons on the Mac while the pointer is over the row.
+    private let accessory: Accessory
 
     @State private var pillOpacity: Double
 
     @State private var animate: Bool = true
 
+    // Mac lists are denser, with smaller text.
+    #if os(macOS)
+    @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .body) private var statusSize: CGFloat = 16
+    private let titleFont = Font.body.weight(.medium)
+    private let subtitleFont = Font.subheadline
+    private let codeFont = Font.title3.monospacedDigit().bold()
+    #else
     @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 40
     @ScaledMetric(relativeTo: .body) private var statusSize: CGFloat = 22
+    private let titleFont = Font.subheadline.weight(.medium)
+    private let subtitleFont = Font.footnote
+    private let codeFont = Font.body.monospacedDigit().bold()
+    #endif
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
     
-    init(account: Account) {
+    init(account: Account, @ViewBuilder accessory: () -> Accessory) {
         self.account = account
+        self.accessory = accessory()
         if account.state == .expired || account.otp == nil {
             self.pillOpacity = 0.5
         } else {
@@ -58,13 +73,13 @@ struct AccountRowView: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading) {
                     Text(account.title)
-                        .font(.subheadline.weight(.medium))
+                        .font(titleFont)
                         .lineLimit(isStacked ? 3 : 1)
                         .minimumScaleFactor(0.9)
                         .truncationMode(.tail)
                     account.subTitle.map {
                         Text($0)
-                            .font(.footnote)
+                            .font(subtitleFont)
                             .lineLimit(isStacked ? 3 : 1)
                             .minimumScaleFactor(0.9)
                             .truncationMode(.tail)
@@ -75,6 +90,7 @@ struct AccountRowView: View {
             if !isStacked {
                 Spacer()
             }
+            accessory
             codePill
         }
         .contentShape(Rectangle())
@@ -130,7 +146,7 @@ struct AccountRowView: View {
                     .foregroundStyle(.clear)
                     .padding(.trailing, 4)
             }
-            .font(.body.monospacedDigit().bold())
+            .font(codeFont)
         }
         .padding(.all, 4)
         .fixedSize() // keep the code on one line in a narrow sidebar; the title truncates instead
@@ -143,6 +159,12 @@ struct AccountRowView: View {
         .accessibilityElement()
         .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
         .opacity(pillOpacity)
+    }
+}
+
+extension AccountRowView where Accessory == EmptyView {
+    init(account: Account) {
+        self.init(account: account) { EmptyView() }
     }
 }
 
