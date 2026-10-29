@@ -259,8 +259,7 @@ extension TokenRequestViewModel {
 
     /// Returns whether Yubico OTP is enabled over USB on the next USB-C YubiKey, or nil on devices with a Lightning port.
     func isYubiOTPEnabledOverUSBC() async -> Bool? {
-        // If this device has a lightning port return nil
-        if DeviceCapabilities.supportsLightning {
+        guard !DeviceCapabilities.hasLightningPort else {
             return nil
         }
         guard let connection = try? await ConnectionManager.shared.nextWiredConnection(),

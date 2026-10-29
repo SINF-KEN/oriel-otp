@@ -40,11 +40,6 @@ enum DeviceCapabilities {
         #endif
     }
 
-    /// YubiKeys connect through the Lightning port on this device.
-    static var supportsLightning: Bool {
-        hasLightningPort
-    }
-
     /// YubiKeys connect as USB smart cards through the USB-C port on this device.
     static var supportsUSBC: Bool {
         #if targetEnvironment(simulator)
@@ -54,8 +49,9 @@ enum DeviceCapabilities {
         #endif
     }
 
-    // Every Lightning-equipped model that can install iOS/iPadOS 16 or newer, matching YubiKit.
-    private static let hasLightningPort: Bool = {
+    /// Every Lightning-equipped model that can install iOS/iPadOS 16 or newer, matching YubiKit. The app doesn't
+    /// declare the MFi accessory protocol of Lightning YubiKeys, so these devices only connect to YubiKeys over NFC.
+    nonisolated static let hasLightningPort: Bool = {
         #if os(macOS)
         return false
         #else

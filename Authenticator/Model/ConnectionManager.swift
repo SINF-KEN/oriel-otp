@@ -67,7 +67,11 @@ final class ConnectionManager {
         #if targetEnvironment(simulator)
         self.init(makeWiredConnection: nil)
         #else
-        self.init(makeWiredConnection: { try await WiredSmartCardConnection.makeConnection() })
+        if DeviceCapabilities.hasLightningPort {
+            self.init(makeWiredConnection: nil)
+        } else {
+            self.init(makeWiredConnection: { try await WiredSmartCardConnection.makeConnection() })
+        }
         #endif
     }
 
@@ -127,13 +131,6 @@ final class ConnectionManager {
         isWiredSuspended = false
         resumeWiredLoop?.resume()
         resumeWiredLoop = nil
-    }
-
-    /// Closes the wired connection. The YubiKey is connected to again if it's still inserted.
-    func restartWiredConnection() {
-        if let wiredConnection {
-            Task { await wiredConnection.close(error: nil) }
-        }
     }
 
     private func runWiredLoop(makeWiredConnection: @Sendable () async throws -> SmartCardConnection) async {

@@ -1,8 +1,8 @@
 # Oriel OTP support
 
 Oriel OTP shows the one-time codes stored on a YubiKey and can copy accounts from
-[Ente Auth](https://ente.io/auth) onto the key. It needs iOS or iPadOS 17 or later and a YubiKey with NFC, Lightning
-or USB-C.
+[Ente Auth](https://ente.io/auth) onto the key. It needs iOS or iPadOS 17 or later and a YubiKey with NFC or USB-C.
+YubiKeys can't connect through a Lightning port; on an iPhone with Lightning, use NFC.
 
 ## Getting help
 
@@ -10,7 +10,7 @@ Search the [issue tracker](https://github.com/SINF-KEN/oriel-otp/issues) for you
 [open a new issue](https://github.com/SINF-KEN/oriel-otp/issues/new). Please include:
 
 - the iPhone or iPad model and iOS version,
-- the YubiKey model and how it connects (NFC, Lightning or USB-C),
+- the YubiKey model and how it connects (NFC or USB-C),
 - the Oriel OTP version, shown under **About**,
 - what you did, what you expected and what happened instead.
 
@@ -22,7 +22,7 @@ Don't post secrets, QR codes, passwords, PINs or Ente recovery keys in an issue.
 Tap **Scan NFC YubiKey** in the account list, or pull the list down. Hold the key flat against the top edge of the
 iPhone until the NFC sheet confirms the read. NFC needs an iPhone; iPads don't read NFC tags.
 
-**The app doesn't find my YubiKey over USB-C or Lightning.**
+**The app doesn't find my YubiKey over USB-C.**
 Unplug the key and plug it in again, and keep the app open. If the key also sends a Yubico OTP when it's plugged in,
 you can turn that off under **Configuration > Toggle One-Time Password**.
 

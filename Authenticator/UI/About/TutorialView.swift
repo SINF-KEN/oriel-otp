@@ -141,12 +141,12 @@ extension TutorialView {
         #else
         [TutorialPageModel(title: String(localized: "How it works"),
                            image: Image(.tutorialAccounts),
-                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC, Lightning or USB-C to get started."),
+                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC or USB-C to get started."),
                            link: nil),
         
          TutorialPageModel(title: String(localized: "Plug in your YubiKey"),
                            image: Image(.tutorialPlugIn),
-                            text: String(localized: "If your YubiKey has a Lightning or USB-C connector, plug it in.\n\nTouch the YubiKey when prompted."),
+                            text: String(localized: "If your YubiKey has a USB-C connector, plug it in.\n\nTouch the YubiKey when prompted."),
                             link: nil),
         
          TutorialPageModel(title: String(localized: "Scan your YubiKey over NFC"),

@@ -52,6 +52,8 @@ Put new features and fixes on `main` or a feature branch, never on `fork/oriel-o
   ids are removed, so set your own team in Xcode before running on a device.
 - `applinks:my.yubico.com` is removed, since only Yubico's app can claim that domain. Tapping a YubiKey's NFC
   OTP link opens Safari instead of the app.
+- Lightning: the `com.yubico.ylp` accessory protocol is removed. Apple only accepts it from apps on Yubico's MFi
+  product plan, so iPhones with a Lightning port reach the YubiKey over NFC instead.
 - App icons: a lock on a shield, in pink or dark, instead of the Yubico logo, and the Yubico wordmark in the navigation bar is
   replaced by the app name.
 - Colors: taken from the icon. The accent, `YubiBlue` and `YubiGreen` (names kept to keep the diff small) are
@@ -69,6 +71,5 @@ Put new features and fixes on `main` or a feature branch, never on `fork/oriel-o
 - "YubiKey" and "Yubico OTP" where they name the hardware or its OTP protocol, and the link to Yubico's smart
   card documentation. These describe what the app works with; [NOTICE](../NOTICE)
   states there is no affiliation.
-- `com.yubico.ylp`, the accessory protocol of Lightning YubiKeys, which the app needs to talk to them.
 
 To pick another name, search for `Oriel OTP`, `OrielOTP`, `orielotp` and `sinf-ken`.

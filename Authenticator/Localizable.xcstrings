@@ -3812,30 +3812,30 @@
         }
       }
     },
-    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC, Lightning or USB-C to get started." : {
+    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC or USB-C to get started." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Besorge Dir ein shared Secret/Seed von jedem Dienst, den Du mit Deinem YubiKey absichern möchtest, speichere es auf Deinem YubiKey und verwende es, um OTP Codes zu generieren.\n\nDu benötigst einen YubiKey mit NFC, Lightning oder USB-C um loszulegen."
+            "value" : "Besorge Dir ein shared Secret/Seed von jedem Dienst, den Du mit Deinem YubiKey absichern möchtest, speichere es auf Deinem YubiKey und verwende es, um OTP Codes zu generieren.\n\nDu benötigst einen YubiKey mit NFC oder USB-C um loszulegen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Obtenez un secret partagé de tout service que vous souhaitez sécuriser, stockez-le sur la YubiKey et utilisez-le pour générer vos codes de sécurité.\n\nVous aurez besoin d'une YubiKey avec NFC, Lightning ou USB-C pour commencer."
+            "value" : "Obtenez un secret partagé de tout service que vous souhaitez sécuriser, stockez-le sur la YubiKey et utilisez-le pour générer vos codes de sécurité.\n\nVous aurez besoin d'une YubiKey avec NFC ou USB-C pour commencer."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "セキュリティを確保したいサービスから共有シークレットを取得し、YubiKeyに保存してセキュリティコードの生成に使用します。\n\n利用開始にはNFC、LightningまたはUSB-C対応のYubiKeyが必要です。"
+            "value" : "セキュリティを確保したいサービスから共有シークレットを取得し、YubiKeyに保存してセキュリティコードの生成に使用します。\n\n利用開始にはNFCまたはUSB-C対応のYubiKeyが必要です。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey s NFC, Lightning alebo USB-C."
+            "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey s NFC alebo USB-C."
           }
         }
       }
@@ -4125,30 +4125,30 @@
         }
       }
     },
-    "If your YubiKey has a Lightning or USB-C connector, plug it in.\n\nTouch the YubiKey when prompted." : {
+    "If your YubiKey has a USB-C connector, plug it in.\n\nTouch the YubiKey when prompted." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Falls Dein YubiKey einen Lightning- oder USB-C-Anschluss hat, schließe ihn an.\n\nBerühre den YubiKey, sobald Du dazu aufgefordert wirst."
+            "value" : "Falls Dein YubiKey einen USB-C-Anschluss hat, schließe ihn an.\n\nBerühre den YubiKey, sobald Du dazu aufgefordert wirst."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Si votre YubiKey a un connecteur Lightning ou USB-C, branchez-la.\n\nTouchez la YubiKey lorsque vous y êtes invité."
+            "value" : "Si votre YubiKey a un connecteur USB-C, branchez-la.\n\nTouchez la YubiKey lorsque vous y êtes invité."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "YubiKeyにLightningまたはUSB-Cコネクタがある場合は、接続してください。\n\nプロンプトが表示されたら、YubiKeyにタッチします。"
+            "value" : "YubiKeyにUSB-Cコネクタがある場合は、接続してください。\n\nプロンプトが表示されたら、YubiKeyにタッチします。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ak má váš YubiKey konektor Lightning alebo USB-C, pripojte ho.\n\nPo výzve sa dotknite YubiKey."
+            "value" : "Ak má váš YubiKey konektor USB-C, pripojte ho.\n\nPo výzve sa dotknite YubiKey."
           }
         }
       }
@@ -5737,34 +5737,6 @@
         }
       }
     },
-    "Operation timed out." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Vorgang wurde abgebrochen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'opération a été interrompue."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "操作がタイムアウトしました。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Operácia vypršala."
-          }
-        }
-      }
-    },
     "Optional" : {
       "comment" : "Add account issuer placeholder",
       "localizations" : {
@@ -7052,35 +7024,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Obnoviť"
-          }
-        }
-      }
-    },
-    "Reinsert your YubiKey." : {
-      "comment" : "FIDO reset view",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stecke Deinen YubiKey erneut."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Réinsérez votre YubiKey."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKeyを再挿入してください。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Opätovne vložte svoj YubiKey."
           }
         }
       }
@@ -9852,34 +9795,6 @@
         }
       }
     },
-    "This operation is not supported over Lightning on this YubiKey. Please use Yubico Authenticator for desktop to reset the FIDO application." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser Vorgang wird bei diesem YubiKey nicht über Lightning unterstützt. Bitte verwenden die Desktop Version des Yubico Authenticator, um die FIDO-Anwendung zurückzusetzen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette opération n'est pas supportée par Lightning sur cette YubiKey. Veuillez utiliser Yubico Authenticator for desktop pour réinitialiser l'application FIDO."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "本YubiKeyでは、Lightning経由でのこの操作はサポートされていません。FIDOアプリケーションをリセットするには、Yubico Authenticator for desktopをご利用ください。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Táto operácia nie je podporovaná cez Lightning na tomto YubiKey. Na obnovenie aplikácie FIDO použite Yubico Authenticator pre počítač."
-          }
-        }
-      }
-    },
     "This removes the account from the YubiKey. You won’t be able to generate codes for it anymore." : {
       "localizations" : {
         "de" : {
@@ -9993,32 +9908,32 @@
         }
       }
     },
-    "This version of iOS does not support operations with the YubiKey for Lightning nor over NFC" : {
+    "This version of iOS does not support operations with the YubiKey over NFC" : {
       "comment" : "Not supported",
       "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Version von iOS unterstützt keine Operationen mit dem YubiKey über Lightning oder NFC"
+            "value" : "Diese Version von iOS unterstützt keine Operationen mit dem YubiKey über NFC"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette version d'iOS ne prend pas en charge les opérations avec YubiKey pour Lightning ni via NFC"
+            "value" : "Cette version d'iOS ne prend pas en charge les opérations avec YubiKey via NFC"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このバージョンのiOSでは、LightningやNFCでのYubiKeyを使用した操作はサポートされていません"
+            "value" : "このバージョンのiOSでは、NFCでのYubiKeyを使用した操作はサポートされていません"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Táto verzia iOS nepodporuje operácie s YubiKey cez Lightning ani cez NFC"
+            "value" : "Táto verzia iOS nepodporuje operácie s YubiKey cez NFC"
           }
         }
       }
@@ -10759,35 +10674,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odopnúť účet"
-          }
-        }
-      }
-    },
-    "Unplug your YubiKey." : {
-      "comment" : "FIDO reset view",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Entferne bitte Deinen YubiKey."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retirez votre YubiKey."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKeyを抜いてください。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Odpojte svoj YubiKey."
           }
         }
       }

@@ -38,7 +38,7 @@ struct FIDOResetView: View {
     var body: some View {
         SettingsView(image: image, imageColor: imageColor) {
             Text("Reset FIDO application").font(.title2).bold().opacity(keyHasBeenReset ? 0.2 : 1.0)
-            ProgressView(value: progress, total: 4.0).opacity(keyHasBeenReset ? 0.2 : 1.0)
+            ProgressView(value: progress, total: 1.0).opacity(keyHasBeenReset ? 0.2 : 1.0)
             Text(messageText).font(.subheadline).multilineTextAlignment(.center).opacity(keyHasBeenReset ? 0.2 : 1.0)
         } buttons: {
             SettingsButton(String(localized: "Reset FIDO")) {
@@ -91,20 +91,8 @@ struct FIDOResetView: View {
             case .ready:
                 self.enableResetButton = true
                 self.messageText = resetMessageText
-            case .waitingForKeyRemove:
-                self.enableResetButton = false
-                self.progress = 1.0
-                self.messageText = String(localized: "Unplug your YubiKey.", comment: "FIDO reset view")
-            case .waitingForKeyReinsert:
-                self.enableResetButton = false
-                self.progress = 2.0
-                self.messageText = String(localized: "Reinsert your YubiKey.", comment: "FIDO reset view")
-            case .waitingForKeyTouch:
-                self.progress = 3.0
-                self.enableResetButton = false
-                self.messageText = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
             case .success:
-                self.progress = 4.0
+                self.progress = 1.0
                 self.keyHasBeenReset = true
                 self.enableResetButton = false
                 self.messageText = String(localized: "The FIDO application of your YubiKey has been reset to factory defaults.", comment: "FIDO reset view")
