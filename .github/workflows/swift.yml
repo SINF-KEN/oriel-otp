@@ -154,23 +154,6 @@ jobs:
         timeout-minutes: 15
         uses: ./.github/actions/swift-packages
 
-      # The iPhone app embeds the watch app, so the test build below builds it too. This step builds it on its
-      # own first so a watchOS-only failure is reported as such.
-      - name: Build watch app
-        timeout-minutes: 10
-        run: |
-          set -euo pipefail
-          xcodebuild build \
-            -project OrielOTP.xcodeproj \
-            -scheme OrielOTPWatch \
-            -destination "generic/platform=watchOS Simulator" \
-            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
-            -disableAutomaticPackageResolution \
-            -onlyUsePackageVersionsFromResolvedFile \
-            -skipPackageUpdates \
-            CODE_SIGNING_ALLOWED=NO \
-            2>&1 | tee "$RUNNER_TEMP/xcodebuild-watch.log"
-
       # This builds the app and extension with warnings as errors. There's no separate analyze build: the sources
       # are all Swift, which the Clang static analyzer doesn't check.
       - name: Test on simulator
@@ -231,6 +214,55 @@ jobs:
           check_coverage EnteLoginFlow.swift 0.50
           check_coverage TokenResponseStore.swift 0.90
 
+      - name: Upload test results and logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: OrielOTP-test-results
+          path: |
+            ${{ runner.temp }}/OrielOTP.xcresult
+            ${{ runner.temp }}/resolve-packages.log
+            ${{ runner.temp }}/xcodebuild-test.log
+            ${{ runner.temp }}/test-summary.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # The watch build and the Mac tests run on a second runner, at the same time as the simulator tests.
+  test-macos:
+    name: Build watch app and test on macOS
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: xcode-27
+    timeout-minutes: 45
+    env:
+      GIT_CONFIG_COUNT: 1
+      GIT_CONFIG_KEY_0: init.defaultBranch
+      GIT_CONFIG_VALUE_0: main
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
+
+      # The iPhone app embeds the watch app, so the simulator test build builds it too. This builds it on its own
+      # so a watchOS-only failure is reported as such.
+      - name: Build watch app
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project OrielOTP.xcodeproj \
+            -scheme OrielOTPWatch \
+            -destination "generic/platform=watchOS Simulator" \
+            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -skipPackageUpdates \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-watch.log"
+
       # CI has no provisioning profile, so the Mac build is signed ad hoc without the keychain access group, which
       # needs one. The keychain tests skip themselves without it.
       - name: Test on macOS
@@ -260,21 +292,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: OrielOTP-test-results
+          name: OrielOTP-macOS-test-results
           path: |
-            ${{ runner.temp }}/OrielOTP.xcresult
             ${{ runner.temp }}/resolve-packages.log
             ${{ runner.temp }}/xcodebuild-watch.log
-            ${{ runner.temp }}/xcodebuild-test.log
             ${{ runner.temp }}/OrielOTP-macOS.xcresult
             ${{ runner.temp }}/xcodebuild-test-macos.log
-            ${{ runner.temp }}/test-summary.json
           if-no-files-found: ignore
           retention-days: 7
 
   # The required status check. It always runs, so a skipped or failed job above can't leave it missing or passing.
   build:
-    needs: [changes, dependency-review, test]
+    needs: [changes, dependency-review, test, test-macos]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -284,9 +313,18 @@ jobs:
           CHANGES: ${{ needs.changes.result }}
           CODE: ${{ needs.changes.outputs.code }}
           DEPENDENCY_REVIEW: ${{ needs.dependency-review.result }}
-          TEST: ${{ needs.test.result }}
+          TEST_IOS: ${{ needs.test.result }}
+          TEST_MACOS: ${{ needs.test-macos.result }}
         run: |
           set -euo pipefail
+          # Both test jobs run or skip together.
+          if [[ "$TEST_IOS" == success && "$TEST_MACOS" == success ]]; then
+            TEST=success
+          elif [[ "$TEST_IOS" == skipped && "$TEST_MACOS" == skipped ]]; then
+            TEST=skipped
+          else
+            TEST="iOS $TEST_IOS, macOS $TEST_MACOS"
+          fi
           echo "changes: $CHANGES (code: ${CODE:-unknown}); dependency-review: $DEPENDENCY_REVIEW; test: $TEST"
           [[ "$CHANGES" == success ]] || { echo "::error::Checking the changed files failed."; exit 1; }
           if [[ "$GITHUB_EVENT_NAME" == pull_request && "$DEPENDENCY_REVIEW" != success ]]; then

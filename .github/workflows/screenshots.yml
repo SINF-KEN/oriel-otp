@@ -34,11 +34,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The iPhone and Mac screenshots are taken on two runners at the same time.
   screenshots:
+    name: screenshots
     runs-on: xcode-27
     timeout-minutes: 45
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v7
       - name: Resolve Swift packages
@@ -50,11 +50,6 @@ jobs:
           SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
           RESULT_BUNDLE_PATH: ${{ runner.temp }}/results/Screenshots.xcresult
         run: tools/screenshots.sh
-      - name: Take Mac screenshots
-        env:
-          SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
-          RESULT_BUNDLE_PATH: ${{ runner.temp }}/results/MacScreenshots.xcresult
-        run: tools/screenshots-macos.sh
       # The result bundles have the failing test's log and a screenshot of where it stopped.
       - name: Upload test results
         if: failure()
@@ -62,16 +57,61 @@ jobs:
         with:
           name: screenshot-test-results
           path: ${{ runner.temp }}/results
+      # The script only rewrites screenshots whose bytes changed, and it never touches the Mac or watch ones.
       - name: Upload screenshots
-        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v7
         with:
-          name: screenshots
+          name: screenshots-ios
+          path: |
+            docs/screenshots/*.png
+            !docs/screenshots/mac-*.png
+            !docs/screenshots/watch-*.png
+
+  mac-screenshots:
+    name: Mac screenshots
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
+      - name: Take Mac screenshots
+        env:
+          SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
+          RESULT_BUNDLE_PATH: ${{ runner.temp }}/results/MacScreenshots.xcresult
+        run: tools/screenshots-macos.sh
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mac-screenshot-test-results
+          path: ${{ runner.temp }}/results
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshots-macos
+          path: docs/screenshots/mac-*.png
+
+  # On main, changed screenshots are pushed to the bot/screenshots branch.
+  push-screenshots:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [screenshots, mac-screenshots]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download screenshots
+        uses: actions/download-artifact@v8
+        with:
+          pattern: screenshots-*
           path: docs/screenshots
+          merge-multiple: true
       - name: Push changed screenshots
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         run: |
-          # The script only rewrites screenshots whose bytes changed, so this is empty unless the UI did.
           if [[ -z "$(git status --porcelain docs/screenshots)" ]]; then
             echo "Screenshots are up to date" >> "$GITHUB_STEP_SUMMARY"
             exit 0
