@@ -37,15 +37,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: github/codeql-action/init@v4
-        with:
-          languages: ${{ matrix.language }}
-          build-mode: ${{ matrix.build-mode }}
-
+      # Resolve packages before init: CodeQL's build tracer breaks SwiftPM's sandboxed resolution.
       - name: Resolve Swift packages
         if: matrix.language == 'swift'
         id: packages
         uses: ./.github/actions/swift-packages
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
 
       # The iPhone app embeds the watch app and token extension, so one build covers all the Swift targets.
       - name: Build for CodeQL
