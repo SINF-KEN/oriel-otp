@@ -16,7 +16,7 @@
 
 import CoreGraphics
 import Testing
-@testable import Authenticator
+@testable import OrielOTP
 
 struct LargestClearRectTests {
 

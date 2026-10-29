@@ -5,7 +5,7 @@ The Mac version is being built in steps, following the checklist in
 
 ## Approach: a native macOS destination
 
-The `Authenticator` target builds for macOS as well as iOS (`SUPPORTED_PLATFORMS = "iphoneos iphonesimulator
+The `OrielOTP` target builds for macOS as well as iOS (`SUPPORTED_PLATFORMS = "iphoneos iphonesimulator
 macosx"`), with macOS 14 as the minimum. It's the same SwiftUI app, compiled against AppKit instead of UIKit.
 
 The alternatives were Mac Catalyst and running the iPad app on Apple silicon ("Designed for iPad"). The native

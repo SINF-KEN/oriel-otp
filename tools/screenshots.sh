@@ -50,7 +50,7 @@ if [[ -n "${SOURCE_PACKAGES_DIR:-}" ]]; then
 fi
 # xcodebuild passes TEST_RUNNER_ variables to the test without the prefix.
 TEST_RUNNER_SCREENSHOT_DIR="$work/screenshots" xcodebuild test \
-    -project Authenticator.xcodeproj -scheme Screenshots -destination "id=$udid" \
+    -project OrielOTP.xcodeproj -scheme Screenshots -destination "id=$udid" \
     -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} | "${formatter[@]}"
 
 mkdir -p "$output"
