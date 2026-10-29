@@ -374,6 +374,15 @@ struct EnteVaultTests {
         #expect(cloud.hasPendingChanges)
     }
 
+    @Test func settingWhatIsAlreadyThereUploadsNothing() throws {
+        // Not in Ente Auth's own format, so any edit would rewrite it.
+        let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"])
+        let id = try #require(cloud.accounts.first).id
+        cloud.setPinned(id, false)
+        cloud.rename(id, issuer: "GitHub", accountName: "alice")
+        #expect(!cloud.hasPendingChanges)
+    }
+
     @Test func sortsTheAccountsByName() throws {
         let cloud = try cloud(with: ["otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP"])
         let model = MainViewModel(cloud: cloud)

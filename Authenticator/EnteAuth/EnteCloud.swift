@@ -329,11 +329,17 @@ import YubiKit
     }
 
     func rename(_ id: String, issuer: String, accountName: String) {
+        guard let code = code(of: id), (code.issuer ?? "", code.accountName) != (issuer, accountName) else { return }
         edit(id) { $0.rename(issuer: issuer, accountName: accountName) }
     }
 
     func setPinned(_ id: String, _ isPinned: Bool) {
+        guard let code = code(of: id), code.isPinned != isPinned else { return }
         edit(id) { $0.isPinned = isPinned }
+    }
+
+    private func code(of id: String) -> EnteCloudCode? {
+        vault?.items.first { $0.id == id }?.rawData.flatMap(EnteCloudCode.init(rawData:))
     }
 
     /// Moves the account to Ente's trash, like deleting it in Ente Auth does. Ente Auth can restore it or delete it
@@ -344,8 +350,7 @@ import YubiKit
 
     /// Returns the next HOTP code and moves the counter on, on all devices.
     func nextHOTPCode(_ id: String) -> String? {
-        guard let rawData = vault?.items.first(where: { $0.id == id })?.rawData, let code = EnteCloudCode(rawData: rawData),
-              code.kind == .hotp else { return nil }
+        guard let code = code(of: id), code.kind == .hotp else { return nil }
         edit(id) { $0.counter = code.counter + 1 }
         return code.hotpCode()
     }
