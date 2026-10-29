@@ -24,9 +24,26 @@ Ente Auth data is end-to-end encrypted on Ente's service. The app downloads and 
 
 Staying signed in is optional. If enabled, the app stores an Ente session token and authenticator key in the device keychain, protected by the current Face ID or Touch ID enrollment. It also stores the account email in local app preferences so the saved session can be identified. If you enter a self-hosted server address, it is saved in local app preferences and remains after sign-out. The app never stores your Ente password.
 
+## Optional Apple Watch app
+
+The Apple Watch app is off until you turn on **Show Ente Auth accounts on Apple Watch** under **Sync from Ente Auth**,
+which needs a saved Ente session. When it's on, the iPhone app sends your time-based Ente Auth accounts, including
+their secrets, to your paired Apple Watch with Apple's WatchConnectivity framework each time they are synced from
+Ente. Counter-based (HOTP) accounts are not sent.
+
+This is different from the YubiKey: the watch keeps a copy of these secrets so it can calculate codes without the
+iPhone. They are stored in the watch's keychain, readable only while the watch is unlocked and not synced to iCloud.
+WatchConnectivity also keeps the most recent list that was sent on the iPhone and the watch until it is replaced.
+The watch app makes no network connections and doesn't store anything else.
+
+Turning the switch off, or signing out of Ente, sends an empty list that replaces the previous one and makes the
+watch delete its copy. If the watch can't be reached at that moment, the iPhone sends it the next time it can.
+
 ## Retention, deletion, and revoking access
 
 - To remove a saved Ente session from this device and sign out, open **Sync from Ente Auth** and choose **Sign out**. This clears the locally saved token, key, and email and asks Ente to end the server session. If the server cannot be reached, the local session is still removed; you may also revoke the session from your Ente account.
+- To remove the Ente Auth accounts from your Apple Watch, turn off **Show Ente Auth accounts on Apple Watch** or sign
+  out of Ente. Deleting the watch app also removes them.
 - To remove a saved YubiKey password from this device, use **Clear saved passwords** in the YubiKey settings.
 - To remove a smart card certificate from this device, tap the minus button next to it under **Smart card extension**.
 - OATH credentials copied to a YubiKey remain on that physical key until you remove them using the app or another compatible tool. Removing a credential from a YubiKey does not delete its source from Ente Auth.

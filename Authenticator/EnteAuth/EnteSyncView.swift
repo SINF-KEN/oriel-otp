@@ -126,13 +126,26 @@ struct EnteSyncView: View {
         .onAppear { focusedField = .email }
     }
 
-    private func savedSessionSection(email: String) -> some View {
+    @ViewBuilder private func savedSessionSection(email: String) -> some View {
         Section {
             LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: email)
             Button(String(localized: "Sync accounts", comment: "Ente saved session sync button")) { model.useSavedSession() }
             Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
         } header: {
             Text(String(localized: "Signed in to Ente Auth", comment: "Ente saved session header"))
+        }
+        watchSection
+    }
+
+    /// Shown with a saved session when a watch with the app is paired, or while the switch is on so it can be turned off.
+    @ViewBuilder private var watchSection: some View {
+        if model.watch.isWatchAvailable || model.watch.isEnabled {
+            Section {
+                Toggle(String(localized: "Show Ente Auth accounts on Apple Watch", comment: "Ente sync Apple Watch toggle"),
+                       isOn: Binding(get: { model.watch.isEnabled }, set: { model.setShowsAccountsOnWatch($0) }))
+            } footer: {
+                Text(String(localized: "A copy of your time-based Ente Auth accounts is kept on your Apple Watch, so it can show codes without your iPhone. The accounts on the watch are updated each time you sync, and deleted when you turn this off or sign out.", comment: "Ente sync Apple Watch toggle footer"))
+            }
         }
     }
 
@@ -257,6 +270,9 @@ struct EnteSyncView: View {
                 LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: email)
             }
             Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
+        }
+        if model.isSessionSaved {
+            watchSection
         }
     }
 

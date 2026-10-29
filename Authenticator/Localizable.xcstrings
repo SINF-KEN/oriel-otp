@@ -481,6 +481,35 @@
         }
       }
     },
+    "A copy of your time-based Ente Auth accounts is kept on your Apple Watch, so it can show codes without your iPhone. The accounts on the watch are updated each time you sync, and deleted when you turn this off or sign out." : {
+      "comment" : "Ente sync Apple Watch toggle footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eine Kopie deiner zeitbasierten Ente Auth-Konten wird auf deiner Apple Watch gespeichert, damit sie Codes ohne dein iPhone anzeigen kann. Die Konten auf der Watch werden bei jeder Synchronisierung aktualisiert und gelöscht, wenn du dies ausschaltest oder dich abmeldest."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une copie de vos comptes Ente Auth basés sur le temps est conservée sur votre Apple Watch, pour qu’elle affiche les codes sans votre iPhone. Les comptes de la montre sont mis à jour à chaque synchronisation et supprimés quand vous désactivez cette option ou vous déconnectez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "時間ベースの Ente Auth アカウントのコピーが Apple Watch に保存され、iPhone がなくてもコードを表示できます。ウォッチ上のアカウントは同期のたびに更新され、この設定をオフにするかログアウトすると削除されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kópia vašich časových účtov Ente Auth sa uloží v Apple Watch, aby mohli zobrazovať kódy aj bez iPhonu. Účty v hodinkách sa aktualizujú pri každej synchronizácii a vymažú sa, keď toto vypnete alebo sa odhlásite."
+          }
+        }
+      }
+    },
     "About" : {
       "comment" : "About navigation title",
       "localizations" : {
@@ -6693,6 +6722,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nastavenia"
+          }
+        }
+      }
+    },
+    "Show Ente Auth accounts on Apple Watch" : {
+      "comment" : "Ente sync Apple Watch toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente Auth-Konten auf der Apple Watch zeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Afficher les comptes Ente Auth sur l’Apple Watch"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Apple Watch に Ente Auth のアカウントを表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zobraziť účty Ente Auth na Apple Watch"
           }
         }
       }

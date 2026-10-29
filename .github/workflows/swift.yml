@@ -36,7 +36,14 @@ jobs:
           license-check: false
 
       - name: Lint new Swift code
-        run: xcrun swift-format lint --configuration .swift-format --strict Authenticator/Model/TokenResponseStore.swift AuthenticatorTests/EnteAuth/CIBehaviorTests.swift
+        run: |
+          xcrun swift-format lint --configuration .swift-format --strict \
+            Authenticator/Model/TokenResponseStore.swift \
+            AuthenticatorTests/EnteAuth/CIBehaviorTests.swift \
+            AuthenticatorTests/EnteAuth/OTPGeneratorTests.swift \
+            Authenticator/EnteAuth/WatchAccountSync.swift \
+            Shared/*.swift \
+            OrielOTPWatch/*.swift
 
       - name: Validate project metadata
         run: |
@@ -47,12 +54,14 @@ jobs:
             Authenticator/Authenticator.entitlements \
             AuthenticatorTests/Info.plist \
             TokenExtension/Info.plist \
-            TokenExtension/TokenExtension.entitlements
+            TokenExtension/TokenExtension.entitlements \
+            OrielOTPWatch/PrivacyInfo.xcprivacy
           xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/Authenticator.xcscheme
+          xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/OrielOTPWatch.xcscheme
           jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version == null or (.state.version | length > 0)) and (.state.revision | length == 40))' \
             Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
-          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
-          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 6
+          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 8
+          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 8
 
       - name: Select simulator
         id: simulator
@@ -126,6 +135,22 @@ jobs:
             -disableAutomaticPackageResolution \
             -onlyUsePackageVersionsFromResolvedFile \
             2>&1 | tee "$RUNNER_TEMP/resolve-packages.log"
+
+      # The iPhone app embeds the watch app, so the test build below builds it too. This step builds it on its
+      # own first so a watchOS-only failure is reported as such.
+      - name: Build watch app
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+          xcodebuild build \
+            -project Authenticator.xcodeproj \
+            -scheme OrielOTPWatch \
+            -destination "generic/platform=watchOS Simulator" \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            CODE_SIGNING_ALLOWED=NO \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-watch.log"
 
       - name: Analyze app and extension
         timeout-minutes: 10
@@ -201,6 +226,7 @@ jobs:
           path: |
             ${{ runner.temp }}/Authenticator.xcresult
             ${{ runner.temp }}/resolve-packages.log
+            ${{ runner.temp }}/xcodebuild-watch.log
             ${{ runner.temp }}/xcodebuild-analyze.log
             ${{ runner.temp }}/xcodebuild-test.log
             ${{ runner.temp }}/test-summary.json

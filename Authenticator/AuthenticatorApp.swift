@@ -26,11 +26,12 @@ struct AuthenticatorApp: App {
     @State var notificationsViewModel = NotificationsViewModel()
     @State var mainViewModel = MainViewModel()
 
-    #if DEBUG && targetEnvironment(simulator)
     init() {
+        #if DEBUG && targetEnvironment(simulator)
         FakeEnteServer.install()
+        #endif
+        WatchAccountSync.shared.activate()
     }
-    #endif
     
     var body: some Scene {
         WindowGroup {

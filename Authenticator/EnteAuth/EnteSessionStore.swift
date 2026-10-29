@@ -80,6 +80,7 @@ struct EnteSessionStore {
                                                        authenticatorKey: saved.authenticatorKey)
         } catch EnteAuthenticatorSyncError.signedOut {
             remove()
+            WatchAccountSync.shared.disable()
             throw EnteAuthenticatorSyncError.signedOut
         }
     }

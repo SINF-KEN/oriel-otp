@@ -15,15 +15,18 @@ The app links to the same privacy policy and support page under **About**.
 
 ## Availability
 
-- iPhone and iPad only. "Designed for iPad" on Mac is turned off in the build settings
+- iPhone and iPad, with a companion Apple Watch app (watchOS 10 or later) embedded in the iPhone app. The watch app
+  needs the iPhone app (`WKRunsIndependentlyOfCompanionApp = NO`).
+- "Designed for iPad" on Mac is turned off in the build settings
   (`SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO`); also leave the app unavailable on Mac under
   **Pricing and Availability**.
 
 ## App Privacy
 
-Both privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/PrivacyInfo.xcprivacy`) declare no
-tracking and no collected data types. The only required-reason API is `UserDefaults`: `CA92.1` for the app's own
-settings, and `1C8F.1` for the app group the app shares with the smart card extension.
+The privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/PrivacyInfo.xcprivacy`,
+`OrielOTPWatch/PrivacyInfo.xcprivacy`) declare no tracking and no collected data types. The only required-reason API
+is `UserDefaults`: `CA92.1` for the app's own settings, and `1C8F.1` for the app group the app shares with the smart
+card extension. The watch app uses only the keychain and WatchConnectivity, so its manifest lists no APIs.
 
 Recommended App Store Connect answer, based on the developer's confirmation: **Data Not Collected**. Oriel OTP
 does not use analytics, advertising, crash reporting, diagnostics reporting, or a developer-operated server.
@@ -88,5 +91,12 @@ market app. Answer the questions in App Store Connect to match, and add the Fran
 > card extension. We can send a YubiKey on request.
 >
 > Ente demo account (no two-factor or email codes): email `…`, password `…`.
+>
+> Apple Watch: the watch app shows codes for the Ente Auth accounts only; it doesn't use the YubiKey. To test it,
+> on the iPhone choose **Sync from Ente Auth** in the account list menu, turn on **Stay signed in**, sign in with
+> the demo account, then turn on **Show Ente Auth accounts on Apple Watch** (shown when a watch with the app is
+> paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
+> watch.
 
-Fill in the demo account and attach the video before submitting.
+Fill in the demo account and attach the video before submitting. Add watch screenshots (41 to 49 mm and Ultra) to
+the Apple Watch section of the listing.

@@ -26,6 +26,7 @@ The screenshots are taken from the app in the simulator, with made-up demo accou
   before a code is shown.
 - **Everyday use.** Search, pin favorites, copy codes, rename and delete accounts, Steam codes, and an optional
   password for the YubiKey's OATH application.
+- **Apple Watch.** Optionally shows the codes of your Ente Auth accounts on Apple Watch, without the iPhone nearby.
 - **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps
   and websites through iOS, in the same way as other smart cards.
 
@@ -34,6 +35,7 @@ The screenshots are taken from the app in the simulator, with made-up demo accou
 | | |
 | --- | --- |
 | System | iOS and iPadOS 17 or later, on iPhone and iPad |
+| Apple Watch | watchOS 10 or later, paired with an iPhone. Shows Ente Auth codes only; a watch can't reach a YubiKey |
 | YubiKey | A YubiKey with the OATH application, such as the YubiKey 5 Series. The Security Key Series and YubiKey Bio don't have it. |
 | NFC | On iPhone, by holding an NFC YubiKey (e.g. YubiKey 5 NFC) to the top of the phone |
 | USB-C | On iPhones and iPads with a USB-C port, e.g. with a YubiKey 5C NFC |
@@ -56,10 +58,26 @@ Everything is decrypted on the device. Your Ente password never leaves it, and b
 the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
 the sign in and decryption work.
 
+## Apple Watch
+
+The watch app shows codes for the time-based accounts in your Ente Auth vault (TOTP and Steam). It can't use a
+YubiKey, since watchOS gives apps no NFC, USB or smart card access, and it can't add, edit or delete accounts.
+
+To turn it on, stay signed in to Ente Auth on the iPhone (**Stay signed in**), then open **Sync from Ente Auth** and
+turn on **Show Ente Auth accounts on Apple Watch**. The switch is off by default and only appears when a watch with
+the app is paired. The accounts are sent to the watch right away and again each time you sync. Counter-based (HOTP)
+accounts are skipped, as the watch couldn't keep the counter in step with Ente.
+
+Unlike the YubiKey accounts, **this keeps a copy of the Ente secrets on the watch**, in its keychain, readable only
+while the watch is unlocked and never synced to iCloud. The watch calculates the codes itself, so it works without
+the iPhone. Turning the switch off or signing out of Ente deletes the accounts from the watch. Codes are hidden when
+you lower your wrist or the screen is in Always On, and there is no way to copy a code on the watch.
+
 ## Security and privacy
 
 - The app has no analytics or advertising and doesn't send your data to the developer.
 - OATH secrets live on the YubiKey. The app only writes them to the key when you add an account.
+- If you turn on Apple Watch, the watch keeps a copy of your time-based Ente Auth accounts. It's off by default.
 - A YubiKey password is only saved in the keychain if you choose to. Staying signed in to Ente Auth is optional,
   and the saved session is protected by Face ID, Touch ID or the device passcode.
 - The only network connections are to Ente's server, or your own, during an Ente Auth import or when you choose
