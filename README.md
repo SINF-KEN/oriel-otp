@@ -51,7 +51,7 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 | YubiKey | A YubiKey with the OATH application, such as the YubiKey 5 Series. The Security Key Series and YubiKey Bio don't have it. |
 | NFC | On iPhone, by holding an NFC YubiKey (e.g. YubiKey 5 NFC) to the top of the phone |
 | USB-C | On iPhones and iPads with a USB-C port, e.g. with a YubiKey 5C NFC |
-| Lightning | On iPhones and iPads with a Lightning port, with a YubiKey 5Ci |
+| Lightning | Not supported. iPhones with a Lightning port use NFC; iPads with a Lightning port can't reach a YubiKey |
 | Mac | Over USB only, with a USB-C or USB-A YubiKey, directly or through a hub or adapter |
 
 ## Ente Auth
@@ -90,7 +90,7 @@ the app is paired. The accounts are sent to the watch right away and again each 
 accounts are skipped, as the watch couldn't keep the counter in step with Ente.
 
 Unlike the YubiKey accounts, **this keeps a copy of the Ente secrets on the watch**, in its keychain, readable only
-while the watch is unlocked and never synced to iCloud. The watch calculates the codes itself, so it works without
+while the watch is unlocked and never synced to iCloud or included in backups. The watch calculates the codes itself, so it works without
 the iPhone. Turning the switch off or signing out of Ente deletes the accounts from the watch. Codes are hidden when
 you lower your wrist or the screen is in Always On, and there is no way to copy a code on the watch.
 

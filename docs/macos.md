@@ -128,7 +128,7 @@ and clear, down to 16 pt.
 ## Not in the Mac version
 
 - The smart card extension and its screens: macOS reads the YubiKey's PIV certificates with its own driver.
-- FIDO PIN and reset: they need NFC or Lightning on iOS, and YubiKit's FIDO over USB uses HID, which the Mac app
+- FIDO PIN and reset: they need NFC on iOS, and YubiKit's FIDO over USB uses HID, which the Mac app
   doesn't use yet.
 - NFC settings, NFC scanning and the Yubico OTP NFC link.
 - Alternate app icons.

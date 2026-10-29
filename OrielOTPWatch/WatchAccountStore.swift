@@ -83,7 +83,7 @@ nonisolated struct AccountKeychain: Sendable {
         guard let data = try? JSONEncoder().encode(accounts) else { return false }
         var item = baseQuery
         item[kSecValueData as String] = data
-        item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlocked
+        item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
         return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
     }
 
