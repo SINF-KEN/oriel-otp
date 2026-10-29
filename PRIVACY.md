@@ -34,7 +34,8 @@ their secrets, to your paired Apple Watch with Apple's WatchConnectivity framewo
 Ente. Counter-based (HOTP) accounts are not sent.
 
 This is different from the YubiKey: the watch keeps a copy of these secrets so it can calculate codes without the
-iPhone. They are stored in the watch's keychain, readable only while the watch is unlocked and not synced to iCloud.
+iPhone. They are stored in the watch's keychain, readable only while the watch is unlocked, and not synced to iCloud or
+included in backups.
 WatchConnectivity also keeps the most recent list that was sent on the iPhone and the watch until it is replaced.
 The watch app makes no network connections and doesn't store anything else.
 
