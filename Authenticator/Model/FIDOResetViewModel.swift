@@ -25,17 +25,11 @@ import YubiKit
     var state: ResetState = .ready
     
     enum ResetState: Equatable {
-        case ready, waitingForKeyRemove, waitingForKeyReinsert, waitingForKeyTouch, success, error(Error)
+        case ready, success, error(Error)
         
         static func == (lhs: FIDOResetViewModel.ResetState, rhs: FIDOResetViewModel.ResetState) -> Bool {
             switch (lhs, rhs) {
             case (.ready, .ready):
-                return true
-            case (.waitingForKeyRemove, .waitingForKeyRemove):
-                return true
-            case (.waitingForKeyReinsert, .waitingForKeyReinsert):
-                return true
-            case (.waitingForKeyTouch, .waitingForKeyTouch):
                 return true
             case (.success, .success):
                 return true
@@ -57,7 +51,6 @@ import YubiKit
     }
     
     @ObservationIgnored private var resetTask: Task<Void, Never>?
-    @ObservationIgnored private var timeoutTask: Task<Void, Never>?
 
     func reset() {
         resetTask = Task {
@@ -69,8 +62,6 @@ import YubiKit
                 #if os(iOS)
                 case let connection as NFCSmartCardConnection:
                     await resetNFC(connection: connection)
-                case is LightningSmartCardConnection:
-                    await resetLightning(connection: connection)
                 #endif
                 default:
                     state = .error(String(localized: "Unknown error"))
@@ -85,18 +76,6 @@ import YubiKit
 
     func cancelReset() {
         resetTask?.cancel()
-        timeoutTask?.cancel()
-        ConnectionManager.shared.restartWiredConnection()
-    }
-
-    private func restartTimeout() {
-        timeoutTask?.cancel()
-        timeoutTask = Task {
-            try? await Task.sleep(for: .seconds(10))
-            guard !Task.isCancelled else { return }
-            resetTask?.cancel()
-            state = .error(FidoViewModelError.timeout)
-        }
     }
 
     init() {
@@ -127,52 +106,3 @@ extension FIDOResetViewModel {
 }
 #endif
 
-
-extension FIDOResetViewModel {
-    /// Over Lightning the reset has to be sent within a few seconds of the YubiKey being inserted, so the user
-    /// removes and reinserts it first.
-    private func resetLightning(connection: SmartCardConnection) async {
-        do {
-            let version = try await connection.managementSession().version
-            guard version < Version("5.7.0")! || version > Version("5.7.2")! else {
-                state = .error(FidoViewModelError.notSupportedOverLightning)
-                return
-            }
-            _ = try await connection.fido2Session()
-        } catch {
-            state = .error(error)
-            return
-        }
-
-        restartTimeout()
-        state = .waitingForKeyRemove
-
-        // Subscribing keeps other screens from using the YubiKey when it's reinserted.
-        var wasRemoved = ConnectionManager.shared.wiredConnection == nil
-        if wasRemoved {
-            state = .waitingForKeyReinsert
-        }
-        for await connection in ConnectionManager.shared.wiredConnections() {
-            guard let connection else {
-                wasRemoved = true
-                restartTimeout()
-                state = .waitingForKeyReinsert
-                continue
-            }
-            guard wasRemoved else { continue }
-            do {
-                let session = try await connection.fido2Session()
-                restartTimeout()
-                state = .waitingForKeyTouch
-                try await session.reset().value
-                timeoutTask?.cancel()
-                state = .success
-            } catch {
-                guard !Task.isCancelled else { return }
-                timeoutTask?.cancel()
-                state = .error(error)
-            }
-            return
-        }
-    }
-}
