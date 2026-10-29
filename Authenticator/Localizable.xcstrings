@@ -1,35 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    " " : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " "
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " "
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " "
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : " "
-          }
-        }
-      }
-    },
     " in this version" : {
       "comment" : "Substring in \"See what's new in this version\"",
       "localizations" : {
@@ -436,13 +407,13 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Saisissez votre nouveau PIN. Un PIN doit avoir au moins %llu caractères et peut inclure des lettres, chiffres et caractères spéciaux."
+            "value" : "Un code PIN doit comporter au moins %llu caractères et peut contenir des lettres, des chiffres et des caractères spéciaux."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "新しいPINを入力してください。PINは%llu文字以上にする必要があり、文字、数字、特殊文字を含めることができます。"
+            "value" : "PINは%llu文字以上にする必要があり、文字、数字、特殊文字を含めることができます。"
           }
         },
         "sk" : {
@@ -829,36 +800,6 @@
         }
       }
     },
-    "Activate NFC" : {
-      "comment" : "Password save type activate NFC",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NFC aktivieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activer NFC"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "NFCを有効化"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktivovať NFC"
-          }
-        }
-      }
-    },
     "Activate NFC on OTP tag read" : {
       "comment" : "NFC settings toggle",
       "localizations" : {
@@ -1000,36 +941,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pridať účet…"
-          }
-        }
-      }
-    },
-    "Add Credential" : {
-      "comment" : "Add account navigation title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentifizierungsdaten hinzufügen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter infos d'identification"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "資格情報を追加"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pridať poverenie"
           }
         }
       }
@@ -2811,20 +2722,20 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Decryption failed"
+            "state" : "translated",
+            "value" : "Entschlüsselung fehlgeschlagen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Decryption failed"
+            "state" : "translated",
+            "value" : "Échec du déchiffrement"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Decryption failed"
+            "state" : "translated",
+            "value" : "復号に失敗しました"
           }
         },
         "sk" : {
@@ -3146,36 +3057,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zakázanie funkcie Yubico OTP zabráni tomu, aby sa YubiKey zobrazoval ako klávesnica. Ak nepoužívate Yubico OTP, toto je odporúčané riešenie. Túto funkciu môžete znovu povoliť na stránke nastavení."
-          }
-        }
-      }
-    },
-    "Dismiss details view" : {
-      "comment" : "Accessibility hint",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Detailansicht verwerfen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fermer la vue détaillée"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "詳細ビューを閉じる"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zrušiť zobrazenie podrobností"
           }
         }
       }
@@ -4534,20 +4415,20 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Invalid decryption"
+            "state" : "translated",
+            "value" : "Ungültige Entschlüsselung"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Invalid decryption"
+            "state" : "translated",
+            "value" : "Déchiffrement non valide"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Invalid decryption"
+            "state" : "translated",
+            "value" : "無効な復号"
           }
         },
         "sk" : {
@@ -4871,35 +4752,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spravovať heslo"
-          }
-        }
-      }
-    },
-    "Menu" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menü"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Menu"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メニュー"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ponuka"
           }
         }
       }
@@ -7603,66 +7455,6 @@
         }
       }
     },
-    "Save Password" : {
-      "comment" : "Password entry save password button",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Passwort speichern"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistrer mot de passe"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パスワードを保存"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uložiť heslo"
-          }
-        }
-      }
-    },
-    "Save and protect with" : {
-      "comment" : "Password entry save substring in 'Save and protect with [save type]'",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speichern und schützen mit"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistrer et protéger avec"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "を使用して保存および保護"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uložiť a chrániť pomocou"
-          }
-        }
-      }
-    },
     "Save and protect with %@" : {
       "localizations" : {
         "de" : {
@@ -8820,20 +8612,20 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Successfully decrypted cipher data"
+            "state" : "translated",
+            "value" : "Verschlüsselte Daten erfolgreich entschlüsselt"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Successfully decrypted cipher data"
+            "state" : "translated",
+            "value" : "Données chiffrées déchiffrées avec succès"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Successfully decrypted cipher data"
+            "state" : "translated",
+            "value" : "暗号データを正常に復号しました"
           }
         },
         "sk" : {
@@ -9079,26 +8871,26 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The OATH application is disabled or not supported on this YubiKey."
+            "state" : "translated",
+            "value" : "Die OATH-Anwendung ist auf diesem YubiKey deaktiviert oder wird nicht unterstützt."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The OATH application is disabled or not supported on this YubiKey."
+            "state" : "translated",
+            "value" : "L'application OATH est désactivée ou non prise en charge sur cette YubiKey."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The OATH application is disabled or not supported on this YubiKey."
+            "state" : "translated",
+            "value" : "このYubiKeyではOATHアプリケーションが無効になっているか、サポートされていません。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "The OATH application is disabled or not supported on this YubiKey."
+            "state" : "translated",
+            "value" : "Aplikácia OATH je na tomto YubiKey vypnutá alebo nie je podporovaná."
           }
         }
       }
@@ -10070,7 +9862,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "警告！これにより、すべてのU2FおよびFIDO2アカウントがパスキーを含めてYubiKeyから削除されます。削除は取り消すことができません。"
+            "value" : "これにより、パスキーを含むすべてのU2FおよびFIDO2アカウントがYubiKeyから削除されます。削除は取り消すことができません。"
           }
         },
         "sk" : {
@@ -10869,7 +10661,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "パスワードの確認"
+            "value" : "確認"
           }
         },
         "sk" : {
@@ -11138,36 +10930,6 @@
         }
       }
     },
-    "Would you like to save this password for YubiKey for next usage in this application?" : {
-      "comment" : "Password entry save password title",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Möchtest Du das Passwort für Deinen YubiKey für die nächste Verwendung in dieser Anwendung speichern?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Souhaitez-vous enregistrer ce mot de passe pour la YubiKey afin de l'utiliser lors de la prochaine utilisation dans cette application ?"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKeyのこのパスワードを保存して、このアプリケーションで次回使用しますか？"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chcete toto heslo pre YubiKey uložiť na ďalšie použitie v tejto aplikácii?"
-          }
-        }
-      }
-    },
     "Wrong PIN code" : {
       "comment" : "PIV extension wrong pin",
       "localizations" : {
@@ -11250,36 +11012,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nesprávne heslo"
-          }
-        }
-      }
-    },
-    "You can remove saved password in Settings." : {
-      "comment" : "Password entry save password message",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kannst das gespeicherte Passwort in den Einstellungen entfernen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous pouvez supprimer le mot de passe enregistré dans les paramètres."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保存されたパスワードは設定で削除できます。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uložené heslo môžete odstrániť v Nastaveniach."
           }
         }
       }
@@ -11944,7 +11676,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "-"
+            "value" : "•"
           }
         },
         "fr" : {

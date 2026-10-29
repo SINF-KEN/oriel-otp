@@ -13,7 +13,7 @@
 	<key>CFBundleDisplayName</key>
 	<string>Oriel OTP</string>
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>Oriel OTP</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

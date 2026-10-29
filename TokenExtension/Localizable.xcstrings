@@ -33,20 +33,20 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Tap here to complete the decryption request using your YubiKey."
+            "state" : "translated",
+            "value" : "Tippe hier, um die Entschlüsselungsanfrage mit Deinem YubiKey abzuschließen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Tap here to complete the decryption request using your YubiKey."
+            "state" : "translated",
+            "value" : "Appuyez ici pour finaliser la demande de déchiffrement avec votre YubiKey."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
-            "value" : "Tap here to complete the decryption request using your YubiKey."
+            "state" : "translated",
+            "value" : "ここをタップし、YubiKeyを使用して復号リクエストを完了します。"
           }
         },
         "sk" : {
