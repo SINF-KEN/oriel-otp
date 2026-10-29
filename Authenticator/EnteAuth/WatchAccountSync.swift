@@ -15,13 +15,17 @@
  */
 
 import Foundation
+#if os(iOS)
 import WatchConnectivity
+#endif
 
 /// Sends the Ente Auth accounts to the Apple Watch app, which keeps them and calculates the codes itself.
 ///
 /// Opt in: nothing is sent until the user turns on **Show Ente Auth accounts on Apple Watch**. The accounts are sent
 /// whenever they are synced from Ente with the saved session. Turning it off or signing out of Ente sends an empty
 /// list, which makes the watch delete everything.
+///
+/// The Mac has no Apple Watch connection, so there a watch is never available and nothing is sent.
 @Observable final class WatchAccountSync: NSObject {
 
     static let shared = WatchAccountSync()
@@ -33,20 +37,32 @@ import WatchConnectivity
     private(set) var isWatchAvailable = false
     private(set) var isEnabled: Bool
 
+    #if os(iOS)
     @ObservationIgnored private let session: WCSession?
+    #endif
     @ObservationIgnored private let defaults: UserDefaults
 
+    #if os(iOS)
     init(session: WCSession? = WCSession.isSupported() ? .default : nil, defaults: UserDefaults = .standard) {
         self.session = session
         self.defaults = defaults
         self.isEnabled = defaults.bool(forKey: Self.enabledKey)
         super.init()
     }
+    #else
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        self.isEnabled = defaults.bool(forKey: Self.enabledKey)
+        super.init()
+    }
+    #endif
 
     func activate() {
+        #if os(iOS)
         guard let session, session.delegate == nil else { return }
         session.delegate = self
         session.activate()
+        #endif
     }
 
     func enable() {
@@ -85,6 +101,7 @@ import WatchConnectivity
     }
 
     @discardableResult private func update(_ accounts: [OTPAccount]) -> Bool {
+        #if os(iOS)
         guard let session, session.activationState == .activated, session.isPaired, session.isWatchAppInstalled else { return false }
         do {
             try session.updateApplicationContext(try WatchAccountsMessage.context(for: accounts))
@@ -92,8 +109,12 @@ import WatchConnectivity
         } catch {
             return false
         }
+        #else
+        return false
+        #endif
     }
 
+    #if os(iOS)
     private func sessionStateChanged() {
         guard let session else { return }
         isWatchAvailable = session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
@@ -101,8 +122,10 @@ import WatchConnectivity
             defaults.removeObject(forKey: Self.pendingClearKey)
         }
     }
+    #endif
 }
 
+#if os(iOS)
 extension WatchAccountSync: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -122,3 +145,4 @@ extension WatchAccountSync: WCSessionDelegate {
         session.activate()
     }
 }
+#endif

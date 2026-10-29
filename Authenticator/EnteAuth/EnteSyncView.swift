@@ -60,6 +60,9 @@ struct EnteSyncView: View {
             }
             .formStyle(.grouped)
             .disabled(model.isBusy)
+            #if os(macOS)
+            .frame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+            #endif
             .navigationTitle(String(localized: "Ente Auth", comment: "Ente sync navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -117,7 +120,11 @@ struct EnteSyncView: View {
                 Text(String(localized: "Options", comment: "Ente sign in options header"))
             } footer: {
                 if model.canSaveSession {
+                    #if os(macOS)
+                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password.", comment: "Mac Ente sign in options footer"))
+                    #else
                     Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Face ID or Touch ID, so you can sync again without your password.", comment: "Ente sign in options footer"))
+                    #endif
                 } else {
                     Text(String(localized: "Leave the server empty unless you host Ente yourself.", comment: "Ente sign in options footer without stay signed in"))
                 }
@@ -343,8 +350,18 @@ private struct EnteCodeRow: View {
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                 }
+                #if os(macOS)
+                Spacer(minLength: 0)
+                #endif
             }
+            #if os(macOS)
+            .contentShape(Rectangle())
+            #endif
         }
+        #if os(macOS)
+        // A whole row that toggles, rather than a bordered push button.
+        .buttonStyle(.plain)
+        #endif
         .disabled(code.template == nil)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }

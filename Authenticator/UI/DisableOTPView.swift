@@ -56,7 +56,7 @@ struct DisableOTPView: View {
                 Spacer()
             }
             .padding(30)
-            .accentColor(Color(UIColor.yubiBlue))
+            .accentColor(Color(.yubiBlue))
             .task {
                 model.checkConfigurationLocked()
                 while !Task.isCancelled {

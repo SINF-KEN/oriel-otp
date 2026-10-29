@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+#if os(iOS)
 import UIKit
+#endif
 import AppIntents
 
 /// What the app can be asked to do from outside it: Home Screen quick actions, Siri and Shortcuts.
@@ -22,6 +24,7 @@ enum QuickAction: String {
     case scanNFC = "io.github.sinf-ken.OrielOTP.scan-nfc"
     case addAccount = "io.github.sinf-ken.OrielOTP.add-account"
 
+    #if os(iOS)
     /// The Home Screen quick actions this device can do.
     @MainActor static var shortcutItems: [UIApplicationShortcutItem] {
         var items = [UIApplicationShortcutItem]()
@@ -37,6 +40,7 @@ enum QuickAction: String {
                                                icon: UIApplicationShortcutIcon(systemImageName: "plus")))
         return items
     }
+    #endif
 }
 
 /// Holds the latest quick action until the main view is active and can do it.
@@ -45,6 +49,7 @@ enum QuickAction: String {
     var pending: QuickAction?
 }
 
+#if os(iOS)
 final class AppDelegate: NSObject, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
@@ -93,3 +98,4 @@ struct OrielOTPShortcuts: AppShortcutsProvider {
                     systemImageName: "wave.3.right")
     }
 }
+#endif

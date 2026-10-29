@@ -74,7 +74,7 @@ struct CloseButton: View {
     let action: () -> Void
 
     var body: some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             Button(role: .close, action: action)
         } else {
             Button(String(localized: "Close"), action: action)
@@ -86,7 +86,7 @@ struct CancelButton: View {
     let action: () -> Void
 
     var body: some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             Button(role: .cancel, action: action)
         } else {
             Button(String(localized: "Cancel"), role: .cancel, action: action)
@@ -104,7 +104,7 @@ struct ConfirmButton: View {
     }
 
     var body: some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             Button(title, role: .confirm, action: action)
         } else {
             Button(title, action: action)
@@ -122,6 +122,7 @@ extension View {
 struct ReservedRegionAvoidingModifier: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
+        #if os(iOS)
         if #available(iOS 27.1, *) {
             GeometryReader { proxy in
                 let regions = proxy.reservedRegions(kind: .division) + proxy.reservedRegions(kind: .occlusion)
@@ -134,13 +135,17 @@ struct ReservedRegionAvoidingModifier: ViewModifier {
         } else {
             content
         }
+        #else
+        // Mac windows have no reserved regions.
+        content
+        #endif
     }
 }
 
 // The filled and plain action buttons of the Yubico OTP screens, in glass on iOS 26 and later.
 extension View {
     @ViewBuilder func prominentActionButtonStyle() -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             buttonStyle(.glassProminent)
         } else {
             buttonStyle(.borderedProminent)
@@ -148,7 +153,7 @@ extension View {
     }
 
     @ViewBuilder func secondaryActionButtonStyle() -> some View {
-        if #available(iOS 26.0, *) {
+        if #available(iOS 26.0, macOS 26.0, *) {
             buttonStyle(.glass)
         } else {
             buttonStyle(.bordered)
