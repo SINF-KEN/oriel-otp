@@ -22,7 +22,8 @@ import Testing
 @testable import OrielOTP
 
 /// Signs in on the sign in screen's view model against the fake Ente server, checking the password doesn't stay behind.
-@MainActor struct EnteSyncViewModelSignInTests {
+/// Serialized as the request log is shared.
+@Suite(.serialized) @MainActor struct EnteSyncViewModelSignInTests {
 
     private func model(protocols: [AnyClass] = [FakeEnteServer.self]) -> EnteSyncViewModel {
         let configuration = URLSessionConfiguration.ephemeral
@@ -64,16 +65,48 @@ import Testing
     }
 
     @Test func cancelWhileSigningInForgetsThePassword() async throws {
-        let model = model()
+        let log = RequestLog.Paths()
+        RequestLog.current = log
+        let model = model(protocols: [RequestLog.self, FakeEnteServer.self])
         model.email = "alice+mfa@example.com"
         model.password = FakeEnteServer.password
         model.signIn()
+        // Closes while the server is asked to send the email code, the flow holding the password comes after.
+        try await log.wait(for: "/users/ott")
         model.close()
-        #expect(model.password.isEmpty)
         try await finish(model)
         #expect(model.flow == nil)
         #expect(model.password.isEmpty)
         #expect(model.phase == .signIn)
+        #expect(model.error == nil)
+    }
+
+    @Test func cancelWhileReadingTheAuthenticatorKeyEndsTheSession() async throws {
+        let log = RequestLog.Paths()
+        RequestLog.current = log
+        let model = model(protocols: [RequestLog.self, FakeEnteServer.self])
+        model.email = "alice@example.com"
+        model.password = FakeEnteServer.password
+        model.signIn()
+        try await log.wait(for: "/authenticator/key")
+        model.close()
+        try await finish(model)
+        try await log.wait(for: "/users/logout")
+        #expect(model.signedInEmail == nil)
+        #expect(model.phase == .signIn)
+        #expect(model.error == nil)
+        #expect(!model.isSessionSaved)
+    }
+
+    @Test func wrongPasswordStopsDerivingKeys() async throws {
+        let model = model()
+        model.email = "alice@example.com"
+        model.password = "wrong"
+        model.signIn()
+        try await finish(model)
+        #expect(model.error != nil)
+        #expect(model.phase == .signIn)
+        #expect(!model.isDerivingKeys)
     }
 
     @Test func failingToSendTheEmailCodeForgetsThePassword() async throws {
@@ -106,6 +139,41 @@ import Testing
         #expect(model.password.isEmpty)
         #expect(!model.isDerivingKeys)
         model.close()
+    }
+}
+
+/// Notes the paths of the requests on their way to the fake server, which answers them.
+nonisolated private final class RequestLog: URLProtocol, @unchecked Sendable {
+
+    nonisolated(unsafe) static var current: RequestLog.Paths?
+
+    final class Paths: @unchecked Sendable {
+        private let lock = NSLock()
+        private var paths: Set<String> = []
+
+        func insert(_ path: String) {
+            lock.withLock { _ = paths.insert(path) }
+        }
+
+        func contains(_ path: String) -> Bool {
+            lock.withLock { paths.contains(path) }
+        }
+
+        func wait(for path: String) async throws {
+            // Signing in can take most of a minute on CI.
+            let deadline = ContinuousClock.now + .seconds(120)
+            while !contains(path) {
+                guard ContinuousClock.now < deadline else { throw URLError(.timedOut) }
+                try await Task.sleep(for: .milliseconds(5))
+            }
+        }
+    }
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        if let path = request.url?.path {
+            current?.insert(path)
+        }
+        return false
     }
 }
 
