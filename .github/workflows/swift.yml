@@ -213,9 +213,10 @@ jobs:
           set -euo pipefail
           RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
           # The name xccov reports for the app target can change (it's "Oriel OTP.app" once the target also builds
-          # for macOS), so pick the one .app target instead of matching its name.
+          # for macOS), and the embedded watch app is a .app target too, so pick the .app target with the app's
+          # TokenResponseStore.swift instead of matching its name.
           xcrun xccov view --report --json "$RESULT_BUNDLE" \
-            | jq -e '[.targets[] | select(.name | endswith(".app"))]
+            | jq -e '[.targets[] | select((.name | endswith(".app")) and any(.files[]; .name == "TokenResponseStore.swift"))]
               | if length == 1 then .[0] else error("Expected one .app target, found \(length)") end' \
             > "$RUNNER_TEMP/app-file-coverage.json"
           check_coverage() {
