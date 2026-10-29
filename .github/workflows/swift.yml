@@ -1,4 +1,4 @@
-name: AuthenticatorTests
+name: OrielOTPTests
 
 on:
   push:
@@ -90,7 +90,7 @@ jobs:
         run: |
           set -euo pipefail
           plutil -lint \
-            Authenticator.xcodeproj/project.pbxproj \
+            OrielOTP.xcodeproj/project.pbxproj \
             Authenticator/Info.plist \
             Authenticator/Info-macOS.plist \
             Authenticator/Authenticator.entitlements \
@@ -99,12 +99,12 @@ jobs:
             TokenExtension/Info.plist \
             TokenExtension/TokenExtension.entitlements \
             OrielOTPWatch/PrivacyInfo.xcprivacy
-          xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/Authenticator.xcscheme
-          xmllint --noout Authenticator.xcodeproj/xcshareddata/xcschemes/OrielOTPWatch.xcscheme
+          xmllint --noout OrielOTP.xcodeproj/xcshareddata/xcschemes/OrielOTP.xcscheme
+          xmllint --noout OrielOTP.xcodeproj/xcshareddata/xcschemes/OrielOTPWatch.xcscheme
           jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version == null or (.state.version | length > 0)) and (.state.revision | length == 40))' \
-            Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
-          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' Authenticator.xcodeproj/project.pbxproj)" -eq 8
-          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' Authenticator.xcodeproj/project.pbxproj)" -eq 8
+            OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
+          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 8
+          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 8
 
       - name: Select simulator
         id: simulator
@@ -161,7 +161,7 @@ jobs:
         run: |
           set -euo pipefail
           xcodebuild build \
-            -project Authenticator.xcodeproj \
+            -project OrielOTP.xcodeproj \
             -scheme OrielOTPWatch \
             -destination "generic/platform=watchOS Simulator" \
             -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
@@ -178,22 +178,22 @@ jobs:
         run: |
           set -euo pipefail
           xcodebuild test \
-            -project Authenticator.xcodeproj \
-            -scheme Authenticator \
+            -project OrielOTP.xcodeproj \
+            -scheme OrielOTP \
             -destination "id=${{ steps.simulator.outputs.id }}" \
             -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
             -disableAutomaticPackageResolution \
             -onlyUsePackageVersionsFromResolvedFile \
             -skipPackageUpdates \
             -enableCodeCoverage YES \
-            -resultBundlePath "$RUNNER_TEMP/Authenticator.xcresult" \
+            -resultBundlePath "$RUNNER_TEMP/OrielOTP.xcresult" \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test.log"
 
       - name: Summarize test results
         if: always()
         run: |
           set -euo pipefail
-          RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
+          RESULT_BUNDLE="$RUNNER_TEMP/OrielOTP.xcresult"
           if [ -d "$RESULT_BUNDLE" ]; then
             xcrun xcresulttool get test-results summary --path "$RESULT_BUNDLE" \
               | tee "$RUNNER_TEMP/test-summary.json" \
@@ -211,7 +211,7 @@ jobs:
         if: success()
         run: |
           set -euo pipefail
-          RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
+          RESULT_BUNDLE="$RUNNER_TEMP/OrielOTP.xcresult"
           # The name xccov reports for the app target can change (it's "Oriel OTP.app" once the target also builds
           # for macOS), and the embedded watch app is a .app target too, so pick the .app target with the app's
           # TokenResponseStore.swift instead of matching its name.
@@ -237,19 +237,19 @@ jobs:
         timeout-minutes: 20
         run: |
           set -euo pipefail
-          ENTITLEMENTS="$RUNNER_TEMP/Authenticator-macOS-CI.entitlements"
+          ENTITLEMENTS="$RUNNER_TEMP/OrielOTP-macOS-CI.entitlements"
           cp Authenticator/Authenticator-macOS.entitlements "$ENTITLEMENTS"
           /usr/libexec/PlistBuddy -c 'Delete :keychain-access-groups' "$ENTITLEMENTS"
           xcodebuild test \
-            -project Authenticator.xcodeproj \
-            -scheme Authenticator \
+            -project OrielOTP.xcodeproj \
+            -scheme OrielOTP \
             -destination 'platform=macOS' \
-            -only-testing:AuthenticatorTests \
+            -only-testing:OrielOTPTests \
             -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
             -disableAutomaticPackageResolution \
             -onlyUsePackageVersionsFromResolvedFile \
             -skipPackageUpdates \
-            -resultBundlePath "$RUNNER_TEMP/Authenticator-macOS.xcresult" \
+            -resultBundlePath "$RUNNER_TEMP/OrielOTP-macOS.xcresult" \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM= \
@@ -260,13 +260,13 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: Authenticator-test-results
+          name: OrielOTP-test-results
           path: |
-            ${{ runner.temp }}/Authenticator.xcresult
+            ${{ runner.temp }}/OrielOTP.xcresult
             ${{ runner.temp }}/resolve-packages.log
             ${{ runner.temp }}/xcodebuild-watch.log
             ${{ runner.temp }}/xcodebuild-test.log
-            ${{ runner.temp }}/Authenticator-macOS.xcresult
+            ${{ runner.temp }}/OrielOTP-macOS.xcresult
             ${{ runner.temp }}/xcodebuild-test-macos.log
             ${{ runner.temp }}/test-summary.json
           if-no-files-found: ignore
