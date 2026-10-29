@@ -91,8 +91,12 @@ Description:
 
 ## Export compliance
 
-`ITSAppUsesNonExemptEncryption` is `true`: the app uses standard algorithms (libsodium for Ente sync) in a mass
-market app. Answer the questions in App Store Connect to match, and add the France declaration if they ask for it.
+`ITSAppUsesNonExemptEncryption` is `false`. The app uses standard algorithms (libsodium for Ente sync), and App
+Store Connect's App Encryption Documentation questions, answered with standard algorithms and no distribution in
+France, need no documents. Apple then issues no compliance code, and an upload with the key set to `true` but no
+`ITSEncryptionExportComplianceCode` is rejected. Leave France out of the app's availability. To add it, upload the
+French encryption declaration under App Encryption Documentation and set the key to `true` with the code Apple
+gives.
 
 ## Review notes (draft)
 

@@ -79,3 +79,7 @@ fastlane/test_output
 # https://github.com/johnno1962/injectionforxcode
 
 iOSInjectionProject/
+
+# Local env files with personal data, such as the answers for the ANSSI declaration. Never commit them.
+.env
+.env.*
