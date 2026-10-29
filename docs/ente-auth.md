@@ -33,7 +33,8 @@ package read authenticator data.
 
 ## Reading accounts
 
-1. `GET /authenticator/key` returns the authenticator key, encrypted with the master key.
+1. `GET /authenticator/key` returns the authenticator key, encrypted with the master key. An account that has
+   never used Ente Auth has none (`404`) and so no accounts to read.
 2. `GET /authenticator/entity/diff` is paged from `sinceTime=0` and the latest version of each entity is kept.
    Deleted entities are dropped.
 3. Each entity is one XChaCha20-Poly1305 secretstream message. It decrypts to JSON: either a string with an
@@ -84,6 +85,12 @@ the keychain, only on this device (`WhenPasscodeSetThisDeviceOnly`). Reading the
 iPhone and iPad (`biometryCurrentSet`) and Touch ID or the Mac's password on the Mac (`userPresence`). After a
 relaunch, syncing only needs that unlock, not the Ente password. The password is never stored, and neither is the
 master key: the authenticator key is all syncing and adding accounts need.
+
+An account that has never used Ente Auth has no authenticator key yet. When the session is saved, signing in
+creates one like Ente Auth does, while the master key is still in memory: 32 random bytes, encrypted with the
+master key (secretbox) and stored with `POST /authenticator/key` (`encryptedKey`, `header` with the nonce). If
+another Ente app created the key in the meantime, the server answers `409` and that key is fetched and used. So a
+new account stays signed in too. Without **Stay signed in** no key is created.
 
 The email and server are kept in the app's preferences, so the account is shown without unlocking: in the sheet,
 and with **Sign out** in the settings (the YubiKey configuration on iPhone and iPad, Settings ▸ General on the

@@ -30,11 +30,25 @@ import SwiftUI
 /// SRP, which also gets an email code. Both codes are 123456. The passkey counts as verified from the second check. The accounts cover the cases the sync handles: an account that is also on the demo
 /// YubiKey, a Steam account, a '#' in a name, Ente's export format, one in Ente's trash, a deleted one and one the
 /// YubiKey can't store.
+///
+/// Each `*.new.ente.test` host is an account of its own that has never used Ente Auth: it has no authenticator key
+/// and no accounts until the app creates the key.
 nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
 
     static let server = URL(string: "https://demo.ente.test")!
     static let password = "demo"
     static let code = "123456"
+    private static let newAccountDomain = "new.ente.test"
+
+    /// A server with a new account that has never used Ente Auth.
+    static func newAccountServer() -> URL {
+        URL(string: "https://\(UUID().uuidString.lowercased()).\(newAccountDomain)")!
+    }
+
+    /// Whether the account at `server` has an authenticator key.
+    static func hasAuthenticatorKey(_ server: URL) -> Bool {
+        FakeEnteAccount.account(for: server.host ?? "").hasAuthenticatorKey
+    }
 
     /// Routes requests to the demo server here and preselects it on the sign in screen.
     static func install() {
@@ -45,7 +59,8 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
-        request.url?.host == server.host
+        guard let host = request.url?.host else { return false }
+        return host == server.host || host.hasSuffix("." + newAccountDomain)
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -55,7 +70,7 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     override func startLoading() {
         let request = request
         DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) { [self] in
-            let (status, json) = FakeEnteAccount.shared.respond(to: request)
+            let (status, json) = FakeEnteAccount.account(for: request.url?.host ?? "").respond(to: request)
             let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1",
                                            headerFields: ["Content-Type": "application/json"])!
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
@@ -67,10 +82,20 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     override func stopLoading() {}
 }
 
-/// The demo account and the server's state.
+/// An account on the demo server and its state.
 nonisolated private final class FakeEnteAccount: @unchecked Sendable {
 
-    static let shared = FakeEnteAccount()
+    private static let accountsLock = NSLock()
+    nonisolated(unsafe) private static var accounts: [String: FakeEnteAccount] = [:]
+
+    static func account(for host: String) -> FakeEnteAccount {
+        accountsLock.withLock {
+            if let account = accounts[host] { return account }
+            let account = FakeEnteAccount(usesEnteAuth: host == FakeEnteServer.server.host)
+            accounts[host] = account
+            return account
+        }
+    }
 
     private let lock = NSLock()
     private var sessions: [String: (srpUserID: String, A: BigUInt, b: BigUInt, B: BigUInt)] = [:]
@@ -88,10 +113,14 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     private let keyAttributes: [String: Any]
     private let encryptedToken: String
     private let token: String
-    private let authenticatorKey: [String: Any]
+    private var authenticatorKey: [String: Any]?
     private let entities: [[String: Any]]
 
-    private init() {
+    var hasAuthenticatorKey: Bool {
+        lock.withLock { authenticatorKey != nil }
+    }
+
+    private init(usesEnteAuth: Bool) {
         let keyEncryptionKey = try! EnteCrypto.deriveKeyEncryptionKey(password: FakeEnteServer.password, salt: kekSalt,
                                                                       opsLimit: opsLimit, memLimit: memLimit)
         loginKey = try! EnteCrypto.deriveLoginKey(keyEncryptionKey: keyEncryptionKey)
@@ -111,6 +140,11 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         token = tokenBytes.enteURLSafeBase64
         encryptedToken = try! EnteCrypto.sealedBox(tokenBytes, publicKey: publicKey).base64EncodedString()
 
+        guard usesEnteAuth else {
+            authenticatorKey = nil
+            entities = []
+            return
+        }
         let key = EnteCrypto.randomBytes(32)
         let encryptedAuthenticatorKey = try! EnteCrypto.secretBox(key, key: masterKey)
         authenticatorKey = ["encryptedKey": encryptedAuthenticatorKey.cipherText.base64EncodedString(),
@@ -160,7 +194,14 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             passkeySessions[sessionID] = nil
             return (200, signedIn())
         case ("GET", "/authenticator/key"):
-            return authorized ? (200, authenticatorKey) : (401, [:])
+            guard authorized else { return (401, [:]) }
+            return authenticatorKey.map { (200, $0) } ?? (404, [:])
+        case ("POST", "/authenticator/key"):
+            guard authorized else { return (401, [:]) }
+            guard authenticatorKey == nil else { return (409, [:]) }
+            guard let encryptedKey = body["encryptedKey"] as? String, let header = body["header"] as? String else { return (400, [:]) }
+            authenticatorKey = ["encryptedKey": encryptedKey, "header": header]
+            return (200, [:])
         case ("GET", "/authenticator/entity/diff"):
             guard authorized else { return (401, [:]) }
             let sinceTime = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?

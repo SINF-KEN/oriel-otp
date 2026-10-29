@@ -221,11 +221,15 @@ import YubiKit
             guard let flow, let keys = flow.keys, let api else { throw EnteLoginError.invalidAccountData }
             self.flow = nil
             defaults.set(server.isEmpty ? nil : server, forKey: Self.serverKey)
-            // Only the authenticator key is kept, the master key goes away with the flow.
-            let authenticatorKey = try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
+            let saveSession = staySignedIn && canSaveSession
+            // Only the authenticator key is kept, the master key goes away with the flow. An account that has never
+            // used Ente Auth gets its key now, while the master key is there, so it stays signed in too.
+            let authenticatorKey = saveSession
+                ? try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
+                : try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
             token = keys.token
             signedInEmail = flow.email
-            if staySignedIn, canSaveSession, let authenticatorKey {
+            if saveSession, let authenticatorKey {
                 try store.save(EnteSavedSession(server: api.server, email: flow.email, token: keys.token, authenticatorKey: authenticatorKey))
                 isSessionSaved = true
             } else {
