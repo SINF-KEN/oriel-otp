@@ -109,7 +109,7 @@ struct EnteSyncView: View {
                 if model.isDerivingKeys {
                     Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
                 } else {
-                    Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records.", comment: "Ente sign in footer"))
+                    Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too.", comment: "Ente sign in footer"))
                 }
             }
 
@@ -147,6 +147,8 @@ struct EnteSyncView: View {
             Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
         } header: {
             Text(String(localized: "Signed in to Ente Auth", comment: "Ente saved session header"))
+        } footer: {
+            Text(String(localized: "Your Ente Auth accounts are kept on this device, encrypted, and listed with your YubiKey's, so their codes work offline. They are synced with Ente when the app opens, after each change and when you refresh the list. Choose Sync accounts to pick ones to add to your YubiKey.", comment: "Ente saved session footer"))
         }
         watchSection
     }

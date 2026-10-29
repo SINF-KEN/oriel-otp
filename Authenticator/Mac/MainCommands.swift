@@ -196,9 +196,4 @@ enum AppWindow {
 // For the rename sheet.
 extension Account: Identifiable {}
 
-extension Account {
-    /// Renaming needs firmware 5.3 or later.
-    var canRename: Bool { keyVersion >= Version("5.3.0")! }
-}
-
 #endif

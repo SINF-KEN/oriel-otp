@@ -51,6 +51,16 @@ struct AccountDetailView: View {
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
+            if account.isInEnte || !model.cloudAccounts.isEmpty {
+                Label {
+                    Text(account.locationDescription)
+                } icon: {
+                    AccountLocationIcon(account: account)
+                        .accessibilityHidden(true)
+                }
+                .font(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
+            }
             Button(action: copyCode) {
                 HStack(spacing: 10) {
                     statusIcon
@@ -102,7 +112,7 @@ struct AccountDetailView: View {
                 .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
             }
             ToolbarItemGroup(placement: .secondaryAction) {
-                if account.keyVersion >= Version("5.3.0")! {
+                if account.canRename {
                     Button(action: { showEditing.toggle() }) {
                         Label(String(localized: "Rename", comment: "Menu"), systemImage: "square.and.pencil")
                     }
@@ -111,7 +121,8 @@ struct AccountDetailView: View {
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
-                .help(String(localized: "Delete the account from the YubiKey", comment: "Toolbar help"))
+                .help(account.isInEnte ? String(localized: "Move the account to the trash in Ente Auth", comment: "Toolbar help")
+                      : String(localized: "Delete the account from the YubiKey", comment: "Toolbar help"))
             }
         }
         .sheet(isPresented: $showEditing) {
@@ -125,7 +136,11 @@ struct AccountDetailView: View {
                 }
             }
         } message: {
-            Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
+            if account.isInEnte {
+                Text(String(localized: "This moves the account to the trash in Ente Auth on all your devices. You can restore it in the Ente Auth app.", comment: "Delete account alert for an account in Ente Auth"))
+            } else {
+                Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
+            }
         }
     }
 

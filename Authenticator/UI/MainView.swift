@@ -41,8 +41,10 @@ struct MainView: View {
     @State var selectedAccountID: String? = nil
     #endif
     @State var showAddAccount: Bool = false
+    /// Whether the add account sheet adds to the YubiKey, or only to Ente Auth.
+    @State var addToYubiKey = true
     @State var addAccountCancellable: AnyCancellable?
-    @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, Bool), Never>()
+    @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, AccountDestinations), Never>()
     @State var showConfiguration: Bool = false
     @State var showAbout: Bool = false
     @State var showEnteSync: Bool = false
@@ -63,23 +65,33 @@ struct MainView: View {
         }
     }
     
+    /// Whether a YubiKey can be reached, over NFC or because one is plugged in.
+    var canAddToYubiKey: Bool {
+        DeviceCapabilities.supportsNFC || model.isKeyPluggedIn
+    }
+
     var body: some View {
         @Bindable var model = model
+        @Bindable var cloud = model.cloud
         presentations
         .errorAlert(error: $model.sessionError)
         .errorAlert(error: $model.connectionError) { model.start() }
+        .errorAlert(error: $cloud.error)
         .onAppear {
             if ApplicationSettingsViewModel().isNFCOnAppLaunchEnabled {
                 model.updateAccountsOverNFC()
             }
-            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, addToEnte) in
+            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, destinations) in
                 oathURL = nil
-                if let template {
+                guard let template else { return }
+                if destinations.contains(.yubiKey) {
                     model.addAccount(template, requiresTouch: requiresTouch) {
-                        if addToEnte {
+                        if destinations.contains(.ente) {
                             addAccountToEnte(template)
                         }
                     }
+                } else if destinations.contains(.ente) {
+                    addAccountToEnte(template)
                 }
             }
         }
@@ -95,6 +107,7 @@ struct MainView: View {
             if showConfiguration { showConfiguration.toggle() }
             if showAbout { showAbout.toggle() }
             oathURL = url
+            addToYubiKey = canAddToYubiKey || !model.cloud.isEnabled
             showAddAccount.toggle()
         })
         .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: { userActivity in
@@ -130,6 +143,7 @@ struct MainView: View {
 
                 guard !notificationsViewModel.showPIVTokenView else { return }
                 model.start() // This is called when app becomes active
+                Task { await model.cloud.syncAutomatically() }
                 performPendingQuickAction()
             } else if phase == .active {
                 performPendingQuickAction()
@@ -197,7 +211,7 @@ struct MainView: View {
                 performPendingQuickAction()
             }
             // If the user removes the YubiKey while adding a new account we dismiss the add account modal.
-            if showAddAccount && !isKeyPluggedIn {
+            if showAddAccount && addToYubiKey && !isKeyPluggedIn {
                 showAddAccount = false
             }
         }
@@ -225,15 +239,19 @@ struct MainView: View {
             .autocorrectionDisabled(true)
             .keyboardType(.asciiCapable)
             .listStyle(.inset)
-            .refreshable(enabled: DeviceCapabilities.supportsNFC) {
+            .refreshable(enabled: DeviceCapabilities.supportsNFC || model.cloud.isEnabled) {
                 otp = nil
-                model.updateAccountsOverNFC()
+                // Synced first, so Face ID for the Ente session isn't asked for while the NFC sheet is up.
+                await model.cloud.sync(reportsErrors: true)
+                if DeviceCapabilities.supportsNFC {
+                    model.updateAccountsOverNFC()
+                }
             }
             .toolbar { mainToolbar }
             #if os(macOS)
             .navigationTitle(Text(verbatim: "Oriel OTP"))
             #else
-            .navigationTitle(model.accountsLoaded ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
+            .navigationTitle(model.hasAccounts ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
             #endif
             .navigationSplitViewColumnWidth(min: 320, ideal: 360)
         } detail: {
@@ -265,10 +283,10 @@ struct MainView: View {
             #endif
         }
         .sheet(isPresented: $showAddAccount) {
-            AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL)
+            AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL, toYubiKey: addToYubiKey)
         }
         .sheet(isPresented: $showEnteSync) {
-            EnteSyncView(existingCredentialIds: Set(model.accounts.map(\.accountId)),
+            EnteSyncView(existingCredentialIds: Set(model.keyAccounts.map(\.accountId)),
                          capacity: model.accountsLoaded ? model.credentialCapacity : nil,
                          canAddToYubiKey: DeviceCapabilities.supportsNFC || model.isKeyPluggedIn) { templates, requiresTouch in
                 importAccounts(templates, requiresTouch: requiresTouch)
@@ -320,7 +338,13 @@ struct MainView: View {
                 model.deleteAccounts(accounts) {}
             }
         } message: { accounts in
-            if accounts.count > 1 {
+            if accounts.contains(where: \.isInEnte) {
+                if accounts.count > 1 {
+                    Text(String(localized: "Accounts on the YubiKey are deleted from it. Accounts in Ente Auth are moved to its trash on all your devices, where the Ente Auth app can restore them.", comment: "Delete several accounts alert when some are in Ente Auth"))
+                } else {
+                    Text(String(localized: "This moves the account to the trash in Ente Auth on all your devices. You can restore it in the Ente Auth app.", comment: "Delete account alert for an account in Ente Auth"))
+                }
+            } else if accounts.count > 1 {
                 Text(String(localized: "This removes the accounts from the YubiKey. You won’t be able to generate codes for them anymore.", comment: "Delete several accounts alert"))
             } else {
                 Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
@@ -358,7 +382,7 @@ struct MainView: View {
                     YubiOtpRowView(otp: otp)
                 }
             }
-            if !model.accountsLoaded {
+            if !model.hasAccounts {
                 ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
                     enteSyncButton
                 }
@@ -368,7 +392,9 @@ struct MainView: View {
                         accountRow(account)
                     }
                 } else {
-                    ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"), message: String(localized: "No matching accounts on YubiKey"), height: reader.size.height)
+                    ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"),
+                                   message: model.cloudAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"),
+                                   height: reader.size.height)
                 }
             } else if model.pinnedAccounts.count > 0 {
                 Section("Pinned") {
@@ -395,13 +421,20 @@ struct MainView: View {
                 }
             } else {
                 ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
-                    Button(action: { showAddAccount.toggle() }) {
+                    Button(action: { addAccount(toYubiKey: true) }) {
                         Label("Add account", systemImage: "plus")
                     }
                     .buttonStyle(.borderedProminent)
-                    .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                    .disabled(!canAddToYubiKey)
                     enteSyncButton
                 }
+            }
+            if !model.accountsLoaded && !model.cloudAccounts.isEmpty && searchText.isEmpty {
+                // The Ente Auth accounts are listed, the YubiKey's join them once it has been read.
+                Label(insertYubiKeyMessage, image: "securitykey")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .listRowSeparator(.hidden)
             }
         }
     }
@@ -428,10 +461,10 @@ struct MainView: View {
                 Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
             }
             .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
-            .disabled(!model.accountsLoaded)
+            .disabled(!model.canRefresh)
         }
         #else
-        if !model.accountsLoaded {
+        if !model.hasAccounts {
             ToolbarItem(placement: .principal) {
                 // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
                 Text(verbatim: "Oriel OTP")
@@ -451,6 +484,12 @@ struct MainView: View {
 
         // Secondary actions collapse into the system overflow menu.
         ToolbarItemGroup(placement: .secondaryAction) {
+            // The add button adds to Ente Auth by itself when no YubiKey can be reached.
+            if model.cloud.isEnabled && canAddToYubiKey {
+                Button(action: { addAccount(toYubiKey: false) }) {
+                    Label(String(localized: "Add to Ente Auth", comment: "Main view menu item"), systemImage: "cloud")
+                }
+            }
             enteSyncButton
                 .help(String(localized: "Sync from Ente Auth", comment: "Main view menu item"))
             #if os(iOS)
@@ -496,8 +535,15 @@ struct MainView: View {
             showAbout = false
             showEnteSync = false
             oathURL = nil
+            addToYubiKey = true
             showAddAccount = true
         }
+    }
+
+    private func addAccount(toYubiKey: Bool) {
+        oathURL = nil
+        addToYubiKey = toYubiKey
+        showAddAccount = true
     }
 
     private func accountRow(_ account: Account) -> some View {
@@ -505,7 +551,7 @@ struct MainView: View {
             #if os(macOS)
             // Copy and pin appear when the pointer is over the row, as there are no swipe actions on the Mac.
             HoverReader { isHovering in
-                AccountRowView(account: account) {
+                AccountRowView(account: account, showsLocation: showsLocation) {
                     if isHovering {
                         HStack(spacing: 2) {
                             copyButton(account)
@@ -519,7 +565,7 @@ struct MainView: View {
                 }
             }
             #else
-            AccountRowView(account: account)
+            AccountRowView(account: account, showsLocation: showsLocation)
             #endif
         }
         .listRowSeparator(.hidden)
@@ -541,6 +587,11 @@ struct MainView: View {
             Divider()
             deleteButton(account)
         }
+    }
+
+    /// Each row shows where its account is stored once there are Ente Auth accounts in the list.
+    private var showsLocation: Bool {
+        !model.cloudAccounts.isEmpty
     }
 
     private func copyButton(_ account: Account) -> some View {
@@ -575,8 +626,8 @@ struct MainView: View {
 
     private var menuState: MainWindowMenuState {
         let selection = selectedAccounts
-        return MainWindowMenuState(canAddAccount: model.isKeyPluggedIn,
-                                   canRefresh: model.accountsLoaded,
+        return MainWindowMenuState(canAddAccount: model.isKeyPluggedIn || model.cloud.isEnabled,
+                                   canRefresh: model.canRefresh,
                                    canSearch: canFocusSearch,
                                    selectionCount: selection.count,
                                    isSelectionPinned: !selection.isEmpty && selection.allSatisfy(\.isPinned),
@@ -588,9 +639,8 @@ struct MainView: View {
         let selection = selectedAccounts
         switch command {
         case .addAccount:
-            guard model.isKeyPluggedIn else { return }
-            oathURL = nil
-            showAddAccount = true
+            guard model.isKeyPluggedIn || model.cloud.isEnabled else { return }
+            addAccount(toYubiKey: model.isKeyPluggedIn)
         case .syncFromEnte:
             showEnteSync = true
         case .refresh:
@@ -616,11 +666,13 @@ struct MainView: View {
 
     private var addAccountToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
-            Button(action: { showAddAccount.toggle() }) {
+            // Without a YubiKey to reach, accounts can still be added to Ente Auth.
+            Button(action: { addAccount(toYubiKey: canAddToYubiKey) }) {
                 Label("Add account", systemImage: "plus")
             }
-            .help(String(localized: "Add an account to the YubiKey", comment: "Toolbar help"))
-            .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+            .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
+                  : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
+            .disabled(!canAddToYubiKey && !model.cloud.isEnabled)
         }
     }
 
@@ -642,20 +694,18 @@ struct MainView: View {
         }
     }
 
-    /// Adds an account that was just put on the YubiKey to Ente Auth too. The YubiKey can't give the secret back
-    /// later, so this is the only time it can be copied.
+    /// Adds an account to the Ente Auth vault, which uploads it. For an account that was just put on the YubiKey,
+    /// this is the only time it can be copied, as the YubiKey can't give the secret back later.
     private func addAccountToEnte(_ template: YubiKitOATHSession.CredentialTemplate) {
-        Task {
-            do {
-                switch try await EnteSessionStore().add(template) {
-                case .added:
-                    toastPresenter.toast(message: String(localized: "Added to Ente Auth", comment: "Toast after adding an account to Ente Auth"))
-                case .alreadyPresent:
-                    toastPresenter.toast(message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
-                }
-            } catch {
-                model.sessionError = EnteSyncError(error)
+        do {
+            switch try model.addCloudAccount(template) {
+            case .added:
+                toastPresenter.toast(message: String(localized: "Added to Ente Auth", comment: "Toast after adding an account to Ente Auth"))
+            case .alreadyPresent:
+                toastPresenter.toast(message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
             }
+        } catch {
+            model.sessionError = EnteSyncError(error)
         }
     }
 
