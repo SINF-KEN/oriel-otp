@@ -8,11 +8,15 @@
 #
 # Usage: tools/watch-screenshots.sh
 #   DEVICE_TYPE  simulator device type, e.g. "Apple Watch Ultra 3 (49mm)" (default: the newest 46mm Apple Watch Series)
+#   OUTPUT       where to write the screenshots (default: docs/screenshots)
+#
+# For App Store Connect, which takes one watch size and scales it for the others:
+#   DEVICE_TYPE="Apple Watch Ultra 3 (49mm)" OUTPUT=build/app-store/watch tools/watch-screenshots.sh
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-output=docs/screenshots
+output=${OUTPUT:-docs/screenshots}
 bundle_id=io.github.sinf-ken.OrielOTP.watchkitapp
 # 2027-01-01 00:00:12 UTC, the same moment as the iPhone screenshots.
 demo_date=1798761612

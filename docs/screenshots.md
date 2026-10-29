@@ -59,7 +59,8 @@ materials, so it isn't used for the screenshots.
 The watch screenshots (`watch-*.png`) are taken by `tools/watch-screenshots.sh`, which needs a watchOS simulator
 runtime (`xcodebuild -downloadPlatform watchOS`) and `jq`. It builds the watch app, installs it on a new, empty
 watch simulator (the newest 46mm Apple Watch Series, or `DEVICE_TYPE`), takes a screenshot of each state with
-`simctl io` and deletes the simulator again.
+`simctl io` and deletes the simulator again. `OUTPUT` writes them somewhere else, e.g. the App Store screenshots
+(see `docs/app-store.md`).
 
 The debug build in the simulator reads launch arguments from `OrielOTPWatch/DemoMode.swift`: `-DemoAccounts YES`
 shows made-up accounts instead of the keychain and doesn't talk to the iPhone, `-DemoDate` freezes the clock at the

@@ -105,8 +105,15 @@ market app. Answer the questions in App Store Connect to match, and add the Fran
 > paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
 > watch.
 
-Fill in the demo account and attach the video before submitting. Add watch screenshots (41 to 49 mm and Ultra) to
-the Apple Watch section of the listing.
+Fill in the demo account and attach the video before submitting. Add watch screenshots to the Apple Watch section
+of the listing. App Store Connect takes one size and scales it for the others, so make them on the largest, the
+Ultra (422 × 514 pixels):
+
+```bash
+DEVICE_TYPE="Apple Watch Ultra 3 (49mm)" OUTPUT=build/app-store/watch tools/watch-screenshots.sh
+```
+
+Upload `watch-accounts.png` and `watch-wrist-down.png`. The time in the corner is the time the script ran.
 
 Mac review notes (draft):
 
