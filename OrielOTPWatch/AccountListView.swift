@@ -24,12 +24,15 @@ struct AccountListView: View {
         NavigationStack {
             Group {
                 if store.accounts.isEmpty {
-                    ContentUnavailableView {
-                        Label("No Accounts", systemImage: "key.viewfinder")
-                    } description: {
-                        Text(
-                            "Turn on Apple Watch in Oriel OTP on your iPhone, under Sync from Ente Auth.",
-                            comment: "Watch empty state. 'Sync from Ente Auth' is the name of the menu item on the iPhone.")
+                    // Scrolls so the whole text can be read at the largest text sizes on the smallest watches.
+                    ScrollView {
+                        ContentUnavailableView {
+                            Label("No Accounts", systemImage: "key.viewfinder")
+                        } description: {
+                            Text(
+                                "Turn on Apple Watch in Oriel OTP on your iPhone, under Sync from Ente Auth.",
+                                comment: "Watch empty state. 'Sync from Ente Auth' is the name of the menu item on the iPhone.")
+                        }
                     }
                 } else {
                     List(store.accounts) { account in
