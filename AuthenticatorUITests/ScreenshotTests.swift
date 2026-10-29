@@ -34,13 +34,14 @@ final class ScreenshotTests: XCTestCase {
         app.launch()
     }
 
+    // The timeouts are generous: CI's simulators can take several seconds to present a screen.
     @MainActor func testScreenshots() throws {
         let github = app.staticTexts["GitHub"].firstMatch
         XCTAssertTrue(github.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try save("accounts")
 
         github.tap()
-        XCTAssertTrue(app.staticTexts["alice@example.com"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["alice@example.com"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try save("account-details")
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
@@ -48,15 +49,15 @@ final class ScreenshotTests: XCTestCase {
         app.buttons["Sync from Ente Auth"].firstMatch.tap()
         // The sign in screen isn't kept: its focused field's blinking cursor would make every run different.
         let email = app.textFields["Email"]
-        XCTAssertTrue(email.waitForExistence(timeout: 5))
+        XCTAssertTrue(email.waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
         email.tap()
         // Return submits, like the Continue and Sign in buttons, whose names the keyboard's return key shares.
         email.typeText("alice@example.com\n")
         let password = app.secureTextFields["Password"]
-        XCTAssertTrue(password.waitForExistence(timeout: 10))
+        XCTAssertTrue(password.waitForExistence(timeout: 20), "The Ente password field didn't show")
         password.tap()
         password.typeText("demo\n")
-        XCTAssertTrue(app.staticTexts["Already on YubiKey"].firstMatch.waitForExistence(timeout: 30))
+        XCTAssertTrue(app.staticTexts["Already on YubiKey"].firstMatch.waitForExistence(timeout: 30), "The Ente accounts didn't show")
         try save("ente-accounts")
     }
 
