@@ -21,7 +21,7 @@ import YubiKit
 
 enum FidoViewModelError: Error, LocalizedError {
     
-    case usbNotSupported, timeout, locked, pinsDoNotMatch, notSupportedOverLightning
+    case usbNotSupported, locked, pinsDoNotMatch
     
     public var errorDescription: String? {
         switch self {
@@ -29,12 +29,8 @@ enum FidoViewModelError: Error, LocalizedError {
             return String(localized: "PINs don't match")
         case .usbNotSupported:
             return String(localized: "FIDO management over USB-C is not supported by iOS. Use NFC or the desktop Yubico Authenticator instead.")
-        case .timeout:
-            return String(localized: "Operation timed out.")
         case .locked:
             return String(localized: "PIN is permanently blocked. Factory reset FIDO application to continue.")
-        case .notSupportedOverLightning:
-            return String(localized: "This operation is not supported over Lightning on this YubiKey. Please use Yubico Authenticator for desktop to reset the FIDO application.")
         }
     }
 }

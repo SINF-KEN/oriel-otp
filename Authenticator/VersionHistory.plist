@@ -11,7 +11,7 @@
 		<true/>
 		<key>changes</key>
 		<string>
-            This is the first release of Oriel OTP, an authenticator for the OATH codes stored on your YubiKey. Sign in to Ente Auth to copy your accounts onto a YubiKey: everything is decrypted on your device and nothing is changed in Ente Auth. The app is built in SwiftUI with the Liquid Glass look on iOS 26 and later, adapts to iPhone Duo, supports landscape on iPhone, and shows your accounts beside their details on wider screens. It works with YubiKeys over NFC, Lightning and USB-C. There is also a native Mac app, which reads the YubiKey over USB and puts your codes in the menu bar, and an optional Apple Watch app that shows the codes of your Ente Auth accounts.
+            This is the first release of Oriel OTP, an authenticator for the OATH codes stored on your YubiKey. Sign in to Ente Auth to copy your accounts onto a YubiKey: everything is decrypted on your device and nothing is changed in Ente Auth. The app is built in SwiftUI with the Liquid Glass look on iOS 26 and later, adapts to iPhone Duo, supports landscape on iPhone, and shows your accounts beside their details on wider screens. It works with YubiKeys over NFC and USB-C. There is also a native Mac app, which reads the YubiKey over USB and puts your codes in the menu bar, and an optional Apple Watch app that shows the codes of your Ente Auth accounts.
         </string>
 	</dict>
 </array>
