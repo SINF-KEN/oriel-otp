@@ -221,9 +221,10 @@ struct EnteSavedAccountTests {
                           defaults: defaults, watch: WatchAccountSync(defaults: defaults))
     }
 
-    /// Waits for the model's network and crypto work to finish.
+    /// Waits for the model's network and crypto work to finish. On CI signing in can take most of a minute, as the
+    /// other tests derive keys at the same time.
     private func settle(_ model: EnteSyncViewModel) async throws {
-        for _ in 0..<400 where model.isBusy {
+        for _ in 0..<2400 where model.isBusy {
             try await Task.sleep(for: .milliseconds(50))
         }
         #expect(!model.isBusy)
