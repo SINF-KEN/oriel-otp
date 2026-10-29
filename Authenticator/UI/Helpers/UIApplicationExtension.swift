@@ -16,14 +16,13 @@
  */
 
 import Foundation
-import UIKit
 
-extension UIApplication {
-    
-    nonisolated static var appVersion: String {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+extension Bundle {
+
+    nonisolated var appVersion: String {
+        return object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
     }
-    nonisolated static var appBuildNumber: String {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
+    nonisolated var appBuildNumber: String {
+        return object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
     }
 }

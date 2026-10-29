@@ -58,7 +58,7 @@ struct TokenRequestYubiOTPView: View {
                 .opacity(isOTPDisabled ? 1 : 0)
             }
             .padding(30)
-            .accentColor(Color(UIColor.yubiBlue))
+            .accentColor(Color(.yubiBlue))
         }
         .alert(String(localized: "Error reading YubiKey", comment: "PIV extension error title"), isPresented: .constant(error != nil), presenting: error) { _ in
             Button(String(localized: "OK")) {

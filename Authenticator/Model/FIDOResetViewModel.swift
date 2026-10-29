@@ -66,10 +66,12 @@ import YubiKit
                 switch connection {
                 case is USBSmartCardConnection:
                     state = .error(FidoViewModelError.usbNotSupported)
+                #if os(iOS)
                 case let connection as NFCSmartCardConnection:
                     await resetNFC(connection: connection)
                 case is LightningSmartCardConnection:
                     await resetLightning(connection: connection)
+                #endif
                 default:
                     state = .error(String(localized: "Unknown error"))
                 }
@@ -107,6 +109,7 @@ import YubiKit
 }
 
 
+#if os(iOS)
 extension FIDOResetViewModel {
     private func resetNFC(connection: NFCSmartCardConnection) async {
         do {
@@ -122,6 +125,7 @@ extension FIDOResetViewModel {
         }
     }
 }
+#endif
 
 
 extension FIDOResetViewModel {

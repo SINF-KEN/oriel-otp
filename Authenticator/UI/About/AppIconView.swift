@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#if os(iOS)
 import SwiftUI
 
 struct AppIconView: View {
@@ -82,3 +83,4 @@ struct AppIconView: View {
         }
     }
 }
+#endif

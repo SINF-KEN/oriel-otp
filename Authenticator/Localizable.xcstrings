@@ -510,6 +510,35 @@
         }
       }
     },
+    "About Oriel OTP" : {
+      "comment" : "Mac app menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über Oriel OTP"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos d’Oriel OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPについて"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O aplikácii Oriel OTP"
+          }
+        }
+      }
+    },
     "Account" : {
       "comment" : "Ente saved session account label",
       "localizations" : {
@@ -888,6 +917,64 @@
         }
       }
     },
+    "Add Account" : {
+      "comment" : "Shortcuts action title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať účet"
+          }
+        }
+      }
+    },
+    "Add Account…" : {
+      "comment" : "Mac File menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto hinzufügen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un compte…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを追加…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať účet…"
+          }
+        }
+      }
+    },
     "Add Credential" : {
       "comment" : "Add account navigation title",
       "extractionState" : "stale",
@@ -943,6 +1030,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pridať účet"
+          }
+        }
+      }
+    },
+    "Add an account to the YubiKey" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto zum YubiKey hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un compte à la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyにアカウントを追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať účet do YubiKey"
           }
         }
       }
@@ -1048,6 +1164,35 @@
         }
       }
     },
+    "Added to Ente Auth" : {
+      "comment" : "Toast after adding an account to Ente Auth",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Ente Auth hinzugefügt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouté à Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authに追加しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridané do Ente Auth"
+          }
+        }
+      }
+    },
     "Advanced settings" : {
       "comment" : "Add account section header",
       "localizations" : {
@@ -1106,6 +1251,35 @@
         }
       }
     },
+    "Allow Oriel OTP to record the screen in System Settings, under Privacy & Security > Screen & System Audio Recording. It only looks for a QR code and doesn't keep the picture." : {
+      "comment" : "Mac QR scan error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlauben Sie Oriel OTP die Bildschirmaufnahme in den Systemeinstellungen unter „Datenschutz & Sicherheit“ > „Bildschirm- & Systemaudioaufnahme“. Es sucht nur nach einem QR-Code und behält das Bild nicht."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisez Oriel OTP à enregistrer l’écran dans Réglages Système, sous Confidentialité et sécurité > Enregistrement de l’écran et de l’audio du système. L’app cherche seulement un code QR et ne conserve pas l’image."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム設定の「プライバシーとセキュリティ」>「画面とシステムオーディオの録音」で、Oriel OTPに画面の収録を許可してください。QRコードを探すだけで、画像は保存しません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V Systémových nastaveniach v časti Súkromie a bezpečnosť > Nahrávanie obrazovky a systémového zvuku povoľte aplikácii Oriel OTP nahrávať obrazovku. Hľadá iba QR kód a obrázok si neuchováva."
+          }
+        }
+      }
+    },
     "Allow notifications" : {
       "comment" : "PIV extension notifications explanation title",
       "localizations" : {
@@ -1135,6 +1309,35 @@
         }
       }
     },
+    "Already in Ente Auth" : {
+      "comment" : "Toast when Ente Auth already has the account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereits in Ente Auth"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjà dans Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでにEnte Authにあります"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Už je v Ente Auth"
+          }
+        }
+      }
+    },
     "Already on YubiKey" : {
       "comment" : "Ente sync account already on YubiKey",
       "localizations" : {
@@ -1160,6 +1363,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Už je na YubiKey"
+          }
+        }
+      }
+    },
+    "Also add to Ente Auth" : {
+      "comment" : "Add account toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch zu Ente Auth hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter aussi à Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authにも追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať aj do Ente Auth"
           }
         }
       }
@@ -1221,6 +1453,35 @@
         }
       }
     },
+    "Back" : {
+      "comment" : "Mac tutorial button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "戻る"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Späť"
+          }
+        }
+      }
+    },
     "Bypass touch requirement" : {
       "comment" : "NFC settings toggle",
       "localizations" : {
@@ -1275,6 +1536,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vypočítať"
+          }
+        }
+      }
+    },
+    "Calculate a new code" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuen Code berechnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculer un nouveau code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいコードを計算"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypočítať nový kód"
           }
         }
       }
@@ -1908,6 +2198,35 @@
         }
       }
     },
+    "Copied" : {
+      "comment" : "Mac menu bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copié"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コピーしました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skopírované"
+          }
+        }
+      }
+    },
     "Copied to clipboard" : {
       "comment" : "Toast copied to clipboard message",
       "localizations" : {
@@ -1937,6 +2256,64 @@
         }
       }
     },
+    "Copies the code" : {
+      "comment" : "Mac menu bar accessibility hint",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert den Code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードをコピーします"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skopíruje kód"
+          }
+        }
+      }
+    },
+    "Copies the code of an account on your YubiKey to the clipboard. The YubiKey has to be plugged in." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiert den Code eines Kontos auf Ihrem YubiKey in die Zwischenablage. Der YubiKey muss angeschlossen sein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copie dans le presse-papiers le code d’un compte de votre YubiKey. La YubiKey doit être branchée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey上のアカウントのコードをクリップボードにコピーします。YubiKeyを接続しておく必要があります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skopíruje kód účtu z vášho YubiKey do schránky. YubiKey musí byť pripojený."
+          }
+        }
+      }
+    },
     "Copy" : {
       "comment" : "Menu",
       "localizations" : {
@@ -1962,6 +2339,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopírovať"
+          }
+        }
+      }
+    },
+    "Copy Code" : {
+      "comment" : "Mac Account menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovať kód"
           }
         }
       }
@@ -2024,6 +2430,122 @@
         }
       }
     },
+    "Copy the code" : {
+      "comment" : "Mac row button help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovať kód"
+          }
+        }
+      }
+    },
+    "Copy the code for ${account}" : {
+      "comment" : "Shortcuts action summary",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code für ${account} kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le code de ${account}"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "${account} のコードをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovať kód pre ${account}"
+          }
+        }
+      }
+    },
+    "Couldn't change the login item" : {
+      "comment" : "Mac setting error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldeobjekt konnte nicht geändert werden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de modifier l’élément d’ouverture"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン項目を変更できませんでした"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Položku pri prihlásení sa nepodarilo zmeniť"
+          }
+        }
+      }
+    },
+    "Couldn't read a QR code" : {
+      "comment" : "Mac add account QR code error title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code konnte nicht gelesen werden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible de lire un code QR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを読み取れませんでした"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR kód sa nepodarilo prečítať"
+          }
+        }
+      }
+    },
     "Current" : {
       "comment" : "Enter current password in secure field to change password.",
       "localizations" : {
@@ -2077,6 +2599,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktuálny PIN"
+          }
+        }
+      }
+    },
+    "Cut" : {
+      "comment" : "Mac Edit menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausschneiden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couper"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カット"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vystrihnúť"
           }
         }
       }
@@ -2197,6 +2748,64 @@
         }
       }
     },
+    "Delete %lld accounts?" : {
+      "comment" : "Delete several accounts alert. The placeholder is the number of accounts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld Konten löschen?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer %lld comptes ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld件のアカウントを削除しますか？"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstrániť %lld účty?"
+          }
+        }
+      }
+    },
+    "Delete Accounts…" : {
+      "comment" : "Mac Account menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten löschen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer les comptes…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを削除…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstrániť účty…"
+          }
+        }
+      }
+    },
     "Delete account?" : {
       "localizations" : {
         "de" : {
@@ -2221,6 +2830,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vymazať účet?"
+          }
+        }
+      }
+    },
+    "Delete the account from the YubiKey" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto vom YubiKey löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le compte de la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyからアカウントを削除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstrániť účet z YubiKey"
+          }
+        }
+      }
+    },
+    "Delete…" : {
+      "comment" : "Mac Account menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Löschen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstrániť…"
           }
         }
       }
@@ -3144,6 +3811,35 @@
         }
       }
     },
+    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with a USB-C or USB-A connector to get started." : {
+      "comment" : "Mac tutorial",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Holen Sie sich von jedem Dienst, den Sie schützen möchten, einen gemeinsamen geheimen Schlüssel, speichern Sie ihn auf dem YubiKey und erzeugen Sie damit Ihre Sicherheitscodes.\n\nSie benötigen einen YubiKey mit USB-C- oder USB-A-Anschluss."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenez une clé secrète partagée auprès du service à sécuriser, enregistrez-la sur la YubiKey et utilisez-la pour générer vos codes de sécurité.\n\nIl vous faut une YubiKey avec un connecteur USB-C ou USB-A pour commencer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保護したいサービスから共有シークレットを取得してYubiKeyに保存し、セキュリティコードの生成に使います。\n\nはじめるには、USB-CまたはUSB-AコネクタのYubiKeyが必要です。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Získajte zdieľaný tajný kľúč od služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a generujte ním bezpečnostné kódy.\n\nNa začiatok potrebujete YubiKey s konektorom USB-C alebo USB-A."
+          }
+        }
+      }
+    },
     "Go back to the app that asked for the certificate." : {
       "comment" : "PIV extension completed message",
       "localizations" : {
@@ -3198,6 +3894,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pomocník"
+          }
+        }
+      }
+    },
+    "How It Works" : {
+      "comment" : "Mac Help menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "So funktioniert es"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctionnement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仕組み"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ako to funguje"
           }
         }
       }
@@ -3920,6 +4645,35 @@
         }
       }
     },
+    "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password." : {
+      "comment" : "Mac Ente sign in options footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lassen Sie den Server leer, außer Sie betreiben Ente selbst. „Angemeldet bleiben“ speichert eine Sitzung im Schlüsselbund, geschützt durch Touch ID oder das Passwort Ihres Mac, damit Sie ohne Ihr Ente-Passwort erneut synchronisieren können."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laissez le serveur vide sauf si vous hébergez Ente vous-même. Rester connecté conserve une session dans le trousseau, protégée par Touch ID ou le mot de passe de votre Mac, pour synchroniser à nouveau sans votre mot de passe Ente."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enteを自分でホストしていない限り、サーバは空欄のままにしてください。サインインしたままにすると、Touch IDまたはMacのパスワードで保護されたセッションがキーチェーンに保存され、Enteのパスワードなしで再び同期できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Server nechajte prázdny, pokiaľ si Ente neprevádzkujete sami. Pri zostaní prihlásený sa relácia uloží do kľúčenky, chránená Touch ID alebo heslom vášho Macu, takže môžete znova synchronizovať bez hesla k Ente."
+          }
+        }
+      }
+    },
     "Licensing" : {
       "comment" : "Licensing view navigation title",
       "localizations" : {
@@ -4202,6 +4956,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ďalej"
+          }
+        }
+      }
+    },
+    "No QR code for an account was found. Make sure the whole QR code can be seen." : {
+      "comment" : "Mac QR scan error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wurde kein QR-Code für ein Konto gefunden. Achten Sie darauf, dass der ganze QR-Code sichtbar ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun code QR de compte n’a été trouvé. Assurez-vous que le code QR est entièrement visible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントのQRコードが見つかりませんでした。QRコード全体が見えていることを確認してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nenašiel sa žiadny QR kód účtu. Uistite sa, že je vidieť celý QR kód."
           }
         }
       }
@@ -4752,6 +5535,35 @@
         }
       }
     },
+    "Open Oriel OTP" : {
+      "comment" : "Mac menu bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Oriel OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPを開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvoriť Oriel OTP"
+          }
+        }
+      }
+    },
     "Open Settings" : {
       "comment" : "Scan QR code settings button",
       "localizations" : {
@@ -4781,6 +5593,64 @@
         }
       }
     },
+    "Open System Settings" : {
+      "comment" : "Mac add account QR code error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Réglages Système"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム設定を開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvoriť Systémové nastavenia"
+          }
+        }
+      }
+    },
+    "Open at login" : {
+      "comment" : "Mac setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beim Anmelden öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir à la connexion"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時に開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvoriť pri prihlásení"
+          }
+        }
+      }
+    },
     "Opens Oriel OTP and reads the codes from a YubiKey over NFC." : {
       "localizations" : {
         "de" : {
@@ -4805,6 +5675,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otvorí Oriel OTP a načíta kódy z YubiKey cez NFC."
+          }
+        }
+      }
+    },
+    "Opens Oriel OTP to add an account to your YubiKey." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet Oriel OTP, um ein Konto zu Ihrem YubiKey hinzuzufügen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre Oriel OTP pour ajouter un compte à votre YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPを開いてYubiKeyにアカウントを追加します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvorí Oriel OTP na pridanie účtu do vášho YubiKey."
           }
         }
       }
@@ -4891,6 +5790,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Možnosti"
+          }
+        }
+      }
+    },
+    "Oriel OTP Help" : {
+      "comment" : "Mac Help menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP-Hilfe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide Oriel OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPヘルプ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pomocník Oriel OTP"
           }
         }
       }
@@ -5406,6 +6334,64 @@
         }
       }
     },
+    "Paste" : {
+      "comment" : "Mac Edit menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einsetzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coller"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ペースト"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vložiť"
+          }
+        }
+      }
+    },
+    "Paste QR Code or Link" : {
+      "comment" : "Mac add account button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code oder Link einsetzen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coller le code QR ou le lien"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードまたはリンクをペースト"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vložiť QR kód alebo odkaz"
+          }
+        }
+      }
+    },
     "Period" : {
       "comment" : "Add account select period",
       "localizations" : {
@@ -5460,6 +6446,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pripnúť"
+          }
+        }
+      }
+    },
+    "Pin the account to the top" : {
+      "comment" : "Mac row button help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto oben anheften"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Épingler le compte en haut"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを上部に固定"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pripnúť účet navrch"
           }
         }
       }
@@ -5549,6 +6564,64 @@
         }
       }
     },
+    "Plug in your YubiKey and try again." : {
+      "comment" : "Mac Shortcuts error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen Sie Ihren YubiKey an und versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branchez votre YubiKey et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyを接続して、もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pripojte YubiKey a skúste to znova."
+          }
+        }
+      }
+    },
+    "Plug your YubiKey into your Mac, directly or through a USB hub or adapter.\n\nTouch the YubiKey when prompted." : {
+      "comment" : "Mac tutorial",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließen Sie Ihren YubiKey direkt oder über einen USB-Hub oder Adapter an Ihren Mac an.\n\nBerühren Sie den YubiKey, wenn Sie dazu aufgefordert werden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Branchez votre YubiKey sur votre Mac, directement ou via un concentrateur ou un adaptateur USB.\n\nTouchez la YubiKey lorsque vous y êtes invité."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyをMacに直接、またはUSBハブやアダプタ経由で接続します。\n\n指示が表示されたらYubiKeyにタッチします。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pripojte YubiKey k Macu priamo alebo cez USB rozbočovač či adaptér.\n\nKeď sa zobrazí výzva, dotknite sa YubiKey."
+          }
+        }
+      }
+    },
     "Plug-in your YubiKey for that operation" : {
       "comment" : "No service found",
       "extractionState" : "stale",
@@ -5604,6 +6677,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nasmerujte kameru na QR kód a naskenujte ho"
+          }
+        }
+      }
+    },
+    "Privacy Policy" : {
+      "comment" : "Mac Help menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutzrichtlinie"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Politique de confidentialité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーポリシー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zásady ochrany súkromia"
           }
         }
       }
@@ -5665,6 +6767,35 @@
         }
       }
     },
+    "QR code" : {
+      "comment" : "Mac add account section header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code QR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR kód"
+          }
+        }
+      }
+    },
     "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add your YubiKey and generate your own security codes." : {
       "localizations" : {
         "de" : {
@@ -5689,6 +6820,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QR kódy sú k dispozícii od služieb, ktoré chcete zabezpečiť.\n\nJednoducho naskenujte QR kód, keď pridáte svoj YubiKey a vygenerujte si vlastné bezpečnostné kódy."
+          }
+        }
+      }
+    },
+    "QR codes are available from the services you wish to secure.\n\nWhen you add an account, Oriel OTP can find the QR code on your screen, read a copied or dropped picture of it, or take one with your iPhone." : {
+      "comment" : "Mac tutorial",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Codes erhalten Sie von den Diensten, die Sie schützen möchten.\n\nBeim Hinzufügen eines Kontos findet Oriel OTP den QR-Code auf Ihrem Bildschirm, liest ein kopiertes oder abgelegtes Bild davon oder nimmt eines mit Ihrem iPhone auf."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les codes QR sont fournis par les services que vous souhaitez sécuriser.\n\nLorsque vous ajoutez un compte, Oriel OTP peut trouver le code QR à l’écran, lire une image copiée ou déposée, ou en prendre une avec votre iPhone."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードは保護したいサービスから入手できます。\n\nアカウントを追加するとき、Oriel OTPは画面上のQRコードを見つけたり、コピーまたはドロップした画像を読み取ったり、iPhoneで撮影したりできます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR kódy získate od služieb, ktoré chcete zabezpečiť.\n\nPri pridávaní účtu dokáže Oriel OTP nájsť QR kód na obrazovke, prečítať jeho skopírovaný alebo presunutý obrázok alebo ho odfotiť iPhonom."
+          }
+        }
+      }
+    },
+    "Quit Oriel OTP" : {
+      "comment" : "Mac menu bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP beenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitter Oriel OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPを終了"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukončiť Oriel OTP"
           }
         }
       }
@@ -5747,6 +6936,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Čítajte viac..."
+          }
+        }
+      }
+    },
+    "Read the codes from the YubiKey again" : {
+      "comment" : "Mac toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codes erneut vom YubiKey lesen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relire les codes depuis la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyからコードを再読み込み"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Znova načítať kódy z YubiKey"
+          }
+        }
+      }
+    },
+    "Reading YubiKey…" : {
+      "comment" : "Mac menu bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey wird gelesen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lecture de la YubiKey…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyを読み取り中…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Číta sa YubiKey…"
+          }
+        }
+      }
+    },
+    "Refresh" : {
+      "comment" : "Mac Account menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktualisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualiser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnoviť"
           }
         }
       }
@@ -5924,6 +7200,64 @@
         }
       }
     },
+    "Rename the account" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto umbenennen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renommer le compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント名を変更"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premenovať účet"
+          }
+        }
+      }
+    },
+    "Rename…" : {
+      "comment" : "Mac Account menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbenennen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renommer…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称変更…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Premenovať…"
+          }
+        }
+      }
+    },
     "Require touch" : {
       "comment" : "Add account toggle",
       "localizations" : {
@@ -5949,6 +7283,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vyžadovať dotyk"
+          }
+        }
+      }
+    },
+    "Requires touch" : {
+      "comment" : "Mac menu bar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berührung erforderlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toucher requis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タッチが必要"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyžaduje dotyk"
           }
         }
       }
@@ -6327,6 +7690,35 @@
         }
       }
     },
+    "Saves the account in Ente Auth for %@ too. A YubiKey never gives its accounts back, so this is the only time it can be copied." : {
+      "comment" : "Add account Ente Auth footer. The placeholder is an email address.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert das Konto auch in Ente Auth für %@. Ein YubiKey gibt seine Konten nie wieder heraus, daher kann es nur jetzt kopiert werden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre aussi le compte dans Ente Auth pour %@. Une YubiKey ne rend jamais ses comptes, c’est donc la seule occasion de le copier."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ のEnte Authにもアカウントを保存します。YubiKeyはアカウントを取り出せないため、コピーできるのは今だけです。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uloží účet aj do Ente Auth pre %@. YubiKey svoje účty nikdy nevydá, takže ho môžete skopírovať iba teraz."
+          }
+        }
+      }
+    },
     "Scan NFC YubiKey" : {
       "localizations" : {
         "de" : {
@@ -6351,6 +7743,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skenovať NFC YubiKey"
+          }
+        }
+      }
+    },
+    "Scan QR Code on Screen" : {
+      "comment" : "Mac add account button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code auf dem Bildschirm scannen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanner le code QR à l’écran"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画面上のQRコードをスキャン"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skenovať QR kód na obrazovke"
           }
         }
       }
@@ -6440,6 +7861,35 @@
         }
       }
     },
+    "Search Accounts" : {
+      "comment" : "Mac Edit menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten durchsuchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを検索"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hľadať účty"
+          }
+        }
+      }
+    },
     "Secret" : {
       "comment" : "Add account field",
       "localizations" : {
@@ -6494,6 +7944,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pozrite "
+          }
+        }
+      }
+    },
+    "Select All" : {
+      "comment" : "Mac Edit menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles auswählen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout sélectionner"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてを選択"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrať všetko"
           }
         }
       }
@@ -6693,6 +8172,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nastavenia"
+          }
+        }
+      }
+    },
+    "Settings…" : {
+      "comment" : "Mac menu bar",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réglages…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nastavenia…"
+          }
+        }
+      }
+    },
+    "Show in menu bar" : {
+      "comment" : "Mac setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In der Menüleiste anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher dans la barre des menus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューバーに表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobraziť v lište menu"
+          }
+        }
+      }
+    },
+    "Show only in menu bar" : {
+      "comment" : "Mac setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur in der Menüleiste anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher uniquement dans la barre des menus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューバーにのみ表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobraziť iba v lište menu"
+          }
+        }
+      }
+    },
+    "Show the QR code on screen, copy it, or drop a picture of it here. To take a picture with your iPhone or iPad, use the File menu. Or enter the details below." : {
+      "comment" : "Mac add account QR code footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigen Sie den QR-Code auf dem Bildschirm an, kopieren Sie ihn oder legen Sie ein Bild davon hier ab. Um ihn mit Ihrem iPhone oder iPad zu fotografieren, verwenden Sie das Menü „Ablage“. Oder geben Sie die Daten unten ein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affichez le code QR à l’écran, copiez-le ou déposez-en une image ici. Pour le photographier avec votre iPhone ou iPad, utilisez le menu Fichier. Ou saisissez les informations ci-dessous."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを画面に表示するか、コピーするか、その画像をここにドロップしてください。iPhoneやiPadで撮影するには「ファイル」メニューを使います。または、以下に詳細を入力してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobrazte QR kód na obrazovke, skopírujte ho alebo sem presuňte jeho obrázok. Ak ho chcete odfotiť iPhonom alebo iPadom, použite ponuku Súbor. Alebo zadajte údaje nižšie."
           }
         }
       }
@@ -7305,6 +8900,35 @@
         }
       }
     },
+    "Sync from Ente Auth…" : {
+      "comment" : "Mac File menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Ente Auth synchronisieren …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniser depuis Ente Auth…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authから同期…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizovať z Ente Auth…"
+          }
+        }
+      }
+    },
     "Terms of use" : {
       "localizations" : {
         "de" : {
@@ -7591,6 +9215,35 @@
         }
       }
     },
+    "The account isn't on the plugged-in YubiKey." : {
+      "comment" : "Mac Shortcuts error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Konto ist nicht auf dem angeschlossenen YubiKey."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le compte n’est pas sur la YubiKey branchée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "接続されているYubiKeyにこのアカウントはありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účet nie je na pripojenom YubiKey."
+          }
+        }
+      }
+    },
     "The code has expired. Request a new one." : {
       "comment" : "Ente sign in error",
       "localizations" : {
@@ -7674,6 +9327,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kľúč je zaneprázdnený vykonávaním inej operácie."
+          }
+        }
+      }
+    },
+    "The menu bar shows your pinned accounts, or all accounts if none are pinned. Click one to copy its code. When the app is only in the menu bar, it isn't in the Dock." : {
+      "comment" : "Mac setting footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Menüleiste zeigt Ihre angehefteten Konten oder alle Konten, wenn keines angeheftet ist. Klicken Sie auf ein Konto, um seinen Code zu kopieren. Ist die App nur in der Menüleiste, erscheint sie nicht im Dock."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La barre des menus affiche vos comptes épinglés, ou tous les comptes si aucun n’est épinglé. Cliquez sur un compte pour copier son code. Lorsque l’app est uniquement dans la barre des menus, elle n’apparaît pas dans le Dock."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メニューバーにはピンで固定したアカウント、固定していない場合はすべてのアカウントが表示されます。クリックするとコードをコピーします。メニューバーにのみ表示する場合、アプリはDockに表示されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lišta menu zobrazuje pripnuté účty, alebo všetky účty, ak žiadny nie je pripnutý. Kliknutím na účet skopírujete jeho kód. Keď je aplikácia iba v lište menu, nie je v Docku."
           }
         }
       }
@@ -8168,6 +9850,35 @@
         }
       }
     },
+    "This removes the accounts from the YubiKey. You won’t be able to generate codes for them anymore." : {
+      "comment" : "Delete several accounts alert",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dadurch werden die Konten vom YubiKey entfernt. Sie können danach keine Codes mehr für sie erzeugen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette action supprime les comptes de la YubiKey. Vous ne pourrez plus générer de codes pour eux."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyからアカウントが削除されます。以後、これらのコードは生成できなくなります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty sa odstránia z YubiKey. Už pre ne nebudete môcť generovať kódy."
+          }
+        }
+      }
+    },
     "This setting is not supported on your YubiKey." : {
       "localizations" : {
         "de" : {
@@ -8453,6 +10164,35 @@
         }
       }
     },
+    "To use this, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on." : {
+      "comment" : "Add account Ente Auth footer without a saved Ente session",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wählen Sie dazu im Menü „Mit Ente Auth synchronisieren“ und melden Sie sich mit aktiviertem „Angemeldet bleiben“ an."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour l’utiliser, choisissez Synchroniser depuis Ente Auth dans le menu et connectez-vous avec Rester connecté activé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用するには、メニューから「Ente Authから同期」を選び、「サインインしたままにする」をオンにしてサインインしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ak to chcete použiť, v ponuke vyberte Synchronizovať z Ente Auth a prihláste sa so zapnutou voľbou Zostať prihlásený."
+          }
+        }
+      }
+    },
     "Toggle One-Time Password" : {
       "localizations" : {
         "de" : {
@@ -8644,6 +10384,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teraz sa dotknite tlačidla na YubiKey."
+          }
+        }
+      }
+    },
+    "Touch the button on the YubiKey to get the code for %@." : {
+      "comment" : "Mac notification. The placeholder is the account name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berühren Sie die Taste am YubiKey, um den Code für %@ zu erhalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez le bouton de la YubiKey pour obtenir le code de %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ のコードを取得するには、YubiKeyのボタンにタッチしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dotknite sa tlačidla na YubiKey a získate kód pre %@."
+          }
+        }
+      }
+    },
+    "Touch your YubiKey" : {
+      "comment" : "Mac notification title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berühren Sie Ihren YubiKey"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez votre YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyにタッチしてください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dotknite sa YubiKey"
           }
         }
       }
@@ -8874,6 +10672,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zrušiť pripnutie"
+          }
+        }
+      }
+    },
+    "Unpin the account" : {
+      "comment" : "Mac row button help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto lösen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désépingler le compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントの固定を解除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odopnúť účet"
           }
         }
       }
@@ -9595,6 +11422,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Vaše kľúče sa nepodarilo odvodiť. Zariadeniu možno chýba pamäť."
+          }
+        }
+      }
+    },
+    "YubiKey" : {
+      "comment" : "Mac settings tab",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey"
+          }
+        }
+      }
+    },
+    "YubiKey Account" : {
+      "comment" : "Shortcuts type name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey-Konto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyアカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účet YubiKey"
           }
         }
       }

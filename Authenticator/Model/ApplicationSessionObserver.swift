@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if canImport(UIKit)
 import Foundation
 import UIKit
 
@@ -66,3 +67,4 @@ private weak var applicationDelegate: ApplicationSessionObserverDelegate?
         applicationDelegate?.didEnterBackground()
     }
 }
+#endif

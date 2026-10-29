@@ -167,6 +167,8 @@ struct ConfigurationView: View {
                         }
                     }
                 }
+                #if os(iOS)
+                // The Mac reads the PIV certificates with its own smart card driver.
                 Section("PIV") {
                     NavigationLink {
                         SmartCardConfigurationView()
@@ -178,12 +180,19 @@ struct ConfigurationView: View {
                         Text("Smart card extension")
                     }
                 }
+                #endif
             }
+            #if os(iOS)
+            // On the Mac the Settings window is titled after the tab.
             .navigationTitle(String(localized: "Configuration", comment: "Configuration navigation title"))
+            #endif
             .toolbar {
+                #if os(iOS)
+                // A tab of the Settings window on the Mac, which has its own close button.
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { showConfiguration.toggle() }
                 }
+                #endif
                 // Always there, so scanning doesn't depend on discovering pull to refresh.
                 if DeviceCapabilities.supportsNFC {
                     ToolbarItem(placement: .primaryAction) {

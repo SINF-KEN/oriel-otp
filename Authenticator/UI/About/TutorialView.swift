@@ -24,40 +24,40 @@ struct TutorialView: View {
     
     var body: some View {
         NavigationStack {
+            #if os(iOS)
             TabView(selection: $page) {
                 ForEach(Array(self.tutorialPages.enumerated()), id: \.element) { index, tutorialPage in
-                    ScrollView {
-                        VStack {
-                            Text(tutorialPage.title)
-                                .multilineTextAlignment(.center)
-                                .font(.title)
-                                .bold()
-                            tutorialPage.image.padding(30)
-                            Text(tutorialPage.text)
-                                .multilineTextAlignment(.center).foregroundStyle(.secondary)
-                            tutorialPage.link.map { link in
-                                Button {
-                                    UIApplication.shared.open(link)
-                                } label: {
-                                    Text("Read more...").bold()
-                                }
-                                .padding(.top, 30)
-                            }
-                            Spacer()
-                        }
-                        .padding(30)
-                        
-                    }.tag(index)
+                    pageView(tutorialPage).tag(index)
                 }
             }
+            #else
+            // A Mac has no swipeable pages, so one page shows at a time, with Back and Next.
+            pageView(tutorialPages[page])
+                .id(page)
+                .transition(.opacity)
+            #endif
         }
+        #if os(iOS)
         .onAppear() {
             // Page indicator is white in light mode and is not visible on white background.
             UIPageControl.appearance().currentPageIndicatorTintColor = .label
             UIPageControl.appearance().pageIndicatorTintColor = .secondaryLabel
         }
         .tabViewStyle(.page(indexDisplayMode: .always))
+        #endif
         .toolbar {
+            #if os(macOS)
+            ToolbarItem(placement: .navigation) {
+                Button {
+                    withAnimation {
+                        page -= 1
+                    }
+                } label: {
+                    Label(String(localized: "Back", comment: "Mac tutorial button"), systemImage: "chevron.backward")
+                }
+                .disabled(page == 0)
+            }
+            #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     withAnimation {
@@ -68,6 +68,38 @@ struct TutorialView: View {
                 }
                 .disabled(page >= self.tutorialPages.count - 1)
             }
+        }
+    }
+
+    private func pageView(_ tutorialPage: TutorialPageModel) -> some View {
+        ScrollView {
+            VStack {
+                Text(tutorialPage.title)
+                    .multilineTextAlignment(.center)
+                    .font(.title)
+                    .bold()
+                #if os(macOS)
+                tutorialPage.image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 220)
+                    .padding(30)
+                #else
+                tutorialPage.image.padding(30)
+                #endif
+                Text(tutorialPage.text)
+                    .multilineTextAlignment(.center).foregroundStyle(.secondary)
+                tutorialPage.link.map { link in
+                    Button {
+                        Platform.open(link)
+                    } label: {
+                        Text("Read more...").bold()
+                    }
+                    .padding(.top, 30)
+                }
+                Spacer()
+            }
+            .padding(30)
         }
     }
 }
@@ -89,6 +121,24 @@ struct TutorialPageModel: Hashable, Identifiable {
 
 extension TutorialView {
     var tutorialPages: [TutorialPageModel] {
+        #if os(macOS)
+        // A Mac connects to a YubiKey over USB only.
+        [TutorialPageModel(title: String(localized: "How it works"),
+                           image: Image(.tutorialAccounts),
+                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with a USB-C or USB-A connector to get started.", comment: "Mac tutorial"),
+                           link: nil),
+
+         TutorialPageModel(title: String(localized: "Plug in your YubiKey"),
+                           image: Image(.tutorialPlugIn),
+                           text: String(localized: "Plug your YubiKey into your Mac, directly or through a USB hub or adapter.\n\nTouch the YubiKey when prompted.", comment: "Mac tutorial"),
+                           link: nil),
+
+         TutorialPageModel(title: String(localized: "Where to get QR codes"),
+                           image: Image(.tutorialQrCode),
+                           text: String(localized: "QR codes are available from the services you wish to secure.\n\nWhen you add an account, Oriel OTP can find the QR code on your screen, read a copied or dropped picture of it, or take one with your iPhone.", comment: "Mac tutorial"),
+                           link: nil)
+        ]
+        #else
         [TutorialPageModel(title: String(localized: "How it works"),
                            image: Image(.tutorialAccounts),
                            text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC, Lightning or USB-C to get started."),
@@ -109,5 +159,6 @@ extension TutorialView {
                             text: String(localized: "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add your YubiKey and generate your own security codes."),
                             link: nil)
         ]
+        #endif
     }
 }

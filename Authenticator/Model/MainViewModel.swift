@@ -165,6 +165,15 @@ import YubiKit
         await ConnectionManager.shared.suspendWiredConnections()
     }
 
+    /// Whether ``start()`` has been called and ``stop()`` hasn't since.
+    var isStarted: Bool { sessionTask != nil }
+
+    /// Reads the accounts and codes from the inserted YubiKey again.
+    func refresh() {
+        guard isStarted, accountsLoaded else { return }
+        Task { await updateAccounts() }
+    }
+
     func stop() {
         sessionTask?.cancel()
         sessionTask = nil
@@ -192,14 +201,19 @@ import YubiKit
                 try await Task.sleep(for: .milliseconds(500))
                 guard isWired, let self else { return }
                 self.showTouchToast = true
-                let generator = UINotificationFeedbackGenerator()
-                generator.notificationOccurred(.error)
+                Platform.notify(.error)
+                #if os(macOS)
+                TouchPrompt.show(for: account.title)
+                #endif
             }
             
             // The prompt stays up until the YubiKey has been touched, or the calculation failed.
             defer {
                 showTouchAlert.cancel()
                 showTouchToast = false
+                #if os(macOS)
+                TouchPrompt.hide()
+                #endif
             }
             let otp = try await session.calculate(credential: account.credential)
             
@@ -350,6 +364,17 @@ import YubiKit
         }
     }
     
+    /// Deletes the accounts one after the other, as the YubiKey handles one command at a time.
+    func deleteAccounts(_ accounts: [Account], completion: @escaping () -> Void) {
+        guard let account = accounts.first else {
+            completion()
+            return
+        }
+        deleteAccount(account) { [weak self] in
+            self?.deleteAccounts(Array(accounts.dropFirst()), completion: completion)
+        }
+    }
+
     /// Shows the password alert and returns the entered password, or nil if the user cancelled.
     private func requestPassword(isRetry: Bool) async -> String? {
         ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Key is password protected", comment: "OATH NFC password protected key"))

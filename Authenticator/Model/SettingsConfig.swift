@@ -15,7 +15,6 @@
  */
 
 import Foundation
-import UIKit
 
 /*! Allows to customize behavior of the app
  Using UserDefaults as permanent storage
@@ -37,9 +36,9 @@ class SettingsConfig {
     
     static var showWhatsNewText: Bool {
         get {
-            if UIApplication.appVersion != UserDefaults.standard.string(forKey: showWhatsNewCounterAppVersion) {
+            if Bundle.main.appVersion != UserDefaults.standard.string(forKey: showWhatsNewCounterAppVersion) {
                 UserDefaults.standard.set(0, forKey: showWhatsNewCounter)
-                UserDefaults.standard.set(UIApplication.appVersion, forKey: showWhatsNewCounterAppVersion)
+                UserDefaults.standard.set(Bundle.main.appVersion, forKey: showWhatsNewCounterAppVersion)
             }
             let counter = UserDefaults.standard.integer(forKey: showWhatsNewCounter)
             // Show whats new text the first 3 times app is started

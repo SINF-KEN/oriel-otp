@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+#if os(iOS)
+
 import XCTest
 
 /// Takes the screenshots shown in the README. Run it with `tools/screenshots.sh`.
@@ -76,3 +78,5 @@ final class ScreenshotTests: XCTestCase {
         }
     }
 }
+
+#endif

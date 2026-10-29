@@ -16,7 +16,6 @@
  */
 
 import Foundation
-import UIKit
 import YubiKit
 
 enum OATHSessionError: Error, LocalizedError, Equatable {
@@ -105,7 +104,7 @@ final class OATHSessionHandler {
     private func wiredSession(connection: SmartCardConnection) async throws -> OATHSession {
         let deviceInfo = await connection.deviceInfo()
         // Yubico OTP over USB makes the YubiKey act as a keyboard, which hides the on-screen keyboard on iPhone.
-        if connection is USBSmartCardConnection && UIDevice.current.userInterfaceIdiom == .phone, let deviceInfo,
+        if connection is USBSmartCardConnection && Platform.isPhone, let deviceInfo,
            deviceInfo.config.isApplicationEnabled(.otp, over: .usb) && !SettingsConfig.isOTPOverUSBIgnored(deviceId: deviceInfo.serialNumber) {
             throw OATHSessionError.otpEnabledError
         }

@@ -1,6 +1,6 @@
 # Oriel OTP
 
-Oriel OTP is an iOS and iPadOS authenticator that keeps your one-time password accounts on a YubiKey instead of
+Oriel OTP is an authenticator for iPhone, iPad and Mac that keeps your one-time password accounts on a YubiKey instead of
 on your phone. It can also **import your accounts from [Ente Auth](https://ente.io/auth)**, so moving them onto a
 hardware key takes a few taps instead of re-scanning every QR code.
 
@@ -12,7 +12,16 @@ hardware key takes a few taps instead of re-scanning every QR code.
   <img src="docs/screenshots/ente-accounts.png" width="250" alt="Choosing which Ente Auth accounts to add to the YubiKey">
 </p>
 
-The screenshots are taken from the app in the simulator, with made-up demo accounts. See
+On the Mac, the accounts sit in a sidebar, every action is in the menu bar, and the menu bar icon copies a code with
+one click:
+
+<p align="center">
+  <img src="docs/screenshots/mac-accounts.png" width="560" alt="The Mac app with the account list and the details of one account">
+  &nbsp;
+  <img src="docs/screenshots/mac-menu-bar.png" width="200" alt="Copying a code from the menu bar">
+</p>
+
+The screenshots are taken from the app in the simulator and on a Mac, with made-up demo accounts. See
 [docs/screenshots.md](docs/screenshots.md).
 
 ## Features
@@ -27,17 +36,21 @@ The screenshots are taken from the app in the simulator, with made-up demo accou
 - **Everyday use.** Search, pin favorites, copy codes, rename and delete accounts, Steam codes, and an optional
   password for the YubiKey's OATH application.
 - **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps
-  and websites through iOS, in the same way as other smart cards.
+  and websites through iOS, in the same way as other smart cards. macOS does this itself, without the app.
+- **On the Mac.** Menu bar commands and keyboard shortcuts, a Settings window, codes in the menu bar, QR codes read
+  from the screen, a pasted or dropped image or your iPhone's camera, a Copy Code action for Shortcuts, and a
+  notification when the YubiKey needs a touch.
 
 ## Compatibility
 
 | | |
 | --- | --- |
-| System | iOS and iPadOS 17 or later, on iPhone and iPad |
+| System | iOS and iPadOS 17 or later, on iPhone and iPad, and macOS 14 or later |
 | YubiKey | A YubiKey with the OATH application, such as the YubiKey 5 Series. The Security Key Series and YubiKey Bio don't have it. |
 | NFC | On iPhone, by holding an NFC YubiKey (e.g. YubiKey 5 NFC) to the top of the phone |
 | USB-C | On iPhones and iPads with a USB-C port, e.g. with a YubiKey 5C NFC |
 | Lightning | On iPhones and iPads with a Lightning port, with a YubiKey 5Ci |
+| Mac | Over USB only, with a USB-C or USB-A YubiKey, directly or through a hub or adapter |
 
 ## Ente Auth
 

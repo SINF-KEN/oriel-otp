@@ -54,6 +54,9 @@ struct AddAccountView: View {
     @State private var digits = 6
     @State private var period: TimeInterval = 30
     @State private var errorMessage: String?
+    #if os(macOS)
+    @State private var qrCodeError: QRCodeReader.ReadError?
+    #endif
     @AppStorage("EnteAuth.AddNewAccounts") private var addToEnte = false
     // Adding to Ente Auth uses the saved session, so it is only offered when there is one.
     private let enteEmail = EnteSessionStore().savedEmail
@@ -64,7 +67,12 @@ struct AddAccountView: View {
         self.accountSubject = accountSubject
         let template = oathURL.flatMap { try? YubiKitOATHSession.CredentialTemplate(otpauthURL: $0) }
         _template = State(initialValue: template)
+        #if os(iOS)
         _mode = State(initialValue: template == nil ? .scanning : .prefilled)
+        #else
+        // The Mac has no camera scanner. QR codes are read from the screen or an image in the form instead.
+        _mode = State(initialValue: template == nil ? .manual : .prefilled)
+        #endif
         _issuer = State(initialValue: template?.issuer ?? "")
         _accountName = State(initialValue: template?.name ?? "")
     }
@@ -72,6 +80,11 @@ struct AddAccountView: View {
     var body: some View {
         NavigationStack {
             Form {
+                #if os(macOS)
+                if template == nil {
+                    qrCodeSection
+                }
+                #endif
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Add account field")) {
                         TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer)
@@ -141,7 +154,9 @@ struct AddAccountView: View {
                     } footer: {
                         Text(String(localized: "Normally these settings should not be changed, doing so may result in the code not working as expected", comment: "Add account advanced settings footer"))
                     }
+                    #if os(iOS)
                     .pickerStyle(.navigationLink)
+                    #endif
                 }
             }
             .formStyle(.grouped)
@@ -155,25 +170,53 @@ struct AddAccountView: View {
                     ConfirmButton(String(localized: "Save")) { save() }
                 }
             }
+            #if os(macOS)
+            .onDrop(of: [.image, .fileURL, .url], isTargeted: nil) { providers in
+                readQRCode { try await QRCodeReader.read(providers) }
+                return true
+            }
+            // File > Import from iPhone or iPad, to take a picture of a QR code with Continuity Camera.
+            .importsItemProviders([.image]) { providers in
+                readQRCode { try await QRCodeReader.read(providers) }
+                return true
+            }
+            .frame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+            #endif
             .alert(String(localized: "Not valid credential information", comment: "Add account error message"),
                    isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text(errorMessage ?? "")
             }
+            #if os(macOS)
+            .alert(String(localized: "Couldn't read a QR code", comment: "Mac add account QR code error title"),
+                   isPresented: Binding(get: { qrCodeError != nil }, set: { if !$0 { qrCodeError = nil } }), presenting: qrCodeError) { error in
+                if case .noScreenRecordingPermission = error {
+                    Button(String(localized: "Open System Settings", comment: "Mac add account QR code error")) {
+                        Platform.open(QRCodeReader.screenRecordingSettings)
+                    }
+                }
+                Button("OK", role: .cancel) { }
+            } message: { error in
+                Text(error.localizedDescription)
+            }
+            #endif
         }
         // Covered by the scanner, so VoiceOver shouldn't reach it either.
         .accessibilityHidden(mode == .scanning)
+        #if os(iOS)
         .overlay {
             if mode == .scanning {
                 scanner
             }
         }
+        #endif
         .onDisappear {
             accountSubject.send((nil, true, false))
         }
     }
 
+    #if os(iOS)
     private var scanner: some View {
         NavigationStack {
             ScanAccountRepresentable { account in
@@ -199,6 +242,45 @@ struct AddAccountView: View {
         // The camera preview is dark in both appearances.
         .environment(\.colorScheme, .dark)
     }
+    #endif
+
+    #if os(macOS)
+    private var qrCodeSection: some View {
+        Section {
+            Button {
+                readQRCode { try await QRCodeReader.scanScreen() }
+            } label: {
+                Label(String(localized: "Scan QR Code on Screen", comment: "Mac add account button"), systemImage: "qrcode.viewfinder")
+            }
+            Button {
+                readQRCode { try QRCodeReader.readPasteboard() }
+            } label: {
+                Label(String(localized: "Paste QR Code or Link", comment: "Mac add account button"), systemImage: "doc.on.clipboard")
+            }
+        } header: {
+            Text(String(localized: "QR code", comment: "Mac add account section header"))
+        } footer: {
+            Text(String(localized: "Show the QR code on screen, copy it, or drop a picture of it here. To take a picture with your iPhone or iPad, use the File menu. Or enter the details below.", comment: "Mac add account QR code footer"))
+        }
+    }
+
+    private func readQRCode(_ read: @escaping () async throws -> URL) {
+        Task {
+            do {
+                let url = try await read()
+                let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
+                self.template = template
+                issuer = template.issuer ?? ""
+                accountName = template.name
+                mode = .prefilled
+            } catch let error as QRCodeReader.ReadError {
+                qrCodeError = error
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+    #endif
 
     private func save() {
         let credential: YubiKitOATHSession.CredentialTemplate
@@ -231,6 +313,7 @@ struct AddAccountView: View {
     }
 }
 
+#if os(iOS)
 // Hosts the QR scanner. It sits in a container because it removes itself from its superview when it finishes.
 private struct ScanAccountRepresentable: UIViewRepresentable {
 
@@ -247,6 +330,7 @@ private struct ScanAccountRepresentable: UIViewRepresentable {
     func updateUIView(_ uiView: UIView, context: Context) {
     }
 }
+#endif
 
 extension YubiKitOATHSession.HashAlgorithm {
 

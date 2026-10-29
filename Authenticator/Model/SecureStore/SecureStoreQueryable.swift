@@ -36,7 +36,7 @@ import LocalAuthentication
  APP ID prefix required in case if we want to share storage with our other applications
  */
 // The Team ID of the keychain access group. Set it to your own team when sharing the keychain with another app.
-let APP_ID = ""
+nonisolated let APP_ID = ""
 
 nonisolated protocol SecureStoreQueryable: Sendable {
     func setUpQuery(useAuthentication: Bool) -> [String: Any]
@@ -63,6 +63,11 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
         var query: [String: Any] = [:]
         query[String(kSecClass)] = kSecClassGenericPassword
         query[String(kSecAttrService)] = service
+#if os(macOS)
+        // The Mac has a second, file-based keychain. Use the same data protection keychain as on iOS, which supports
+        // the access control flags below and doesn't ask for the login password.
+        query[String(kSecUseDataProtectionKeychain)] = true
+#endif
 // Access group if target environment is not simulator
 #if !targetEnvironment(simulator)
         if let accessGroup = accessGroup {

@@ -15,7 +15,10 @@
  * limitations under the License.
  */
 
+import CoreGraphics
+#if canImport(UIKit)
 import UIKit
+#endif
 
 extension CGRect {
     // The largest part of the rect that none of the obstacles overlap. Pieces are ranked by their shorter side
@@ -41,6 +44,7 @@ extension CGRect {
     }
 }
 
+#if canImport(UIKit)
 extension UIView {
     // The largest part of the bounds that the fold and the camera housing leave clear, on devices that reserve regions.
     var boundsClearOfReservedRegions: CGRect {
@@ -49,3 +53,4 @@ extension UIView {
         return bounds.largestClearRect(avoiding: regions.map(\.frame))
     }
 }
+#endif

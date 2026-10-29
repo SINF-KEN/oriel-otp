@@ -16,6 +16,7 @@
  */
 
 
+#if os(iOS)
 import SwiftUI
 import OSLog
 
@@ -87,7 +88,7 @@ struct SmartCardConfigurationView: View {
         .alert(String(localized: "Smart card extension", comment: "PIV extension info alert title"), isPresented: $presentHelpAlert, actions: {
             Button(role: .none) {
                 if let url = URL(string: "https://docs.yubico.com/software/yubikey/tools/authenticator/auth-guide/smart-card-index.html") {
-                    UIApplication.shared.open(url)
+                    Platform.open(url)
                 }
             } label: {
                 Text(String(localized: "Read more...", comment: "PIV extension read more alert title"))
@@ -298,3 +299,4 @@ private struct SmartCardCertificateRow: View {
             .font(.system(size: 26, weight: .light))
     }
 }
+#endif

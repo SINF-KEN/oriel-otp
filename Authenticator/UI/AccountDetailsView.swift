@@ -83,7 +83,7 @@ struct AccountDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             // Copy is what people come here for, so it's the last to move into the overflow menu when the bar is narrow.
-            if #available(iOS 27.0, *) {
+            if #available(iOS 27.0, macOS 27.0, *) {
                 copyToolbarItem
                     .visibilityPriority(.high)
             } else {
@@ -93,21 +93,25 @@ struct AccountDetailView: View {
                 Button(action: { account.calculate() }) {
                     Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
                 }
+                .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
                 .disabled(!account.enableRefresh)
                 Button(action: { account.isPinned.toggle() }) {
                     Label(account.isPinned ? String(localized: "Unpin", comment: "Menu") : String(localized: "Pin", comment: "Menu"),
                           systemImage: account.isPinned ? "pin.slash" : "pin")
                 }
+                .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
             }
             ToolbarItemGroup(placement: .secondaryAction) {
                 if account.keyVersion >= Version("5.3.0")! {
                     Button(action: { showEditing.toggle() }) {
                         Label(String(localized: "Rename", comment: "Menu"), systemImage: "square.and.pencil")
                     }
+                    .help(String(localized: "Rename the account", comment: "Toolbar help"))
                 }
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
+                .help(String(localized: "Delete the account from the YubiKey", comment: "Toolbar help"))
             }
         }
         .sheet(isPresented: $showEditing) {
@@ -130,6 +134,7 @@ struct AccountDetailView: View {
             Button(action: copyCode) {
                 Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
             }
+            .help(String(localized: "Copy the code", comment: "Mac row button help"))
             .disabled(account.state == .expired || account.otp == nil)
         }
     }

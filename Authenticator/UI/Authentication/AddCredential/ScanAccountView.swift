@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#if os(iOS)
 import AVFoundation
 import AVKit
 import UIKit
@@ -145,7 +146,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
             guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
                 return
             }
-            UIApplication.shared.open(settingsUrl)
+            Platform.open(settingsUrl)
         }, for: .primaryActionTriggered)
         
         addSubview(textLabel)
@@ -500,3 +501,4 @@ extension ScanAccountView {
         return overlayView
     }
 }
+#endif

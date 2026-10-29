@@ -23,13 +23,13 @@ import Foundation
 nonisolated enum AppClock {
 
     static var now: Date {
-        #if DEBUG && targetEnvironment(simulator)
+        #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         if let demoDate { return demoDate }
         #endif
         return Date()
     }
 
-    #if DEBUG && targetEnvironment(simulator)
+    #if DEBUG && (targetEnvironment(simulator) || os(macOS))
     private static let demoDate: Date? = {
         let seconds = UserDefaults.standard.double(forKey: "DemoDate")
         return seconds > 0 ? Date(timeIntervalSince1970: seconds) : nil

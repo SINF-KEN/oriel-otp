@@ -37,7 +37,7 @@ struct AboutView: View {
                     Text(verbatim: "Oriel OTP")
                         .font(.title)
                         .multilineTextAlignment(.center)
-                    Text("\(UIApplication.appVersion) (build \(UIApplication.appBuildNumber))")
+                    Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
                         .font(.body)
                     AboutLanguageView()
                 }
@@ -60,14 +60,16 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "list.clipboard"), color: Color(.systemGreen))
                         Text("Version history")
                     }
+                    #if os(iOS)
                     NavigationLink {
                         AppIconView()
                     } label: {
                         ListIconView(image: Image(systemName: "app.badge"), color: Color(.systemGreen), padding: 5)
                         Text("App icon")
                     }
+                    #endif
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)
+                        Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
@@ -75,7 +77,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/PRIVACY.md")!)
+                        Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/PRIVACY.md")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.secondaryLabel))
@@ -93,7 +95,7 @@ struct AboutView: View {
                 }
                 Section("Support") {
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp#readme")!)
+                        Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp#readme")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "book"), color: Color(.systemPink))
@@ -101,7 +103,7 @@ struct AboutView: View {
                         }
                     }
                     Button {
-                        UIApplication.shared.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/SUPPORT.md")!)
+                        Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/SUPPORT.md")!)
                     } label: {
                         HStack {
                             ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)
@@ -110,12 +112,19 @@ struct AboutView: View {
                     }
                 }
             }
+            #if os(macOS)
+            // Rows, like on iOS, rather than bordered push buttons.
+            .buttonStyle(.plain)
+            #endif
             .navigationTitle(String(localized: "About", comment: "About navigation title"))
+            #if os(iOS)
+            // A window with its own close button on the Mac.
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { dismiss() }
                 }
             }
+            #endif
         }
     }
 }
