@@ -232,11 +232,8 @@ struct EnteSavedAccountTests {
     private func signIn(_ model: EnteSyncViewModel, server: URL = FakeEnteServer.server) async throws {
         model.email = "alice@example.com"
         model.server = server.absoluteString
-        model.signIn()
-        try await settle(model)
-        #expect(model.phase == .password)
         model.password = FakeEnteServer.password
-        model.submitPassword()
+        model.signIn()
         try await settle(model)
         #expect(model.error == nil)
         #expect(model.phase == .accounts)
@@ -296,7 +293,7 @@ struct EnteSavedAccountTests {
         let model = makeModel()
         model.useSavedSession()
         try await settle(model)
-        #expect(model.phase == .password)
+        #expect(model.phase == .signIn)
         #expect(model.email == "alice@example.com")
         #expect(store.savedAccount == EnteSavedAccount(email: "alice@example.com", server: FakeEnteServer.server, hasSession: false))
 
@@ -307,7 +304,7 @@ struct EnteSavedAccountTests {
         #expect(reopened.server == FakeEnteServer.server.absoluteString)
 
         model.password = FakeEnteServer.password
-        model.submitPassword()
+        model.signIn()
         try await settle(model)
         #expect(model.phase == .accounts)
         #expect(store.savedAccount?.hasSession == true)
