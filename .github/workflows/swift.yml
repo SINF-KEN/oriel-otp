@@ -44,7 +44,9 @@ jobs:
           plutil -lint \
             Authenticator.xcodeproj/project.pbxproj \
             Authenticator/Info.plist \
+            Authenticator/Info-macOS.plist \
             Authenticator/Authenticator.entitlements \
+            Authenticator/Authenticator-macOS.entitlements \
             AuthenticatorTests/Info.plist \
             TokenExtension/Info.plist \
             TokenExtension/TokenExtension.entitlements
@@ -193,6 +195,30 @@ jobs:
           check_coverage EnteLoginFlow.swift 0.50
           check_coverage TokenResponseStore.swift 0.90
 
+      # CI has no provisioning profile, so the Mac build is signed ad hoc without the keychain access group, which
+      # needs one. The keychain tests skip themselves without it.
+      - name: Test on macOS
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          ENTITLEMENTS="$RUNNER_TEMP/Authenticator-macOS-CI.entitlements"
+          cp Authenticator/Authenticator-macOS.entitlements "$ENTITLEMENTS"
+          /usr/libexec/PlistBuddy -c 'Delete :keychain-access-groups' "$ENTITLEMENTS"
+          xcodebuild test \
+            -project Authenticator.xcodeproj \
+            -scheme Authenticator \
+            -destination 'platform=macOS' \
+            -only-testing:AuthenticatorTests \
+            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -resultBundlePath "$RUNNER_TEMP/Authenticator-macOS.xcresult" \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGN_STYLE=Manual \
+            DEVELOPMENT_TEAM= \
+            CODE_SIGN_ENTITLEMENTS="$ENTITLEMENTS" \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-test-macos.log"
+
       - name: Upload test results and logs
         if: always()
         uses: actions/upload-artifact@v6
@@ -203,6 +229,8 @@ jobs:
             ${{ runner.temp }}/resolve-packages.log
             ${{ runner.temp }}/xcodebuild-analyze.log
             ${{ runner.temp }}/xcodebuild-test.log
+            ${{ runner.temp }}/Authenticator-macOS.xcresult
+            ${{ runner.temp }}/xcodebuild-test-macos.log
             ${{ runner.temp }}/test-summary.json
           if-no-files-found: ignore
           retention-days: 7

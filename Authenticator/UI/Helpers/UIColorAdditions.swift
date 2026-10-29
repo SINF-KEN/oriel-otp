@@ -15,23 +15,8 @@
  * limitations under the License.
  */
 
-import UIKit
+import SwiftUI
 
-extension UIColor {
-    static let colorSetForAccountIcons = [UIColor(named: "Color1"),
-                                          UIColor(named: "Color2"),
-                                          UIColor(named: "Color3"),
-                                          UIColor(named: "Color4"),
-                                          UIColor(named: "Color5"),
-                                          UIColor(named: "Color6"),
-                                          UIColor(named: "Color7"),
-                                          UIColor(named: "Color8"),
-                                          UIColor(named: "Color9"),
-                                          UIColor(named: "Color10"),
-                                          UIColor(named: "Color11"),
-                                          UIColor(named: "Color12"),
-                                          UIColor(named: "Color13"),
-                                          UIColor(named: "Color14"),
-                                          UIColor(named: "Color15"),
-                                          UIColor(named: "Color16")]
+extension Color {
+    static let colorSetForAccountIcons = (1...16).map { Color("Color\($0)") }
 }
