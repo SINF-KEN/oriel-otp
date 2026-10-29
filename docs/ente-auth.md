@@ -33,7 +33,8 @@ package read authenticator data.
 
 ## Reading accounts
 
-1. `GET /authenticator/key` returns the authenticator key, encrypted with the master key.
+1. `GET /authenticator/key` returns the authenticator key, encrypted with the master key. An account that has
+   never used Ente Auth has none (`404`) and so no accounts to read.
 2. `GET /authenticator/entity/diff` is paged from `sinceTime=0` and the latest version of each entity is kept.
    Deleted entities are dropped.
 3. Each entity is one XChaCha20-Poly1305 secretstream message. It decrypts to JSON: either a string with an
@@ -63,7 +64,7 @@ sheet to save the account in Ente Auth as well. The choice is remembered.
 This uses the saved session, so it is offered once you have signed in with **Stay signed in**. After the account
 is on the YubiKey:
 
-1. The saved session is unlocked with Face ID, Touch ID or the passcode.
+1. The saved session is unlocked with Face ID or Touch ID, or Touch ID or the password on the Mac.
 2. The accounts in Ente Auth are read as above. If one has the same name, nothing is added.
 3. The otpauth URL is JSON encoded like Ente's apps do, encrypted with the authenticator key as one
    XChaCha20-Poly1305 secretstream message, and sent with `POST /authenticator/entity`.
@@ -78,13 +79,38 @@ the error is shown.
 
 ## What is stored
 
-By default nothing is stored. The session only lives while the sheet is open, and when it closes the token is
-revoked with `POST /users/logout`.
+The account stays signed in, like in Ente's own apps. **Stay signed in** is on by default when the device can
+protect the session: the auth token and the authenticator key, the key that decrypts the accounts, are saved in
+the keychain, only on this device (`WhenPasscodeSetThisDeviceOnly`). Reading them needs Face ID or Touch ID on
+iPhone and iPad (`biometryCurrentSet`) and Touch ID or the Mac's password on the Mac (`userPresence`). After a
+relaunch, syncing only needs that unlock, not the Ente password. The password is never stored, and neither is the
+master key: the authenticator key is all syncing and adding accounts need.
 
-With **Stay signed in**, offered when the device has a passcode, the auth token and the authenticator key are
-saved in the keychain, protected by Face ID, Touch ID or the passcode (`biometryCurrentSet`,
-`WhenPasscodeSetThisDeviceOnly`), so later syncs need no password. The master key and the password are never
-stored. **Sign out** revokes the token and removes the keychain item.
+An account that has never used Ente Auth has no authenticator key yet. When the session is saved, signing in
+creates one like Ente Auth does, while the master key is still in memory: 32 random bytes, encrypted with the
+master key (secretbox) and stored with `POST /authenticator/key` (`encryptedKey`, `header` with the nonce). If
+another Ente app created the key in the meantime, the server answers `409` and that key is fetched and used. So a
+new account stays signed in too. Without **Stay signed in** no key is created.
+
+Saving deletes any earlier keychain item and adds a new one, because updating an item keeps the access control it
+was added with. Sessions saved by earlier versions, protected by Touch ID only on the Mac, are saved again with
+the current access control the first time they are unlocked.
+
+The email and server are kept in the app's preferences, so the account is shown without unlocking: in the sheet,
+and with **Sign out** in the settings (the YubiKey configuration on iPhone and iPad, Settings ▸ General on the
+Mac). **Sign out** asks for the unlock to read the token, deletes the token, the key and the account right away,
+and then revokes the token with `POST /users/logout` without waiting for the answer. If the unlock is cancelled or
+the server can't be reached, the account is still deleted from the device.
+
+When the server rejects the token (`401`), e.g. because the session was ended from another device, or when Face ID
+or Touch ID changed and the keychain item can no longer be read, the token and key are deleted but the account is
+kept. The sheet then asks for the password of that account again and saves the new session.
+
+With **Stay signed in** turned off, nothing is stored. The session only lives while the sheet is open, and when it
+closes the token is revoked with `POST /users/logout`.
+
+`EnteSessionStore.unlock()` returns the server, token and authenticator key of the saved account after the unlock,
+for code that needs to read or add accounts outside the sheet.
 
 ## Self-hosted servers
 
@@ -101,7 +127,8 @@ Everything lives in `Authenticator/EnteAuth/` and is added to the project as a s
 | `EnteAPIClient.swift` | HTTP client and wire models |
 | `EnteLoginFlow.swift` | Sign in state machine and key decryption |
 | `EnteAuthenticatorSync.swift` | Downloads, decrypts and parses the accounts, and encrypts and adds new ones |
-| `EnteSessionStore.swift` | Optional saved session in the keychain, and adding an account with it |
+| `EnteSessionStore.swift` | The saved account and session in the keychain, and adding an account with it |
+| `EnteAccountSection.swift` | The saved account and **Sign out** in the settings |
 | `EnteSyncViewModel.swift`, `EnteSyncView.swift` | The sheet |
 
 Outside that folder the feature adds a menu item, buttons in the empty account list and a sheet in `MainView`, the

@@ -128,9 +128,9 @@ struct EnteSyncView: View {
             } footer: {
                 if model.canSaveSession {
                     #if os(macOS)
-                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password.", comment: "Mac Ente sign in options footer"))
+                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password, which is never stored.", comment: "Mac Ente sign in options footer"))
                     #else
-                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps a session in the keychain, protected by Face ID or Touch ID, so you can sync again without your password.", comment: "Ente sign in options footer"))
+                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored.", comment: "Ente sign in options footer"))
                     #endif
                 } else {
                     Text(String(localized: "Leave the server empty unless you host Ente yourself.", comment: "Ente sign in options footer without stay signed in"))

@@ -34,7 +34,7 @@ import YubiKit
     var password = ""
     var code = ""
     var server: String
-    var staySignedIn = false
+    var staySignedIn: Bool
     var isBusy = false
     /// Whether the password is being turned into keys, the part of signing in that can take a few seconds.
     var isDerivingKeys = false
@@ -69,14 +69,23 @@ import YubiKit
         self.session = session
         self.watch = watch
         self.server = defaults.string(forKey: Self.serverKey) ?? ""
-        if let email = store.savedEmail {
-            phase = .savedSession(email: email)
+        // Staying signed in is the default where the device can protect the session, like in Ente's own apps.
+        self.staySignedIn = store.canSave
+        if let account = store.savedAccount {
+            if account.hasSession {
+                phase = .savedSession(email: account.email)
+            } else {
+                // The server rejected the session, so the account only needs the password again.
+                email = account.email
+                server = Self.serverField(for: account.server)
+                phase = .signIn
+            }
         } else {
             phase = .signIn
         }
     }
 
-    var canSaveSession: Bool { EnteSessionStore.canSave }
+    var canSaveSession: Bool { store.canSave }
 
     var passkeyURL: URL? { flow?.passkeyURL }
 
@@ -212,13 +221,20 @@ import YubiKit
             guard let flow, let keys = flow.keys, let api else { throw EnteLoginError.invalidAccountData }
             self.flow = nil
             defaults.set(server.isEmpty ? nil : server, forKey: Self.serverKey)
-            // Only the authenticator key is kept, the master key goes away with the flow.
-            let authenticatorKey = try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
+            let saveSession = staySignedIn && canSaveSession
+            // Only the authenticator key is kept, the master key goes away with the flow. An account that has never
+            // used Ente Auth gets its key now, while the master key is there, so it stays signed in too.
+            let authenticatorKey = saveSession
+                ? try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
+                : try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
             token = keys.token
             signedInEmail = flow.email
-            if staySignedIn, canSaveSession, let authenticatorKey {
+            if saveSession, let authenticatorKey {
                 try store.save(EnteSavedSession(server: api.server, email: flow.email, token: keys.token, authenticatorKey: authenticatorKey))
                 isSessionSaved = true
+            } else {
+                // An account kept from an earlier session isn't signed in any more.
+                store.remove()
             }
             try await loadCodes(api: api, token: keys.token, authenticatorKey: authenticatorKey)
         }
@@ -257,21 +273,27 @@ import YubiKit
     }
 
     private func loadSavedCodes() async throws {
-        let saved = try await store.load()
-        let api = try EnteAPIClient(server: saved.server, session: session)
-        self.api = api
-        token = saved.token
-        signedInEmail = saved.email
-        isSessionSaved = true
         do {
+            let saved = try await store.unlock()
+            let api = try EnteAPIClient(server: saved.server, session: session)
+            self.api = api
+            token = saved.token
+            signedInEmail = saved.email
+            isSessionSaved = true
             try await loadCodes(api: api, token: saved.token, authenticatorKey: saved.authenticatorKey)
         } catch EnteAuthenticatorSyncError.signedOut {
-            // The session was revoked, e.g. from another device.
-            store.remove()
+            // The session was revoked, e.g. from another device, or Face ID or Touch ID changed. The account is kept
+            // and the password asked for again.
+            store.forgetSession()
             watch.disable()
+            token = nil
             isSessionSaved = false
-            email = saved.email
+            signedInEmail = nil
             phase = .signIn
+            if let account = store.savedAccount {
+                email = account.email
+                server = Self.serverField(for: account.server)
+            }
             throw EnteAuthenticatorSyncError.signedOut
         }
     }
@@ -281,11 +303,23 @@ import YubiKit
         useSavedSession()
     }
 
-    /// Ends the session on Ente's server and forgets it on this device.
+    /// Ends the session on Ente's server and forgets the account on this device.
     func signOut() {
-        revokeSession()
-        store.remove()
-        watch.disable()
+        if token == nil {
+            // The saved session hasn't been unlocked, the store unlocks it to end it on the server. Signing in again
+            // waits for the unlock, so the account it saves isn't deleted with this one.
+            let store = store
+            let watch = watch
+            isBusy = true
+            Task {
+                await store.signOut(watch: watch)
+                isBusy = false
+            }
+        } else {
+            revokeSession()
+            store.remove()
+            watch.disable()
+        }
         isSessionSaved = false
         codes = []
         selection = []
@@ -321,6 +355,11 @@ import YubiKit
         if isSessionSaved {
             watch.send(codes)
         }
+    }
+
+    /// The server as typed on the sign in screen, empty for Ente's own server.
+    private static func serverField(for server: URL) -> String {
+        server == EnteAPIClient.defaultServer ? "" : server.absoluteString
     }
 
     private func serverURL() throws -> URL {

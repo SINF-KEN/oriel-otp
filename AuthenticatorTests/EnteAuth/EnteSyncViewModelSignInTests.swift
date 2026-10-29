@@ -27,9 +27,12 @@ import Testing
     private func model(protocols: [AnyClass] = [FakeEnteServer.self]) -> EnteSyncViewModel {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = protocols
-        let model = EnteSyncViewModel(existingCredentialIds: [], store: EnteSessionStore(service: "EnteSyncViewModelSignInTests"),
-                                      defaults: UserDefaults(suiteName: "EnteSyncViewModelSignInTests")!,
-                                      session: URLSession(configuration: configuration))
+        // The session is kept in memory: the Mac build CI tests is signed without the keychain access group.
+        let defaults = makeTestDefaults()
+        let model = EnteSyncViewModel(existingCredentialIds: [],
+                                      store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+                                      defaults: defaults, session: URLSession(configuration: configuration),
+                                      watch: WatchAccountSync(defaults: defaults))
         model.server = FakeEnteServer.server.absoluteString
         return model
     }
