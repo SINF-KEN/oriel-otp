@@ -210,13 +210,17 @@ jobs:
         run: |
           set -euo pipefail
           RESULT_BUNDLE="$RUNNER_TEMP/Authenticator.xcresult"
-          xcrun xccov view --report --files-for-target Authenticator.app --json "$RESULT_BUNDLE" \
+          # The name xccov reports for the app target can change (it's "Oriel OTP.app" once the target also builds
+          # for macOS), so pick the one .app target instead of matching its name.
+          xcrun xccov view --report --json "$RESULT_BUNDLE" \
+            | jq -e '[.targets[] | select(.name | endswith(".app"))]
+              | if length == 1 then .[0] else error("Expected one .app target, found \(length)") end' \
             > "$RUNNER_TEMP/app-file-coverage.json"
           check_coverage() {
             local file_name="$1"
             local minimum="$2"
             local actual
-            actual=$(jq -er --arg name "$file_name" '.[0].files[] | select(.name == $name) | .lineCoverage' \
+            actual=$(jq -er --arg name "$file_name" '.files[] | select(.name == $name) | .lineCoverage' \
               "$RUNNER_TEMP/app-file-coverage.json")
             awk -v file_name="$file_name" -v actual="$actual" -v minimum="$minimum" \
               'BEGIN { printf "%s coverage: %.1f%% (minimum %.0f%%)\n", file_name, actual * 100, minimum * 100; exit !(actual >= minimum) }'
