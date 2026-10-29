@@ -238,6 +238,28 @@ def tutorial_accounts(p):
     return svg(726, 666, out)
 
 
+def check(cx, cy, p):
+    """A filled circle with a checkmark, like a selected row."""
+    return circle(cx, cy, 24, p["accent"]) + \
+        f'<path d="M{cx - 11:g},{cy:g} L{cx - 3:g},{cy + 9:g} L{cx + 12:g},{cy - 9:g}" stroke="{p["card"]}" ' \
+        f'stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n'
+
+
+def tutorial_ente_sync(p):
+    """Accounts picked from Ente Auth, going onto a YubiKey."""
+    out = rect(2, 2, 456, 516, 40, p["card_stroke"]) + rect(4, 4, 452, 512, 38, p["card"])
+    for i, label in enumerate((180, 150, 200)):
+        y = 50 + i * 150
+        out += circle(80, y + 60, 40, p["avatars"][i])
+        out += rect(140, y + 40, label, 16, 8, p["ink"]) + rect(140, y + 70, label - 60, 12, 6, p["bar"])
+        out += check(394, y + 60, p)
+        if i < 2:
+            out += rect(36, y + 132, 388, 2, 1, p["bar"])
+    out += arrow(620, 260, 1, p)
+    drawing, height = key("usbc", p)
+    return svg(860, 520, out + group(f"translate(760 {(520 - height * 0.9) / 2:g}) scale(0.9)", drawing))
+
+
 # Symbol
 
 def num(v):
@@ -341,7 +363,8 @@ def main():
         write_imageset(f"SecurityKeys/key-{kind}.imageset", key_image(kind, LIGHT), key_image(kind, DARK))
     write_imageset("InsertKey.imageset", insert_key())
     pages = {"tutorial-accounts": tutorial_accounts, "tutorial-plug-in": tutorial_plug_in,
-             "tutorial-nfc": tutorial_nfc, "tutorial-qr-code": tutorial_qr}
+             "tutorial-nfc": tutorial_nfc, "tutorial-qr-code": tutorial_qr,
+             "tutorial-ente-sync": tutorial_ente_sync}
     for name, draw in pages.items():
         write_imageset(f"Tutorial/{name}.imageset", draw(LIGHT), draw(DARK))
     write_symbol("securitykey")

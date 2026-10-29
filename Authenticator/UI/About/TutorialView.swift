@@ -78,15 +78,13 @@ struct TutorialView: View {
                     .multilineTextAlignment(.center)
                     .font(.title)
                     .bold()
-                #if os(macOS)
+                // The drawings are larger than the screen, so they're scaled down to fit.
                 tutorialPage.image
                     .resizable()
                     .scaledToFit()
                     .frame(maxHeight: 220)
                     .padding(30)
-                #else
-                tutorialPage.image.padding(30)
-                #endif
+                    .accessibilityHidden(true)
                 Text(tutorialPage.text)
                     .multilineTextAlignment(.center).foregroundStyle(.secondary)
                 tutorialPage.link.map { link in
@@ -128,6 +126,11 @@ extension TutorialView {
                            text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with a USB-C or USB-A connector to get started.", comment: "Mac tutorial"),
                            link: nil),
 
+         TutorialPageModel(title: String(localized: "Add accounts from Ente Auth", comment: "Tutorial page title"),
+                           image: Image(.tutorialEnteSync),
+                           text: String(localized: "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this Mac, and nothing in Ente Auth is changed.", comment: "Mac tutorial"),
+                           link: nil),
+
          TutorialPageModel(title: String(localized: "Plug in your YubiKey"),
                            image: Image(.tutorialPlugIn),
                            text: String(localized: "Plug your YubiKey into your Mac, directly or through a USB hub or adapter.\n\nTouch the YubiKey when prompted.", comment: "Mac tutorial"),
@@ -142,6 +145,11 @@ extension TutorialView {
         [TutorialPageModel(title: String(localized: "How it works"),
                            image: Image(.tutorialAccounts),
                            text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC or USB-C to get started."),
+                           link: nil),
+
+         TutorialPageModel(title: String(localized: "Add accounts from Ente Auth", comment: "Tutorial page title"),
+                           image: Image(.tutorialEnteSync),
+                           text: String(localized: "Already use Ente Auth? Choose Sync from Ente Auth in the account list menu, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this device, and nothing in Ente Auth is changed.", comment: "Tutorial"),
                            link: nil),
         
          TutorialPageModel(title: String(localized: "Plug in your YubiKey"),

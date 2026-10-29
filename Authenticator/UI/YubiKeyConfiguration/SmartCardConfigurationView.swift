@@ -87,7 +87,7 @@ struct SmartCardConfigurationView: View {
         }
         .alert(String(localized: "Smart card extension", comment: "PIV extension info alert title"), isPresented: $presentHelpAlert, actions: {
             Button(role: .none) {
-                if let url = URL(string: "https://docs.yubico.com/software/yubikey/tools/authenticator/auth-guide/smart-card-index.html") {
+                if let url = URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/SUPPORT.md#smart-card-extension") {
                     Platform.open(url)
                 }
             } label: {

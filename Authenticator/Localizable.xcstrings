@@ -1063,6 +1063,35 @@
         }
       }
     },
+    "Add accounts from Ente Auth" : {
+      "comment" : "Tutorial page title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten aus Ente Auth hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter des comptes depuis Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Auth からアカウントを追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať účty z Ente Auth"
+          }
+        }
+      }
+    },
     "Add an account to the YubiKey" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -1392,6 +1421,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Už je na YubiKey"
+          }
+        }
+      }
+    },
+    "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this Mac, and nothing in Ente Auth is changed." : {
+      "comment" : "Mac tutorial",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sie nutzen bereits Ente Auth? Wählen Sie „Ablage“ > „Mit Ente Auth synchronisieren“, melden Sie sich an und wählen Sie die Konten aus, die auf Ihren YubiKey sollen.\n\nIhre Ente-Auth-Daten werden auf diesem Mac entschlüsselt, und in Ente Auth wird nichts geändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous utilisez déjà Ente Auth ? Choisissez Fichier > Synchroniser depuis Ente Auth, connectez-vous et choisissez les comptes à ajouter à votre YubiKey.\n\nVos données Ente Auth sont déchiffrées sur ce Mac, et rien n’est modifié dans Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Auth をお使いですか？「ファイル」>「Ente Authから同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\nEnte Auth のデータはこの Mac 上で復号され、Ente Auth の内容は変更されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Už používate Ente Auth? Vyberte Súbor > Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nVaše údaje z Ente Auth sa dešifrujú v tomto Macu a v Ente Auth sa nič nezmení."
+          }
+        }
+      }
+    },
+    "Already use Ente Auth? Choose Sync from Ente Auth in the account list menu, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this device, and nothing in Ente Auth is changed." : {
+      "comment" : "Tutorial",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du nutzt schon Ente Auth? Wähle im Menü der Kontenliste „Aus Ente Auth synchronisieren“, melde dich an und wähle die Konten aus, die auf deinen YubiKey sollen.\n\nDeine Ente-Auth-Daten werden auf diesem Gerät entschlüsselt, und in Ente Auth wird nichts geändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous utilisez déjà Ente Auth ? Choisissez Synchroniser depuis Ente Auth dans le menu de la liste des comptes, connectez-vous et choisissez les comptes à ajouter à votre YubiKey.\n\nVos données Ente Auth sont déchiffrées sur cet appareil, et rien n’est modifié dans Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Auth をお使いですか？アカウント一覧のメニューから「Ente Auth から同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\nEnte Auth のデータはこのデバイス上で復号され、Ente Auth の内容は変更されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Už používate Ente Auth? V ponuke zoznamu účtov vyberte Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nVaše údaje z Ente Auth sa dešifrujú v tomto zariadení a v Ente Auth sa nič nezmení."
           }
         }
       }
@@ -3613,30 +3700,30 @@
         }
       }
     },
-    "FIDO management over USB-C is not supported by iOS. Use NFC or the desktop Yubico Authenticator instead." : {
+    "FIDO management over USB-C is not supported by iOS. Use NFC instead, or manage FIDO on a computer." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die FIDO-Verwaltung über USB-C wird von iOS nicht unterstützt. Verwende stattdessen NFC oder die Desktop Version des Yubico Authenticator."
+            "value" : "Die FIDO-Verwaltung über USB-C wird von iOS nicht unterstützt. Verwende stattdessen NFC oder verwalte FIDO an einem Computer."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La gestion FIDO via USB-C n'est pas prise en charge par iOS. Utilisez plutôt la NFC ou Yubico Authenticator."
+            "value" : "La gestion FIDO via USB-C n'est pas prise en charge par iOS. Utilisez plutôt la NFC, ou gérez FIDO sur un ordinateur."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "USB-C経由のFIDO管理はiOSではサポートされていません。代わりにNFCまたはデスクトップのYubico Authenticatorをご利用ください。"
+            "value" : "USB-C経由のFIDO管理はiOSではサポートされていません。代わりにNFCを使用するか、コンピュータでFIDOを管理してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Systém iOS nepodporuje spravovanie FIDO cez USB-C. Namiesto toho použite NFC alebo Yubico Authenticator na počítači."
+            "value" : "Systém iOS nepodporuje spravovanie FIDO cez USB-C. Namiesto toho použite NFC alebo spravujte FIDO v počítači."
           }
         }
       }
