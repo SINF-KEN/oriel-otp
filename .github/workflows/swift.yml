@@ -155,7 +155,9 @@ jobs:
         uses: ./.github/actions/swift-packages
 
       # This builds the app and extension with warnings as errors. There's no separate analyze build: the sources
-      # are all Swift, which the Clang static analyzer doesn't check.
+      # are all Swift, which the Clang static analyzer doesn't check. The Debug build is optimized: the Ente sign in
+      # tests do 4096-bit SRP with BigInt, which takes the unoptimized build minutes and the optimized one seconds.
+      # Debug's DEBUG flag and testability are unchanged.
       - name: Test on simulator
         timeout-minutes: 30
         run: |
@@ -170,6 +172,7 @@ jobs:
             -skipPackageUpdates \
             -enableCodeCoverage YES \
             -resultBundlePath "$RUNNER_TEMP/OrielOTP.xcresult" \
+            SWIFT_OPTIMIZATION_LEVEL=-O \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test.log"
 
       - name: Summarize test results
@@ -264,7 +267,8 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-watch.log"
 
       # CI has no provisioning profile, so the Mac build is signed ad hoc without the keychain access group, which
-      # needs one. The keychain tests skip themselves without it.
+      # needs one. The keychain tests skip themselves without it. The build is optimized like the simulator's. The
+      # optimized app has no debug dylib, so the hardened runtime is off: it won't load the ad hoc test bundle.
       - name: Test on macOS
         timeout-minutes: 20
         run: |
@@ -286,6 +290,8 @@ jobs:
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM= \
             CODE_SIGN_ENTITLEMENTS="$ENTITLEMENTS" \
+            SWIFT_OPTIMIZATION_LEVEL=-O \
+            ENABLE_HARDENED_RUNTIME=NO \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test-macos.log"
 
       - name: Upload test results and logs
