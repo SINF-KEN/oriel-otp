@@ -9,7 +9,6 @@ The drawings are the app's own and use the colors of the app icon. Run from the 
 import json
 import math
 import random
-import re
 from pathlib import Path
 
 ASSETS = Path(__file__).resolve().parent.parent / "Authenticator" / "Assets.xcassets"
@@ -168,10 +167,20 @@ def tutorial_qr(p):
     out = phone(8, 8, 506, 998, p)
     grid, cell = qr_modules(), 9.6
     left, top = 261 - len(grid) * cell / 2, 507 - len(grid) * cell / 2
+    # One path, with each run of dark modules in a row as a single rectangle.
+    runs = ""
     for y, row in enumerate(grid):
-        for x, on in enumerate(row):
-            if on:
-                out += rect(left + x * cell, top + y * cell, cell + 0.3, cell + 0.3, 0, p["ink"])
+        x = 0
+        while x < len(row):
+            if row[x]:
+                end = x
+                while end < len(row) and row[end]:
+                    end += 1
+                runs += f"M{left + x * cell:g} {top + y * cell:g}h{(end - x) * cell:g}v{cell:g}h{-(end - x) * cell:g}z"
+                x = end
+            else:
+                x += 1
+    out += f'<path d="{runs}" fill="{p["ink"]}"/>\n'
     corner = 'stroke="%s" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"' % p["accent"]
     for sx, sy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
         cx, cy = 261 + sx * 160, 507 + sy * 160
@@ -231,49 +240,66 @@ def tutorial_accounts(p):
 
 # Symbol
 
+def num(v):
+    """A coordinate to two decimals, without trailing zeros."""
+    return f"{v:.2f}".rstrip("0").rstrip(".")
+
+
 def rounded_rect_path(x, y, w, h, r, clockwise=True):
+    a, n = f"A{num(r)} {num(r)} 0 0 {1 if clockwise else 0} ", num
     if clockwise:
-        return (f"M{x + r:.3f},{y:.3f} L{x + w - r:.3f},{y:.3f} A{r:.3f},{r:.3f} 0 0 1 {x + w:.3f},{y + r:.3f} "
-                f"L{x + w:.3f},{y + h - r:.3f} A{r:.3f},{r:.3f} 0 0 1 {x + w - r:.3f},{y + h:.3f} "
-                f"L{x + r:.3f},{y + h:.3f} A{r:.3f},{r:.3f} 0 0 1 {x:.3f},{y + h - r:.3f} "
-                f"L{x:.3f},{y + r:.3f} A{r:.3f},{r:.3f} 0 0 1 {x + r:.3f},{y:.3f} z")
-    return (f"M{x + r:.3f},{y:.3f} A{r:.3f},{r:.3f} 0 0 0 {x:.3f},{y + r:.3f} "
-            f"L{x:.3f},{y + h - r:.3f} A{r:.3f},{r:.3f} 0 0 0 {x + r:.3f},{y + h:.3f} "
-            f"L{x + w - r:.3f},{y + h:.3f} A{r:.3f},{r:.3f} 0 0 0 {x + w:.3f},{y + h - r:.3f} "
-            f"L{x + w:.3f},{y + r:.3f} A{r:.3f},{r:.3f} 0 0 0 {x + w - r:.3f},{y:.3f} z")
+        return (f"M{n(x + r)} {n(y)}H{n(x + w - r)}{a}{n(x + w)} {n(y + r)}V{n(y + h - r)}{a}{n(x + w - r)} {n(y + h)}"
+                f"H{n(x + r)}{a}{n(x)} {n(y + h - r)}V{n(y + r)}{a}{n(x + r)} {n(y)}Z")
+    return (f"M{n(x + r)} {n(y)}{a}{n(x)} {n(y + r)}V{n(y + h - r)}{a}{n(x + r)} {n(y + h)}"
+            f"H{n(x + w - r)}{a}{n(x + w)} {n(y + h - r)}V{n(y + r)}{a}{n(x + w - r)} {n(y)}Z")
 
 
 def symbol_glyph(cx, top, scale, stroke):
     """An outlined key with a touch pad and an open connector, sized like the medium scale at scale 1."""
-    s, w = scale, stroke
+    s, w, n = scale, stroke, num
     bw, bh, br = 50 * s + (w - 6.655 * s), 80 * s, 12 * s
-    x, bottom = cx - bw / 2, top + 112.4 * s
-    body = rounded_rect_path(x, top, bw, bh, br) + " " + \
-        rounded_rect_path(x + w, top + w, bw - 2 * w, bh - 2 * w, max(br - w, 1), clockwise=False)
+    # A short connector, with the glyph moved down by half of what it lost to stay centered where it was.
+    top += 7.2 * s
+    x, bottom = cx - bw / 2, top + 98 * s
+    pw, pr = 28 * s + (w - 6.655 * s), 5 * s
+    left, right = cx - pw / 2, cx + pw / 2
+    # Xcode fills symbols even-odd, so the body and the connector share one outline instead of overlapping:
+    # the connector's sides leave the body's bottom corners where they cross x = cx +/- pw / 2.
+    yc = top + bh - br + math.sqrt(br ** 2 - (pw / 2 - (bw / 2 - br)) ** 2)
+    ab, ap = f"A{n(br)} {n(br)} 0 0 1 ", f"A{n(pr)} {n(pr)} 0 0 1 "
+    outline = (f"M{n(x + br)} {n(top)}H{n(x + bw - br)}{ab}{n(x + bw)} {n(top + br)}V{n(top + bh - br)}"
+               f"{ab}{n(right)} {n(yc)}V{n(bottom - pr)}{ap}{n(right - pr)} {n(bottom)}"
+               f"H{n(left + pr)}{ap}{n(left)} {n(bottom - pr)}V{n(yc)}{ab}{n(x)} {n(top + bh - br)}"
+               f"V{n(top + br)}{ab}{n(x + br)} {n(top)}Z")
+    hollow = rounded_rect_path(x + w, top + w, bw - 2 * w, bh - 2 * w, max(br - w, 1), clockwise=False)
+    opening = f"M{n(left + w)} {n(top + bh)}V{n(bottom - w)}H{n(right - w)}V{n(top + bh)}Z"
     pad = rounded_rect_path(cx - 10 * s, top + bh / 2 - 10 * s, 20 * s, 20 * s, 6 * s)
-    pw, pr, ptop = 28 * s + (w - 6.655 * s), 5 * s, top + bh - w / 2
-    plug = (f"M{cx - pw / 2:.3f},{ptop:.3f} L{cx - pw / 2:.3f},{bottom - pr:.3f} "
-            f"A{pr:.3f},{pr:.3f} 0 0 0 {cx - pw / 2 + pr:.3f},{bottom:.3f} L{cx + pw / 2 - pr:.3f},{bottom:.3f} "
-            f"A{pr:.3f},{pr:.3f} 0 0 0 {cx + pw / 2:.3f},{bottom - pr:.3f} L{cx + pw / 2:.3f},{ptop:.3f} "
-            f"L{cx + pw / 2 - w:.3f},{ptop:.3f} L{cx + pw / 2 - w:.3f},{bottom - w:.3f} "
-            f"L{cx - pw / 2 + w:.3f},{bottom - w:.3f} L{cx - pw / 2 + w:.3f},{ptop:.3f} z")
-    return "".join(f'      <path d="{d}" fill="#000000"/>\n' for d in (body, pad, plug))
+    return f'<path d="{outline}{hollow}{opening}"/><path d="{pad}"/>'
 
 
-# The positions and stroke widths of each weight and scale in the template.
+# The positions and stroke widths of each weight and scale in Apple's symbol template (v3.0).
 SYMBOL_GROUPS = [
     ("Semibold-L", 2043.27, 1455.373, 1.26, 9.666), ("Regular-L", 1449.84, 1455.373, 1.26, 8.387),
     ("Semibold-M", 2043.27, 1037.749, 1.0, 8.443), ("Regular-M", 1449.84, 1037.749, 1.0, 6.655),
     ("Semibold-S", 2043.27, 619.535, 0.861, 7.284), ("Regular-S", 1449.84, 619.535, 0.861, 5.73),
 ]
+# The baseline and cap line of each scale, and the margins of the regular medium glyph.
+SYMBOL_GUIDES = {"S": (696, 625.54), "M": (1126, 1055.54), "L": (1556, 1485.54)}
+SYMBOL_MARGINS = (1399.77, 1499.92)
 
 
-def write_symbol(name, template):
-    """Writes a symbol set, reusing the guides and notes of an existing symbol template."""
-    groups = "".join(f'    <g id="{group_id}">\n{symbol_glyph(cx, top, scale, stroke)}    </g>\n'
+def write_symbol(name):
+    """Writes a symbol set holding only what Xcode reads from the template: its version, guides and glyphs."""
+    guides = "".join(f'<path id="Baseline-{k}" d="M263 {num(b)}H3036"/><path id="Capline-{k}" d="M263 {num(c)}H3036"/>'
+                     for k, (b, c) in SYMBOL_GUIDES.items())
+    guides += "".join(f'<path id="{side}-margin-Regular-M" d="M{num(m)} 1030.79V1150.12"/>'
+                      for side, m in zip(("left", "right"), SYMBOL_MARGINS))
+    glyphs = "".join(f'<g id="{group_id}">{symbol_glyph(cx, top, scale, stroke)}</g>\n'
                      for group_id, cx, top, scale, stroke in SYMBOL_GROUPS)
-    text = re.sub(r'  <g id="Symbols">.*</g>\s*</svg>', lambda _: f'  <g id="Symbols">\n{groups}  </g>\n</svg>',
-                  template, flags=re.S)
+    text = ('<svg xmlns="http://www.w3.org/2000/svg" width="3300" height="2200" viewBox="0 0 3300 2200">\n'
+            '<g id="Notes"><text id="template-version">Template v.3.0</text></g>\n'
+            f'<g id="Guides" stroke="#27AAE1" stroke-width=".5">{guides}</g>\n'
+            f'<g id="Symbols">\n{glyphs}</g>\n</svg>\n')
     folder = ASSETS / f"Symbols/{name}.symbolset"
     folder.mkdir(parents=True, exist_ok=True)
     (folder / f"{name}.svg").write_text(text)
@@ -318,8 +344,7 @@ def main():
              "tutorial-nfc": tutorial_nfc, "tutorial-qr-code": tutorial_qr}
     for name, draw in pages.items():
         write_imageset(f"Tutorial/{name}.imageset", draw(LIGHT), draw(DARK))
-    template = ASSETS / "Symbols/securitykey.symbolset/securitykey.svg"
-    write_symbol("securitykey", template.read_text())
+    write_symbol("securitykey")
 
 
 if __name__ == "__main__":
