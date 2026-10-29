@@ -38,7 +38,7 @@ struct VersionHistoryView: View {
                     Text(verbatim: "Oriel OTP")
                         .font(.title)
                         .multilineTextAlignment(.center)
-                    Text("\(UIApplication.appVersion) (build \(UIApplication.appBuildNumber))")
+                    Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
                         .font(.body)
                 }
                 .frame(maxWidth: .infinity)
@@ -103,7 +103,7 @@ extension VersionHistoryView {
         // Wait for first application update before showing whats new on app launch
         // Go back in history until we reach the update last shown and search for changes that should be prompted
         guard let lastVersionPrompted = SettingsConfig.lastWhatsNewVersionShown else {
-            SettingsConfig.lastWhatsNewVersionShown = UIApplication.appVersion
+            SettingsConfig.lastWhatsNewVersionShown = Bundle.main.appVersion
             return false
         }
 

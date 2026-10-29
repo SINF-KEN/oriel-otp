@@ -27,7 +27,19 @@ struct MainView: View {
     @Environment(NotificationsViewModel.self) var notificationsViewModel
     
     @Environment(MainViewModel.self) var model
+    #if os(macOS)
+    // Several accounts can be selected on the Mac, to pin or delete them together. The details show for one.
+    @State var selectedAccountIDs: Set<String> = []
+    var selectedAccountID: String? {
+        get { selectedAccountIDs.count == 1 ? selectedAccountIDs.first : nil }
+        nonmutating set { selectedAccountIDs = newValue.map { [$0] } ?? [] }
+    }
+    @State var accountToRename: Account?
+    @State var commands = MainWindowCommands.shared
+    @State var isSearchFocused = false
+    #else
     @State var selectedAccountID: String? = nil
+    #endif
     @State var showAddAccount: Bool = false
     @State var addAccountCancellable: AnyCancellable?
     @State var addAccountSubject = PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, Bool), Never>()
@@ -39,7 +51,7 @@ struct MainView: View {
     @State var didEnterBackground = true
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
-    @State var accountToDelete: Account? = nil
+    @State var accountsToDelete: [Account] = []
     @State var quickActions = QuickActionCenter.shared
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
@@ -53,62 +65,163 @@ struct MainView: View {
     
     var body: some View {
         @Bindable var model = model
-        NavigationSplitView {
-            GeometryReader { reader in
-                List(selection: $selectedAccountID) {
-                    if let otp {
-                        Section("Yubico OTP") {
-                            YubiOtpRowView(otp: otp)
-                        }
-                    }
-                    if !model.accountsLoaded {
-                        ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
-                            enteSyncButton
-                        }
-                    } else if !searchText.isEmpty {
-                        if searchResults.count > 0 {
-                            ForEach(searchResults, id: \.id) { account in
-                                accountRow(account)
-                            }
-                        } else {
-                            ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"), message: String(localized: "No matching accounts on YubiKey"), height: reader.size.height)
-                        }
-                    } else if model.pinnedAccounts.count > 0 {
-                        Section("Pinned") {
-                            ForEach(model.pinnedAccounts, id: \.id) { account in
-                                accountRow(account)
-                            }
-                        }
-                        if model.otherAccounts.count > 0 {
-                            Section("Other") {
-                                ForEach(model.otherAccounts, id: \.id) { account in
-                                    accountRow(account)
-                                }
-                            }
-                        }
-                    } else if model.accounts.count > 0 && otp != nil {
-                        Section("Accounts") {
-                            ForEach(model.otherAccounts, id: \.id) { account in
-                                accountRow(account)
-                            }
-                        }
-                    } else if model.accounts.count > 0 {
-                        ForEach(model.accounts, id: \.id) { account in
-                            accountRow(account)
-                        }
-                    } else {
-                        ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
-                            Button(action: { showAddAccount.toggle() }) {
-                                Label("Add account", systemImage: "plus")
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
-                            enteSyncButton
+        presentations
+        .errorAlert(error: $model.sessionError)
+        .errorAlert(error: $model.connectionError) { model.start() }
+        .onAppear {
+            if ApplicationSettingsViewModel().isNFCOnAppLaunchEnabled {
+                model.updateAccountsOverNFC()
+            }
+            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, addToEnte) in
+                oathURL = nil
+                if let template {
+                    model.addAccount(template, requiresTouch: requiresTouch) {
+                        if addToEnte {
+                            addAccountToEnte(template)
                         }
                     }
                 }
             }
+        }
+        .onOpenURL(perform: { url in
+            #if os(macOS)
+            // The Dock menu and Shortcuts ask for actions with a URL, which also opens the window when it was closed.
+            if let action = QuickAction(url: url) {
+                quickActions.pending = action
+                return
+            }
+            #endif
+            guard url.scheme == "otpauth" else { return }
+            if showConfiguration { showConfiguration.toggle() }
+            if showAbout { showAbout.toggle() }
+            oathURL = url
+            showAddAccount.toggle()
+        })
+        .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: { userActivity in
+            guard let otp = userActivity.webpageURL?.yubiOTP else { return }
+            if showConfiguration { showConfiguration.toggle() }
+            if showAbout { showAbout.toggle() }
+            self.otp = otp
+            if ApplicationSettingsViewModel().isNFCOnOTPLaunchEnabled {
+                model.updateAccountsOverNFC()
+            }
+        })
+        #if DEBUG && (targetEnvironment(simulator) || os(macOS))
+        .onReceive(NotificationCenter.default.publisher(for: .simulatedYubicoOTP)) { notification in
+            otp = notification.object as? String
+        }
+        #endif
+        .onChange(of: otp) { _, otp in
+            if let otp, SettingsConfig.isCopyOTPEnabled {
+                toastPresenter.copyToClipboard(otp)
+            }
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            #if os(macOS)
+            MainWindowState.shared.isVisible = phase != .background
+            #endif
+        }
+        .onChange(of: scenePhase) { _, phase in
+            // Both the NFC and the Face ID scanning alerts make the app enter the `.inactive` state
+            // and in that situation we don't want to call model.stop() nor model.closeConnections()
+            if phase == .active && didEnterBackground {
+                didEnterBackground = false
+                ConnectionManager.shared.resumeWiredConnections()
+
+                guard !notificationsViewModel.showPIVTokenView else { return }
+                model.start() // This is called when app becomes active
+                performPendingQuickAction()
+            } else if phase == .active {
+                performPendingQuickAction()
+            } else if phase == .background {
+                didEnterBackground = true
+
+                #if os(iOS)
+                // Keep running until the YubiKey connection is closed.
+                let backgroundTask = UIApplication.shared.beginBackgroundTask()
+                model.stop()
+                Task {
+                    await model.closeConnections()
+                    UIApplication.shared.endBackgroundTask(backgroundTask)
+                }
+                #else
+                model.stop()
+                Task {
+                    await model.closeConnections()
+                }
+                #endif
+            }
+        }
+        // Quick actions and the Scan NFC YubiKey intent wait for the scene to be active, as NFC can't start before that.
+        .onChange(of: quickActions.pending, initial: true) { _, _ in
+            performPendingQuickAction()
+        }
+        .onChange(of: model.showTouchToast) { _, showToast in
+            let message = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
+            if showToast {
+                toastPresenter.toast(message: message, duration: nil)
+            } else {
+                toastPresenter.dismiss(message: message)
+            }
+        }
+        .onChange(of: notificationsViewModel.showPIVTokenView) { _, showPIVTokenview in
+            if showPIVTokenview {
+                showAddAccount = false
+                showEnteSync = false
+                showConfiguration = false
+                showAbout = false
+                selectedAccountID = nil
+            } else if scenePhase == .active {
+                // Closed with Cancel or Done. Becoming active skipped starting while the PIV view was up.
+                model.start()
+            }
+        }
+        .onChange(of: model.presentDisableOTP) { _, presentDisableOTP in
+            if presentDisableOTP {
+                showAddAccount = false
+                showEnteSync = false
+                showConfiguration = false
+                showAbout = false
+                selectedAccountID = nil
+                notificationsViewModel.presentDisableOTP = true
+            }
+        }
+        .onChange(of: notificationsViewModel.presentDisableOTP) { _, presentDisableOTP in
+            if !presentDisableOTP {
+                model.presentDisableOTP = false
+                model.start()
+            }
+        }
+        .onChange(of: model.isKeyPluggedIn) { _, isKeyPluggedIn in
+            if isKeyPluggedIn {
+                performPendingQuickAction()
+            }
+            // If the user removes the YubiKey while adding a new account we dismiss the add account modal.
+            if showAddAccount && !isKeyPluggedIn {
+                showAddAccount = false
+            }
+        }
+    }
+    
+    private var splitView: some View {
+        @Bindable var model = model
+        return NavigationSplitView {
+            accountList
+            #if os(macOS)
+            .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
+            .searchFocusedIfAvailable($isSearchFocused)
+            // Return copies the selected account's code, Delete deletes the selected accounts.
+            .onKeyPress(.return) {
+                guard let selectedAccount else { return .ignored }
+                toastPresenter.copyCode(of: selectedAccount)
+                return .handled
+            }
+            .onDeleteCommand {
+                accountsToDelete = selectedAccounts
+            }
+            #else
             .searchable(text: $searchText, prompt: String(localized: "Search"))
+            #endif
             .autocorrectionDisabled(true)
             .keyboardType(.asciiCapable)
             .listStyle(.inset)
@@ -116,53 +229,12 @@ struct MainView: View {
                 otp = nil
                 model.updateAccountsOverNFC()
             }
-            .toolbar {
-                // Always there, so scanning doesn't depend on discovering pull to refresh.
-                if DeviceCapabilities.supportsNFC {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            otp = nil
-                            model.updateAccountsOverNFC()
-                        } label: {
-                            Label(String(localized: "Scan NFC YubiKey"), systemImage: "wave.3.right")
-                        }
-                    }
-                }
-
-                if !model.accountsLoaded {
-                    ToolbarItem(placement: .principal) {
-                        // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
-                        Text(verbatim: "Oriel OTP")
-                            .font(.headline)
-                            .foregroundStyle(Color("YubiGreen"))
-                            .accessibilityHidden(true)
-                    }
-                }
-
-                if #available(iOS 27.0, *) {
-                    addAccountToolbarItem
-                        .visibilityPriority(.high)
-                } else {
-                    addAccountToolbarItem
-                }
-
-                // Secondary actions collapse into the system overflow menu.
-                ToolbarItemGroup(placement: .secondaryAction) {
-                    enteSyncButton
-                    Button(action: { showConfiguration.toggle() }) {
-                        Label("Configuration", systemImage: "switch.2")
-                    }
-                    .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
-                    #if DEBUG && targetEnvironment(simulator)
-                    SimulatedYubiKeyMenu()
-                    SimulatedYubicoOTPButton()
-                    #endif
-                    Button(action: { showAbout.toggle() }) {
-                        Label("About", systemImage: "questionmark.circle")
-                    }
-                }
-            }
+            .toolbar { mainToolbar }
+            #if os(macOS)
+            .navigationTitle(Text(verbatim: "Oriel OTP"))
+            #else
             .navigationTitle(model.accountsLoaded ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
+            #endif
             .navigationSplitViewColumnWidth(min: 320, ideal: 360)
         } detail: {
             if let selectedAccount {
@@ -177,11 +249,20 @@ struct MainView: View {
                     .accessibilityHidden(true)
             }
         }
+    }
+
+    private var presentations: some View {
+        @Bindable var model = model
+        return splitView
         .onChange(of: model.accounts.map(\.accountId)) { _, accountIDs in
             // Drop the selection when the account goes away, e.g. the YubiKey was removed or the account deleted.
+            #if os(macOS)
+            selectedAccountIDs.formIntersection(accountIDs)
+            #else
             if let selectedAccountID, !accountIDs.contains(selectedAccountID) {
                 self.selectedAccountID = nil
             }
+            #endif
         }
         .sheet(isPresented: $showAddAccount) {
             AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL)
@@ -232,132 +313,168 @@ struct MainView: View {
             Button(String(localized: "Never for this YubiKey", comment: "Save password alert.")) { model.selectPasswordSaveType(.never) }
             Button(String(localized: "Not now", comment: "Save passsword alert"), role: .cancel) { model.selectPasswordSaveType(nil) }
         }
-        .alert("Delete account?", isPresented: Binding(get: { accountToDelete != nil }, set: { if !$0 { accountToDelete = nil } }), presenting: accountToDelete) { account in
+        .alert(accountsToDelete.count > 1 ? String(localized: "Delete \(accountsToDelete.count) accounts?", comment: "Delete several accounts alert. The placeholder is the number of accounts.") : String(localized: "Delete account?"),
+               isPresented: Binding(get: { !accountsToDelete.isEmpty }, set: { if !$0 { accountsToDelete = [] } }), presenting: accountsToDelete) { accounts in
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
-                model.deleteAccount(account) {}
+                model.deleteAccounts(accounts) {}
             }
-        } message: { _ in
-            Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
+        } message: { accounts in
+            if accounts.count > 1 {
+                Text(String(localized: "This removes the accounts from the YubiKey. You won’t be able to generate codes for them anymore.", comment: "Delete several accounts alert"))
+            } else {
+                Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
+            }
         }
+        #if os(iOS)
         // Blanks the codes, which are privacy sensitive, whenever the scene isn't active, so they don't show in the
         // app switcher or its snapshot. Only the codes, so the screen still makes sense behind the NFC and Face ID sheets.
+        // The Mac has no app switcher snapshots, and codes are read from the window while another app is in front.
         .redacted(reason: scenePhase == .active ? [] : .privacy)
-        .errorAlert(error: $model.sessionError)
-        .errorAlert(error: $model.connectionError) { model.start() }
-        .onAppear {
-            if ApplicationSettingsViewModel().isNFCOnAppLaunchEnabled {
-                model.updateAccountsOverNFC()
+        #else
+        .sheet(item: $accountToRename) { account in
+            EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
+        }
+        .focusedSceneValue(\.mainWindowMenuState, menuState)
+        .onChange(of: commands.pending) { _, command in
+            guard let command else { return }
+            commands.pending = nil
+            perform(command)
+        }
+        .frame(minWidth: 640, minHeight: 420)
+        #endif
+    }
+
+    private var accountList: some View {
+    GeometryReader { reader in
+        #if os(macOS)
+        let selection = $selectedAccountIDs
+        #else
+        let selection = $selectedAccountID
+        #endif
+        List(selection: selection) {
+            if let otp {
+                Section("Yubico OTP") {
+                    YubiOtpRowView(otp: otp)
+                }
             }
-            addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, addToEnte) in
-                oathURL = nil
-                if let template {
-                    model.addAccount(template, requiresTouch: requiresTouch) {
-                        if addToEnte {
-                            addAccountToEnte(template)
+            if !model.accountsLoaded {
+                ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
+                    enteSyncButton
+                }
+            } else if !searchText.isEmpty {
+                if searchResults.count > 0 {
+                    ForEach(searchResults, id: \.id) { account in
+                        accountRow(account)
+                    }
+                } else {
+                    ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"), message: String(localized: "No matching accounts on YubiKey"), height: reader.size.height)
+                }
+            } else if model.pinnedAccounts.count > 0 {
+                Section("Pinned") {
+                    ForEach(model.pinnedAccounts, id: \.id) { account in
+                        accountRow(account)
+                    }
+                }
+                if model.otherAccounts.count > 0 {
+                    Section("Other") {
+                        ForEach(model.otherAccounts, id: \.id) { account in
+                            accountRow(account)
                         }
                     }
                 }
-            }
-        }
-        .onOpenURL(perform: { url in
-            guard url.scheme == "otpauth" else { return }
-            if showConfiguration { showConfiguration.toggle() }
-            if showAbout { showAbout.toggle() }
-            oathURL = url
-            showAddAccount.toggle()
-        })
-        .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: { userActivity in
-            guard let otp = userActivity.webpageURL?.yubiOTP else { return }
-            if showConfiguration { showConfiguration.toggle() }
-            if showAbout { showAbout.toggle() }
-            self.otp = otp
-            if ApplicationSettingsViewModel().isNFCOnOTPLaunchEnabled {
-                model.updateAccountsOverNFC()
-            }
-        })
-        #if DEBUG && targetEnvironment(simulator)
-        .onReceive(NotificationCenter.default.publisher(for: .simulatedYubicoOTP)) { notification in
-            otp = notification.object as? String
-        }
-        #endif
-        .onChange(of: otp) { _, otp in
-            if let otp, SettingsConfig.isCopyOTPEnabled {
-                toastPresenter.copyToClipboard(otp)
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            // Both the NFC and the Face ID scanning alerts make the app enter the `.inactive` state
-            // and in that situation we don't want to call model.stop() nor model.closeConnections()
-            if phase == .active && didEnterBackground {
-                didEnterBackground = false
-                ConnectionManager.shared.resumeWiredConnections()
-
-                guard !notificationsViewModel.showPIVTokenView else { return }
-                model.start() // This is called when app becomes active
-                performPendingQuickAction()
-            } else if phase == .active {
-                performPendingQuickAction()
-            } else if phase == .background {
-                didEnterBackground = true
-
-                // Keep running until the YubiKey connection is closed.
-                let backgroundTask = UIApplication.shared.beginBackgroundTask()
-                model.stop()
-                Task {
-                    await model.closeConnections()
-                    UIApplication.shared.endBackgroundTask(backgroundTask)
+            } else if model.accounts.count > 0 && otp != nil {
+                Section("Accounts") {
+                    ForEach(model.otherAccounts, id: \.id) { account in
+                        accountRow(account)
+                    }
+                }
+            } else if model.accounts.count > 0 {
+                ForEach(model.accounts, id: \.id) { account in
+                    accountRow(account)
+                }
+            } else {
+                ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
+                    Button(action: { showAddAccount.toggle() }) {
+                        Label("Add account", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+                    enteSyncButton
                 }
             }
         }
-        // Quick actions and the Scan NFC YubiKey intent wait for the scene to be active, as NFC can't start before that.
-        .onChange(of: quickActions.pending, initial: true) { _, _ in
-            performPendingQuickAction()
-        }
-        .onChange(of: model.showTouchToast) { _, showToast in
-            let message = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
-            if showToast {
-                toastPresenter.toast(message: message, duration: nil)
-            } else {
-                toastPresenter.dismiss(message: message)
+    }
+    }
+
+    @ToolbarContentBuilder private var mainToolbar: some ToolbarContent {
+        #if os(iOS)
+        // Always there, so scanning doesn't depend on discovering pull to refresh.
+        if DeviceCapabilities.supportsNFC {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    otp = nil
+                    model.updateAccountsOverNFC()
+                } label: {
+                    Label(String(localized: "Scan NFC YubiKey"), systemImage: "wave.3.right")
+                }
             }
         }
-        .onChange(of: notificationsViewModel.showPIVTokenView) { _, showPIVTokenview in
-            if showPIVTokenview {
-                showAddAccount = false
-                showEnteSync = false
-                showConfiguration = false
-                showAbout = false
-                selectedAccountID = nil
-            } else if scenePhase == .active {
-                // Closed with Cancel or Done. Becoming active skipped starting while the PIV view was up.
-                model.start()
+        #endif
+
+        #if os(macOS)
+        ToolbarItem(placement: .primaryAction) {
+            Button(action: { model.refresh() }) {
+                Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
+            }
+            .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
+            .disabled(!model.accountsLoaded)
+        }
+        #else
+        if !model.accountsLoaded {
+            ToolbarItem(placement: .principal) {
+                // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
+                Text(verbatim: "Oriel OTP")
+                    .font(.headline)
+                    .foregroundStyle(Color("YubiGreen"))
+                    .accessibilityHidden(true)
             }
         }
-        .onChange(of: model.presentDisableOTP) { _, presentDisableOTP in
-            if presentDisableOTP {
-                showAddAccount = false
-                showEnteSync = false
-                showConfiguration = false
-                showAbout = false
-                selectedAccountID = nil
-                notificationsViewModel.presentDisableOTP = true
-            }
+        #endif
+
+        if #available(iOS 27.0, macOS 27.0, *) {
+            addAccountToolbarItem
+                .visibilityPriority(.high)
+        } else {
+            addAccountToolbarItem
         }
-        .onChange(of: notificationsViewModel.presentDisableOTP) { _, presentDisableOTP in
-            if !presentDisableOTP {
-                model.presentDisableOTP = false
-                model.start()
+
+        // Secondary actions collapse into the system overflow menu.
+        ToolbarItemGroup(placement: .secondaryAction) {
+            enteSyncButton
+                .help(String(localized: "Sync from Ente Auth", comment: "Main view menu item"))
+            #if os(iOS)
+            // In the Settings window and the app menu on the Mac.
+            Button(action: { showConfiguration.toggle() }) {
+                Label("Configuration", systemImage: "switch.2")
             }
-        }
-        .onChange(of: model.isKeyPluggedIn) { _, isKeyPluggedIn in
-            // If the user removes the YubiKey while adding a new account we dismiss the add account modal.
-            if showAddAccount && !isKeyPluggedIn {
-                showAddAccount = false
+            .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
+            #endif
+            // In the Debug menu on the Mac, so it isn't in the screenshots.
+            #if DEBUG && targetEnvironment(simulator)
+            if SimulatedYubiKey.isEnabled {
+                SimulatedYubiKeyMenu()
+                SimulatedYubicoOTPButton()
             }
+            #endif
+            #if os(iOS)
+            Button(action: { showAbout.toggle() }) {
+                Label("About", systemImage: "questionmark.circle")
+            }
+            #endif
         }
     }
-    
+
     private func performPendingQuickAction() {
         guard scenePhase == .active, let action = quickActions.pending else { return }
         quickActions.pending = nil
@@ -370,7 +487,11 @@ struct MainView: View {
             otp = nil
             model.updateAccountsOverNFC()
         case .addAccount:
-            guard DeviceCapabilities.supportsNFC || model.isKeyPluggedIn else { return }
+            guard DeviceCapabilities.supportsNFC || model.isKeyPluggedIn else {
+                // Done once the YubiKey is connected, e.g. right after the window opened for it.
+                quickActions.pending = action
+                return
+            }
             showConfiguration = false
             showAbout = false
             showEnteSync = false
@@ -381,7 +502,25 @@ struct MainView: View {
 
     private func accountRow(_ account: Account) -> some View {
         NavigationLink(value: account.accountId) {
+            #if os(macOS)
+            // Copy and pin appear when the pointer is over the row, as there are no swipe actions on the Mac.
+            HoverReader { isHovering in
+                AccountRowView(account: account) {
+                    if isHovering {
+                        HStack(spacing: 2) {
+                            copyButton(account)
+                                .help(String(localized: "Copy the code", comment: "Mac row button help"))
+                            pinButton(account)
+                                .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
+                        }
+                        .labelStyle(.iconOnly)
+                        .buttonStyle(.borderless)
+                    }
+                }
+            }
+            #else
             AccountRowView(account: account)
+            #endif
         }
         .listRowSeparator(.hidden)
         // The same actions as the detail view, without having to open it. VoiceOver lists them as the row's actions.
@@ -418,7 +557,7 @@ struct MainView: View {
     }
 
     private func deleteButton(_ account: Account) -> some View {
-        Button(action: { accountToDelete = account }) {
+        Button(action: { accountsToDelete = [account] }) {
             Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
         }
     }
@@ -429,11 +568,58 @@ struct MainView: View {
         }
     }
 
+    #if os(macOS)
+    private var selectedAccounts: [Account] {
+        model.accounts.filter { selectedAccountIDs.contains($0.accountId) }
+    }
+
+    private var menuState: MainWindowMenuState {
+        let selection = selectedAccounts
+        return MainWindowMenuState(canAddAccount: model.isKeyPluggedIn,
+                                   canRefresh: model.accountsLoaded,
+                                   canSearch: canFocusSearch,
+                                   selectionCount: selection.count,
+                                   isSelectionPinned: !selection.isEmpty && selection.allSatisfy(\.isPinned),
+                                   canRename: selection.count == 1 && selection[0].canRename)
+    }
+
+    /// Does what was chosen in the menu bar.
+    private func perform(_ command: MainWindowCommands.Command) {
+        let selection = selectedAccounts
+        switch command {
+        case .addAccount:
+            guard model.isKeyPluggedIn else { return }
+            oathURL = nil
+            showAddAccount = true
+        case .syncFromEnte:
+            showEnteSync = true
+        case .refresh:
+            model.refresh()
+        case .search:
+            isSearchFocused = true
+        case .copyCode:
+            if let selectedAccount { toastPresenter.copyCode(of: selectedAccount) }
+        case .togglePin:
+            let pin = !selection.allSatisfy(\.isPinned)
+            selection.forEach { $0.isPinned = pin }
+        case .rename:
+            accountToRename = selectedAccount
+        case .delete:
+            accountsToDelete = selection
+        }
+    }
+
+    private var canFocusSearch: Bool {
+        if #available(macOS 15.0, *) { true } else { false }
+    }
+    #endif
+
     private var addAccountToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .primaryAction) {
             Button(action: { showAddAccount.toggle() }) {
                 Label("Add account", systemImage: "plus")
             }
+            .help(String(localized: "Add an account to the YubiKey", comment: "Toolbar help"))
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
         }
     }

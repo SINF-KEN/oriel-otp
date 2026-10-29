@@ -24,6 +24,19 @@ struct ToastView: View {
     @State var isVisible = true
     
     var body: some View {
+        #if os(macOS)
+        // A small banner at the bottom of the window, like the Mac's own status messages.
+        Text(message)
+            .font(.callout)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.regularMaterial, in: Capsule())
+            .overlay(Capsule().strokeBorder(Color(.separator)))
+            .shadow(color: .black.opacity(0.15), radius: 4, y: 1)
+            .padding()
+        #else
         ZStack(alignment: .leading) {
             Text(message)
                 .font(.body)
@@ -38,6 +51,7 @@ struct ToastView: View {
                 .shadow(radius: 5)
         }
         .padding(.horizontal)
+        #endif
     }
 }
 
@@ -57,11 +71,16 @@ struct ToastModifier: ViewModifier {
     }
     
     @ViewBuilder public func body(content: Content) -> some View {
+        #if os(macOS)
+        let alignment = Alignment.bottom
+        #else
+        let alignment = Alignment.top
+        #endif
         content
-            .overlay(alignment: .top) {
+            .overlay(alignment: alignment) {
                 // In the largest region clear of the fold, so a toast isn't split across the halves of an iPhone Duo.
                 main()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
                     .avoidingReservedRegions()
             }
             .animation(.spring(), value: isPresenting)

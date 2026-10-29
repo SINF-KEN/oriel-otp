@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
+#if canImport(CoreNFC)
 import CoreNFC
+#endif
 
 /// The ways this device can connect to a YubiKey.
 enum DeviceCapabilities {
 
     /// NFC reading of ISO 7816 tags, which YubiKeys are.
     static var supportsNFC: Bool {
-        #if targetEnvironment(simulator)
+        #if targetEnvironment(simulator) || !canImport(CoreNFC)
         return false
         #else
         return NFCTagReaderSession.readingAvailable
@@ -31,7 +33,7 @@ enum DeviceCapabilities {
 
     /// NFC reading of NDEF tags, which is how a YubiKey sends a Yubico OTP over NFC.
     static var supportsNFCScanning: Bool {
-        #if targetEnvironment(simulator)
+        #if targetEnvironment(simulator) || !canImport(CoreNFC)
         return false
         #else
         return NFCNDEFReaderSession.readingAvailable
@@ -54,6 +56,9 @@ enum DeviceCapabilities {
 
     // Every Lightning-equipped model that can install iOS/iPadOS 16 or newer, matching YubiKit.
     private static let hasLightningPort: Bool = {
+        #if os(macOS)
+        return false
+        #else
         var systemInfo = utsname()
         uname(&systemInfo)
         let model = withUnsafePointer(to: &systemInfo.machine) {
@@ -103,5 +108,6 @@ enum DeviceCapabilities {
         default:
             return false
         }
+        #endif
     }()
 }
