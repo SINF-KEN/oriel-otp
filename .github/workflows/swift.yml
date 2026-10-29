@@ -10,15 +10,63 @@ on:
 permissions:
   contents: read
 
-# A newer push to the same branch or PR supersedes the run in progress.
+# A newer push to the same pull request supersedes the run in progress. Runs for main and tags always finish.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
+  # Pull requests that only touch documentation skip the macOS build. Anything not on this list builds.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    outputs:
+      code: ${{ steps.files.outputs.code }}
+    steps:
+      - name: Check changed files
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" != "pull_request" ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          files=$(gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --jq '.[].filename')
+          # The API lists at most 3000 files.
+          if [[ -z "$files" || $(wc -l <<< "$files") -ge 3000 ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          code=$(grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|crowdin\.yml|\.github/dependabot\.yml)$' <<< "$files" || true)
+          if [[ -n "$code" ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+            echo "Only documentation changed; skipping the build and tests." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate
+          license-check: false
+
+  test:
+    name: Build and test
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: xcode-27
-    timeout-minutes: 60
+    timeout-minutes: 45
     # Checkout initializes its temporary repository before any step runs.
     # Set its default branch explicitly to avoid Git's platform-specific "master" hint.
     env:
@@ -27,13 +75,6 @@ jobs:
       GIT_CONFIG_VALUE_0: main
     steps:
       - uses: actions/checkout@v7
-
-      - name: Review dependency changes
-        if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v5
-        with:
-          fail-on-severity: moderate
-          license-check: false
 
       - name: Lint new Swift code
         run: xcrun swift-format lint --configuration .swift-format --strict Authenticator/Model/TokenResponseStore.swift AuthenticatorTests/EnteAuth/CIBehaviorTests.swift
@@ -88,7 +129,7 @@ jobs:
               ;;
             Shutdown)
               xcrun simctl boot "$DEVICE_ID"
-              echo "Simulator boot started before package resolution and analysis"
+              echo "Simulator boot started before package resolution and the build"
               ;;
             *)
               echo "::error::Unexpected state '$DEVICE_STATE' for simulator $DEVICE_ID"
@@ -97,50 +138,13 @@ jobs:
               ;;
           esac
 
-      - name: Compute Swift package cache key
-        id: spm-cache-key
-        run: |
-          set -euo pipefail
-          PACKAGE_RESOLVED="Authenticator.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
-          FILE_HASH=$(shasum -a 256 "$PACKAGE_RESOLVED" | awk '{print $1}')
-          CACHE_HASH=$(printf '%s' "$FILE_HASH" | xxd -r -p | shasum -a 256 | awk '{print $1}')
-          echo "hash=$CACHE_HASH" >> "$GITHUB_OUTPUT"
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
 
-      # Source packages are portable; DerivedData and simulator products are runner-specific.
-      - name: Cache Swift packages
-        uses: actions/cache@v6
-        with:
-          path: ${{ runner.temp }}/SourcePackages
-          key: ${{ runner.os }}-spm-${{ steps.spm-cache-key.outputs.hash }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-
-      - name: Resolve pinned Swift packages
-        timeout-minutes: 10
-        run: |
-          set -euo pipefail
-          xcodebuild -resolvePackageDependencies \
-            -project Authenticator.xcodeproj \
-            -scheme Authenticator \
-            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
-            -disableAutomaticPackageResolution \
-            -onlyUsePackageVersionsFromResolvedFile \
-            2>&1 | tee "$RUNNER_TEMP/resolve-packages.log"
-
-      - name: Analyze app and extension
-        timeout-minutes: 10
-        run: |
-          set -euo pipefail
-          xcodebuild analyze \
-            -project Authenticator.xcodeproj \
-            -scheme Authenticator \
-            -destination "id=${{ steps.simulator.outputs.id }}" \
-            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
-            -disableAutomaticPackageResolution \
-            -onlyUsePackageVersionsFromResolvedFile \
-            CODE_SIGNING_ALLOWED=NO \
-            2>&1 | tee "$RUNNER_TEMP/xcodebuild-analyze.log"
-
+      # This builds the app and extension with warnings as errors. There's no separate analyze build: the sources
+      # are all Swift, which the Clang static analyzer doesn't check.
       - name: Test on simulator
         timeout-minutes: 30
         run: |
@@ -149,9 +153,10 @@ jobs:
             -project Authenticator.xcodeproj \
             -scheme Authenticator \
             -destination "id=${{ steps.simulator.outputs.id }}" \
-            -clonedSourcePackagesDirPath "$RUNNER_TEMP/SourcePackages" \
+            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
             -disableAutomaticPackageResolution \
             -onlyUsePackageVersionsFromResolvedFile \
+            -skipPackageUpdates \
             -enableCodeCoverage YES \
             -resultBundlePath "$RUNNER_TEMP/Authenticator.xcresult" \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test.log"
@@ -201,8 +206,37 @@ jobs:
           path: |
             ${{ runner.temp }}/Authenticator.xcresult
             ${{ runner.temp }}/resolve-packages.log
-            ${{ runner.temp }}/xcodebuild-analyze.log
             ${{ runner.temp }}/xcodebuild-test.log
             ${{ runner.temp }}/test-summary.json
           if-no-files-found: ignore
           retention-days: 7
+
+  # The required status check. It always runs, so a skipped or failed job above can't leave it missing or passing.
+  build:
+    needs: [changes, dependency-review, test]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check results
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          CODE: ${{ needs.changes.outputs.code }}
+          DEPENDENCY_REVIEW: ${{ needs.dependency-review.result }}
+          TEST: ${{ needs.test.result }}
+        run: |
+          set -euo pipefail
+          echo "changes: $CHANGES (code: ${CODE:-unknown}); dependency-review: $DEPENDENCY_REVIEW; test: $TEST"
+          [[ "$CHANGES" == success ]] || { echo "::error::Checking the changed files failed."; exit 1; }
+          if [[ "$GITHUB_EVENT_NAME" == pull_request && "$DEPENDENCY_REVIEW" != success ]]; then
+            echo "::error::Dependency review did not pass."
+            exit 1
+          fi
+          if [[ "$CODE" == true && "$TEST" != success ]]; then
+            echo "::error::Build and test did not pass."
+            exit 1
+          fi
+          if [[ "$CODE" != true && "$TEST" != skipped ]]; then
+            echo "::error::Build and test ran unexpectedly: $TEST."
+            exit 1
+          fi
