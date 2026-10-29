@@ -70,6 +70,18 @@ struct EnteFakeServerLoginTests {
         #expect(flow.keys != nil)
     }
 
+    @Test func passkeyAccountKeepsThePasswordWhileThePasskeyIsVerified() async throws {
+        let (flow, step) = try await start("alice+passkey@example.com")
+        #expect(step == .emailCode)
+        #expect(try await flow.submitCode(FakeEnteServer.code) == .secondFactor(totp: false, passkey: true))
+        #expect(flow.passkeyURL != nil)
+        // Not verified in the browser yet, the password entered at the start is still kept.
+        #expect(try await flow.checkPasskey() == nil)
+        #expect(try await flow.checkPasskey() == .complete)
+        #expect(!flow.needsPassword)
+        #expect(flow.keys?.userID == 42)
+    }
+
     @Test func accountWithoutSRPVerifiesTheEmailCode() async throws {
         let (flow, step) = try await start("alice+nosrp@example.com")
         #expect(step == .emailCode)

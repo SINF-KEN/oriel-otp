@@ -26,8 +26,8 @@ import SwiftUI
 /// It plays the server side of everything the app does for real: SRP with its own proof, encrypted key
 /// attributes, a sealed auth token and secretstream-encrypted authenticator entities. Any email signs in with
 /// the password "demo". Tags in the email turn on the other ways of signing in: "+mfa" asks for an email code,
-/// "+2fa" for a TOTP code and "+nosrp" acts like an account without SRP, which also gets an email code. Both codes
-/// are 123456. The accounts cover the cases the sync handles: an account that is also on the demo
+/// "+2fa" for a TOTP code, "+passkey" for an email code and then a passkey, and "+nosrp" acts like an account without
+/// SRP, which also gets an email code. Both codes are 123456. The passkey counts as verified from the second check. The accounts cover the cases the sync handles: an account that is also on the demo
 /// YubiKey, a Steam account, a '#' in a name, Ente's export format, one in Ente's trash, a deleted one and one the
 /// YubiKey can't store.
 nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
@@ -75,6 +75,8 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     private let lock = NSLock()
     private var sessions: [String: (srpUserID: String, A: BigUInt, b: BigUInt, B: BigUInt)] = [:]
     private var twoFactorSessions: Set<String> = []
+    /// Passkey sessions, with whether they were checked before. The first check finds the passkey not verified yet.
+    private var passkeySessions: [String: Bool] = [:]
 
     private let srpUserID = UUID().uuidString.lowercased()
     private let srpSalt = EnteCrypto.randomBytes(16)
@@ -129,7 +131,8 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             guard !Self.has("nosrp", email) else { return (404, [:]) }
             return (200, ["attributes": ["srpUserID": srpUserID(twoFactor: Self.has("2fa", email)), "srpSalt": srpSalt.base64EncodedString(),
                                          "memLimit": memLimit, "opsLimit": opsLimit,
-                                         "kekSalt": kekSalt.base64EncodedString(), "isEmailMFAEnabled": Self.has("mfa", email)]])
+                                         "kekSalt": kekSalt.base64EncodedString(),
+                                         "isEmailMFAEnabled": Self.has("mfa", email) || Self.has("passkey", email)]])
         case ("POST", "/users/srp/create-session"):
             return createSession(body)
         case ("POST", "/users/srp/verify-session"):
@@ -138,11 +141,23 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             return (200, [:])
         case ("POST", "/users/verify-email"):
             guard body["ott"] as? String == FakeEnteServer.code else { return (401, [:]) }
-            return Self.has("2fa", body["email"] as? String ?? "") ? (200, startTwoFactor()) : (200, signedIn())
+            let email = body["email"] as? String ?? ""
+            if Self.has("passkey", email) { return (200, startPasskey()) }
+            return Self.has("2fa", email) ? (200, startTwoFactor()) : (200, signedIn())
         case ("POST", "/users/two-factor/verify"):
             guard let sessionID = body["sessionID"] as? String, twoFactorSessions.contains(sessionID) else { return (404, [:]) }
             guard body["code"] as? String == FakeEnteServer.code else { return (401, [:]) }
             twoFactorSessions.remove(sessionID)
+            return (200, signedIn())
+        case ("GET", "/users/two-factor/passkeys/get-token"):
+            let sessionID = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "sessionID" }?.value ?? ""
+            guard let checked = passkeySessions[sessionID] else { return (404, [:]) }
+            guard checked else {
+                passkeySessions[sessionID] = true
+                return (400, [:])
+            }
+            passkeySessions[sessionID] = nil
             return (200, signedIn())
         case ("GET", "/authenticator/key"):
             return authorized ? (200, authenticatorKey) : (401, [:])
@@ -181,6 +196,12 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         let sessionID = UUID().uuidString.lowercased()
         twoFactorSessions.insert(sessionID)
         return ["id": 42, "twoFactorSessionID": sessionID]
+    }
+
+    private func startPasskey() -> [String: Any] {
+        let sessionID = UUID().uuidString.lowercased()
+        passkeySessions[sessionID] = false
+        return ["id": 42, "passkeySessionID": sessionID, "accountsUrl": "https://accounts.ente.test"]
     }
 
     private func createSession(_ body: [String: Any]) -> (Int, Any) {

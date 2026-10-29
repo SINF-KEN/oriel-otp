@@ -106,7 +106,7 @@ struct EnteSyncView: View {
             } header: {
                 Text(String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
-                if model.isBusy {
+                if model.isDerivingKeys {
                     Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
                 } else {
                     Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records.", comment: "Ente sign in footer"))

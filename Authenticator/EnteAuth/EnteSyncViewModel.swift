@@ -36,6 +36,8 @@ import YubiKit
     var server: String
     var staySignedIn = false
     var isBusy = false
+    /// Whether the password is being turned into keys, the part of signing in that can take a few seconds.
+    var isDerivingKeys = false
     var error: Error?
     var codes: [EnteCode] = []
     var selection: Set<String> = []
@@ -47,21 +49,24 @@ import YubiKit
     /// How many accounts the YubiKey can hold, nil if that isn't known, e.g. no YubiKey has been read yet.
     let capacity: Int?
 
-    @ObservationIgnored private var flow: EnteLoginFlow?
+    @ObservationIgnored private(set) var flow: EnteLoginFlow?
     @ObservationIgnored private var api: EnteAPIClient?
     @ObservationIgnored private var token: String?
     /// Whether the session is saved in the keychain, needed to show the accounts on Apple Watch.
     private(set) var isSessionSaved = false
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let session: URLSession
+    @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored let watch: WatchAccountSync
 
     init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard,
-         watch: WatchAccountSync = .shared) {
+         session: URLSession = .shared, watch: WatchAccountSync = .shared) {
         self.existingCredentialIds = existingCredentialIds
         self.capacity = capacity
         self.store = store
         self.defaults = defaults
+        self.session = session
         self.watch = watch
         self.server = defaults.string(forKey: Self.serverKey) ?? ""
         if let email = store.savedEmail {
@@ -134,18 +139,23 @@ import YubiKit
         guard canSignIn else { return }
         let password = password
         run {
+            // Only the flow keeps the password, while the email code or second factor it's needed for can be retried.
+            defer { self.password = "" }
             let server = try self.serverURL()
             if let flow = self.flow, flow.needsPassword, flow.email == email, flow.api.server == server {
                 try await self.handle { try await flow.submitPassword(password) }
                 return
             }
-            let api = try EnteAPIClient(server: server)
+            let api = try EnteAPIClient(server: server, session: self.session)
             self.flow = nil
             try await self.handle {
-                let (flow, step) = try await EnteLoginFlow.start(api: api, email: email, password: password)
+                let (flow, step) = try await EnteLoginFlow.start(api: api, email: email, password: password) {
+                    self.isDerivingKeys = $0
+                }
+                // The view went away while signing in.
+                try Task.checkCancellation()
                 self.api = api
                 self.flow = flow
-                self.password = ""
                 return step
             }
         }
@@ -248,7 +258,7 @@ import YubiKit
 
     private func loadSavedCodes() async throws {
         let saved = try await store.load()
-        let api = try EnteAPIClient(server: saved.server)
+        let api = try EnteAPIClient(server: saved.server, session: session)
         self.api = api
         token = saved.token
         signedInEmail = saved.email
@@ -283,8 +293,13 @@ import YubiKit
         startOver()
     }
 
-    /// Call when the view goes away. A session that wasn't saved is ended so no token is left behind.
+    /// Call when the view goes away. The sign in is abandoned so the password doesn't stay in memory, and a session
+    /// that wasn't saved is ended so no token is left behind.
     func close() {
+        task?.cancel()
+        flow = nil
+        password = ""
+        code = ""
         guard !isSessionSaved else { return }
         revokeSession()
     }
@@ -319,7 +334,7 @@ import YubiKit
         guard !isBusy else { return }
         isBusy = true
         error = nil
-        Task {
+        task = Task {
             defer { isBusy = false }
             do {
                 try await operation()

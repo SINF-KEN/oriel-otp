@@ -76,6 +76,8 @@ final class EnteLoginFlow {
     /// Kept until the keys are decrypted when the email code has to be verified first.
     private var password: String?
     private var state: State
+    /// Called with true while the password is turned into keys and the keys are decrypted, and with false after.
+    private let onDerivingKeys: (Bool) -> Void
 
     var keys: EnteAccountKeys? {
         if case .complete(let keys) = state { return keys }
@@ -88,23 +90,27 @@ final class EnteLoginFlow {
         return false
     }
 
-    private init(api: EnteAPIClient, email: String, password: String?, state: State) {
+    private init(api: EnteAPIClient, email: String, password: String?, state: State, onDerivingKeys: @escaping (Bool) -> Void) {
         self.api = api
         self.email = email
         self.password = password
         self.state = state
+        self.onDerivingKeys = onDerivingKeys
     }
 
-    static func start(api: EnteAPIClient, email: String, password: String) async throws -> (EnteLoginFlow, EnteLoginStep) {
+    /// `onDerivingKeys` tells when the slow part runs, as opposed to waiting for the server.
+    static func start(api: EnteAPIClient, email: String, password: String,
+                      onDerivingKeys: @escaping (Bool) -> Void = { _ in }) async throws -> (EnteLoginFlow, EnteLoginStep) {
         let attributes = try await api.srpAttributes(email: email)
         if let attributes, !attributes.isEmailMFAEnabled {
-            let (response, keyEncryptionKey) = try await signInWithSRP(api: api, password: password, attributes: attributes)
+            let (response, keyEncryptionKey) = try await signInWithSRP(api: api, password: password, attributes: attributes, onDerivingKeys: onDerivingKeys)
             // advance(_:keyEncryptionKey:) replaces the state with the next step.
-            let flow = EnteLoginFlow(api: api, email: email, password: nil, state: .secondFactor(response: response, keyEncryptionKey: keyEncryptionKey))
+            let flow = EnteLoginFlow(api: api, email: email, password: nil, state: .secondFactor(response: response, keyEncryptionKey: keyEncryptionKey),
+                                     onDerivingKeys: onDerivingKeys)
             return (flow, try await flow.advance(response, keyEncryptionKey: keyEncryptionKey))
         }
         try await api.sendEmailCode(email: email)
-        return (EnteLoginFlow(api: api, email: email, password: password, state: .emailCode), .emailCode)
+        return (EnteLoginFlow(api: api, email: email, password: password, state: .emailCode, onDerivingKeys: onDerivingKeys), .emailCode)
     }
 
     func resendEmailCode() async throws {
@@ -164,6 +170,8 @@ final class EnteLoginFlow {
         }
         // Verified, so a wrong password can be retried with submitPassword(_:).
         state = .password(verified: response)
+        onDerivingKeys(true)
+        defer { onDerivingKeys(false) }
         let keyEncryptionKey = if let keyEncryptionKey { keyEncryptionKey } else { try await deriveKeyEncryptionKey(for: response) }
         state = .complete(try await Self.decryptKeys(response, keyEncryptionKey: keyEncryptionKey))
         password = nil
@@ -177,12 +185,19 @@ final class EnteLoginFlow {
         return try await Self.deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: attributes.opsLimit, memLimit: attributes.memLimit)
     }
 
-    private static func signInWithSRP(api: EnteAPIClient, password: String, attributes: EnteSRPAttributes) async throws -> (EnteAuthResponse, Data) {
+    private static func signInWithSRP(api: EnteAPIClient, password: String, attributes: EnteSRPAttributes,
+                                      onDerivingKeys: (Bool) -> Void) async throws -> (EnteAuthResponse, Data) {
         guard let kekSalt = Data(enteBase64: attributes.kekSalt),
               let srpSalt = Data(enteBase64: attributes.srpSalt) else { throw EnteLoginError.invalidAccountData }
-        let keyEncryptionKey = try await deriveKeyEncryptionKey(password: password, salt: kekSalt,
+        onDerivingKeys(true)
+        let keyEncryptionKey: Data
+        let client: EnteSRPClient
+        do {
+            defer { onDerivingKeys(false) }
+            keyEncryptionKey = try await deriveKeyEncryptionKey(password: password, salt: kekSalt,
                                                                 opsLimit: attributes.opsLimit, memLimit: attributes.memLimit)
-        let client = try await makeSRPClient(identity: attributes.srpUserID, keyEncryptionKey: keyEncryptionKey, salt: srpSalt)
+            client = try await makeSRPClient(identity: attributes.srpUserID, keyEncryptionKey: keyEncryptionKey, salt: srpSalt)
+        }
         let session = try await api.createSRPSession(srpUserID: attributes.srpUserID, srpA: client.publicKey)
         let proofs = try await srpProofs(client, serverPublicKey: session.srpB)
         let response = try await mapErrors(code: false) {
