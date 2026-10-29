@@ -72,14 +72,23 @@ struct EnteSessionStore {
     }
 
     /// Adds an account to Ente Auth with the saved session, after asking for Face ID, Touch ID or the passcode.
-    /// A session that was revoked, e.g. from another device, is forgotten.
+    /// A session that was revoked, e.g. from another device, is forgotten. When the accounts are shown on Apple Watch,
+    /// the watch gets the new list too.
     @MainActor func add(_ template: YubiKitOATHSession.CredentialTemplate) async throws -> EnteAuthenticatorSync.AddResult {
         let saved = try await load()
         do {
-            return try await EnteAuthenticatorSync.add(template, api: try EnteAPIClient(server: saved.server), token: saved.token,
-                                                       authenticatorKey: saved.authenticatorKey)
+            let api = try EnteAPIClient(server: saved.server)
+            let result = try await EnteAuthenticatorSync.add(template, api: api, token: saved.token, authenticatorKey: saved.authenticatorKey)
+            if result == .added, WatchAccountSync.shared.isEnabled {
+                // The account is already in Ente, so a failed refresh only leaves the watch a sync behind.
+                if let codes = try? await EnteAuthenticatorSync.codes(api: api, token: saved.token, authenticatorKey: saved.authenticatorKey) {
+                    WatchAccountSync.shared.send(codes)
+                }
+            }
+            return result
         } catch EnteAuthenticatorSyncError.signedOut {
             remove()
+            WatchAccountSync.shared.disable()
             throw EnteAuthenticatorSyncError.signedOut
         }
     }
