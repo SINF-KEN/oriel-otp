@@ -23,7 +23,6 @@ import YubiKit
         case signIn
         case savedSession(email: String)
         case emailCode
-        case password
         case secondFactor(totp: Bool, passkey: Bool)
         case accounts
     }
@@ -124,24 +123,31 @@ import YubiKit
 
     // MARK: - Sign in
 
-    func signIn() {
-        let email = email.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !email.isEmpty else { return }
-        run {
-            let api = try EnteAPIClient(server: try self.serverURL())
-            let (flow, step) = try await EnteLoginFlow.start(api: api, email: email)
-            self.api = api
-            self.flow = flow
-            try await self.handle(step)
-        }
+    var canSignIn: Bool {
+        !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !password.isEmpty
     }
 
-    func submitPassword() {
-        guard let flow, !password.isEmpty else { return }
+    /// Signs in with the email and password. After a wrong password following the email code, the codes aren't asked
+    /// for again if the email and server are the same.
+    func signIn() {
+        let email = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard canSignIn else { return }
         let password = password
         run {
-            defer { self.password = "" }
-            try await self.handle(try await flow.submitPassword(password))
+            let server = try self.serverURL()
+            if let flow = self.flow, flow.needsPassword, flow.email == email, flow.api.server == server {
+                try await self.handle { try await flow.submitPassword(password) }
+                return
+            }
+            let api = try EnteAPIClient(server: server)
+            self.flow = nil
+            try await self.handle {
+                let (flow, step) = try await EnteLoginFlow.start(api: api, email: email, password: password)
+                self.api = api
+                self.flow = flow
+                self.password = ""
+                return step
+            }
         }
     }
 
@@ -150,7 +156,7 @@ import YubiKit
         let code = code
         run {
             defer { self.code = "" }
-            try await self.handle(try await flow.submitCode(code))
+            try await self.handle { try await flow.submitCode(code) }
         }
     }
 
@@ -163,10 +169,9 @@ import YubiKit
     func checkPasskey() {
         guard let flow else { return }
         run {
-            if let step = try await flow.checkPasskey() {
-                try await self.handle(step)
-            } else {
-                throw EnteSyncError.passkeyNotVerified
+            try await self.handle {
+                guard let step = try await flow.checkPasskey() else { throw EnteSyncError.passkeyNotVerified }
+                return step
             }
         }
     }
@@ -178,10 +183,17 @@ import YubiKit
         phase = .signIn
     }
 
-    private func handle(_ step: EnteLoginStep) async throws {
+    /// Runs a step of the sign in. A wrong password goes back to the sign in screen, also after the email code.
+    private func handle(_ operation: () async throws -> EnteLoginStep) async throws {
+        let step: EnteLoginStep
+        do {
+            step = try await operation()
+        } catch EnteLoginError.incorrectPassword {
+            password = ""
+            phase = .signIn
+            throw EnteLoginError.incorrectPassword
+        }
         switch step {
-        case .password:
-            phase = .password
         case .emailCode:
             phase = .emailCode
         case .secondFactor(let totp, let passkey):
