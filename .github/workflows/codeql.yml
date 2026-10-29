@@ -37,7 +37,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # Resolve packages before init: CodeQL's build tracer breaks SwiftPM's sandboxed resolution.
+      # CodeQL's build tracer can't start /usr/bin/sandbox-exec ("Bad CPU type in executable"), which SwiftPM uses
+      # to load package manifests, and xcodebuild build reloads them. The runner is discarded after the job.
+      - name: Disable the package manifest sandbox
+        if: matrix.language == 'swift'
+        run: defaults write com.apple.dt.Xcode IDEPackageSupportDisableManifestSandbox -bool YES
+
       - name: Resolve Swift packages
         if: matrix.language == 'swift'
         id: packages
