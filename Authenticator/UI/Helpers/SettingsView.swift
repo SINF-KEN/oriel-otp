@@ -24,7 +24,7 @@ struct SettingsView<Content: View, Buttons: View>: View {
                         image
                             .resizable()
                             .scaledToFit()
-                            .font(Font.title.weight(.semibold))
+                            .scaledFont(.title) { $0.weight(.semibold) }
                             .padding(10)
                             .frame(width: 60, height: 60)
                             .foregroundStyle(.white)
@@ -40,5 +40,6 @@ struct SettingsView<Content: View, Buttons: View>: View {
             }
         }
         .formStyle(.grouped)
+        .scaledButtonLabels()
     }
 }

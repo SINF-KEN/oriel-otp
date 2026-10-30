@@ -29,11 +29,11 @@ struct OATHResetView: View {
     
     var body: some View {
         SettingsView(image: image, imageColor: imageColor) {
-            Text(String(localized: "Reset OATH application")).font(.title2).bold()
+            Text(String(localized: "Reset OATH application")).scaledFont(.title2).bold()
                 .accessibilityAddTraits(.isHeader)
                 .opacity(keyHasBeenReset ? 0.2 : 1.0)
             Text("Reset all accounts stored on YubiKey, make sure they are not in use anywhere before doing this.")
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
                 .opacity(keyHasBeenReset ? 0.2 : 1.0)
         } buttons: {
@@ -61,7 +61,7 @@ struct OATHResetView: View {
         })
         .errorAlert(error: $error)
         .onChange(of: model.state) { _, state in
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 switch state {
                 case .ready:
                     self.keyHasBeenReset = false

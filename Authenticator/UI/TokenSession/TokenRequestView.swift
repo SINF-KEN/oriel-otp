@@ -35,8 +35,8 @@ struct TokenRequestView: View {
     @State private var presentYubiOTP = false
     @State private var error: TokenRequestViewModel.TokenError? = nil
 
-    @ScaledMetric(relativeTo: .body) private var iconColumnWidth: CGFloat = 35
-    @ScaledMetric(relativeTo: .largeTitle) private var completedIconSize: CGFloat = 64
+    @ScaledSize(relativeTo: .body) private var iconColumnWidth: CGFloat = 35
+    @ScaledSize(relativeTo: .largeTitle) private var completedIconSize: CGFloat = 64
     
     init(userInfo: [AnyHashable: Any]?) {
         self.userInfo = userInfo
@@ -142,7 +142,7 @@ struct TokenRequestView: View {
 
             VStack(spacing: 8) {
                 SecureField(String(localized: "Smart card (PIV) PIN"), text: $pin)
-                    .font(.title3)
+                    .scaledFont(.title3)
                     .multilineTextAlignment(.center)
                     .keyboardType(.numbersAndPunctuation)
                     .textContentType(.oneTimeCode)

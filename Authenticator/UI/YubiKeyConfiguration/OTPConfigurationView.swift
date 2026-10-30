@@ -39,10 +39,10 @@ struct OTPConfigurationView: View {
     
     var body: some View {
         SettingsView(image: Image(systemName: "ellipsis.rectangle"), imageColor: Color(.systemBlue)) {
-            Text("One-Time Password").font(.title2).bold()
+            Text("One-Time Password").scaledFont(.title2).bold()
                 .accessibilityAddTraits(.isHeader)
             Text(description)
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
         } buttons: {
             Toggle("One-Time Password", isOn: Binding(get: { isEnabled }, set: { enabled in

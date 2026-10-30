@@ -131,12 +131,14 @@ struct AddAccountView: View {
                         TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer)
                             // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
                             .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
+                            .accessibilityIdentifier("add-account.issuer")
                             .submitLabel(.next)
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
                         TextField(String("john@doe.com"), text: $accountName)
                             .accessibilityLabel(String(localized: "Account name", comment: "Add account field"))
+                            .accessibilityIdentifier("add-account.account-name")
                             .textContentType(.username)
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
@@ -146,6 +148,7 @@ struct AddAccountView: View {
                     if mode == .manual {
                         LabeledContent(String(localized: "Secret", comment: "Add account field")) {
                             TextField(String(localized: "Secret", comment: "Add account field"), text: $secret)
+                                .accessibilityIdentifier("add-account.secret")
                                 .textInputAutocapitalization(.characters)
                                 .autocorrectionDisabled()
                                 .submitLabel(.done)
@@ -173,16 +176,20 @@ struct AddAccountView: View {
                     Section {
                         Picker(String(localized: "Type", comment: "Add account select type"), selection: $kind) {
                             ForEach(CredentialKind.allCases) { Text($0.rawValue).tag($0) }
+                                .scaledBodyFont()
                         }
                         Picker(String(localized: "Algorithm", comment: "Add account select algorithm"), selection: $algorithm) {
                             ForEach(Self.algorithms, id: \.self) { Text($0).tag($0) }
+                                .scaledBodyFont()
                         }
                         Picker(String(localized: "Digits", comment: "Add account select number of digits"), selection: $digits) {
                             ForEach(Self.digitOptions, id: \.self) { Text(String($0)).tag($0) }
+                                .scaledBodyFont()
                         }
                         if kind == .totp {
                             Picker(String(localized: "Period", comment: "Add account select period"), selection: $period) {
                                 ForEach(Self.periods, id: \.self) { Text(String(Int($0))).tag($0) }
+                                    .scaledBodyFont()
                             }
                         }
                     } header: {
@@ -196,6 +203,7 @@ struct AddAccountView: View {
                 }
             }
             .formStyle(.grouped)
+            .scaledButtonLabels()
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             // VoiceOver's escape gesture, a two-finger Z, does the same as Cancel.
@@ -206,6 +214,7 @@ struct AddAccountView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     ConfirmButton(String(localized: "Save")) { save() }
+                        .accessibilityIdentifier("add-account.save")
                 }
             }
             #if os(macOS)
@@ -218,7 +227,7 @@ struct AddAccountView: View {
                 readQRCode { try await QRCodeReader.read(providers) }
                 return true
             }
-            .frame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
             .alert(String(localized: "Not valid credential information", comment: "Add account error message"),
                    isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
@@ -265,11 +274,14 @@ struct AddAccountView: View {
             Section {
                 Picker(String(localized: "Save to", comment: "Add account picker of where the account is saved"),
                        selection: Binding(get: { destinations }, set: { chosenDestinations = $0 })) {
-                    Text(String(localized: "YubiKey", comment: "Add account destination")).tag(AccountDestinations.yubiKey)
-                    Text(String(localized: "Ente Auth", comment: "Add account destination")).tag(AccountDestinations.ente)
-                    if !isHOTP {
-                        Text(String(localized: "YubiKey and Ente Auth", comment: "Add account destination")).tag(AccountDestinations.both)
+                    Group {
+                        Text(String(localized: "YubiKey", comment: "Add account destination")).tag(AccountDestinations.yubiKey)
+                        Text(String(localized: "Ente Auth", comment: "Add account destination")).tag(AccountDestinations.ente)
+                        if !isHOTP {
+                            Text(String(localized: "YubiKey and Ente Auth", comment: "Add account destination")).tag(AccountDestinations.both)
+                        }
                     }
+                    .scaledBodyFont()
                 }
             } footer: {
                 switch destinations {
@@ -324,6 +336,7 @@ struct AddAccountView: View {
                         Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
                     }
                     .accessibilityInputLabels(VoiceControlNames.enterManually)
+                    .accessibilityIdentifier("add-account.enter-manually")
                 }
             }
         }

@@ -106,6 +106,18 @@ struct ScanNFCYubiKeyIntent: AppIntent {
     }
 }
 
+/// Opens the add account sheet, like the Home Screen quick action, for Siri, Shortcuts and Apple Intelligence.
+struct AddAccountIntent: AppIntent {
+    static let title: LocalizedStringResource = "Add Account"
+    static let description = IntentDescription("Opens Oriel OTP to add an account to your YubiKey.")
+    static let openAppWhenRun = true
+
+    @MainActor func perform() async throws -> some IntentResult {
+        QuickActionCenter.shared.pending = .addAccount
+        return .result()
+    }
+}
+
 struct OrielOTPShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(intent: ScanNFCYubiKeyIntent(),
@@ -113,6 +125,11 @@ struct OrielOTPShortcuts: AppShortcutsProvider {
                               "Show my codes in \(.applicationName)"],
                     shortTitle: "Scan NFC YubiKey",
                     systemImageName: "wave.3.right")
+        AppShortcut(intent: AddAccountIntent(),
+                    phrases: ["Add an account to \(.applicationName)",
+                              "Add a YubiKey account with \(.applicationName)"],
+                    shortTitle: "Add Account",
+                    systemImageName: "plus")
     }
 }
 #endif
