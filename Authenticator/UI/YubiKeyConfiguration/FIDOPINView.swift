@@ -36,19 +36,28 @@ struct FIDOPINView: View {
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
             
+            // With a symbol, so it doesn't take the red to see it's a problem.
             if model.state.isBlocked() {
-                Text("PIN is temporary blocked. Remove and reinsert YubiKey to try again.")
-                    .font(.subheadline)
-                    .foregroundStyle(.red)
-                    .bold()
-                    .multilineTextAlignment(.center)
+                Label {
+                    Text("PIN is temporary blocked. Remove and reinsert YubiKey to try again.")
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.red)
+                .bold()
+                .multilineTextAlignment(.center)
             }
             if model.state.isPermanentlyBlocked() {
-                Text("PIN is permanently blocked. Factory reset FIDO application to continue.")
-                    .font(.subheadline)
-                    .foregroundStyle(.red)
-                    .bold()
-                    .multilineTextAlignment(.center)
+                Label {
+                    Text("PIN is permanently blocked. Factory reset FIDO application to continue.")
+                } icon: {
+                    Image(systemName: "exclamationmark.octagon.fill")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.red)
+                .bold()
+                .multilineTextAlignment(.center)
             }
         } buttons: {
             if showSetButton {

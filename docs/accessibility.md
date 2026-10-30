@@ -38,6 +38,14 @@ in dark mode. The tutorial and security key drawings have dark versions; the oth
 gray YubiKey drawing, which reads on both. The QR scanner is dark in both appearances, over the camera. The watch app
 is always dark.
 
+## Differentiate Without Color Alone
+
+Color is never the only sign of a state. Errors and warnings in red or orange have a symbol (the app lock's wait, a
+blocked FIDO PIN, an Ente Auth account that can't be added, too many accounts selected). An expired code has the
+refresh symbol in place of the countdown, and with Differentiate Without Color it's crossed out too. The watch's ring
+turns orange in the last five seconds, and dashed with that setting. Account icons show the account's first letter,
+their color only tells them apart. Swipe actions have a symbol and a title.
+
 ## Sufficient Contrast
 
 Text has at least 4.5:1 against its background, large text and icons 3:1, with Increase Contrast on (Apple's

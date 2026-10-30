@@ -353,7 +353,7 @@ private struct EnteCodeRow: View {
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                     if let reason = code.unsupportedReason {
-                        Text(reason)
+                        Label(reason, systemImage: "exclamationmark.triangle.fill")
                             .font(.footnote)
                             .foregroundStyle(.red)
                     } else if isOnYubiKey {

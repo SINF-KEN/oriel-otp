@@ -28,6 +28,7 @@ struct AccountDetailView: View {
     let onDelete: () -> Void
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
 
@@ -82,6 +83,7 @@ struct AccountDetailView: View {
                     // Slide Over or half of a folded iPhone Duo.
                     Text(account.formattedCode ?? "*** ***")
                         .privacySensitive()
+                        .strikethrough(differentiateWithoutColor && account.state == .expired)
                         .font(.system(size: codeFontSize, weight: .bold))
                         .monospacedDigit()
                         .lineLimit(1)

@@ -84,14 +84,19 @@ struct AppLockSecretEntry: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             if checksRetryDate, let retryDate = lock.retryDate {
-                Text("Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).", comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
-                    .monospacedDigit()
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .task(id: retryDate) {
-                        try? await Task.sleep(for: .seconds(max(0, retryDate.timeIntervalSinceNow) + 0.2))
-                        lock.updateRetryDate()
-                    }
+                Label {
+                    Text("Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).", comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
+                } icon: {
+                    // So it doesn't take the red to see that something's wrong.
+                    Image(systemName: "hourglass")
+                }
+                .monospacedDigit()
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
+                .task(id: retryDate) {
+                    try? await Task.sleep(for: .seconds(max(0, retryDate.timeIntervalSinceNow) + 0.2))
+                    lock.updateRetryDate()
+                }
             } else if let length = method.codeLength {
                 AppLockCodePad(length: length, submit: submit)
             } else {
