@@ -551,7 +551,7 @@ struct MainView: View {
             #if os(macOS)
             // Copy and pin appear when the pointer is over the row, as there are no swipe actions on the Mac.
             HoverReader { isHovering in
-                AccountRowView(account: account, showsLocation: showsLocation) {
+                AccountRowView(account: account, showsLocation: showsLocation, copyCode: { toastPresenter.copyCode(of: account) }) {
                     if isHovering {
                         HStack(spacing: 2) {
                             copyButton(account)
@@ -565,7 +565,7 @@ struct MainView: View {
                 }
             }
             #else
-            AccountRowView(account: account, showsLocation: showsLocation)
+            AccountRowView(account: account, showsLocation: showsLocation, copyCode: { toastPresenter.copyCode(of: account) })
             #endif
         }
         .listRowSeparator(.hidden)
