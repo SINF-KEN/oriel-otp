@@ -1863,6 +1863,35 @@
         }
       }
     },
+    "Backspace" : {
+      "comment" : "Voice Control name for the app lock delete key",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rücktaste"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retour arrière"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックスペース"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backspace"
+          }
+        }
+      }
+    },
     "Bypass touch requirement" : {
       "comment" : "NFC settings toggle",
       "localizations" : {
@@ -2981,6 +3010,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopírovať Yubico OTP do schránky"
+          }
+        }
+      }
+    },
+    "Copy code" : {
+      "comment" : "Voice Control name for the Copy button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovať kód"
           }
         }
       }
@@ -5373,6 +5431,35 @@
         }
       }
     },
+    "Keyboard" : {
+      "comment" : "Voice Control name for the Enter manually button, after its keyboard symbol",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tastatur"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clavier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キーボード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klávesnica"
+          }
+        }
+      }
+    },
     "Leave the server empty unless you host Ente yourself." : {
       "comment" : "Ente sign in options footer without stay signed in",
       "localizations" : {
@@ -5603,6 +5690,35 @@
         }
       }
     },
+    "Manual" : {
+      "comment" : "Voice Control name for the Enter manually button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuell"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manuel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手動"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ručne"
+          }
+        }
+      }
+    },
     "Move the account to the trash in Ente Auth" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -5686,6 +5802,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presunuté do YubiKey. Ente Auth ho ponechá v koši."
+          }
+        }
+      }
+    },
+    "NFC" : {
+      "comment" : "Voice Control name for the Scan NFC YubiKey button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NFC"
           }
         }
       }
@@ -5830,6 +5975,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nové nastavenie OTP bolo uložené"
+          }
+        }
+      }
+    },
+    "New account" : {
+      "comment" : "Voice Control name for the Add account button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Konto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新規アカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nový účet"
+          }
+        }
+      }
+    },
+    "New code" : {
+      "comment" : "Voice Control name for the Calculate button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuer Code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新しいコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nový kód"
           }
         }
       }
@@ -7642,6 +7845,35 @@
         }
       }
     },
+    "Plus" : {
+      "comment" : "Voice Control name for the Add account button, after its + symbol",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プラス"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus"
+          }
+        }
+      }
+    },
     "Point your camera at a QR code to scan it" : {
       "comment" : "Scan QR code message",
       "localizations" : {
@@ -8100,6 +8332,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Obnoviť"
+          }
+        }
+      }
+    },
+    "Reload" : {
+      "comment" : "Voice Control name for the Refresh button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu laden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recharger"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再読み込み"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Znova načítať"
           }
         }
       }
@@ -8736,6 +8997,35 @@
         }
       }
     },
+    "Scan" : {
+      "comment" : "Voice Control name for the Scan NFC YubiKey button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scannen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanner"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スキャン"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skenovať"
+          }
+        }
+      }
+    },
     "Scan NFC YubiKey" : {
       "localizations" : {
         "de" : {
@@ -8789,6 +9079,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skenovať QR kód na obrazovke"
+          }
+        }
+      }
+    },
+    "Scan YubiKey" : {
+      "comment" : "Voice Control name for the Scan NFC YubiKey button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey scannen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanner la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyをスキャン"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skenovať YubiKey"
           }
         }
       }
@@ -10058,6 +10377,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Podpora"
+          }
+        }
+      }
+    },
+    "Sync" : {
+      "comment" : "Voice Control name for the Sync from Ente Auth button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "同期"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronizovať"
           }
         }
       }

@@ -442,6 +442,7 @@ struct MainView: View {
                     Button(action: { addAccount() }) {
                         Label("Add account", systemImage: "plus")
                     }
+                    .accessibilityInputLabels(VoiceControlNames.addAccount)
                     .buttonStyle(.borderedProminent)
                     .disabled(!canAddToYubiKey)
                     enteSyncButton
@@ -469,6 +470,7 @@ struct MainView: View {
                 } label: {
                     Label(String(localized: "Scan NFC YubiKey"), systemImage: "wave.3.right")
                 }
+                .accessibilityInputLabels(VoiceControlNames.scanNFC)
             }
         }
         #endif
@@ -478,6 +480,7 @@ struct MainView: View {
             Button(action: { model.refresh() }) {
                 Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
             }
+            .accessibilityInputLabels(VoiceControlNames.refresh)
             .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
             .disabled(!model.canRefresh)
         }
@@ -509,6 +512,7 @@ struct MainView: View {
             Button(action: { showConfiguration.toggle() }) {
                 Label("Configuration", systemImage: "switch.2")
             }
+            .accessibilityInputLabels(VoiceControlNames.configuration)
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
             #endif
             // In the Debug menu on the Mac, so it isn't in the screenshots.
@@ -522,6 +526,7 @@ struct MainView: View {
             Button(action: { showAbout.toggle() }) {
                 Label("About", systemImage: "questionmark.circle")
             }
+            .accessibilityInputLabels(VoiceControlNames.about)
             #endif
         }
     }
@@ -624,6 +629,7 @@ struct MainView: View {
         Button(action: { toastPresenter.copyCode(of: account) }) {
             Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
         }
+        .accessibilityInputLabels(VoiceControlNames.copy)
     }
 
     private func pinButton(_ account: Account) -> some View {
@@ -643,6 +649,7 @@ struct MainView: View {
         Button(action: { showEnteSync.toggle() }) {
             Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
         }
+        .accessibilityInputLabels(VoiceControlNames.syncFromEnte)
     }
 
     #if os(macOS)
@@ -702,6 +709,7 @@ struct MainView: View {
             Button(action: { addAccount() }) {
                 Label("Add account", systemImage: "plus")
             }
+            .accessibilityInputLabels(VoiceControlNames.addAccount)
             .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
                   : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
             .disabled(!canAddToYubiKey && !model.cloud.isEnabled)

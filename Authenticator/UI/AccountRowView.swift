@@ -119,6 +119,8 @@ struct AccountRowView<Accessory: View>: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(account.accessibilityLabel)
         .accessibilityValue(accessibilityValue)
+        // Said to Voice Control without the code, e.g. "Tap GitHub".
+        .accessibilityInputLabels([account.title] + [account.subTitle.map { "\(account.title) \($0)" }].compactMap { $0 })
         .onChange(of: account.state) { _, state in
             // Not sure why we have to schedule this in the next runloop
             Task {
