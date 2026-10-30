@@ -144,6 +144,8 @@ private struct AppLockCodePad: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel(String(localized: "Delete", comment: "App lock number pad delete button"))
+                    .accessibilityInputLabels([String(localized: "Delete", comment: "App lock number pad delete button"),
+                                               String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")])
                     .opacity(code.isEmpty ? 0 : 1)
                     .disabled(code.isEmpty)
                 }
