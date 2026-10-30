@@ -226,6 +226,7 @@ private struct SmartCardHeaderRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .accessibilityHidden(true)
             Text(title).font(.title2).bold()
+                .accessibilityAddTraits(.isHeader)
                 .multilineTextAlignment(.center)
             Text(text)
                 .font(.subheadline)

@@ -38,7 +38,8 @@ final class ScreenshotTests: XCTestCase {
 
     // The timeouts are generous: CI's simulators can take several seconds to present a screen.
     @MainActor func testScreenshots() throws {
-        let github = app.staticTexts["GitHub"].firstMatch
+        // A row is one element, labelled with the issuer, the account name and the code.
+        let github = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'GitHub,'")).firstMatch
         XCTAssertTrue(github.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try save("accounts")
 

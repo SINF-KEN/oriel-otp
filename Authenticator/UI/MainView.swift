@@ -34,7 +34,6 @@ struct MainView: View {
         get { selectedAccountIDs.count == 1 ? selectedAccountIDs.first : nil }
         nonmutating set { selectedAccountIDs = newValue.map { [$0] } ?? [] }
     }
-    @State var accountToRename: Account?
     @State var commands = MainWindowCommands.shared
     @State var isSearchFocused = false
     #else
@@ -54,6 +53,7 @@ struct MainView: View {
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
     @State var accountsToDelete: [Account] = []
+    @State var accountToRename: Account?
     @State var quickActions = QuickActionCenter.shared
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
@@ -316,6 +316,11 @@ struct MainView: View {
                 }
                 .appLockCover()
         }
+        // Rename from the Mac's menu bar, or from a row's VoiceOver actions.
+        .sheet(item: $accountToRename) { account in
+            EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
+                .appLockCover()
+        }
         .sheet(isPresented: $showAbout) {
             AboutView()
                 .onAppear {
@@ -372,10 +377,6 @@ struct MainView: View {
         // The Mac has no app switcher snapshots, and codes are read from the window while another app is in front.
         .redacted(reason: scenePhase == .active ? [] : .privacy)
         #else
-        .sheet(item: $accountToRename) { account in
-            EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
-                .appLockCover()
-        }
         .focusedSceneValue(\.mainWindowMenuState, menuState)
         .onChange(of: commands.pending) { _, command in
             guard let command else { return }
@@ -596,6 +597,21 @@ struct MainView: View {
             CopyToYubiKeyButtons(account: account)
             Divider()
             deleteButton(account)
+        }
+        // VoiceOver lists the swipe actions on iOS. These are the rest of the context menu's and the details' actions,
+        // so every one can be done from the list.
+        .accessibilityActions {
+            #if os(macOS)
+            copyButton(account)
+            pinButton(account)
+            #endif
+            CopyToYubiKeyButtons(account: account)
+            if account.canRename {
+                Button(String(localized: "Rename", comment: "Menu")) { accountToRename = account }
+            }
+            #if os(macOS)
+            deleteButton(account)
+            #endif
         }
     }
 

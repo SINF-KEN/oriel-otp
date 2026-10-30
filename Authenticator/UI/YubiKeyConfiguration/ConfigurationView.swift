@@ -188,6 +188,7 @@ struct ConfigurationView: View {
             #if os(iOS)
             // On the Mac the Settings window is titled after the tab.
             .navigationTitle(String(localized: "Configuration", comment: "Configuration navigation title"))
+            .accessibilityAction(.escape) { showConfiguration.toggle() }
             #endif
             .toolbar {
                 #if os(iOS)
@@ -242,6 +243,8 @@ struct ListIconView: View {
             .foregroundStyle(.white)
             .background(color)
             .clipShape(.rect(cornerRadius: 6.5))
+            // Beside the row's title, which says what it is.
+            .accessibilityHidden(true)
     }
 }
 
