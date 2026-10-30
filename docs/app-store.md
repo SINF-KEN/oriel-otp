@@ -145,6 +145,12 @@ gives.
 > showing NFC and USB-C, adding an account by QR code, Ente sync from sign-in to writing to the key, and the smart
 > card extension. We can send a YubiKey on request.
 >
+> Ente sync is optional and only signs in to the person's own Ente account, through Ente's public API, the same one
+> Ente's open-source (AGPL-3.0) apps use. The email and sign-in requests go only to Ente, or to the self-hosted server
+> the person enters, as the sign-in screen says; the password is checked with SRP and never leaves the device. We
+> run no server and receive none of this data, so the App Privacy answer is Data Not Collected. Oriel OTP is not
+> affiliated with Ente.
+>
 > Ente demo account (no two-factor or email codes): email `…`, password `…`.
 >
 > The app lock is off by default, so the app opens without a code. It can be turned on under Configuration > App
@@ -156,9 +162,12 @@ gives.
 > paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
 > watch.
 
-Fill in the demo account and attach the video before submitting. Add watch screenshots to the Apple Watch section
-of the listing. App Store Connect takes one size and scales it for the others, so make them on the largest, the
-Ultra (422 × 514 pixels):
+Fill in the demo account and attach the video before submitting. If App Review asks about guideline 5.2.2 (using
+Ente's service), reply with [Ente's terms](https://ente.com/terms), which don't mention third-party clients, and
+the AGPL-3.0 license of Ente's apps and server, and attach Ente's written permission once we have it.
+
+Add watch screenshots to the Apple Watch section of the listing. App Store Connect takes one size and scales it for
+the others, so make them on the largest, the Ultra (422 × 514 pixels):
 
 ```bash
 DEVICE_TYPE="Apple Watch Ultra 3 (49mm)" OUTPUT=build/app-store/watch tools/watch-screenshots.sh
