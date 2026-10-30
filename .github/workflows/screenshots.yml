@@ -1,20 +1,12 @@
 name: Screenshots
 
-# Regenerates the README screenshots in docs/screenshots when the app changes. On pull requests they are uploaded as
-# an artifact to look at. On main, changed screenshots are pushed to the bot/screenshots branch, ready for a pull
-# request: main only takes pull requests, and Actions isn't allowed to open them in this repository.
+# Regenerates the README screenshots in docs/screenshots when the app changes on main. Pull requests don't take them:
+# the run takes two macOS runners for up to half an hour. Changed screenshots are pushed to the bot/screenshots branch,
+# ready for a pull request: main only takes pull requests, and Actions isn't allowed to open them in this repository.
+# To look at a branch's screenshots before it merges, run the workflow on it by hand; they're uploaded as artifacts.
 on:
   push:
     branches: [main]
-    paths:
-      - "Authenticator/**"
-      - "OrielOTP.xcodeproj/**"
-      - "AuthenticatorUITests/**"
-      - "tools/screenshots.sh"
-      - "tools/screenshots-macos.sh"
-      - ".github/workflows/screenshots.yml"
-      - ".github/actions/swift-packages/**"
-  pull_request:
     paths:
       - "Authenticator/**"
       - "OrielOTP.xcodeproj/**"
@@ -28,7 +20,7 @@ on:
 permissions:
   contents: read
 
-# Each run regenerates every screenshot, so a newer run on the same branch or pull request makes the older one moot.
+# Each run regenerates every screenshot, so a newer run on the same branch makes the older one moot.
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -96,7 +88,7 @@ jobs:
 
   # On main, changed screenshots are pushed to the bot/screenshots branch.
   push-screenshots:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     needs: [screenshots, mac-screenshots]
     runs-on: ubuntu-latest
     timeout-minutes: 10
