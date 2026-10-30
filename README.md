@@ -36,7 +36,7 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
   to Ente Auth, and changes from Ente's other apps show up here.
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
-- **Everyday use.** Search, pin favorites, copy codes, rename and delete accounts, Steam codes, and an optional
+- **Everyday use.** Search, pin favorites, tap a code to copy it, rename and delete accounts, Steam codes, and an optional
   password for the YubiKey's OATH application.
 - **Apple Watch.** Optionally shows the codes of your Ente Auth accounts on Apple Watch, without the iPhone nearby.
 - **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps

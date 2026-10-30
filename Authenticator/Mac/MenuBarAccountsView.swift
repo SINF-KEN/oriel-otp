@@ -144,7 +144,7 @@ private struct MenuBarAccountRow: View {
         .buttonStyle(.plain)
         .onHover { isHovering = $0 }
         .accessibilityLabel(account.title)
-        .accessibilityHint(String(localized: "Copies the code", comment: "Mac menu bar accessibility hint"))
+        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
     }
 }
 

@@ -2458,7 +2458,7 @@
       }
     },
     "Copies the code" : {
-      "comment" : "Mac menu bar accessibility hint",
+      "comment" : "Accessibility hint for a code in the account list or the Mac menu bar",
       "localizations" : {
         "de" : {
           "stringUnit" : {
