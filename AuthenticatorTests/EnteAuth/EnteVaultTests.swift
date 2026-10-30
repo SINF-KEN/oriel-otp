@@ -31,6 +31,21 @@ nonisolated final class InMemoryVaultStorage: EnteVaultStorage, @unchecked Senda
     func remove() { lock.withLock { vault = nil } }
 }
 
+/// A vault file that can't be read until the device is unlocked.
+nonisolated final class LockedVaultStorage: EnteVaultStorage, @unchecked Sendable {
+    private let lock = NSLock()
+    private let storage = InMemoryVaultStorage()
+    private var isLocked = true
+
+    func unlock() { lock.withLock { isLocked = false } }
+    func load() throws -> EnteVault? {
+        if lock.withLock({ isLocked }) { throw EnteVaultError.unavailable }
+        return try storage.load()
+    }
+    func save(_ vault: EnteVault) throws { try storage.save(vault) }
+    func remove() { storage.remove() }
+}
+
 /// Stands in for the keychain item with the vault file's key.
 nonisolated final class InMemoryVaultKey: EnteVaultKeychain, @unchecked Sendable {
     private let lock = NSLock()
@@ -384,6 +399,30 @@ struct EnteVaultTests {
         cloud.setPinned(id, false)
         cloud.rename(id, issuer: "GitHub", accountName: "alice")
         #expect(!cloud.hasPendingChanges)
+    }
+
+    @Test func readsAVaultLockedAtLaunchOnceTheDeviceIsUnlocked() async throws {
+        let defaults = makeTestDefaults()
+        let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
+        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        var vault = EnteVault(email: "alice@example.com", server: server)
+        vault.merge([(EnteAuthenticatorEntity(id: "e0", encryptedData: nil, header: nil, isDeleted: false, updatedAt: 1),
+                      rawData("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP"))], latest: 1)
+        _ = vault.add(rawData: rawData("otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP"))
+        let storage = LockedVaultStorage()
+        try storage.save(vault)
+
+        // Launched in the background while the device is locked.
+        let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+        let model = MainViewModel(cloud: cloud)
+        #expect(!cloud.isEnabled)
+        #expect(model.cloudAccounts.isEmpty)
+
+        // The change that wasn't uploaded yet is still there, so the vault wasn't replaced with an empty one.
+        storage.unlock()
+        await cloud.syncAutomatically()
+        #expect(model.cloudAccounts.map(\.title) == ["GitHub", "GitLab"])
+        #expect(cloud.hasPendingChanges)
     }
 
     @Test func sortsTheAccountsByName() throws {

@@ -322,7 +322,10 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
 // MARK: - Storage
 
 enum EnteVaultError: Error {
+    /// The file or its key can't be decrypted, e.g. because the device was restored from a backup.
     case unreadable
+    /// The file or its key can't be read until the device is unlocked.
+    case unavailable
 }
 
 /// Where the vault is kept: an encrypted file in the app, memory in the tests.
@@ -358,8 +361,15 @@ nonisolated struct EnteVaultFile: EnteVaultStorage {
     func load() throws -> EnteVault? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         guard let key = try keychain.existingKey() else { throw EnteVaultError.unreadable }
+        let data: Data
         do {
-            let box = try ChaChaPoly.SealedBox(combined: try Data(contentsOf: url))
+            data = try Data(contentsOf: url)
+        } catch {
+            // Its data protection keeps it closed while the device is locked.
+            throw EnteVaultError.unavailable
+        }
+        do {
+            let box = try ChaChaPoly.SealedBox(combined: data)
             return try JSONDecoder().decode(EnteVault.self, from: try ChaChaPoly.open(box, using: key))
         } catch {
             throw EnteVaultError.unreadable
@@ -416,6 +426,8 @@ nonisolated struct EnteVaultKeychainKey: EnteVaultKeychain {
             return SymmetricKey(data: data)
         case errSecItemNotFound:
             return nil
+        case errSecInteractionNotAllowed:
+            throw EnteVaultError.unavailable
         default:
             throw SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
         }

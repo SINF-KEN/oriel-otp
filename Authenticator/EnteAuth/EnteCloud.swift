@@ -65,6 +65,8 @@ import YubiKit
     /// Changes when the vault is replaced, so a sync that was under way when it was doesn't write into the new one.
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var pathMonitor: NWPathMonitor?
+    /// The vault file couldn't be read when the app started because the device was locked.
+    @ObservationIgnored private var isVaultLocked = false
 
     init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .shared,
          watch: WatchAccountSync = .shared) {
@@ -72,8 +74,23 @@ import YubiKit
         self.storage = storage
         self.urlSession = session
         self.watch = watch
+        loadVault()
+    }
+
+    /// Reads the vault of the saved account. If the device is locked, e.g. when the app was launched in the
+    /// background, it is read once the app comes to the foreground, and nothing is written over it until then.
+    private func loadVault() {
         let saved = store.savedAccount
-        let vault = try? storage.load()
+        let vault: EnteVault?
+        do {
+            vault = try storage.load()
+        } catch EnteVaultError.unavailable {
+            isVaultLocked = saved != nil
+            return
+        } catch {
+            vault = nil
+        }
+        isVaultLocked = false
         if let saved {
             if let vault, vault.email.lowercased() == saved.email.lowercased(), vault.server == saved.server {
                 self.vault = vault
@@ -84,6 +101,15 @@ import YubiKit
         } else if vault != nil {
             // Signed out while the vault was kept by an earlier version.
             storage.remove()
+        }
+    }
+
+    /// Reads the vault if it couldn't be read before because the device was locked.
+    private func loadVaultIfLocked() {
+        guard isVaultLocked else { return }
+        loadVault()
+        if vault != nil {
+            changed()
         }
     }
 
@@ -117,6 +143,7 @@ import YubiKit
 
     /// Uses a session that was just saved or unlocked, e.g. in the sync sheet. A vault of another account is replaced.
     func use(_ session: EnteSavedSession) {
+        loadVaultIfLocked()
         self.session = session
         didAskToUnlock = true
         if vault?.belongs(to: session) != true {
@@ -128,7 +155,11 @@ import YubiKit
     /// Deletes the vault, for when the Ente account is signed out or not kept.
     func remove() {
         session = nil
-        guard vault != nil else { return }
+        isVaultLocked = false
+        guard vault != nil else {
+            storage.remove()
+            return
+        }
         replaceVault(with: nil)
     }
 
@@ -191,6 +222,7 @@ import YubiKit
     /// Syncs, asking to unlock the session if needed. Errors are shown if `reportsErrors` is set, e.g. when the user
     /// pulled down the list; changes made offline just wait for the next sync.
     func sync(unlock: Bool = true, reportsErrors: Bool = false) async {
+        loadVaultIfLocked()
         guard vault != nil, let session = await unlockedSession(unlock: unlock) else { return }
         do {
             try await enqueueSync(session).value
