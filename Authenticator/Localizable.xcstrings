@@ -1067,6 +1067,35 @@
         }
       }
     },
+    "Actual Size" : {
+      "comment" : "Mac View menu, back to the normal text size",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Originalgröße"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille réelle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "実際のサイズ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skutočná veľkosť"
+          }
+        }
+      }
+    },
     "Add" : {
       "comment" : "Ente sync add selected accounts to YubiKey",
       "localizations" : {
@@ -1686,6 +1715,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Už používate Ente Auth? V ponuke zoznamu účtov vyberte Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nSo zapnutou možnosťou Zostať prihlásený sa tu zobrazia aj vaše účty z Ente Auth a vaše zmeny sa uložia do Ente Auth. Vaše údaje z Ente Auth sa dešifrujú v tomto zariadení."
+          }
+        }
+      }
+    },
+    "Also in the View menu: Make Text Bigger (⌘+), Make Text Smaller (⌘−) and Actual Size (⌘0)." : {
+      "comment" : "Mac setting footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auch im Menü „Darstellung“: Text vergrößern (⌘+), Text verkleinern (⌘−) und Originalgröße (⌘0)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aussi dans le menu Présentation : Agrandir le texte (⌘+), Réduire le texte (⌘−) et Taille réelle (⌘0)."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「表示」メニューにもあります：テキストを拡大（⌘+）、テキストを縮小（⌘−）、実際のサイズ（⌘0）。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aj v menu Zobraziť: Zväčšiť text (⌘+), Zmenšiť text (⌘−) a Skutočná veľkosť (⌘0)."
           }
         }
       }
@@ -5630,6 +5688,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Heslo Macu"
+          }
+        }
+      }
+    },
+    "Make Text Bigger" : {
+      "comment" : "Mac View menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text vergrößern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agrandir le texte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストを拡大"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zväčšiť text"
+          }
+        }
+      }
+    },
+    "Make Text Smaller" : {
+      "comment" : "Mac View menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Text verkleinern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réduire le texte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストを縮小"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmenšiť text"
           }
         }
       }
@@ -10521,6 +10637,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Podmienky používania"
+          }
+        }
+      }
+    },
+    "Text size" : {
+      "comment" : "Mac setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Textgröße"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taille du texte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "テキストサイズ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veľkosť textu"
           }
         }
       }

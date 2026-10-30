@@ -403,6 +403,10 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         
         self.errorOverlay?.isHidden = true
         UIAccessibility.post(notification: .announcement, argument: String(localized: "QR code scanned", comment: "VoiceOver announcement after scanning a QR code"))
+        // With Reduce Motion the checkmark only fades in, without shrinking into place.
+        if UIAccessibility.isReduceMotionEnabled {
+            checkboxImageView.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+        }
         UIView.animate(withDuration: 0.2) {
             self.textLabel.text = Self.scanMessage
             self.checkboxImageView.alpha = 1
@@ -448,8 +452,10 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
             UIView.animate(withDuration: 0.7) {
                 self.permissionView.alpha = 1
                 self.errorOverlay?.alpha = 1
-                self.textLabel.textColor = .darkGray
+                // Without a camera there's nothing to point.
+                self.textLabel.alpha = 0
             }
+            textLabel.isAccessibilityElement = false
         }
     }
     

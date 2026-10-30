@@ -38,30 +38,32 @@ final class ScreenshotTests: XCTestCase {
 
     // The timeouts are generous: CI's simulators can take several seconds to present a screen.
     @MainActor func testScreenshots() throws {
-        // A row is one element, labelled with the issuer, the account name and the code.
-        let github = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'GitHub,'")).firstMatch
+        // Elements are found by their accessibility identifiers, see docs/accessibility.md.
+        let github = app.descendants(matching: .any)["account-row.GitHub:alice@example.com"].firstMatch
         XCTAssertTrue(github.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try save("accounts")
 
         github.tap()
-        XCTAssertTrue(app.staticTexts["alice@example.com"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
+        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try save("account-details")
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
-        app.navigationBars.buttons["More"].firstMatch.tap()
+        app.navigationBars.buttons["OverflowBarButtonItem"].firstMatch.tap()
+        // The More menu's items are the system's, which don't keep their identifiers.
         app.buttons["Sync from Ente Auth"].firstMatch.tap()
         // The sign in screen isn't kept: its focused field's blinking cursor would make every run different.
-        let email = app.textFields["Email"]
+        let email = app.textFields["ente.email"]
         XCTAssertTrue(email.waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
         email.tap()
         // Return moves on to the password, where it signs in. Typing it avoids tapping the Sign in button, whose name
         // the keyboard's return key shares.
         email.typeText("alice@example.com\n")
-        let password = app.secureTextFields["Password"]
+        let password = app.secureTextFields["ente.password"]
         XCTAssertTrue(password.waitForExistence(timeout: 20), "The Ente password field didn't show")
         password.tap()
         password.typeText("demo\n")
-        XCTAssertTrue(app.staticTexts["Already on YubiKey"].firstMatch.waitForExistence(timeout: 30), "The Ente accounts didn't show")
+        // Shown once the accounts are listed.
+        XCTAssertTrue(app.buttons["ente.add"].firstMatch.waitForExistence(timeout: 30), "The Ente accounts didn't show")
         try save("ente-accounts")
     }
 

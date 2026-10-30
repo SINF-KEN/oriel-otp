@@ -54,8 +54,10 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
   commands reach it through `MainWindowCommands`; publishing closures made SwiftUI rebuild the menus constantly.
 - **Keyboard**: the list can be used with the arrow keys, Return copies the code, Delete deletes, Escape and Return
   cancel and confirm sheets. Several accounts can be selected to pin or delete them together.
-- **Settings** (⌘,): General (menu bar, menu bar only, open at login) and YubiKey, the configuration screen that is a
-  sheet on iOS.
+- **Text size**: View > Make Text Bigger (⌘+), Make Text Smaller (⌘−) and Actual Size (⌘0), from 100% to 200%, also
+  in Settings > General. macOS has no text size apps can follow, see [accessibility.md](accessibility.md).
+- **Settings** (⌘,): General (menu bar, menu bar only, text size, open at login) and YubiKey, the configuration
+  screen that is a sheet on iOS.
 - **Toolbar**: Refresh, Add and Sync from Ente Auth, with help tags. There is no pull to refresh; the YubiKey is
   read when it's plugged in. Copy and pin also appear on a row when the pointer is over it, in place of swipe actions,
   and clicking a code copies it.

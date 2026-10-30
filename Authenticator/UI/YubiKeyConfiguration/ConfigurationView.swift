@@ -35,7 +35,7 @@ struct ConfigurationView: View {
     
     var body: some View {
         NavigationStack {
-            List {
+            SettingsList {
                 if model.deviceInfo == nil {
                     VStack(alignment: .center) {
                         Image("securitykey")
@@ -211,12 +211,12 @@ struct ConfigurationView: View {
             }
         }
         .onChange(of: model.deviceInfo == nil) { _, _ in
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 showInsertYubiKey = model.deviceInfo == nil
             }
         }
         .onAppear {
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 showInsertYubiKey = model.deviceInfo == nil
             }
 
@@ -229,7 +229,8 @@ struct ConfigurationView: View {
 }
 
 struct ListIconView: View {
-    
+
+    @Environment(\.textScale) private var textScale
     var image: Image
     var color: Color
     var padding: CGFloat = 4.3
@@ -238,9 +239,10 @@ struct ListIconView: View {
         image
             .resizable()
             .scaledToFit()
-            .font(Font.title.weight(.semibold))
-            .padding(padding)
-            .frame(width: 29, height: 29)
+            .scaledFont(.title) { $0.weight(.semibold) }
+            .padding(padding * textScale)
+            // Grows with the Mac's text size. On iOS it stays the size of the system's settings icons.
+            .frame(width: 29 * textScale, height: 29 * textScale)
             .foregroundStyle(.white)
             .background(color)
             .clipShape(.rect(cornerRadius: 6.5))

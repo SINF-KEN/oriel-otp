@@ -20,7 +20,7 @@ import SwiftUI
 struct AppLockView: View {
 
     private var lock: AppLock { .shared }
-    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
+    @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
 
     var body: some View {
         VStack(spacing: 24) {
@@ -30,7 +30,7 @@ struct AppLockView: View {
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
             Text(String(localized: "Oriel OTP is locked", comment: "App lock screen title"))
-                .font(.title2.bold())
+                .scaledFont(.title2) { $0.bold() }
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             if lock.isUnavailable {
@@ -47,6 +47,7 @@ struct AppLockView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(lock.isAuthenticating)
+                .accessibilityIdentifier("app-lock.unlock")
             } else {
                 AppLockSecretEntry(method: lock.method,
                                    prompt: lock.method == .password
@@ -84,14 +85,19 @@ struct AppLockSecretEntry: View {
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
             if checksRetryDate, let retryDate = lock.retryDate {
-                Text("Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).", comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
-                    .monospacedDigit()
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .task(id: retryDate) {
-                        try? await Task.sleep(for: .seconds(max(0, retryDate.timeIntervalSinceNow) + 0.2))
-                        lock.updateRetryDate()
-                    }
+                Label {
+                    Text("Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).", comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
+                } icon: {
+                    // So it doesn't take the red to see that something's wrong.
+                    Image(systemName: "hourglass")
+                }
+                .monospacedDigit()
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
+                .task(id: retryDate) {
+                    try? await Task.sleep(for: .seconds(max(0, retryDate.timeIntervalSinceNow) + 0.2))
+                    lock.updateRetryDate()
+                }
             } else if let length = method.codeLength {
                 AppLockCodePad(length: length, submit: submit)
             } else {
@@ -111,9 +117,10 @@ private struct AppLockCodePad: View {
     @State private var code = ""
     @State private var wrongAttempts = 0
     @FocusState private var isFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The keys grow with the text, up to a size where three still fit across the smallest iPhone. Beyond that the
     // digits stop growing and show in the Large Content Viewer when held.
-    @ScaledMetric(relativeTo: .title) private var scaledKeySize: CGFloat = 72
+    @ScaledSize(relativeTo: .title) private var scaledKeySize: CGFloat = 72
     private var keySize: CGFloat { min(scaledKeySize, 96) }
 
     private let rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
@@ -128,7 +135,8 @@ private struct AppLockCodePad: View {
                         .frame(width: 14, height: 14)
                 }
             }
-            .modifier(Shake(animatableData: CGFloat(wrongAttempts)))
+            // With Reduce Motion the dots don't shake; the error haptic and the dots emptying still show it.
+            .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             .accessibilityElement()
             .accessibilityLabel(String(localized: "\(code.count) of \(length) digits entered", comment: "App lock code dots for VoiceOver"))
 
@@ -143,7 +151,7 @@ private struct AppLockCodePad: View {
                     key("0")
                     Button(action: deleteDigit) {
                         Image(systemName: "delete.backward")
-                            .font(.title2)
+                            .scaledFont(.title2)
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                             .frame(width: keySize, height: keySize)
                             .contentShape(.rect)
@@ -153,6 +161,7 @@ private struct AppLockCodePad: View {
                     .accessibilityLabel(String(localized: "Delete", comment: "App lock number pad delete button"))
                     .accessibilityInputLabels([String(localized: "Delete", comment: "App lock number pad delete button"),
                                                String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")])
+                    .accessibilityIdentifier("app-lock.delete")
                     .opacity(code.isEmpty ? 0 : 1)
                     .disabled(code.isEmpty)
                 }
@@ -177,7 +186,7 @@ private struct AppLockCodePad: View {
             add(digit)
         } label: {
             Text(verbatim: digit)
-                .font(.title.weight(.regular))
+                .scaledFont(.title) { $0.weight(.regular) }
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                 .frame(width: keySize, height: keySize)
                 .background(Color.secondary.opacity(0.18), in: Circle())
@@ -187,6 +196,7 @@ private struct AppLockCodePad: View {
         .accessibilityShowsLargeContentViewer { Text(verbatim: digit) }
         // Typed as soon as the finger lifts, like the system's passcode keys.
         .accessibilityAddTraits(.isKeyboardKey)
+        .accessibilityIdentifier("app-lock.key.\(digit)")
     }
 
     private func add(_ digits: String) {
@@ -219,6 +229,7 @@ private struct AppLockPasswordField: View {
     @State private var password = ""
     @State private var wrongAttempts = 0
     @FocusState private var isFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 16) {
@@ -226,8 +237,9 @@ private struct AppLockPasswordField: View {
                 .textContentType(.password)
                 .textFieldStyle(.roundedBorder)
                 .focused($isFocused)
+                .accessibilityIdentifier("app-lock.password")
                 .onSubmit(enter)
-                .modifier(Shake(animatableData: CGFloat(wrongAttempts)))
+                .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             Button(String(localized: "Continue", comment: "App lock password button"), action: enter)
                 .buttonStyle(.borderedProminent)
                 .disabled(password.isEmpty)

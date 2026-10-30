@@ -71,25 +71,30 @@ struct AuthenticatorApp: App {
                 .toast(isPresenting: $toastPresenter.isPresenting, message: toastPresenter.message)
                 .sheet(isPresented: $notificationsViewModel.presentDisableOTP) {
                     DisableOTPView()
+                        .scaledBodyFont()
                         .appLockCover()
                 }
                 .appLockCover()
                 .withAppEnvironment(self)
+                .appTextSize(bodyFont: false)
         }
         .defaultSize(width: 900, height: 600)
         .commands {
             MainCommands()
+            TextSizeCommands()
         }
 
         Settings {
             MacSettingsView()
                 .appLockCover()
                 .withAppEnvironment(self)
+                .appTextSize()
         }
 
         Window(String(localized: "About Oriel OTP", comment: "Mac app menu"), id: AppWindow.about) {
             AboutView()
-                .frame(width: 420, height: 560)
+                .textScaledFrame(width: 420, height: 560)
+                .appTextSize()
         }
         .windowResizability(.contentSize)
         .defaultPosition(.center)
@@ -98,7 +103,8 @@ struct AuthenticatorApp: App {
 
         Window(String(localized: "How It Works", comment: "Mac Help menu"), id: AppWindow.tutorial) {
             TutorialView()
-                .frame(minWidth: 420, minHeight: 560)
+                .textScaledFrame(minWidth: 420, minHeight: 560)
+                .appTextSize()
         }
         .defaultSize(width: 480, height: 620)
         .defaultPosition(.center)
@@ -109,6 +115,7 @@ struct AuthenticatorApp: App {
             MenuBarAccountsView()
                 .appLockCover()
                 .withAppEnvironment(self)
+                .appTextSize()
         } label: {
             Image("securitykey")
                 .accessibilityLabel(Text(verbatim: "Oriel OTP"))

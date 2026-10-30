@@ -25,7 +25,7 @@ struct AboutView: View {
     
     var body: some View {
         NavigationStack {
-            List {
+            SettingsList {
                 VStack(alignment: .center) {
                     Image(.icon)
                         .resizable()
@@ -35,10 +35,10 @@ struct AboutView: View {
                         .padding(15)
                         .accessibilityHidden(true)
                     Text(verbatim: "Oriel OTP")
-                        .font(.title)
+                        .scaledFont(.title)
                         .multilineTextAlignment(.center)
                     Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
-                        .font(.body)
+                        .scaledFont(.body)
                     AboutLanguageView()
                 }
                 .frame(maxWidth: .infinity)
@@ -53,6 +53,7 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "lightbulb"), color: Color(.systemOrange))
                         Text("How does it work")
                     }
+                    .accessibilityIdentifier("about.tutorial")
                     NavigationLink {
                         VersionHistoryView(presentedFromMainView: false)
                             .navigationTitle(String(localized: "Version history", comment: "About navigation title"))
@@ -60,6 +61,7 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "list.clipboard"), color: Color(.systemGreen))
                         Text("Version history")
                     }
+                    .accessibilityIdentifier("about.version-history")
                     #if os(iOS)
                     NavigationLink {
                         AppIconView()
@@ -67,6 +69,7 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "app.badge"), color: Color(.systemGreen), padding: 5)
                         Text("App icon")
                     }
+                    .accessibilityIdentifier("about.app-icon")
                     #endif
                     Button {
                         Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)
@@ -141,7 +144,7 @@ struct AboutLanguageView: View {
         if shouldShowLanguageNote {
             Text("This translation is a community effort. To suggest a correction, [open an issue on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).")
                 .multilineTextAlignment(.center)
-                .font(.footnote)
+                .scaledFont(.footnote)
                 .foregroundStyle(.secondary)
                 .padding(.top, 15)
         } else {

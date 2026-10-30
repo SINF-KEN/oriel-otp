@@ -25,10 +25,10 @@ struct MacSettingsView: View {
     var body: some View {
         TabView {
             GeneralSettingsView()
-                .frame(width: 520, height: 480)
+                .textScaledFrame(width: 520, height: 480)
                 .tabItem { Label(String(localized: "General", comment: "Mac settings tab"), systemImage: "gearshape") }
             YubiKeySettingsView()
-                .frame(width: 520, height: 560)
+                .textScaledFrame(width: 520, height: 560)
                 .tabItem { Label(String(localized: "YubiKey", comment: "Mac settings tab"), image: "securitykey") }
         }
     }
@@ -79,12 +79,18 @@ private struct GeneralSettingsView: View {
                 Text(String(localized: "The menu bar shows your pinned accounts, or all accounts if none are pinned. Click one to copy its code. When the app is only in the menu bar, it isn't in the Dock.", comment: "Mac setting footer"))
             }
             Section {
+                TextSizePicker()
+            } footer: {
+                Text(String(localized: "Also in the View menu: Make Text Bigger (⌘+), Make Text Smaller (⌘−) and Actual Size (⌘0).", comment: "Mac setting footer"))
+            }
+            Section {
                 Toggle(String(localized: "Open at login", comment: "Mac setting"), isOn: $opensAtLogin)
             }
             AppLockSection()
             EnteAccountSection()
         }
         .formStyle(.grouped)
+        .scaledButtonLabels()
         .onChange(of: menuBarOnly) { MacPreferences.applyActivationPolicy() }
         .onChange(of: opensAtLogin) { _, opensAtLogin in
             do {

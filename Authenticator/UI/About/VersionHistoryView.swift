@@ -25,7 +25,7 @@ struct VersionHistoryView: View {
     private static var changes: [Change] = { [Change].init(withChangesFrom: "VersionHistory.plist") ?? [Change]() }()
     
     var body: some View {
-        List {
+        SettingsList {
             if presentedFromMainView {
                 VStack(alignment: .center) {
                     Image(.icon)
@@ -36,13 +36,14 @@ struct VersionHistoryView: View {
                         .padding(15)
                         .accessibilityHidden(true)
                     Text(verbatim: "Oriel OTP")
-                        .font(.title)
+                        .scaledFont(.title)
                         .multilineTextAlignment(.center)
                     Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
-                        .font(.body)
+                        .scaledFont(.body)
                 }
                 .frame(maxWidth: .infinity)
-                .listRowBackground(Color(.sheetBackground))
+                // On the list's own background, so it stands as a header.
+                .listRowBackground(Color.clear)
             }
             Section {
                 ForEach(VersionHistoryView.changes) { change in

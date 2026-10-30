@@ -56,6 +56,16 @@ wrong attempts the app makes you wait before the next one, up to an hour.
 Under **Configuration > Smart card extension**, add the certificate to the device and allow notifications. When an
 app asks for the certificate, tap the notification and enter the YubiKey's PIN.
 
+## Accessibility
+
+Oriel OTP is made to work with VoiceOver, Voice Control, larger text, dark mode, Increase Contrast, Differentiate
+Without Color and Reduce Motion on iPhone, iPad and Mac, and VoiceOver and larger text on Apple Watch. See
+[Accessibility](docs/accessibility.md) for what that covers and how it's tested.
+
+If something in the app is hard or impossible to use with the accessibility features you rely on, please
+[open an issue](https://github.com/SINF-KEN/oriel-otp/issues/new?labels=accessibility) and say which feature, which
+screen and what happened. Barriers are treated as bugs.
+
 ## Smart card extension
 
 Certificates in the YubiKey's smart card (PIV) application can be used by other apps on the iPhone or iPad to sign

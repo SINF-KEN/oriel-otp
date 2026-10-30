@@ -116,6 +116,10 @@ private struct CountdownRing: View {
     let period: Int
 
     @ScaledMetric(relativeTo: .title2) private var size: CGFloat = 18
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
+
+    /// Orange in the last seconds, and dashed too when color shouldn't be the only sign.
+    private var isEnding: Bool { secondsLeft <= 5 }
 
     var body: some View {
         ZStack {
@@ -123,7 +127,10 @@ private struct CountdownRing: View {
                 .stroke(.quaternary, lineWidth: 3)
             Circle()
                 .trim(from: 0, to: CGFloat(secondsLeft) / CGFloat(max(1, period)))
-                .stroke(secondsLeft <= 5 ? Color.orange : Color.accentColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                .stroke(
+                    isEnding ? Color.orange : Color.accentColor,
+                    style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: isEnding && differentiateWithoutColor ? [2, 4] : [])
+                )
                 .rotationEffect(.degrees(-90))
         }
         .frame(width: size, height: size)

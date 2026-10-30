@@ -25,7 +25,7 @@ struct ListStatusView<Actions: View>: View {
     /// Buttons for what to do next, shown below the message.
     @ViewBuilder let actions: Actions
     @State var showWhatsNew = false
-    @ScaledMetric(relativeTo: .largeTitle) private var imageSize: CGFloat = 100
+    @ScaledSize(relativeTo: .largeTitle) private var imageSize: CGFloat = 100
     
     var body: some View {
         HStack {
@@ -38,7 +38,7 @@ struct ListStatusView<Actions: View>: View {
                     .foregroundStyle(Color(.symbol))
                     .accessibilityHidden(true)
                 Text(message)
-                    .font(.title3)
+                    .scaledFont(.title3)
                     .multilineTextAlignment(.center)
                     .padding(EdgeInsets(top: 0, leading: 30, bottom: 0, trailing: 30))
                 // A button style other than plain, so each button gets its own taps rather than the whole row's.
@@ -85,7 +85,7 @@ struct WhatsNewView: View {
         Button {
             showWhatsNew.toggle()
         } label: {
-            Text(text).font(.footnote)
+            Text(text).scaledFont(.footnote)
         }
     }
 }

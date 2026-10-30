@@ -76,7 +76,7 @@ struct MenuBarAccountsView: View {
             }
         }
         .padding(6)
-        .frame(width: 300)
+        .textScaledFrame(width: 300)
         .onAppear {
             guard !mainWindow.isVisible, !model.isStarted else { return }
             startedModel = true
@@ -117,7 +117,7 @@ private struct MenuBarAccountRow: View {
                         .lineLimit(1)
                     account.subTitle.map {
                         Text($0)
-                            .font(.caption)
+                            .scaledFont(.caption)
                             .foregroundStyle(isHovering ? .primary : .secondary)
                             .lineLimit(1)
                     }
@@ -131,13 +131,13 @@ private struct MenuBarAccountRow: View {
                         .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
                 } else {
                     Text(account.state == .expired ? "*** ***" : account.formattedCode ?? "*** ***")
-                        .font(.body.monospacedDigit().bold())
+                        .scaledFont(.body) { $0.monospacedDigit().bold() }
                         .privacySensitive()
                 }
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .foregroundStyle(isHovering ? Color.white : Color.primary)
+            .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
             .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
             .contentShape(Rectangle())
         }
@@ -149,6 +149,12 @@ private struct MenuBarAccountRow: View {
                             : account.spokenCode)
         .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
     }
+}
+
+private extension Color {
+    /// Text on the accent color: white on the dark red of light mode, dark on the light pink of dark mode, where white
+    /// would be unreadable.
+    static let onAccent = Color(nsColor: .textBackgroundColor)
 }
 
 private struct MenuBarButton: View {
@@ -167,7 +173,7 @@ private struct MenuBarButton: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .foregroundStyle(isHovering ? Color.white : Color.primary)
+                .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
                 .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
                 .contentShape(Rectangle())
         }

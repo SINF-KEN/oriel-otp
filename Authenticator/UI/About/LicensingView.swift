@@ -22,7 +22,7 @@ struct LicensingView: View {
     var body: some View {
         List {
             Text(self.licensingText())
-                .font(.footnote)
+                .scaledFont(.footnote)
         }
         .navigationTitle("Licensing")
     }

@@ -37,7 +37,7 @@ struct YubiOtpRowView: View {
             VStack(alignment: .leading) {
                 Text(otp)
                     .privacySensitive()
-                    .font(.subheadline.weight(.medium))
+                    .scaledFont(.subheadline) { $0.weight(.medium) }
                     // Wraps at the accessibility sizes instead of shrinking back to the default size.
                     .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                     .minimumScaleFactor(0.1)

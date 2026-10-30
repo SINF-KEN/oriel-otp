@@ -23,7 +23,7 @@ struct TokenRequestYubiOTPView: View {
         ScrollView {
             ZStack(alignment: .topLeading) {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("Yubico OTP enabled").font(.title).bold()
+                    Text("Yubico OTP enabled").scaledFont(.title).bold()
                     .accessibilityAddTraits(.isHeader)
                     Text("This YubiKey has Yubico OTP enabled which makes it appear as an external keyboard to the iPhone. Unfortunately this causes problem with the normal on-screen keyboard.")
                     Spacer().frame(height: 15)
@@ -37,7 +37,7 @@ struct TokenRequestYubiOTPView: View {
                     }
                     .prominentActionButtonStyle()
                     Text("Disabling Yubico OTP will prevent the YubiKey from appearing as a keyboard. If you don’t use Yubico OTP this is the recommended solution. This can be re-enabled from the settings page.")
-                        .font(.footnote)
+                        .scaledFont(.footnote)
                         .foregroundStyle(.secondary)
                     Spacer().frame(height: 25)
                     Button {
@@ -48,12 +48,12 @@ struct TokenRequestYubiOTPView: View {
                     }
                     .secondaryActionButtonStyle()
                     Text("While the YubiKey is inserted the on-screen keyboard will not appear. To show the keyboard you will have to remove the YubiKey and then re-insert it.")
-                        .font(.footnote)
+                        .scaledFont(.footnote)
                         .foregroundStyle(.secondary)
                 }
                 .opacity(isOTPDisabled ? 0 : 1)
                 VStack(alignment: .leading, spacing: 15) {
-                    Text("Yubico OTP has been disabled").font(.title).bold()
+                    Text("Yubico OTP has been disabled").scaledFont(.title).bold()
                     .accessibilityAddTraits(.isHeader)
                     Text("Remove and re-insert your YubiKey")
                 }

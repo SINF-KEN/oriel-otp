@@ -19,7 +19,8 @@
 import SwiftUI
 
 struct TutorialView: View {
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State var page: Int = 0
     
     var body: some View {
@@ -49,23 +50,26 @@ struct TutorialView: View {
             #if os(macOS)
             ToolbarItem(placement: .navigation) {
                 Button {
-                    withAnimation {
+                    // Swapped at once with Reduce Motion, rather than sliding.
+                    withAnimation(reduceMotion ? nil : .default) {
                         page -= 1
                     }
                 } label: {
                     Label(String(localized: "Back", comment: "Mac tutorial button"), systemImage: "chevron.backward")
                 }
+                .accessibilityIdentifier("tutorial.back")
                 .disabled(page == 0)
             }
             #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    withAnimation {
+                    withAnimation(reduceMotion ? nil : .default) {
                         page += 1
                     }
                 } label: {
                     Label("Next", systemImage: "chevron.forward")
                 }
+                .accessibilityIdentifier("tutorial.next")
                 .disabled(page >= self.tutorialPages.count - 1)
             }
         }
@@ -76,7 +80,7 @@ struct TutorialView: View {
             VStack {
                 Text(tutorialPage.title)
                     .multilineTextAlignment(.center)
-                    .font(.title)
+                    .scaledFont(.title)
                     .bold()
                     .accessibilityAddTraits(.isHeader)
                 // The drawings are larger than the screen, so they're scaled down to fit.

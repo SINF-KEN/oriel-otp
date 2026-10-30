@@ -37,10 +37,10 @@ struct FIDOResetView: View {
 
     var body: some View {
         SettingsView(image: image, imageColor: imageColor) {
-            Text("Reset FIDO application").font(.title2).bold().opacity(keyHasBeenReset ? 0.2 : 1.0)
+            Text("Reset FIDO application").scaledFont(.title2).bold().opacity(keyHasBeenReset ? 0.2 : 1.0)
                 .accessibilityAddTraits(.isHeader)
             ProgressView(value: progress, total: 1.0).opacity(keyHasBeenReset ? 0.2 : 1.0)
-            Text(messageText).font(.subheadline).multilineTextAlignment(.center).opacity(keyHasBeenReset ? 0.2 : 1.0)
+            Text(messageText).scaledFont(.subheadline).multilineTextAlignment(.center).opacity(keyHasBeenReset ? 0.2 : 1.0)
         } buttons: {
             SettingsButton(String(localized: "Reset FIDO")) {
                 presentConfirmAlert.toggle()
@@ -87,7 +87,7 @@ struct FIDOResetView: View {
     }
     
     func updateState() {
-        withAnimation {
+        withAnimation(.unlessReduceMotion) {
             switch model.state {
             case .ready:
                 self.enableResetButton = true

@@ -29,13 +29,16 @@ struct AppLockSection: View {
         Section {
             Picker(String(localized: "Lock with", comment: "App lock setting"),
                    selection: Binding(get: { lock.method }, set: { method in Task { await requestChange(to: method) } })) {
-                Text(String(localized: "Off", comment: "App lock method")).tag(AppLockMethod.off)
-                if AppLock.canUseDeviceOwner || lock.method == .device {
-                    Text(verbatim: AppLock.deviceOwnerTitle).tag(AppLockMethod.device)
+                Group {
+                    Text(String(localized: "Off", comment: "App lock method")).tag(AppLockMethod.off)
+                    if AppLock.canUseDeviceOwner || lock.method == .device {
+                        Text(verbatim: AppLock.deviceOwnerTitle).tag(AppLockMethod.device)
+                    }
+                    Text(String(localized: "4-digit code", comment: "App lock method")).tag(AppLockMethod.code4)
+                    Text(String(localized: "6-digit code", comment: "App lock method")).tag(AppLockMethod.code6)
+                    Text(String(localized: "Password", comment: "App lock method")).tag(AppLockMethod.password)
                 }
-                Text(String(localized: "4-digit code", comment: "App lock method")).tag(AppLockMethod.code4)
-                Text(String(localized: "6-digit code", comment: "App lock method")).tag(AppLockMethod.code6)
-                Text(String(localized: "Password", comment: "App lock method")).tag(AppLockMethod.password)
+                .scaledBodyFont()
             }
             if lock.method.hasSecret {
                 Button(lock.method == .password
@@ -155,7 +158,7 @@ private struct AppLockChangeView: View {
             }
         }
         #if os(macOS)
-        .frame(width: 420, height: 560)
+        .textScaledFrame(width: 420, height: 560)
         #endif
         .interactiveDismissDisabled()
     }

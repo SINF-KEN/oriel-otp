@@ -46,11 +46,11 @@ final class MacScreenshotTests: XCTestCase {
     @MainActor func testScreenshots() throws {
         let window = app.windows["Oriel OTP"]
         XCTAssertTrue(window.waitForExistence(timeout: 20))
-        // A row is one element, labelled with the issuer, the account name and the code.
-        let github = window.buttons.matching(NSPredicate(format: "label BEGINSWITH 'GitHub,'")).firstMatch
+        // Elements are found by their accessibility identifiers, see docs/accessibility.md.
+        let github = window.descendants(matching: .any)["account-row.GitHub:alice@example.com"].firstMatch
         XCTAssertTrue(github.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         github.click()
-        XCTAssertTrue(window.staticTexts["alice@example.com"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(window.descendants(matching: .any)["account-details.code"].firstMatch.waitForExistence(timeout: 5))
         try save("mac-accounts", window)
 
         app.typeKey("n", modifierFlags: .command)
@@ -61,21 +61,21 @@ final class MacScreenshotTests: XCTestCase {
 
         app.typeKey("e", modifierFlags: [.command, .shift])
         // The email field is focused when the sheet opens.
-        let email = window.sheets.textFields.firstMatch
+        let email = window.sheets.textFields["ente.email"].firstMatch
         XCTAssertTrue(email.waitForExistence(timeout: 5))
         email.typeText("alice@example.com\r")
-        let password = window.sheets.secureTextFields.firstMatch
+        let password = window.sheets.secureTextFields["ente.password"].firstMatch
         XCTAssertTrue(password.waitForExistence(timeout: 10))
         // The ad-hoc signed build has no keychain access group, so it can't keep the session in the keychain.
-        let staySignedIn = window.sheets.switches.firstMatch
+        let staySignedIn = window.sheets.switches["ente.stay-signed-in"].firstMatch
         XCTAssertTrue(staySignedIn.waitForExistence(timeout: 5))
         if staySignedIn.value as? Int == 1 {
             staySignedIn.click()
         }
         password.click()
         password.typeText("demo\r")
-        let alreadyOnYubiKey = window.sheets.buttons.matching(NSPredicate(format: "label ENDSWITH 'Already on YubiKey'")).firstMatch
-        XCTAssertTrue(alreadyOnYubiKey.waitForExistence(timeout: 30))
+        // The Add button is there once the accounts are listed.
+        XCTAssertTrue(window.sheets.buttons["ente.add"].firstMatch.waitForExistence(timeout: 30))
         try save("mac-ente-accounts", window)
         app.typeKey(.escape, modifierFlags: [])
 
@@ -96,7 +96,7 @@ final class MacScreenshotTests: XCTestCase {
     @MainActor func testMacWindows() throws {
         let window = app.windows["Oriel OTP"]
         XCTAssertTrue(window.waitForExistence(timeout: 20))
-        XCTAssertTrue(window.buttons.matching(NSPredicate(format: "label BEGINSWITH 'GitHub,'")).firstMatch.waitForExistence(timeout: 20))
+        XCTAssertTrue(window.descendants(matching: .any)["account-row.GitHub:alice@example.com"].firstMatch.waitForExistence(timeout: 20))
 
         try openSettings(tab: "YubiKey")
         let serialNumber = app.windows["YubiKey"].staticTexts["Serial number"]
