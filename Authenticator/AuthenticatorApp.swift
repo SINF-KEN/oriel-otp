@@ -71,7 +71,9 @@ struct AuthenticatorApp: App {
                 .toast(isPresenting: $toastPresenter.isPresenting, message: toastPresenter.message)
                 .sheet(isPresented: $notificationsViewModel.presentDisableOTP) {
                     DisableOTPView()
+                        .appLockCover()
                 }
+                .appLockCover()
                 .withAppEnvironment(self)
         }
         .defaultSize(width: 900, height: 600)
@@ -81,6 +83,7 @@ struct AuthenticatorApp: App {
 
         Settings {
             MacSettingsView()
+                .appLockCover()
                 .withAppEnvironment(self)
         }
 
@@ -104,6 +107,7 @@ struct AuthenticatorApp: App {
 
         MenuBarExtra(isInserted: $menuBar.isShown) {
             MenuBarAccountsView()
+                .appLockCover()
                 .withAppEnvironment(self)
         } label: {
             Image("securitykey")

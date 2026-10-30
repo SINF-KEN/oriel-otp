@@ -118,6 +118,10 @@ you lower your wrist or the screen is in Always On, and there is no way to copy 
 - A YubiKey password is only saved in the keychain if you choose to. The Ente Auth session and authenticator key
   stay on the device in the keychain, protected by Face ID or Touch ID (Touch ID or the password on the Mac), unless
   you turn off **Stay signed in**. The Ente password is never stored.
+- The app can be locked with Face ID or Touch ID, a 4 or 6 digit code, or a password, under **App lock** in
+  the settings (**Configuration** on iPhone and iPad, **Settings > General** on the Mac). It's off by default. The
+  lock is asked for when the app opens and when it comes back from the background, or on the Mac when the screen
+  locks or the Mac sleeps. Only a salted PBKDF2 hash of the code or password is kept, in the keychain on this device.
 - The only network connections are to Ente's server, or your own, while you use Ente Auth in the app: during an
   import, and when the app syncs your Ente Auth accounts while you stay signed in.
 

@@ -81,6 +81,7 @@ private struct GeneralSettingsView: View {
             Section {
                 Toggle(String(localized: "Open at login", comment: "Mac setting"), isOn: $opensAtLogin)
             }
+            AppLockSection()
             EnteAccountSection()
         }
         .formStyle(.grouped)
