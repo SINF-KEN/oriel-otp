@@ -1,0 +1,171 @@
+name: TestFlight
+
+# Uploads the iPhone (with the watch app) and Mac builds to App Store Connect after the tests pass on main. Commits
+# that only change documentation aren't uploaded. Run it by hand to upload any branch. See docs/testflight.md for the
+# secrets it needs.
+on:
+  workflow_run:
+    workflows: [OrielOTPTests]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Uploads queue rather than cancel each other: one cancelled in the middle of an upload can leave a build half
+# processed. A newer pending run still replaces an older pending one.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    # Tag pushes run the tests too; only main's pushes are published.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.files.outputs.code }}
+      sha: ${{ steps.files.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 2
+      - name: Check changed files
+        id: files
+        run: |
+          set -euo pipefail
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # main only takes squashed pull requests, so the last commit is the whole change.
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]] || ! git rev-parse -q --verify HEAD^ >/dev/null; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          code=$(git diff --name-only HEAD^ HEAD \
+            | grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|crowdin\.yml|\.github/.*)$' || true)
+          if [[ -n "$code" ]]; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "code=false" >> "$GITHUB_OUTPUT"
+            echo "Only documentation or CI changed; nothing to upload." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  upload:
+    name: upload (${{ matrix.platform }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: xcode-27
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [iOS, macOS]
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.changes.outputs.sha }}
+
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
+
+      # Archiving signs for development, with the team's Apple Development certificate. Without one on the runner,
+      # Xcode would create a new certificate on every run. Distribution signing happens at upload, with a certificate
+      # Apple keeps in the cloud, so the distribution certificate never leaves Apple.
+      - name: Install signing credentials
+        env:
+          CERTIFICATE_P12: ${{ secrets.DEVELOPMENT_CERTIFICATE_P12 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPMENT_CERTIFICATE_PASSWORD }}
+          API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+        run: |
+          set -euo pipefail
+          keychain="$RUNNER_TEMP/signing.keychain-db"
+          password=$(uuidgen)
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 3600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          base64 --decode <<< "$CERTIFICATE_P12" > "$RUNNER_TEMP/development.p12"
+          security import "$RUNNER_TEMP/development.p12" -k "$keychain" -P "$CERTIFICATE_PASSWORD" \
+            -T /usr/bin/codesign -T /usr/bin/security
+          rm "$RUNNER_TEMP/development.p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$password" "$keychain" >/dev/null
+          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8"
+
+      - name: Archive
+        timeout-minutes: 30
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          xcodebuild archive \
+            -project OrielOTP.xcodeproj \
+            -scheme OrielOTP \
+            -configuration Release \
+            -destination "generic/platform=${{ matrix.platform }}" \
+            -archivePath "$RUNNER_TEMP/OrielOTP.xcarchive" \
+            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -skipPackageUpdates \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/archive.log"
+
+      # App Store Connect gives the upload the next free build number, so the project's number doesn't need bumping.
+      - name: Upload to App Store Connect
+        timeout-minutes: 20
+        env:
+          KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          SHA: ${{ needs.changes.outputs.sha }}
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>XW69FY82W3</string>
+            <key>manageAppVersionAndBuildNumber</key><true/>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/OrielOTP.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+            -authenticationKeyID "$KEY_ID" \
+            -authenticationKeyIssuerID "$ISSUER_ID" \
+            2>&1 | tee "$RUNNER_TEMP/upload.log"
+          echo "Uploaded the ${{ matrix.platform }} build of ${SHA::7} to App Store Connect." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: testflight-${{ matrix.platform }}-logs
+          path: |
+            ${{ runner.temp }}/archive.log
+            ${{ runner.temp }}/upload.log
+          if-no-files-found: ignore
+
+      - name: Remove signing credentials
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/AuthKey.p8"

@@ -140,7 +140,8 @@ Debug builds in the simulator connect to a simulated YubiKey with demo accounts 
 server at `https://demo.ente.test` with any email and the password `demo` (add `+mfa`, `+2fa` or `+nosrp` to the
 email's name to be asked for the code `123456`, and `+passkey` to also be asked for a passkey). None of this is
 compiled into release builds. [docs/screenshots.md](docs/screenshots.md) explains how the README screenshots are
-regenerated, [docs/ci.md](docs/ci.md) what CI checks, [docs/macos.md](docs/macos.md) how the Mac version is built and
+regenerated, [docs/ci.md](docs/ci.md) what CI checks, [docs/testflight.md](docs/testflight.md) how builds from `main`
+reach TestFlight, [docs/macos.md](docs/macos.md) how the Mac version is built and
 [docs/accessibility.md](docs/accessibility.md) how accessibility is supported and tested.
 
 ## About this fork
