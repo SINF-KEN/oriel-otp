@@ -200,6 +200,13 @@ enum VoiceControlNames {
     }
 }
 
+extension Animation {
+    /// The default animation, or none with Reduce Motion on, so buttons and rows appear and go without sliding.
+    @MainActor static var unlessReduceMotion: Animation? {
+        Platform.prefersReducedMotion ? nil : .default
+    }
+}
+
 extension View {
     /// Centers the view in the space it's given, and scrolls it instead when it's taller, e.g. at the largest text
     /// sizes or in landscape.

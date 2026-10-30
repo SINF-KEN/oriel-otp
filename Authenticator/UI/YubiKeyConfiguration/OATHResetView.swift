@@ -61,7 +61,7 @@ struct OATHResetView: View {
         })
         .errorAlert(error: $error)
         .onChange(of: model.state) { _, state in
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 switch state {
                 case .ready:
                     self.keyHasBeenReset = false

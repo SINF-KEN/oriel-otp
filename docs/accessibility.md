@@ -58,6 +58,21 @@ short of that in places, as in Apple's own apps; everything the app draws itself
   red and blue for at least 4.5:1 in both appearances.
 - Every asset color has a high contrast variant, for light and dark mode.
 
+## Reduced Motion
+
+With Reduce Motion on, toasts fade instead of growing and springing, the tutorial's Next and Back swap pages at once,
+the app lock's dots don't shake after a wrong code (the haptic, the announcement and the dots emptying still say
+so), the QR scanner's checkmark only fades in, the countdown pie steps once a second instead of turning, and rows and
+buttons in the YubiKey settings appear without sliding. Fades, which Apple recommends in place of motion, are kept.
+Nothing animates on its own or loops; the countdown only follows the time. The watch's ring steps once a second
+already.
+
+## Captions and Audio Descriptions
+
+The app has no video or audio: the tutorial is still drawings, and help links open in the browser. These features
+don't apply and aren't claimed. Any video added later needs captions and an audio description, or a text alternative,
+before it's released (see [app-store.md](app-store.md)).
+
 ## Testing
 
 `AuthenticatorUITests/AccessibilityAuditTests.swift` runs Xcode's accessibility audit

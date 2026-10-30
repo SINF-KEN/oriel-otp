@@ -19,7 +19,8 @@
 import SwiftUI
 
 struct TutorialView: View {
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State var page: Int = 0
     
     var body: some View {
@@ -49,7 +50,8 @@ struct TutorialView: View {
             #if os(macOS)
             ToolbarItem(placement: .navigation) {
                 Button {
-                    withAnimation {
+                    // Swapped at once with Reduce Motion, rather than sliding.
+                    withAnimation(reduceMotion ? nil : .default) {
                         page -= 1
                     }
                 } label: {
@@ -60,7 +62,7 @@ struct TutorialView: View {
             #endif
             ToolbarItem(placement: .primaryAction) {
                 Button {
-                    withAnimation {
+                    withAnimation(reduceMotion ? nil : .default) {
                         page += 1
                     }
                 } label: {

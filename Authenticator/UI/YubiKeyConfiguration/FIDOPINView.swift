@@ -100,7 +100,7 @@ struct FIDOPINView: View {
     }
     
     func updateState() {
-        withAnimation {
+        withAnimation(.unlessReduceMotion) {
             switch model.state {
             case .unknown:
                 break

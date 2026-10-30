@@ -273,7 +273,8 @@ extension Account {
 }
 
 struct PieProgressView<Style: ShapeStyle>: View {
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let progress: Double
     let color: Style
     let animate: Bool
@@ -286,7 +287,8 @@ struct PieProgressView<Style: ShapeStyle>: View {
 
     var body: some View {
         var duration = progress >= 1.0 ? 0.0 : 1.0
-        duration = animate ? duration : 0.0
+        // Steps once a second with Reduce Motion, rather than turning all the time.
+        duration = animate && !reduceMotion ? duration : 0.0
         return PieShape(progress: self.progress)
             .foregroundStyle(color)
             .animation(.linear(duration: duration), value: self.progress)

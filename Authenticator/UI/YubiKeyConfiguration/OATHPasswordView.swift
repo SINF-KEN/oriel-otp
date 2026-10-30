@@ -67,7 +67,7 @@ struct OATHPasswordView: View {
         }
         .errorAlert(error: $error) { dismiss() }
         .onChange(of: model.state) { _, state in
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 switch state {
                 case .unknown:
                     self.showSetButton = true

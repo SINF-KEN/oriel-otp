@@ -211,12 +211,12 @@ struct ConfigurationView: View {
             }
         }
         .onChange(of: model.deviceInfo == nil) { _, _ in
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 showInsertYubiKey = model.deviceInfo == nil
             }
         }
         .onAppear {
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 showInsertYubiKey = model.deviceInfo == nil
             }
 

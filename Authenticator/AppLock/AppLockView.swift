@@ -116,6 +116,7 @@ private struct AppLockCodePad: View {
     @State private var code = ""
     @State private var wrongAttempts = 0
     @FocusState private var isFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The keys grow with the text, up to a size where three still fit across the smallest iPhone. Beyond that the
     // digits stop growing and show in the Large Content Viewer when held.
     @ScaledMetric(relativeTo: .title) private var scaledKeySize: CGFloat = 72
@@ -133,7 +134,8 @@ private struct AppLockCodePad: View {
                         .frame(width: 14, height: 14)
                 }
             }
-            .modifier(Shake(animatableData: CGFloat(wrongAttempts)))
+            // With Reduce Motion the dots don't shake; the error haptic and the dots emptying still show it.
+            .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             .accessibilityElement()
             .accessibilityLabel(String(localized: "\(code.count) of \(length) digits entered", comment: "App lock code dots for VoiceOver"))
 
@@ -224,6 +226,7 @@ private struct AppLockPasswordField: View {
     @State private var password = ""
     @State private var wrongAttempts = 0
     @FocusState private var isFocused: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 16) {
@@ -232,7 +235,7 @@ private struct AppLockPasswordField: View {
                 .textFieldStyle(.roundedBorder)
                 .focused($isFocused)
                 .onSubmit(enter)
-                .modifier(Shake(animatableData: CGFloat(wrongAttempts)))
+                .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             Button(String(localized: "Continue", comment: "App lock password button"), action: enter)
                 .buttonStyle(.borderedProminent)
                 .disabled(password.isEmpty)

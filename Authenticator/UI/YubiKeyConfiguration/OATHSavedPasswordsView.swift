@@ -60,7 +60,7 @@ struct OATHSavedPasswordsView: View {
         })
         .alert(errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: { })
         .onChange(of: model.state) { _, state in
-            withAnimation {
+            withAnimation(.unlessReduceMotion) {
                 switch state {
                 case .ready:
                     self.passwordsHasBeenCleared = false

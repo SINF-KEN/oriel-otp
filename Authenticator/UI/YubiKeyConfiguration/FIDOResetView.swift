@@ -87,7 +87,7 @@ struct FIDOResetView: View {
     }
     
     func updateState() {
-        withAnimation {
+        withAnimation(.unlessReduceMotion) {
             switch model.state {
             case .ready:
                 self.enableResetButton = true
