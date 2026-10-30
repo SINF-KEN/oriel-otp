@@ -87,7 +87,7 @@ struct MainView: View {
         .errorAlert(error: $cloud.error)
         .onAppear {
             if ApplicationSettingsViewModel().isNFCOnAppLaunchEnabled {
-                model.updateAccountsOverNFC()
+                AppLock.shared.whenUnlocked { model.updateAccountsOverNFC() }
             }
             addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, destinations) in
                 oathURL = nil
@@ -124,7 +124,7 @@ struct MainView: View {
             if showAbout { showAbout.toggle() }
             self.otp = otp
             if ApplicationSettingsViewModel().isNFCOnOTPLaunchEnabled {
-                model.updateAccountsOverNFC()
+                AppLock.shared.whenUnlocked { model.updateAccountsOverNFC() }
             }
         })
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
@@ -150,9 +150,13 @@ struct MainView: View {
                 ConnectionManager.shared.resumeWiredConnections()
 
                 guard !notificationsViewModel.showPIVTokenView else { return }
-                model.start() // This is called when app becomes active
-                Task { await model.cloud.syncAutomatically() }
-                performPendingQuickAction()
+                // Nothing is read or asked for behind the lock screen: the YubiKey's password, NFC or the Ente
+                // session's Face ID would come up over it or compete with it.
+                AppLock.shared.whenUnlocked {
+                    model.start() // This is called when app becomes active
+                    Task { await model.cloud.syncAutomatically() }
+                    performPendingQuickAction()
+                }
             } else if phase == .active {
                 performPendingQuickAction()
             } else if phase == .background {
@@ -292,6 +296,7 @@ struct MainView: View {
         }
         .sheet(isPresented: $showAddAccount) {
             AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL, destinations: addAccountDestinations)
+                .appLockCover()
         }
         .sheet(isPresented: $showEnteSync) {
             EnteSyncView(existingCredentialIds: Set(model.keyAccounts.map(\.accountId)),
@@ -299,6 +304,7 @@ struct MainView: View {
                          canAddToYubiKey: DeviceCapabilities.supportsNFC || model.isKeyPluggedIn) { templates, requiresTouch in
                 importAccounts(templates, requiresTouch: requiresTouch)
             }
+            .appLockCover()
         }
         // Sheets rather than full-screen covers, so they read as a task on top of the account list and can be swiped away.
         .sheet(isPresented: $showConfiguration) {
@@ -308,6 +314,7 @@ struct MainView: View {
                 }.onDisappear {
                     model.start()
                 }
+                .appLockCover()
         }
         .sheet(isPresented: $showAbout) {
             AboutView()
@@ -316,6 +323,7 @@ struct MainView: View {
                 }.onDisappear {
                     model.start()
                 }
+                .appLockCover()
         }
         .alert(String(localized: "Enter password", comment: "Password alert"), isPresented: $model.presentPasswordEntry) {
             SecureField(String(localized: "Password", comment: "Password alert"), text: $password)
@@ -366,6 +374,7 @@ struct MainView: View {
         #else
         .sheet(item: $accountToRename) { account in
             EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
+                .appLockCover()
         }
         .focusedSceneValue(\.mainWindowMenuState, menuState)
         .onChange(of: commands.pending) { _, command in
@@ -517,7 +526,7 @@ struct MainView: View {
     }
 
     private func performPendingQuickAction() {
-        guard scenePhase == .active, let action = quickActions.pending else { return }
+        guard scenePhase == .active, !AppLock.shared.isLocked, let action = quickActions.pending else { return }
         quickActions.pending = nil
         guard !notificationsViewModel.showPIVTokenView && !notificationsViewModel.presentDisableOTP else { return }
         switch action {

@@ -180,7 +180,8 @@ struct ConfigurationView: View {
                         Text("Smart card extension")
                     }
                 }
-                // The Mac shows the Ente account in the General tab of its Settings window.
+                // The Mac shows the app lock and the Ente account in the General tab of its Settings window.
+                AppLockSection()
                 EnteAccountSection()
                 #endif
             }

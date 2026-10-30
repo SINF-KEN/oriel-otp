@@ -30,6 +30,10 @@ Staying signed in is on by default when the device can protect the session, and 
 
 While you stay signed in, the copy of your Ente Auth accounts, including their secrets, and any changes not yet uploaded, are kept in a file in the app's storage on the device. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked, without Face ID or Touch ID, so the codes are shown at once and work offline. The file is excluded from backups. If Ente's server rejects the session, the copy is kept so the codes keep working until you sign in again or sign out.
 
+## App lock
+
+If you turn on **App lock**, the app keeps the lock method you chose in the device keychain, only on this device. For a code or password it keeps a salted PBKDF2-SHA256 hash, never the code or password itself. Face ID, Touch ID and the device passcode are checked by the system; the app only learns whether it succeeded. The number of wrong attempts and the time of the last one are kept in local app preferences to make you wait after too many. Nothing about the lock leaves the device. The lock covers this app only: the Apple Watch app keeps showing codes while the watch is unlocked.
+
 ## Optional Apple Watch app
 
 The Apple Watch app is off until you turn on **Show Ente Auth accounts on Apple Watch** under **Sync from Ente Auth**,

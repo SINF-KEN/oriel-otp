@@ -34,6 +34,20 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
         #endif
     }
 
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Locked when the screen locks, the Mac sleeps or another user takes over, and asked for when the app is
+        // next used.
+        let lock: @Sendable (Notification) -> Void = { _ in Task { @MainActor in AppLock.shared.lock() } }
+        DistributedNotificationCenter.default().addObserver(forName: Notification.Name("com.apple.screenIsLocked"), object: nil, queue: .main, using: lock)
+        let workspace = NSWorkspace.shared.notificationCenter
+        for name in [NSWorkspace.willSleepNotification, NSWorkspace.screensDidSleepNotification, NSWorkspace.sessionDidResignActiveNotification] {
+            workspace.addObserver(forName: name, object: nil, queue: .main, using: lock)
+        }
+        NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
+            Task { @MainActor in AppLock.shared.didBecomeActive() }
+        }
+    }
+
     // The Dock menu, in place of the Home Screen quick actions on iOS.
     func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
         let menu = NSMenu()

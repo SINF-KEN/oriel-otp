@@ -70,6 +70,23 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 
 final class SceneDelegate: NSObject, UIWindowSceneDelegate {
 
+    private var appLockWindow: AppLockWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+        guard let windowScene = scene as? UIWindowScene else { return }
+        appLockWindow = AppLockWindow(windowScene: windowScene)
+    }
+
+    func sceneDidBecomeActive(_ scene: UIScene) {
+        AppLock.shared.didBecomeActive()
+    }
+
+    // Not when the scene only resigns active, as the NFC and Face ID sheets make it do.
+    func sceneDidEnterBackground(_ scene: UIScene) {
+        AppLock.shared.lock()
+        appLockWindow?.update(animated: false)
+    }
+
     // A quick action used while the app is running.
     func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem) async -> Bool {
         guard let action = QuickAction(rawValue: shortcutItem.type) else { return false }
