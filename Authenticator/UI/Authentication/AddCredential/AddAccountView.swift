@@ -183,11 +183,15 @@ struct AddAccountView: View {
             // VoiceOver's escape gesture, a two-finger Z, does the same as Cancel.
             .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    CancelButton { showAddAccount = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    ConfirmButton(String(localized: "Save")) { save() }
+                // Left out while the scanner covers the form: the bar's buttons would still be reachable with
+                // VoiceOver behind it, as hiding the form doesn't hide them.
+                if mode != .scanning {
+                    ToolbarItem(placement: .cancellationAction) {
+                        CancelButton { showAddAccount = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        ConfirmButton(String(localized: "Save")) { save() }
+                    }
                 }
             }
             #if os(macOS)

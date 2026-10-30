@@ -35,6 +35,10 @@ alone.
 The test is `AuthenticatorUITests/ScreenshotTests.swift`. To add a screenshot, navigate to the screen there and
 call `save("name")`, then add `docs/screenshots/name.png` to the README.
 
+The same run has `AuthenticatorUITests/AccessibilityAuditTests.swift`, which goes through the main screens and runs
+Xcode's accessibility audit on each. It fails for every issue it finds, so a screen that breaks at a large text size
+fails the screenshots job. See [accessibility.md](accessibility.md).
+
 ## The Mac screenshots
 
 ```bash

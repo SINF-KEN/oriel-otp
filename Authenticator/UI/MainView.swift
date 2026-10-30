@@ -55,6 +55,7 @@ struct MainView: View {
     @State var accountsToDelete: [Account] = []
     @State var accountToRename: Account?
     @State var quickActions = QuickActionCenter.shared
+    @ScaledMetric(relativeTo: .largeTitle) private var placeholderSize: CGFloat = 64
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
     var insertYubiKeyMessage: String {
@@ -274,7 +275,7 @@ struct MainView: View {
                 .id(selectedAccount.accountId)
             } else {
                 Image(systemName: "person.crop.circle")
-                    .font(.system(size: 64))
+                    .font(.system(size: placeholderSize))
                     .foregroundStyle(Color(.tertiaryLabel))
                     .accessibilityHidden(true)
             }

@@ -25,6 +25,7 @@ struct ListStatusView<Actions: View>: View {
     /// Buttons for what to do next, shown below the message.
     @ViewBuilder let actions: Actions
     @State var showWhatsNew = false
+    @ScaledMetric(relativeTo: .largeTitle) private var imageSize: CGFloat = 100
     
     var body: some View {
         HStack {
@@ -32,7 +33,8 @@ struct ListStatusView<Actions: View>: View {
             VStack(spacing: 20) {
                 Spacer()
                 image
-                    .font(.system(size: 100.0))
+                    // Grows a little with the text, leaving the room to the message at the largest sizes.
+                    .font(.system(size: min(imageSize, 140)))
                     .foregroundStyle(Color(.symbol))
                     .accessibilityHidden(true)
                 Text(message)

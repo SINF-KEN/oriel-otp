@@ -22,6 +22,7 @@ struct YubiOtpRowView: View {
 
     @Environment(ToastPresenter.self) var toastPresenter
     var otp: String
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     
     var body: some View {
         HStack {
@@ -37,7 +38,8 @@ struct YubiOtpRowView: View {
                 Text(otp)
                     .privacySensitive()
                     .font(.subheadline.weight(.medium))
-                    .lineLimit(1)
+                    // Wraps at the accessibility sizes instead of shrinking back to the default size.
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                     .minimumScaleFactor(0.1)
             }
         }
