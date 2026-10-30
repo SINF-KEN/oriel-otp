@@ -66,13 +66,15 @@ room is left, only selects as many accounts as fit, and warns when the selection
 The import reads accounts from Ente Auth and copies them onto the YubiKey. Accounts you later remove from Ente stay
 on the YubiKey until you delete them there.
 
-The other way, turn on **Also add to Ente Auth** when adding an account to save it in Ente Auth too. This needs a
-saved session (**Stay signed in**). A YubiKey never gives its secrets back, so this works only while an account is
-added; accounts already on the key can't be copied to Ente.
+The other way, choose **YubiKey and Ente Auth** under **Save to** when adding an account to save it in Ente Auth too.
+This needs a saved session (**Stay signed in**). A YubiKey never gives its secrets back, so this works only while an
+account is added; accounts already on the key can't be copied to Ente.
 
 With a saved session the app is also an Ente Auth client of its own. Your Ente Auth accounts are kept on the device,
 encrypted, and listed with the YubiKey's, with a cloud next to each one, so their codes work without a YubiKey and
-offline. Add accounts with **Add to Ente Auth** in the menu, or with the add button when no YubiKey can be reached.
+offline. When adding an account, choose under **Save to** whether it goes on the YubiKey, in Ente Auth or both; the
+choice is remembered. Without a YubiKey to reach, the add button saves to Ente Auth. **Copy to YubiKey** and **Move to
+YubiKey** on an Ente Auth account put it on the YubiKey; moving puts it in Ente's trash once it is on the key.
 Renaming, pinning or deleting an Ente Auth account changes it in Ente Auth too (deleting moves it to Ente's trash),
 and changes made in Ente's other apps show up after the next sync. The app syncs when it opens, when you pull down
 the list (or choose Refresh on the Mac) and after each change. If the same account was changed on another device in

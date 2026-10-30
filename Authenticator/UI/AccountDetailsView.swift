@@ -61,6 +61,13 @@ struct AccountDetailView: View {
                 .font(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
             }
+            if !account.isInEnte && model.cloud.isEnabled {
+                Text(String(localized: "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.", comment: "Account details of a YubiKey account while signed in to Ente Auth"))
+                    .font(.footnote)
+                    .foregroundStyle(Color(.secondaryLabel))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 360)
+            }
             Button(action: copyCode) {
                 HStack(spacing: 10) {
                     statusIcon
@@ -112,6 +119,7 @@ struct AccountDetailView: View {
                 .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
             }
             ToolbarItemGroup(placement: .secondaryAction) {
+                CopyToYubiKeyButtons(account: account)
                 if account.canRename {
                     Button(action: { showEditing.toggle() }) {
                         Label(String(localized: "Rename", comment: "Menu"), systemImage: "square.and.pencil")
@@ -166,5 +174,47 @@ struct AccountDetailView: View {
 
     private func copyCode() {
         toastPresenter.copyCode(of: account)
+    }
+}
+
+/// Copy to YubiKey and Move to YubiKey, for an account in Ente Auth. Moving puts it in Ente's trash once it is on
+/// the YubiKey, so it can still be restored in Ente Auth.
+struct CopyToYubiKeyButtons: View {
+
+    @Environment(MainViewModel.self) private var model
+    @Environment(ToastPresenter.self) private var toastPresenter
+    let account: Account
+
+    var body: some View {
+        if account.isInEnte {
+            let canReachYubiKey = DeviceCapabilities.supportsNFC || model.isKeyPluggedIn
+            if model.canCopyToYubiKey(account, moving: false) {
+                Button(action: { Self.copy(account, moving: false, model: model, toastPresenter: toastPresenter) }) {
+                    Label(String(localized: "Copy to YubiKey", comment: "Menu"), systemImage: "plus.square.on.square")
+                }
+                .help(String(localized: "Put the account on the YubiKey and keep it in Ente Auth", comment: "Toolbar help"))
+                .disabled(!canReachYubiKey)
+            }
+            if model.canCopyToYubiKey(account, moving: true) {
+                Button(action: { Self.copy(account, moving: true, model: model, toastPresenter: toastPresenter) }) {
+                    Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.right.square")
+                }
+                .help(String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help"))
+                .disabled(!canReachYubiKey)
+            }
+        }
+    }
+
+    static func copy(_ account: Account, moving: Bool, model: MainViewModel, toastPresenter: ToastPresenter) {
+        model.copyToYubiKey(account, moving: moving) { result in
+            switch result {
+            case .copied:
+                toastPresenter.toast(message: String(localized: "Copied to the YubiKey", comment: "Toast after copying an Ente Auth account to the YubiKey"))
+            case .moved:
+                toastPresenter.toast(message: String(localized: "Moved to the YubiKey. Ente Auth keeps it in the trash.", comment: "Toast after moving an Ente Auth account to the YubiKey"))
+            case .alreadyOnYubiKey:
+                toastPresenter.toast(message: String(localized: "The YubiKey already has an account with this name. Nothing was changed.", comment: "Toast when copying an Ente Auth account to a YubiKey that has one with the same name"))
+            }
+        }
     }
 }
