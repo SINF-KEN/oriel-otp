@@ -111,11 +111,14 @@ struct AddAccountView: View {
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Add account field")) {
                         TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer)
+                            // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
+                            .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
                             .submitLabel(.next)
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
                         TextField(String("john@doe.com"), text: $accountName)
+                            .accessibilityLabel(String(localized: "Account name", comment: "Add account field"))
                             .textContentType(.username)
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
@@ -311,6 +314,7 @@ struct AddAccountView: View {
                     Button { mode = .manual } label: {
                         Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
                     }
+                    .accessibilityInputLabels(VoiceControlNames.enterManually)
                 }
             }
         }

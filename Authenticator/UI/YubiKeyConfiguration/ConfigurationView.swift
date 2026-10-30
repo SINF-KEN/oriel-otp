@@ -205,6 +205,7 @@ struct ConfigurationView: View {
                         } label: {
                             Label(String(localized: "Scan NFC YubiKey"), systemImage: "wave.3.right")
                         }
+                        .accessibilityInputLabels(VoiceControlNames.scanNFC)
                     }
                 }
             }
