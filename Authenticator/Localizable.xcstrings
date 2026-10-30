@@ -274,6 +274,35 @@
         }
       }
     },
+    "%lld seconds left" : {
+      "comment" : "VoiceOver, time until the code changes",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch %lld Sekunden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld secondes restantes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "残り%lld秒"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zostáva %lld s"
+          }
+        }
+      }
+    },
     "%lld were already on the YubiKey." : {
       "comment" : "Import result. The placeholder is the number of accounts.",
       "localizations" : {
@@ -1917,6 +1946,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vypočítať nový kód"
+          }
+        }
+      }
+    },
+    "Calculate to get a code" : {
+      "comment" : "VoiceOver, an account whose code hasn't been calculated",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berechnen, um einen Code zu erhalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calculer pour obtenir un code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "計算するとコードが表示されます"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypočítajte, aby ste získali kód"
           }
         }
       }
@@ -7786,6 +7844,35 @@
         }
       }
     },
+    "QR code scanned" : {
+      "comment" : "VoiceOver announcement after scanning a QR code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code gescannt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code QR scanné"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを読み取りました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR kód naskenovaný"
+          }
+        }
+      }
+    },
     "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add your YubiKey and generate your own security codes." : {
       "localizations" : {
         "de" : {
@@ -12559,6 +12646,35 @@
         }
       }
     },
+    "Wrong code. Try again." : {
+      "comment" : "VoiceOver announcement after a wrong app lock code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falscher Code. Versuche es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code incorrect. Réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードが違います。もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nesprávny kód. Skúste to znova."
+          }
+        }
+      }
+    },
     "Wrong password" : {
       "comment" : "Password Configuration wrong password",
       "localizations" : {
@@ -12584,6 +12700,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nesprávne heslo"
+          }
+        }
+      }
+    },
+    "Wrong password. Try again." : {
+      "comment" : "VoiceOver announcement after a wrong app lock password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falsches Passwort. Versuche es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe incorrect. Réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードが違います。もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nesprávne heslo. Skúste to znova."
           }
         }
       }

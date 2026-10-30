@@ -45,6 +45,7 @@ struct AccountDetailView: View {
             Text(account.title)
                 .font(.title2.weight(.medium))
                 .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
             account.subTitle.map {
                 Text($0)
                     .font(.body)
@@ -90,7 +91,9 @@ struct AccountDetailView: View {
             }
             .buttonStyle(.plain)
             .padding(.top, 12)
-            .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
+            .accessibilityLabel(account.spokenCode)
+            .accessibilityValue(account.accessibilityCodeState)
+            .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
             Spacer()
             Spacer()
         }

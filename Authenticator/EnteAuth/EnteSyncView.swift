@@ -63,6 +63,7 @@ struct EnteSyncView: View {
             #endif
             .navigationTitle(String(localized: "Ente Auth", comment: "Ente sync navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { dismiss() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { dismiss() }
