@@ -78,6 +78,7 @@ struct TutorialView: View {
                     .multilineTextAlignment(.center)
                     .font(.title)
                     .bold()
+                    .accessibilityAddTraits(.isHeader)
                 // The drawings are larger than the screen, so they're scaled down to fit.
                 tutorialPage.image
                     .resizable()

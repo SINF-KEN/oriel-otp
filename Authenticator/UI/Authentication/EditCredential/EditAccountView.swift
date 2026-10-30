@@ -70,6 +70,7 @@ struct EditView: View {
             .formStyle(.grouped)
             .navigationTitle(String(localized: "Rename", comment: "Rename account navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { showEditing = false }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { showEditing = false }

@@ -30,6 +30,7 @@ struct FIDOPINView: View {
     var body: some View {
         SettingsView(image: Image(systemName: "lock.shield"), imageColor: Color(.systemPurple)) {
             Text("FIDO PIN").font(.title2).bold()
+                .accessibilityAddTraits(.isHeader)
 
             Text("To prevent unauthorized access the FIDO application can be protected by a PIN.")
                 .font(.subheadline)
@@ -182,6 +183,7 @@ struct FIDOSetChangePINView: View {
             .formStyle(.grouped)
             .navigationTitle(type == .set ? String(localized: "Set PIN") : String(localized: "Change PIN"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { dismiss() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { dismiss() }

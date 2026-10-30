@@ -45,6 +45,7 @@ struct AccountDetailView: View {
             Text(account.title)
                 .font(.title2.weight(.medium))
                 .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
             account.subTitle.map {
                 Text($0)
                     .font(.body)
@@ -90,7 +91,12 @@ struct AccountDetailView: View {
             }
             .buttonStyle(.plain)
             .padding(.top, 12)
-            .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
+            .accessibilityLabel(account.spokenCode)
+            .accessibilityValue(account.accessibilityCodeState)
+            .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+            // The label is the code itself, which can't be said to Voice Control.
+            .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
+                                       String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
             Spacer()
             Spacer()
         }
@@ -110,6 +116,7 @@ struct AccountDetailView: View {
                 Button(action: { account.calculate() }) {
                     Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
                 }
+                .accessibilityInputLabels(VoiceControlNames.calculate)
                 .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
                 .disabled(!account.enableRefresh)
                 Button(action: { account.isPinned.toggle() }) {
@@ -157,6 +164,7 @@ struct AccountDetailView: View {
             Button(action: copyCode) {
                 Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
             }
+            .accessibilityInputLabels(VoiceControlNames.copy)
             .help(String(localized: "Copy the code", comment: "Mac row button help"))
             .disabled(account.state == .expired || account.otp == nil)
         }

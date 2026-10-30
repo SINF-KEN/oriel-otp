@@ -33,6 +33,7 @@ struct OATHPasswordView: View {
     var body: some View {
         SettingsView(image: Image(systemName: "lock.shield"), imageColor: Color(.systemPurple)) {
             Text("OATH password").font(.title2).bold()
+                .accessibilityAddTraits(.isHeader)
             Text("To prevent unauthorized access the OATH application can be protected by a password.")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
@@ -201,6 +202,7 @@ struct OATHSetChangePasswordView: View {
             .formStyle(.grouped)
             .navigationTitle(self.navBarTitle)
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { dismiss() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { dismiss() }

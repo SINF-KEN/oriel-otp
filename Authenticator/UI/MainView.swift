@@ -34,7 +34,6 @@ struct MainView: View {
         get { selectedAccountIDs.count == 1 ? selectedAccountIDs.first : nil }
         nonmutating set { selectedAccountIDs = newValue.map { [$0] } ?? [] }
     }
-    @State var accountToRename: Account?
     @State var commands = MainWindowCommands.shared
     @State var isSearchFocused = false
     #else
@@ -54,6 +53,7 @@ struct MainView: View {
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
     @State var accountsToDelete: [Account] = []
+    @State var accountToRename: Account?
     @State var quickActions = QuickActionCenter.shared
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
@@ -316,6 +316,11 @@ struct MainView: View {
                 }
                 .appLockCover()
         }
+        // Rename from the Mac's menu bar, or from a row's VoiceOver actions.
+        .sheet(item: $accountToRename) { account in
+            EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
+                .appLockCover()
+        }
         .sheet(isPresented: $showAbout) {
             AboutView()
                 .onAppear {
@@ -372,10 +377,6 @@ struct MainView: View {
         // The Mac has no app switcher snapshots, and codes are read from the window while another app is in front.
         .redacted(reason: scenePhase == .active ? [] : .privacy)
         #else
-        .sheet(item: $accountToRename) { account in
-            EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
-                .appLockCover()
-        }
         .focusedSceneValue(\.mainWindowMenuState, menuState)
         .onChange(of: commands.pending) { _, command in
             guard let command else { return }
@@ -441,6 +442,7 @@ struct MainView: View {
                     Button(action: { addAccount() }) {
                         Label("Add account", systemImage: "plus")
                     }
+                    .accessibilityInputLabels(VoiceControlNames.addAccount)
                     .buttonStyle(.borderedProminent)
                     .disabled(!canAddToYubiKey)
                     enteSyncButton
@@ -468,6 +470,7 @@ struct MainView: View {
                 } label: {
                     Label(String(localized: "Scan NFC YubiKey"), systemImage: "wave.3.right")
                 }
+                .accessibilityInputLabels(VoiceControlNames.scanNFC)
             }
         }
         #endif
@@ -477,6 +480,7 @@ struct MainView: View {
             Button(action: { model.refresh() }) {
                 Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
             }
+            .accessibilityInputLabels(VoiceControlNames.refresh)
             .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
             .disabled(!model.canRefresh)
         }
@@ -508,6 +512,7 @@ struct MainView: View {
             Button(action: { showConfiguration.toggle() }) {
                 Label("Configuration", systemImage: "switch.2")
             }
+            .accessibilityInputLabels(VoiceControlNames.configuration)
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
             #endif
             // In the Debug menu on the Mac, so it isn't in the screenshots.
@@ -521,6 +526,7 @@ struct MainView: View {
             Button(action: { showAbout.toggle() }) {
                 Label("About", systemImage: "questionmark.circle")
             }
+            .accessibilityInputLabels(VoiceControlNames.about)
             #endif
         }
     }
@@ -597,6 +603,21 @@ struct MainView: View {
             Divider()
             deleteButton(account)
         }
+        // VoiceOver lists the swipe actions on iOS. These are the rest of the context menu's and the details' actions,
+        // so every one can be done from the list.
+        .accessibilityActions {
+            #if os(macOS)
+            copyButton(account)
+            pinButton(account)
+            #endif
+            CopyToYubiKeyButtons(account: account)
+            if account.canRename {
+                Button(String(localized: "Rename", comment: "Menu")) { accountToRename = account }
+            }
+            #if os(macOS)
+            deleteButton(account)
+            #endif
+        }
     }
 
     /// Each row shows where its account is stored once there are Ente Auth accounts in the list.
@@ -608,6 +629,7 @@ struct MainView: View {
         Button(action: { toastPresenter.copyCode(of: account) }) {
             Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
         }
+        .accessibilityInputLabels(VoiceControlNames.copy)
     }
 
     private func pinButton(_ account: Account) -> some View {
@@ -627,6 +649,7 @@ struct MainView: View {
         Button(action: { showEnteSync.toggle() }) {
             Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
         }
+        .accessibilityInputLabels(VoiceControlNames.syncFromEnte)
     }
 
     #if os(macOS)
@@ -686,6 +709,7 @@ struct MainView: View {
             Button(action: { addAccount() }) {
                 Label("Add account", systemImage: "plus")
             }
+            .accessibilityInputLabels(VoiceControlNames.addAccount)
             .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
                   : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
             .disabled(!canAddToYubiKey && !model.cloud.isEnabled)

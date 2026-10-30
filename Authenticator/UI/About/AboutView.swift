@@ -119,6 +119,7 @@ struct AboutView: View {
             .navigationTitle(String(localized: "About", comment: "About navigation title"))
             #if os(iOS)
             // A window with its own close button on the Mac.
+            .accessibilityAction(.escape) { dismiss() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { dismiss() }

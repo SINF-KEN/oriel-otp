@@ -24,6 +24,7 @@ struct TokenRequestYubiOTPView: View {
             ZStack(alignment: .topLeading) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Yubico OTP enabled").font(.title).bold()
+                    .accessibilityAddTraits(.isHeader)
                     Text("This YubiKey has Yubico OTP enabled which makes it appear as an external keyboard to the iPhone. Unfortunately this causes problem with the normal on-screen keyboard.")
                     Spacer().frame(height: 15)
                     Button {
@@ -53,6 +54,7 @@ struct TokenRequestYubiOTPView: View {
                 .opacity(isOTPDisabled ? 0 : 1)
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Yubico OTP has been disabled").font(.title).bold()
+                    .accessibilityAddTraits(.isHeader)
                     Text("Remove and re-insert your YubiKey")
                 }
                 .opacity(isOTPDisabled ? 1 : 0)

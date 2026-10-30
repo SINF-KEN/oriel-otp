@@ -63,6 +63,7 @@ struct EnteSyncView: View {
             #endif
             .navigationTitle(String(localized: "Ente Auth", comment: "Ente sync navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { dismiss() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { dismiss() }
@@ -115,6 +116,8 @@ struct EnteSyncView: View {
 
             Section {
                 TextField(EnteAPIClient.defaultServer.absoluteString, text: $model.server)
+                    // The placeholder is the default server's address, which isn't a name to say.
+                    .accessibilityLabel(String(localized: "Server", comment: "Ente sign in server field"))
                     .keyboardType(.URL)
                     .textContentType(.URL)
                     .textInputAutocapitalization(.never)

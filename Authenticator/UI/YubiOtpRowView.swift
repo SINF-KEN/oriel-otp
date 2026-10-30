@@ -32,6 +32,7 @@ struct YubiOtpRowView: View {
                 .background(Color.accentColor)
                 .clipShape(.circle)
                 .padding(.trailing, 5)
+                .accessibilityHidden(true)
             VStack(alignment: .leading) {
                 Text(otp)
                     .privacySensitive()
@@ -48,5 +49,9 @@ struct YubiOtpRowView: View {
         .onLongPressGesture {
             toastPresenter.copyToClipboard(otp)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        .accessibilityAction { toastPresenter.copyToClipboard(otp) }
     }
 }

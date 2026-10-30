@@ -56,6 +56,10 @@ struct TokenRequestView: View {
             .avoidingReservedRegions()
             .navigationTitle(String(localized: "Unlock YubiKey"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) {
+                if !isCompleted { model.cancel() }
+                dismiss()
+            }
             .toolbar {
                 if isCompleted {
                     ToolbarItem(placement: .confirmationAction) {

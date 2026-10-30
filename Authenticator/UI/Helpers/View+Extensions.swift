@@ -160,3 +160,42 @@ extension View {
         }
     }
 }
+
+/// The names Voice Control accepts for a button: its visible title first, so "Tap Add account" works as shown, then
+/// shorter or more natural ones, e.g. "Tap Plus" for the + button.
+enum VoiceControlNames {
+    static var addAccount: [String] {
+        [String(localized: "Add account"), String(localized: "Add", comment: "Voice Control name for the Add account button"),
+         String(localized: "Plus", comment: "Voice Control name for the Add account button, after its + symbol"),
+         String(localized: "New account", comment: "Voice Control name for the Add account button")]
+    }
+    static var scanNFC: [String] {
+        [String(localized: "Scan NFC YubiKey"), String(localized: "Scan", comment: "Voice Control name for the Scan NFC YubiKey button"),
+         String(localized: "NFC", comment: "Voice Control name for the Scan NFC YubiKey button"),
+         String(localized: "Scan YubiKey", comment: "Voice Control name for the Scan NFC YubiKey button")]
+    }
+    static var refresh: [String] {
+        [String(localized: "Refresh", comment: "Mac toolbar"), String(localized: "Reload", comment: "Voice Control name for the Refresh button")]
+    }
+    static var calculate: [String] {
+        [String(localized: "Calculate", comment: "Menu"), String(localized: "Refresh", comment: "Mac toolbar"),
+         String(localized: "New code", comment: "Voice Control name for the Calculate button")]
+    }
+    static var copy: [String] {
+        [String(localized: "Copy", comment: "Menu"), String(localized: "Copy code", comment: "Voice Control name for the Copy button")]
+    }
+    static var syncFromEnte: [String] {
+        [String(localized: "Sync from Ente Auth", comment: "Main view menu item"), String(localized: "Sync", comment: "Voice Control name for the Sync from Ente Auth button"),
+         String(localized: "Ente Auth", comment: "Ente sync navigation title")]
+    }
+    static var configuration: [String] {
+        [String(localized: "Configuration"), String(localized: "Settings", comment: "Voice Control name for the Configuration button")]
+    }
+    static var about: [String] {
+        [String(localized: "About"), String(localized: "Help", comment: "Smart card extension help button")]
+    }
+    static var enterManually: [String] {
+        [String(localized: "Enter manually", comment: "Scan QR code add manually button"), String(localized: "Manual", comment: "Voice Control name for the Enter manually button"),
+         String(localized: "Keyboard", comment: "Voice Control name for the Enter manually button, after its keyboard symbol")]
+    }
+}

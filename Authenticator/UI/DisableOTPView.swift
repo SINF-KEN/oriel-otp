@@ -27,6 +27,7 @@ struct DisableOTPView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Yubico OTP enabled").font(.title).bold()
+                    .accessibilityAddTraits(.isHeader)
                 Text("This YubiKey has Yubico OTP enabled which makes it appear as an external keyboard to the iPhone. Unfortunately this causes problem with the normal on-screen keyboard.")
                 Spacer().frame(height: 15)
                 Button {
