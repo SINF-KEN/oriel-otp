@@ -53,10 +53,12 @@ result=()
 if [[ -n "${RESULT_BUNDLE_PATH:-}" ]]; then
     result=(-resultBundlePath "$RESULT_BUNDLE_PATH")
 fi
-# xcodebuild passes TEST_RUNNER_ variables to the test without the prefix.
+# xcodebuild passes TEST_RUNNER_ variables to the test without the prefix. The app is optimized: signing in to the fake
+# Ente server runs 4096-bit SRP, which the unoptimized build took long enough over on CI for the test to give up.
 TEST_RUNNER_SCREENSHOT_DIR="$work/screenshots" xcodebuild test \
     -project OrielOTP.xcodeproj -scheme Screenshots -destination "id=$udid" \
-    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} ${result[@]+"${result[@]}"} | "${formatter[@]}"
+    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} ${result[@]+"${result[@]}"} \
+    SWIFT_OPTIMIZATION_LEVEL=-O | "${formatter[@]}"
 
 mkdir -p "$output"
 for new in "$work"/screenshots/*.png; do
