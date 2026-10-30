@@ -22,6 +22,8 @@ struct AccountRowView<Accessory: View>: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     var account: Account
+    /// Shows whether the account is on the YubiKey or in Ente Auth, for lists that have both.
+    private let showsLocation: Bool
     // Shown before the code, e.g. buttons on the Mac while the pointer is over the row.
     private let accessory: Accessory
 
@@ -47,8 +49,9 @@ struct AccountRowView<Accessory: View>: View {
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
     
-    init(account: Account, @ViewBuilder accessory: () -> Accessory) {
+    init(account: Account, showsLocation: Bool = false, @ViewBuilder accessory: () -> Accessory) {
         self.account = account
+        self.showsLocation = showsLocation
         self.accessory = accessory()
         if account.state == .expired || account.otp == nil {
             self.pillOpacity = 0.5
@@ -72,11 +75,18 @@ struct AccountRowView<Accessory: View>: View {
                     .padding(.trailing, 5)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading) {
-                    Text(account.title)
-                        .font(titleFont)
-                        .lineLimit(isStacked ? 3 : 1)
-                        .minimumScaleFactor(0.9)
-                        .truncationMode(.tail)
+                    HStack(spacing: 4) {
+                        Text(account.title)
+                            .font(titleFont)
+                            .lineLimit(isStacked ? 3 : 1)
+                            .minimumScaleFactor(0.9)
+                            .truncationMode(.tail)
+                        if showsLocation {
+                            AccountLocationIcon(account: account)
+                                .font(subtitleFont)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                     account.subTitle.map {
                         Text($0)
                             .font(subtitleFont)
@@ -163,8 +173,37 @@ struct AccountRowView<Accessory: View>: View {
 }
 
 extension AccountRowView where Accessory == EmptyView {
-    init(account: Account) {
-        self.init(account: account) { EmptyView() }
+    init(account: Account, showsLocation: Bool = false) {
+        self.init(account: account, showsLocation: showsLocation) { EmptyView() }
+    }
+}
+
+/// A key for an account on the YubiKey, a cloud for one in Ente Auth, and a clock while a change to an Ente Auth
+/// account waits to be uploaded.
+struct AccountLocationIcon: View {
+    let account: Account
+
+    var body: some View {
+        Group {
+            if account.isInEnte {
+                Image(systemName: account.isPendingSync ? "clock.arrow.circlepath" : "cloud")
+            } else {
+                Image("securitykey")
+            }
+        }
+        .accessibilityLabel(account.locationDescription)
+    }
+}
+
+extension Account {
+    var locationDescription: String {
+        if !isInEnte {
+            String(localized: "Stored on YubiKey", comment: "Where an account is stored")
+        } else if isPendingSync {
+            String(localized: "Stored in Ente Auth, not synced yet", comment: "Where an account is stored, for an Ente Auth account with changes that haven't been uploaded")
+        } else {
+            String(localized: "Stored in Ente Auth", comment: "Where an account is stored")
+        }
     }
 }
 

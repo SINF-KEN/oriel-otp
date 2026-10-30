@@ -154,7 +154,7 @@ func makeTestDefaults() -> UserDefaults {
         watch.enable()
         try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
                                         authenticatorKey: Data(repeating: 7, count: 32)))
-        await store.signOut(watch: watch)
+        await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch))
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
         #expect(!watch.isEnabled)
@@ -211,14 +211,18 @@ struct EnteSavedAccountTests {
 
     let keychain = InMemoryKeychain()
     let defaults = makeTestDefaults()
+    /// Kept across relaunches, like the vault file.
+    let vaultStorage = InMemoryVaultStorage()
 
     init() {
         URLProtocol.registerClass(FakeEnteServer.self)
     }
 
     private func makeModel(canSave: Bool = true) -> EnteSyncViewModel {
-        EnteSyncViewModel(existingCredentialIds: [], store: EnteSessionStore(keychain: keychain, defaults: defaults, canSave: canSave),
-                          defaults: defaults, watch: WatchAccountSync(defaults: defaults))
+        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: canSave)
+        let watch = WatchAccountSync(defaults: defaults)
+        return EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, watch: watch,
+                                 cloud: EnteCloud(store: store, storage: vaultStorage, watch: watch))
     }
 
     /// Waits for the model's network and crypto work to finish. On CI signing in can take most of a minute, as the
@@ -317,10 +321,29 @@ struct EnteSavedAccountTests {
         watch.enable()
         try store.save(EnteSavedSession(server: FakeEnteServer.server, email: "alice@example.com", token: "the-token",
                                         authenticatorKey: EnteCrypto.randomBytes(32)))
-        await store.signOut(watch: watch)
+        let cloud = EnteCloud(store: store, storage: vaultStorage, watch: watch)
+        #expect(cloud.isEnabled)
+        await store.signOut(watch: watch, cloud: cloud)
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
         #expect(!watch.isEnabled)
+        // The copy of the accounts goes too.
+        #expect(!cloud.isEnabled)
+        #expect(try vaultStorage.load() == nil)
+    }
+
+    @Test func signingInKeepsTheAccountsOnTheDevice() async throws {
+        let model = makeModel()
+        try await signIn(model)
+        let saved = try #require(try vaultStorage.load())
+        #expect(saved.email == "alice@example.com")
+        #expect(saved.lastSyncTime > 0)
+        // After a relaunch the accounts are there before syncing, without the ones in Ente's trash or deleted.
+        let relaunched = EnteCloud(store: EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true), storage: vaultStorage,
+                                   watch: WatchAccountSync(defaults: defaults))
+        #expect(relaunched.codes.map(\.id) == model.codes.map(\.id))
+        #expect(!relaunched.codes.contains { ["e11", "e12"].contains($0.id) })
+        #expect(relaunched.accounts.contains { $0.code.kind == .steam })
     }
 
     @Test func notStayingSignedInForgetsTheAccount() async throws {
@@ -332,6 +355,7 @@ struct EnteSavedAccountTests {
         model.staySignedIn = false
         try await signIn(model)
         #expect(store.savedAccount == nil)
+        #expect(try vaultStorage.load() == nil)
         model.close()
     }
 }
