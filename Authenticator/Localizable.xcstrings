@@ -244,7 +244,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%1$lld von %2$lld frei"
           }
         },
@@ -256,19 +256,19 @@
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Libres : %1$lld sur %2$lld"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%2$lld 件中 %1$lld 件空き"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Voľné: %1$lld z %2$lld"
           }
         }
@@ -666,25 +666,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Eine Kopie deiner zeitbasierten Ente Auth-Konten wird auf deiner Apple Watch gespeichert, damit sie Codes ohne dein iPhone anzeigen kann. Die Konten auf der Watch werden bei jeder Synchronisierung aktualisiert und gelöscht, wenn du dies ausschaltest oder dich abmeldest."
+            "state" : "translated",
+            "value" : "Eine Kopie deiner zeitbasierten Ente-Auth-Konten wird auf deiner Apple Watch gespeichert, damit sie Codes ohne dein iPhone anzeigen kann. Die Konten auf der Watch werden bei jeder Synchronisierung aktualisiert und gelöscht, wenn du dies ausschaltest oder dich abmeldest."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Une copie de vos comptes Ente Auth basés sur le temps est conservée sur votre Apple Watch, pour qu’elle affiche les codes sans votre iPhone. Les comptes de la montre sont mis à jour à chaque synchronisation et supprimés quand vous désactivez cette option ou vous déconnectez."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "時間ベースの Ente Auth アカウントのコピーが Apple Watch に保存され、iPhone がなくてもコードを表示できます。ウォッチ上のアカウントは同期のたびに更新され、この設定をオフにするかログアウトすると削除されます。"
+            "state" : "translated",
+            "value" : "時間ベースの Ente Auth アカウントのコピーが Apple Watch に保存され、iPhone がなくてもコードを表示できます。ウォッチ上のアカウントは同期のたびに更新され、この設定をオフにするかサインアウトすると削除されます。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Kópia vašich časových účtov Ente Auth sa uloží v Apple Watch, aby mohli zobrazovať kódy aj bez iPhonu. Účty v hodinkách sa aktualizujú pri každej synchronizácii a vymažú sa, keď toto vypnete alebo sa odhlásite."
           }
         }
@@ -753,25 +753,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Konto"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Compte"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "アカウント"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Účet"
           }
         }
@@ -1101,25 +1101,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Hinzufügen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ajouter"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "追加"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pridať"
           }
         }
@@ -1130,25 +1130,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%lld hinzufügen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ajouter %lld"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "%lld 件を追加"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pridať %lld"
           }
         }
@@ -1637,25 +1637,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Bereits auf dem YubiKey"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Déjà sur la YubiKey"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey に登録済み"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Už je na YubiKey"
           }
         }
@@ -1679,7 +1679,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Auth をお使いですか？「ファイル」>「Ente Authから同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\n「ログインしたままにする」をオンにすると、Ente Auth のアカウントもここに表示され、変更は Ente Auth に保存されます。Ente Auth のデータはこの Mac 上で復号されます。"
+            "value" : "Ente Auth をお使いですか？「ファイル」>「Ente Authから同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\n「サインインしたままにする」をオンにすると、Ente Auth のアカウントもここに表示され、変更は Ente Auth に保存されます。Ente Auth のデータはこの Mac 上で復号されます。"
           }
         },
         "sk" : {
@@ -1708,7 +1708,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Auth をお使いですか？アカウント一覧のメニューから「Ente Auth から同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\n「ログインしたままにする」をオンにすると、Ente Auth のアカウントもここに表示され、変更は Ente Auth に保存されます。Ente Auth のデータはこのデバイス上で復号されます。"
+            "value" : "Ente Auth をお使いですか？アカウント一覧のメニューから「Ente Auth から同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\n「サインインしたままにする」をオンにすると、Ente Auth のアカウントもここに表示され、変更は Ente Auth に保存されます。Ente Auth のデータはこのデバイス上で復号されます。"
           }
         },
         "sk" : {
@@ -2300,25 +2300,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Prüfe deine E-Mails"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Consultez vos e-mails"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "メールを確認してください"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Skontrolujte e-mail"
           }
         }
@@ -2528,25 +2528,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Code"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Code"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "コード"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Kód"
           }
         }
@@ -3597,25 +3597,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Deine Schlüssel werden abgeleitet. Das kann einige Sekunden dauern."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Dérivation de vos clés. Cela peut prendre quelques secondes."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "鍵を導出しています。数秒かかることがあります。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Odvodzujú sa vaše kľúče. Môže to trvať niekoľko sekúnd."
           }
         }
@@ -3826,25 +3826,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "E-Mail"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "E-mail"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "メールアドレス"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "E-mail"
           }
         }
@@ -3884,25 +3884,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth"
           }
         }
@@ -3942,25 +3942,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Der Server von Ente hat eine unerwartete Antwort gesendet."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Le serveur d'Ente a renvoyé une réponse inattendue."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente のサーバーから予期しない応答がありました。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Server Ente poslal neočakávanú odpoveď."
           }
         }
@@ -3971,25 +3971,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Gib eine Server-URL ein, die mit https:// beginnt."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Saisissez une URL de serveur commençant par https://."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "https:// で始まるサーバー URL を入力してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zadajte URL servera, ktorá začína na https://."
           }
         }
@@ -4174,25 +4174,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Gib den Code aus deiner Authenticator-App ein."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Saisissez le code de votre application d'authentification."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "認証アプリに表示されたコードを入力してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zadajte kód z vašej overovacej aplikácie."
           }
         }
@@ -4203,25 +4203,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Gib den Bestätigungscode ein, den Ente an %@ gesendet hat."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Saisissez le code de vérification envoyé par Ente à %@."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente から %@ に送信された確認コードを入力してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zadajte overovací kód, ktorý Ente poslal na %@."
           }
         }
@@ -4689,25 +4689,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Besorge Dir ein shared Secret/Seed von jedem Dienst, den Du mit Deinem YubiKey absichern möchtest, speichere es auf Deinem YubiKey und verwende es, um OTP Codes zu generieren.\n\nDu benötigst einen YubiKey mit NFC oder USB-C um loszulegen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Obtenez un secret partagé de tout service que vous souhaitez sécuriser, stockez-le sur la YubiKey et utilisez-le pour générer vos codes de sécurité.\n\nVous aurez besoin d'une YubiKey avec NFC ou USB-C pour commencer."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "セキュリティを確保したいサービスから共有シークレットを取得し、YubiKeyに保存してセキュリティコードの生成に使用します。\n\n利用開始にはNFCまたはUSB-C対応のYubiKeyが必要です。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey s NFC alebo USB-C."
           }
         }
@@ -4890,25 +4890,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ich habe den Passkey bestätigt"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "J'ai vérifié la clé d'accès"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "パスキーを確認しました"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Prístupový kľúč je overený"
           }
         }
@@ -4974,7 +4974,7 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Falls Du einen YubiKey mit NFC Funktionalität besitzt, ziehe bitte in der Hauptansicht der App nach unten um das NFC Scanning zu aktivieren.\n\nHalte den YubiKey waagerecht und neige das iPhone zum YubiKey.\n\nBerühre mit der Mitte des YubiKeys den Rand Deines iPhones."
           }
         },
@@ -5002,25 +5002,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Falls Dein YubiKey einen USB-C-Anschluss hat, schließe ihn an.\n\nBerühre den YubiKey, sobald Du dazu aufgefordert wirst."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Si votre YubiKey a un connecteur USB-C, branchez-la.\n\nTouchez la YubiKey lorsque vous y êtes invité."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKeyにUSB-Cコネクタがある場合は、接続してください。\n\nプロンプトが表示されたら、YubiKeyにタッチします。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ak má váš YubiKey konektor USB-C, pripojte ho.\n\nPo výzve sa dotknite YubiKey."
           }
         }
@@ -5031,25 +5031,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Falscher Code."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Code incorrect."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "コードが正しくありません。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nesprávny kód."
           }
         }
@@ -5060,25 +5060,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Falsche E-Mail-Adresse oder falsches Passwort."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Adresse e-mail ou mot de passe incorrect."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "メールアドレスまたはパスワードが正しくありません。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nesprávny e-mail alebo heslo."
           }
         }
@@ -5261,25 +5261,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Verbinde deinen YubiKey, um die Konten hinzuzufügen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Insérez votre YubiKey pour ajouter les comptes."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "アカウントを追加するには YubiKey を挿入してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ak chcete pridať účty, vložte YubiKey."
           }
         }
@@ -5523,25 +5523,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Lass das Serverfeld leer, außer du betreibst Ente selbst."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Laissez le serveur vide, sauf si vous hébergez Ente vous-même."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente をセルフホストしていない場合は、サーバーを空欄のままにしてください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ak Ente neprevádzkujete sami, nechajte server prázdny."
           }
         }
@@ -6503,25 +6503,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Nicht alle Konten passen auf den YubiKey, daher sind nur die ersten ausgewählt. Wähle die aus, die du am meisten brauchst."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tous les comptes ne tiennent pas sur la YubiKey, seuls les premiers sont donc sélectionnés. Choisissez ceux dont vous avez le plus besoin."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "すべてのアカウントは YubiKey に入りきらないため、先頭のアカウントのみ選択されています。必要なアカウントを選んでください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Na YubiKey sa nezmestia všetky účty, preto sú vybrané iba prvé. Vyberte tie, ktoré potrebujete najviac."
           }
         }
@@ -7050,25 +7050,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Optionen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Options"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "オプション"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Možnosti"
           }
         }
@@ -7447,25 +7447,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Passkey"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Clé d'accès"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "パスキー"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Prístupový kľúč"
           }
         }
@@ -7849,25 +7849,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Schließe Deinen YubiKey an"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Branchez votre YubiKey"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKeyを接続する"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Pripojte svoj YubiKey"
           }
         }
@@ -8746,25 +8746,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Code erneut senden"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Renvoyer le code"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "コードを再送信"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Znova poslať kód"
           }
         }
@@ -9261,25 +9261,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey per NFC scannen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Scannez votre YubiKey par NFC"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "NFCでYubiKeyをスキャンする"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Naskenujte svoj YubiKey cez NFC"
           }
         }
@@ -9434,25 +9434,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Alle auswählen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tout sélectionner"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "すべて選択"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vybrať všetko"
           }
         }
@@ -9463,25 +9463,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Keine auswählen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tout désélectionner"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "選択を解除"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zrušiť výber"
           }
         }
@@ -9691,25 +9691,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ente Auth-Konten auf der Apple Watch zeigen"
+            "state" : "translated",
+            "value" : "Ente-Auth-Konten auf der Apple Watch zeigen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Afficher les comptes Ente Auth sur l’Apple Watch"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Apple Watch に Ente Auth のアカウントを表示"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zobraziť účty Ente Auth na Apple Watch"
           }
         }
@@ -9807,25 +9807,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Anmelden"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Se connecter"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ログイン"
+            "state" : "translated",
+            "value" : "サインイン"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Prihlásiť sa"
           }
         }
@@ -9865,25 +9865,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Bei Ente Auth anmelden"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Se connecter à Ente Auth"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ente Auth にログイン"
+            "state" : "translated",
+            "value" : "Ente Auth にサインイン"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Prihlásenie do Ente Auth"
           }
         }
@@ -9894,25 +9894,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Abmelden"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Se déconnecter"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ログアウト"
+            "state" : "translated",
+            "value" : "サインアウト"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Odhlásiť sa"
           }
         }
@@ -9952,25 +9952,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Bei Ente Auth angemeldet"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Connecté à Ente Auth"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ente Auth にログイン中"
+            "state" : "translated",
+            "value" : "Ente Auth にサインイン中"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ste prihlásení do Ente Auth"
           }
         }
@@ -10126,25 +10126,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Platz auf dem YubiKey"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Espace sur la YubiKey"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey の空き容量"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Miesto na YubiKey"
           }
         }
@@ -10184,25 +10184,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Angemeldet bleiben"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Rester connecté"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ログインしたままにする"
+            "state" : "translated",
+            "value" : "サインインしたままにする"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zostať prihlásený"
           }
         }
@@ -10531,25 +10531,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Konten synchronisieren"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchroniser les comptes"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "アカウントを同期"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchronizovať účty"
           }
         }
@@ -10560,25 +10560,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Aus Ente Auth synchronisieren"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchroniser depuis Ente Auth"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth から同期"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Synchronizovať z Ente Auth"
           }
         }
@@ -10876,25 +10876,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Der YubiKey ist voll. Lösche Konten darauf, um Platz zu schaffen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La YubiKey est pleine. Supprimez-en des comptes pour libérer de l'espace."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey がいっぱいです。空きを作るにはアカウントを削除してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey je plný. Ak chcete uvoľniť miesto, vymažte z neho účty."
           }
         }
@@ -10905,25 +10905,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Der YubiKey ist voll. Diese Konten wurden nicht hinzugefügt: %@."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La YubiKey est pleine. Ces comptes n'ont pas été ajoutés : %@."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey がいっぱいです。次のアカウントは追加されませんでした: %@。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey je plný. Tieto účty neboli pridané: %@."
           }
         }
@@ -10962,25 +10962,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Das Konto wurde auf dem YubiKey nicht gefunden."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Le compte est introuvable sur la YubiKey."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "YubiKey にアカウントが見つかりませんでした。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Účet sa na YubiKey nenašiel."
           }
         }
@@ -10991,25 +10991,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Die Kontodaten von Ente konnten nicht gelesen werden."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Les données du compte Ente n'ont pas pu être lues."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente のアカウントデータを読み取れませんでした。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Údaje účtu z Ente sa nepodarilo načítať."
           }
         }
@@ -11078,25 +11078,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Der Code ist abgelaufen. Fordere einen neuen an."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Le code a expiré. Demandez-en un nouveau."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "コードの有効期限が切れました。新しいコードをリクエストしてください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Platnosť kódu vypršala. Vyžiadajte si nový."
           }
         }
@@ -11194,25 +11194,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Der Passkey wurde noch nicht bestätigt. Bestätige ihn im Browser und versuche es dann erneut."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La clé d'accès n'a pas encore été vérifiée. Vérifiez-la dans le navigateur, puis réessayez."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "パスキーはまだ確認されていません。ブラウザで確認してから、もう一度お試しください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Prístupový kľúč ešte nebol overený. Overte ho v prehliadači a skúste to znova."
           }
         }
@@ -11309,25 +11309,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Die ausgewählten Konten werden zu deinem YubiKey hinzugefügt. Konten mit demselben Namen wie ein Konto auf dem YubiKey werden übersprungen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Les comptes sélectionnés sont ajoutés à votre YubiKey. Les comptes portant le même nom qu'un compte de la YubiKey sont ignorés."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "選択したアカウントが YubiKey に追加されます。YubiKey 上のアカウントと同じ名前のアカウントはスキップされます。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vybrané účty sa pridajú do YubiKey. Účty s rovnakým názvom ako účet na YubiKey sa preskočia."
           }
         }
@@ -11338,25 +11338,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Der Server konnte nicht nachweisen, dass er dein Passwort kennt. Prüfe die Serveradresse."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Le serveur n'a pas pu prouver qu'il connaît votre mot de passe. Vérifiez l'adresse du serveur."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "サーバーがパスワードを知っていることを証明できませんでした。サーバーのアドレスを確認してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Server nedokázal preukázať, že pozná vaše heslo. Skontrolujte adresu servera."
           }
         }
@@ -11425,25 +11425,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Die Anmeldesitzung ist abgelaufen. Beginne von vorn."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "La session de connexion a expiré. Recommencez."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "ログインセッションの有効期限が切れました。最初からやり直してください。"
+            "state" : "translated",
+            "value" : "サインインセッションの有効期限が切れました。最初からやり直してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Platnosť prihlasovacej relácie vypršala. Začnite znova."
           }
         }
@@ -11483,25 +11483,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "In Ente Auth gibt es keine Konten."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Il n'y a aucun compte dans Ente Auth."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth にアカウントがありません。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "V Ente Auth nie sú žiadne účty."
           }
         }
@@ -11628,25 +11628,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Dieses Konto konnte nicht entschlüsselt werden."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ce compte n'a pas pu être déchiffré."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "このアカウントを復号できませんでした。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tento účet sa nepodarilo dešifrovať."
           }
         }
@@ -11657,25 +11657,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Dieses Konto konnte nicht gelesen werden."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ce compte n'a pas pu être lu."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "このアカウントを読み取れませんでした。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Tento účet sa nepodarilo načítať."
           }
         }
@@ -12041,7 +12041,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Authにもアカウントを保存するには、メニューで「Ente Auth から同期」を選び、「ログインしたままにする」をオンにしてサインインしてください。"
+            "value" : "Ente Authにもアカウントを保存するには、メニューで「Ente Auth から同期」を選び、「サインインしたままにする」をオンにしてサインインしてください。"
           }
         },
         "sk" : {
@@ -12114,19 +12114,19 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zu viele Konten ausgewählt. Wähle %lld ab, damit alle auf den YubiKey passen."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Trop de comptes sélectionnés. Désélectionnez-en %lld pour qu'ils tiennent tous sur la YubiKey."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "選択したアカウントが多すぎます。すべてを YubiKey に収めるには、%lld 件の選択を解除してください。"
           }
         },
@@ -12196,25 +12196,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zu viele Versuche. Versuche es später erneut."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Trop de tentatives. Réessayez plus tard."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "試行回数が多すぎます。しばらくしてからもう一度お試しください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Príliš veľa pokusov. Skúste to neskôr."
           }
         }
@@ -12368,25 +12368,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Zwei-Faktor-Authentifizierung"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Authentification à deux facteurs"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "2 要素認証"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Dvojfaktorové overenie"
           }
         }
@@ -12455,25 +12455,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Unbekanntes Konto"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Compte inconnu"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "不明なアカウント"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Neznámy účet"
           }
         }
@@ -12714,25 +12714,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Anderes Konto verwenden"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Utiliser un autre compte"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "別のアカウントを使用"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Použiť iný účet"
           }
         }
@@ -12829,25 +12829,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Code überprüfen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vérifier le code"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "コードを確認"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Overiť kód"
           }
         }
@@ -12858,25 +12858,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Passkey im Browser bestätigen"
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vérifier la clé d'accès dans le navigateur"
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "ブラウザでパスキーを確認"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Overiť prístupový kľúč v prehliadači"
           }
         }
@@ -12887,25 +12887,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Bestätige deinen Passkey auf der Website von Ente und komm dann hierher zurück."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vérifiez votre clé d'accès sur le site web d'Ente, puis revenez ici."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente のウェブサイトでパスキーを確認してから、ここに戻ってください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Overte prístupový kľúč na webe Ente a potom sa sem vráťte."
           }
         }
@@ -13231,55 +13231,55 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Du wurdest von Ente abgemeldet. Melde dich erneut an."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vous avez été déconnecté d'Ente. Reconnectez-vous."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ente からログアウトされました。もう一度ログインしてください。"
+            "state" : "translated",
+            "value" : "Ente からサインアウトされました。もう一度サインインしてください。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Boli ste odhlásení z Ente. Prihláste sa znova."
           }
         }
       }
     },
-    "Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too." : {
+    "Your email and sign-in requests are sent to Ente, or to your own server. Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too." : {
       "comment" : "Ente sign in footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre Ente-Auth-Konten sind Ende-zu-Ende-verschlüsselt und werden nur auf diesem Gerät entschlüsselt, und Ihr Passwort verlässt es nie. Wenn Sie angemeldet bleiben, werden die Konten auf diesem Gerät aufbewahrt und mit denen Ihres YubiKey aufgelistet, und Konten, die Sie hier hinzufügen, umbenennen, anheften oder löschen, werden auch in Ente Auth geändert."
+            "value" : "Ihre E-Mail-Adresse und Ihre Anmeldeanfragen werden an Ente oder an Ihren eigenen Server gesendet. Ihre Ente-Auth-Konten sind Ende-zu-Ende-verschlüsselt und werden nur auf diesem Gerät entschlüsselt, und Ihr Passwort verlässt es nie. Wenn Sie angemeldet bleiben, werden die Konten auf diesem Gerät aufbewahrt und mit denen Ihres YubiKey aufgelistet, und Konten, die Sie hier hinzufügen, umbenennen, anheften oder löschen, werden auch in Ente Auth geändert."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vos comptes Ente Auth sont chiffrés de bout en bout et ne sont déchiffrés que sur cet appareil, que votre mot de passe ne quitte jamais. Si vous restez connecté, les comptes sont conservés sur cet appareil et affichés avec ceux de votre YubiKey, et les comptes que vous ajoutez, renommez, épinglez ou supprimez ici sont aussi modifiés dans Ente Auth."
+            "value" : "Votre adresse e-mail et vos demandes de connexion sont envoyées à Ente, ou à votre propre serveur. Vos comptes Ente Auth sont chiffrés de bout en bout et ne sont déchiffrés que sur cet appareil, que votre mot de passe ne quitte jamais. Si vous restez connecté, les comptes sont conservés sur cet appareil et affichés avec ceux de votre YubiKey, et les comptes que vous ajoutez, renommez, épinglez ou supprimez ici sont aussi modifiés dans Ente Auth."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Authのアカウントはエンドツーエンドで暗号化され、このデバイスでのみ復号されます。パスワードがこのデバイスから送信されることはありません。サインインしたままにすると、アカウントはこのデバイスに保存されてYubiKeyのアカウントと一緒に表示され、ここで追加、名前変更、ピン留め、削除したアカウントはEnte Authでも変更されます。"
+            "value" : "メールアドレスとサインインのリクエストは、Ente またはご自身のサーバーに送信されます。Ente Authのアカウントはエンドツーエンドで暗号化され、このデバイスでのみ復号されます。パスワードがこのデバイスから送信されることはありません。サインインしたままにすると、アカウントはこのデバイスに保存されてYubiKeyのアカウントと一緒に表示され、ここで追加、名前変更、ピン留め、削除したアカウントはEnte Authでも変更されます。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vaše účty Ente Auth sú šifrované end-to-end a dešifrujú sa iba na tomto zariadení, ktoré vaše heslo nikdy neopustí. Ak zostanete prihlásení, účty sa uchovajú na tomto zariadení a zobrazia sa spolu s účtami na YubiKey a účty, ktoré tu pridáte, premenujete, pripnete alebo odstránite, sa zmenia aj v Ente Auth."
+            "value" : "Váš e-mail a požiadavky na prihlásenie sa odosielajú do Ente alebo na váš vlastný server. Vaše účty Ente Auth sú šifrované end-to-end a dešifrujú sa iba na tomto zariadení, ktoré vaše heslo nikdy neopustí. Ak zostanete prihlásení, účty sa uchovajú na tomto zariadení a zobrazia sa spolu s účtami na YubiKey a účty, ktoré tu pridáte, premenujete, pripnete alebo odstránite, sa zmenia aj v Ente Auth."
           }
         }
       }
@@ -13318,25 +13318,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Deine Ente-Auth-Daten konnten nicht entschlüsselt werden."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vos données Ente Auth n'ont pas pu être déchiffrées."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Ente Auth のデータを復号できませんでした。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vaše údaje Ente Auth sa nepodarilo dešifrovať."
           }
         }
@@ -13404,25 +13404,25 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Deine Schlüssel konnten nicht abgeleitet werden. Möglicherweise hat das Gerät zu wenig Arbeitsspeicher."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vos clés n'ont pas pu être dérivées. L'appareil manque peut-être de mémoire."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "鍵を導出できませんでした。デバイスのメモリが不足している可能性があります。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Vaše kľúče sa nepodarilo odvodiť. Zariadeniu možno chýba pamäť."
           }
         }
