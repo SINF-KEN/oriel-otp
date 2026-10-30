@@ -53,6 +53,7 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "lightbulb"), color: Color(.systemOrange))
                         Text("How does it work")
                     }
+                    .accessibilityIdentifier("about.tutorial")
                     NavigationLink {
                         VersionHistoryView(presentedFromMainView: false)
                             .navigationTitle(String(localized: "Version history", comment: "About navigation title"))
@@ -60,6 +61,7 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "list.clipboard"), color: Color(.systemGreen))
                         Text("Version history")
                     }
+                    .accessibilityIdentifier("about.version-history")
                     #if os(iOS)
                     NavigationLink {
                         AppIconView()
@@ -67,6 +69,7 @@ struct AboutView: View {
                         ListIconView(image: Image(systemName: "app.badge"), color: Color(.systemGreen), padding: 5)
                         Text("App icon")
                     }
+                    .accessibilityIdentifier("about.app-icon")
                     #endif
                     Button {
                         Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)

@@ -47,6 +47,7 @@ struct AppLockView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(lock.isAuthenticating)
+                .accessibilityIdentifier("app-lock.unlock")
             } else {
                 AppLockSecretEntry(method: lock.method,
                                    prompt: lock.method == .password
@@ -160,6 +161,7 @@ private struct AppLockCodePad: View {
                     .accessibilityLabel(String(localized: "Delete", comment: "App lock number pad delete button"))
                     .accessibilityInputLabels([String(localized: "Delete", comment: "App lock number pad delete button"),
                                                String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")])
+                    .accessibilityIdentifier("app-lock.delete")
                     .opacity(code.isEmpty ? 0 : 1)
                     .disabled(code.isEmpty)
                 }
@@ -194,6 +196,7 @@ private struct AppLockCodePad: View {
         .accessibilityShowsLargeContentViewer { Text(verbatim: digit) }
         // Typed as soon as the finger lifts, like the system's passcode keys.
         .accessibilityAddTraits(.isKeyboardKey)
+        .accessibilityIdentifier("app-lock.key.\(digit)")
     }
 
     private func add(_ digits: String) {
@@ -234,6 +237,7 @@ private struct AppLockPasswordField: View {
                 .textContentType(.password)
                 .textFieldStyle(.roundedBorder)
                 .focused($isFocused)
+                .accessibilityIdentifier("app-lock.password")
                 .onSubmit(enter)
                 .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             Button(String(localized: "Continue", comment: "App lock password button"), action: enter)

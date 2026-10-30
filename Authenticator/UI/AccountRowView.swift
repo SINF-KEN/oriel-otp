@@ -120,6 +120,8 @@ struct AccountRowView<Accessory: View>: View {
         .accessibilityValue(accessibilityValue)
         // Said to Voice Control without the code, e.g. "Tap GitHub".
         .accessibilityInputLabels([account.title] + [account.subTitle.map { "\(account.title) \($0)" }].compactMap { $0 })
+        // Stable for UI tests and agents, e.g. "account-row.GitHub:alice@example.com", see docs/accessibility.md.
+        .accessibilityIdentifier("account-row.\(account.accountId)")
         .onChange(of: account.state) { _, state in
             // Not sure why we have to schedule this in the next runloop
             Task {

@@ -75,6 +75,7 @@ struct EnteSyncView: View {
                         ProgressView()
                     } else if model.phase == .accounts {
                         ConfirmButton(addButtonTitle) { importSelection() }
+                            .accessibilityIdentifier("ente.add")
                             .disabled(model.selection.isEmpty || !canAddToYubiKey)
                     }
                 }
@@ -98,14 +99,17 @@ struct EnteSyncView: View {
                     .autocorrectionDisabled()
                     .submitLabel(.next)
                     .focused($focusedField, equals: .email)
+                    .accessibilityIdentifier("ente.email")
                     .onSubmit { focusedField = .password }
                 SecureField(String(localized: "Password", comment: "Ente sign in field"), text: $model.password)
                     .textContentType(.password)
                     .submitLabel(.go)
                     .focused($focusedField, equals: .password)
+                    .accessibilityIdentifier("ente.password")
                     .onSubmit { model.signIn() }
                 Button(String(localized: "Sign in", comment: "Ente sign in button")) { model.signIn() }
                     .disabled(!model.canSignIn)
+                    .accessibilityIdentifier("ente.sign-in")
             } header: {
                 Text(String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
@@ -120,6 +124,7 @@ struct EnteSyncView: View {
                 TextField(EnteAPIClient.defaultServer.absoluteString, text: $model.server)
                     // The placeholder is the default server's address, which isn't a name to say.
                     .accessibilityLabel(String(localized: "Server", comment: "Ente sign in server field"))
+                    .accessibilityIdentifier("ente.server")
                     .keyboardType(.URL)
                     .textContentType(.URL)
                     .textInputAutocapitalization(.never)
@@ -127,6 +132,7 @@ struct EnteSyncView: View {
                     .focused($focusedField, equals: .server)
                 if model.canSaveSession {
                     Toggle(String(localized: "Stay signed in", comment: "Ente sign in toggle"), isOn: $model.staySignedIn)
+                        .accessibilityIdentifier("ente.stay-signed-in")
                 }
             } header: {
                 Text(String(localized: "Options", comment: "Ente sign in options header"))

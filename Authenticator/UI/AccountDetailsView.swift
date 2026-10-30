@@ -101,6 +101,7 @@ struct AccountDetailView: View {
             .accessibilityLabel(account.spokenCode)
             .accessibilityValue(account.accessibilityCodeState)
             .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+            .accessibilityIdentifier("account-details.code")
             // The label is the code itself, which can't be said to Voice Control.
             .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
                                        String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
@@ -124,6 +125,7 @@ struct AccountDetailView: View {
                     Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
                 }
                 .accessibilityInputLabels(VoiceControlNames.calculate)
+                .accessibilityIdentifier("account-details.calculate")
                 .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
                 .disabled(!account.enableRefresh)
                 Button(action: { account.isPinned.toggle() }) {
@@ -131,6 +133,7 @@ struct AccountDetailView: View {
                           systemImage: account.isPinned ? "pin.slash" : "pin")
                 }
                 .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
+                .accessibilityIdentifier("account-details.pin")
             }
             ToolbarItemGroup(placement: .secondaryAction) {
                 CopyToYubiKeyButtons(account: account)
@@ -139,12 +142,14 @@ struct AccountDetailView: View {
                         Label(String(localized: "Rename", comment: "Menu"), systemImage: "square.and.pencil")
                     }
                     .help(String(localized: "Rename the account", comment: "Toolbar help"))
+                    .accessibilityIdentifier("account-details.rename")
                 }
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
                 .help(account.isInEnte ? String(localized: "Move the account to the trash in Ente Auth", comment: "Toolbar help")
                       : String(localized: "Delete the account from the YubiKey", comment: "Toolbar help"))
+                .accessibilityIdentifier("account-details.delete")
             }
         }
         .sheet(isPresented: $showEditing) {
@@ -172,6 +177,7 @@ struct AccountDetailView: View {
                 Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
             }
             .accessibilityInputLabels(VoiceControlNames.copy)
+            .accessibilityIdentifier("account-details.copy")
             .help(String(localized: "Copy the code", comment: "Mac row button help"))
             .disabled(account.state == .expired || account.otp == nil)
         }

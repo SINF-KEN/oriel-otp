@@ -57,6 +57,7 @@ struct TutorialView: View {
                 } label: {
                     Label(String(localized: "Back", comment: "Mac tutorial button"), systemImage: "chevron.backward")
                 }
+                .accessibilityIdentifier("tutorial.back")
                 .disabled(page == 0)
             }
             #endif
@@ -68,6 +69,7 @@ struct TutorialView: View {
                 } label: {
                     Label("Next", systemImage: "chevron.forward")
                 }
+                .accessibilityIdentifier("tutorial.next")
                 .disabled(page >= self.tutorialPages.count - 1)
             }
         }

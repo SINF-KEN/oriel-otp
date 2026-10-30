@@ -131,12 +131,14 @@ struct AddAccountView: View {
                         TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer)
                             // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
                             .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
+                            .accessibilityIdentifier("add-account.issuer")
                             .submitLabel(.next)
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
                         TextField(String("john@doe.com"), text: $accountName)
                             .accessibilityLabel(String(localized: "Account name", comment: "Add account field"))
+                            .accessibilityIdentifier("add-account.account-name")
                             .textContentType(.username)
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
@@ -146,6 +148,7 @@ struct AddAccountView: View {
                     if mode == .manual {
                         LabeledContent(String(localized: "Secret", comment: "Add account field")) {
                             TextField(String(localized: "Secret", comment: "Add account field"), text: $secret)
+                                .accessibilityIdentifier("add-account.secret")
                                 .textInputAutocapitalization(.characters)
                                 .autocorrectionDisabled()
                                 .submitLabel(.done)
@@ -206,6 +209,7 @@ struct AddAccountView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     ConfirmButton(String(localized: "Save")) { save() }
+                        .accessibilityIdentifier("add-account.save")
                 }
             }
             #if os(macOS)
@@ -324,6 +328,7 @@ struct AddAccountView: View {
                         Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
                     }
                     .accessibilityInputLabels(VoiceControlNames.enterManually)
+                    .accessibilityIdentifier("add-account.enter-manually")
                 }
             }
         }

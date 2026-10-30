@@ -472,6 +472,7 @@ struct MainView: View {
                     Label(String(localized: "Scan NFC YubiKey"), systemImage: "wave.3.right")
                 }
                 .accessibilityInputLabels(VoiceControlNames.scanNFC)
+                .accessibilityIdentifier("accounts.scan-nfc")
             }
         }
         #endif
@@ -482,6 +483,7 @@ struct MainView: View {
                 Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
             }
             .accessibilityInputLabels(VoiceControlNames.refresh)
+            .accessibilityIdentifier("accounts.refresh")
             .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
             .disabled(!model.canRefresh)
         }
@@ -514,6 +516,7 @@ struct MainView: View {
                 Label("Configuration", systemImage: "switch.2")
             }
             .accessibilityInputLabels(VoiceControlNames.configuration)
+            .accessibilityIdentifier("accounts.configuration")
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
             #endif
             // In the Debug menu on the Mac, so it isn't in the screenshots.
@@ -528,6 +531,7 @@ struct MainView: View {
                 Label("About", systemImage: "questionmark.circle")
             }
             .accessibilityInputLabels(VoiceControlNames.about)
+            .accessibilityIdentifier("accounts.about")
             #endif
         }
     }
@@ -653,6 +657,7 @@ struct MainView: View {
             Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
         }
         .accessibilityInputLabels(VoiceControlNames.syncFromEnte)
+        .accessibilityIdentifier("accounts.sync-from-ente")
     }
 
     #if os(macOS)
@@ -713,6 +718,7 @@ struct MainView: View {
                 Label("Add account", systemImage: "plus")
             }
             .accessibilityInputLabels(VoiceControlNames.addAccount)
+            .accessibilityIdentifier("accounts.add-account")
             .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
                   : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
             .disabled(!canAddToYubiKey && !model.cloud.isEnabled)

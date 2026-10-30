@@ -73,6 +73,32 @@ The app has no video or audio: the tutorial is still drawings, and help links op
 don't apply and aren't claimed. Any video added later needs captions and an audio description, or a text alternative,
 before it's released (see [app-store.md](app-store.md)).
 
+## AI agents and UI tests
+
+Agents and UI tests drive the app through the same accessibility tree as VoiceOver, so the labels, values, actions
+and headers above serve them too. Key elements also have a stable `accessibilityIdentifier`, which doesn't change with
+the language or the visible text. The UI tests find elements by these.
+
+The scheme is `<screen>.<element>`, in lowercase words joined by hyphens, with the item's id after a further dot
+where there are many of a kind:
+
+| Screen | Identifiers |
+| --- | --- |
+| Account list | `accounts.add-account`, `accounts.scan-nfc`, `accounts.refresh` (Mac), `accounts.sync-from-ente` (the button in the empty list) |
+| A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth |
+| Account details | `account-details.code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete` |
+| Add account | `add-account.issuer`, `add-account.account-name`, `add-account.secret`, `add-account.save`, `add-account.enter-manually` |
+| Ente sync | `ente.email`, `ente.password`, `ente.sign-in`, `ente.server`, `ente.stay-signed-in`, `ente.add` |
+| App lock | `app-lock.unlock`, `app-lock.key.<digit>`, `app-lock.delete`, `app-lock.password` |
+| About | `about.tutorial`, `about.version-history`, `about.app-icon`, `tutorial.next`, `tutorial.back` |
+
+The search field is the system's (`app.searchFields.firstMatch`), and the account list's menu is the system's More
+button (`OverflowBarButtonItem`). Its items (Sync from Ente Auth, Configuration, About) don't keep identifiers on iOS,
+so they're found by their title. Name new identifiers the same way and add them here.
+
+App Intents cover the tasks that make sense from outside the app: Scan NFC YubiKey and Add Account on iOS (Siri,
+Shortcuts, Spotlight, Apple Intelligence), Add Account and Copy Code on the Mac, with a parameter for the account.
+
 ## Testing
 
 `AuthenticatorUITests/AccessibilityAuditTests.swift` runs Xcode's accessibility audit
