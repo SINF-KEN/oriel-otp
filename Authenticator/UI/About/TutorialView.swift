@@ -128,7 +128,7 @@ extension TutorialView {
 
          TutorialPageModel(title: String(localized: "Add accounts from Ente Auth", comment: "Tutorial page title"),
                            image: Image(.tutorialEnteSync),
-                           text: String(localized: "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this Mac, and nothing in Ente Auth is changed.", comment: "Mac tutorial"),
+                           text: String(localized: "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nWith Stay signed in, your Ente Auth accounts are listed here too, and changes you make are saved in Ente Auth. Your Ente Auth data is decrypted on this Mac.", comment: "Mac tutorial"),
                            link: nil),
 
          TutorialPageModel(title: String(localized: "Plug in your YubiKey"),
@@ -149,7 +149,7 @@ extension TutorialView {
 
          TutorialPageModel(title: String(localized: "Add accounts from Ente Auth", comment: "Tutorial page title"),
                            image: Image(.tutorialEnteSync),
-                           text: String(localized: "Already use Ente Auth? Choose Sync from Ente Auth in the account list menu, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this device, and nothing in Ente Auth is changed.", comment: "Tutorial"),
+                           text: String(localized: "Already use Ente Auth? Choose Sync from Ente Auth in the account list menu, sign in and pick the accounts to add to your YubiKey.\n\nWith Stay signed in, your Ente Auth accounts are listed here too, and changes you make are saved in Ente Auth. Your Ente Auth data is decrypted on this device.", comment: "Tutorial"),
                            link: nil),
         
          TutorialPageModel(title: String(localized: "Plug in your YubiKey"),
