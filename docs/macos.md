@@ -57,7 +57,8 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
 - **Settings** (⌘,): General (menu bar, menu bar only, open at login) and YubiKey, the configuration screen that is a
   sheet on iOS.
 - **Toolbar**: Refresh, Add and Sync from Ente Auth, with help tags. There is no pull to refresh; the YubiKey is
-  read when it's plugged in. Copy and pin also appear on a row when the pointer is over it, in place of swipe actions.
+  read when it's plugged in. Copy and pin also appear on a row when the pointer is over it, in place of swipe actions,
+  and clicking a code copies it.
 - **Density**: smaller row icons and text, and a larger code, sized for the Mac's 13 pt body text.
 - **Toasts** are a small banner at the bottom of the window.
 - **Touch**: when a code needs a touch and the app isn't in front, e.g. when copying from the menu bar or Shortcuts,
