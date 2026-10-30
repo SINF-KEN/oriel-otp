@@ -85,7 +85,7 @@ struct AccountRowView<Accessory: View>: View {
                         if showsLocation {
                             AccountLocationIcon(account: account)
                                 .font(subtitleFont)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(secondaryStyle)
                         }
                     }
                     account.subTitle.map {
@@ -94,7 +94,7 @@ struct AccountRowView<Accessory: View>: View {
                             .lineLimit(isStacked ? 3 : 1)
                             .minimumScaleFactor(0.9)
                             .truncationMode(.tail)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(secondaryStyle)
                     }
                 }
             }
@@ -133,6 +133,12 @@ struct AccountRowView<Accessory: View>: View {
         .onDisappear {
             animate = false
         }
+    }
+
+    // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
+    // Increase Contrast the way the system's label colors do, so the primary one is used then.
+    private var secondaryStyle: HierarchicalShapeStyle {
+        colorSchemeContrast == .increased ? .primary : .secondary
     }
 
     private var accessibilityValue: String {

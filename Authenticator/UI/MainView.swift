@@ -586,16 +586,18 @@ struct MainView: View {
         }
         .listRowSeparator(.hidden)
         // The same actions as the detail view, without having to open it. VoiceOver lists them as the row's actions.
+        // Swipe actions have white labels, so their colors are dark enough for 4.5:1 in both appearances, which the
+        // system red and blue aren't.
         .swipeActions(edge: .leading) {
             pinButton(account)
-                .tint(Color("Favorite"))
+                .tint(Color(.favorite))
         }
         .swipeActions(edge: .trailing) {
             // Not a destructive role, which would remove the row before the deletion is confirmed.
             deleteButton(account)
-                .tint(.red)
+                .tint(Color(.deleteAction))
             copyButton(account)
-                .tint(.blue)
+                .tint(Color(.copyAction))
         }
         .contextMenu {
             copyButton(account)

@@ -38,6 +38,18 @@ in dark mode. The tutorial and security key drawings have dark versions; the oth
 gray YubiKey drawing, which reads on both. The QR scanner is dark in both appearances, over the camera. The watch app
 is always dark.
 
+## Sufficient Contrast
+
+Text has at least 4.5:1 against its background, large text and icons 3:1, with Increase Contrast on (Apple's
+criterion is "by default, or when Increase Contrast is on"). By default the system's secondary labels are a little
+short of that in places, as in Apple's own apps; everything the app draws itself passes by default too:
+
+- The code is drawn in the full accent color (7.2:1 in light mode, 13.6:1 in dark mode). An expired or not yet
+  calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
+- Swipe actions have white labels on Favorite, DeleteAction and CopyAction, which are darker than the system yellow,
+  red and blue for at least 4.5:1 in both appearances.
+- Every asset color has a high contrast variant, for light and dark mode.
+
 ## Testing
 
 `AuthenticatorUITests/AccessibilityAuditTests.swift` runs Xcode's accessibility audit
@@ -46,8 +58,12 @@ and details, the Ente sign in and account list, Configuration, About, the tutori
 the add account form. It runs with the screenshots (`tools/screenshots.sh`, and the Screenshots workflow in CI), see
 [screenshots.md](screenshots.md).
 
-- `testDarkAppearance` switches the simulator to dark mode and fails for text or icons without enough contrast, and
-  for clipped text. It switches back to light mode for the screenshots.
+- `testLightAppearance` fails for text or icons without enough contrast in light mode. Text that nearly passes, like
+  the system's secondary labels in places, is left to the Increase Contrast check. Disabled controls are left out, as
+  WCAG does, and so is what the keyboard covers.
+- After the screenshots, `tools/screenshots.sh` switches the simulator to dark mode with `simctl` and runs
+  `testDarkAppearance`, the same check in dark mode, then turns on Increase Contrast and runs `testIncreasedContrast`
+  in light and dark mode, where nothing has to nearly pass. The tests skip themselves in a normal run.
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.

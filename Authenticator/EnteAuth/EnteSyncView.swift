@@ -57,6 +57,8 @@ struct EnteSyncView: View {
                 }
             }
             .formStyle(.grouped)
+            // Scrolling puts the keyboard away, so the footers under it can be read.
+            .scrollDismissesKeyboard(.immediately)
             .disabled(model.isBusy)
             #if os(macOS)
             .frame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
