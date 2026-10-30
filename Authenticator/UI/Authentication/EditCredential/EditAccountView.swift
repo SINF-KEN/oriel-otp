@@ -68,6 +68,7 @@ struct EditView: View {
                 }
             }
             .formStyle(.grouped)
+            .scaledButtonLabels()
             .navigationTitle(String(localized: "Rename", comment: "Rename account navigation title"))
             .navigationBarTitleDisplayMode(.inline)
             .accessibilityAction(.escape) { showEditing = false }

@@ -77,17 +77,17 @@ final class AccessibilityAuditTests: XCTestCase {
     @MainActor private func auditMainScreens(for types: XCUIAccessibilityAuditType, allowsNearlyPassingContrast: Bool = false) throws {
         self.allowsNearlyPassingContrast = allowsNearlyPassingContrast
         // The first account, which is on screen at every text size.
-        let bank = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Bank,'")).firstMatch
+        let bank = app.descendants(matching: .any)["account-row.60/Bank:alice"].firstMatch
         XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try audit("account list", types)
 
         bank.tap()
-        XCTAssertTrue(app.buttons["Copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
+        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try audit("account details", types)
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
         openMenuItem("Sync from Ente Auth")
-        XCTAssertTrue(app.textFields["Email"].waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
+        XCTAssertTrue(app.textFields["ente.email"].waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
         dismissKeyboard()
         try audit("Ente sign in", types)
         closeSheet()
@@ -100,12 +100,12 @@ final class AccessibilityAuditTests: XCTestCase {
         openMenuItem("About")
         XCTAssertTrue(app.navigationBars["About"].waitForExistence(timeout: 20), "About didn't show")
         try audit("About", types)
-        app.buttons["How does it work"].firstMatch.tap()
-        XCTAssertTrue(app.buttons["Next"].firstMatch.waitForExistence(timeout: 20), "The tutorial didn't show")
+        app.buttons["about.tutorial"].firstMatch.tap()
+        XCTAssertTrue(app.buttons["tutorial.next"].firstMatch.waitForExistence(timeout: 20), "The tutorial didn't show")
         try audit("tutorial", types)
         app.navigationBars.buttons.element(boundBy: 0).tap()
         // Below the fold at the largest text sizes.
-        let appIcon = app.buttons["App icon"].firstMatch
+        let appIcon = app.buttons["about.app-icon"].firstMatch
         if !appIcon.exists { app.swipeUp() }
         appIcon.tap()
         try audit("app icon", types)
@@ -113,25 +113,25 @@ final class AccessibilityAuditTests: XCTestCase {
         closeSheet()
 
         // The scanner asks for the camera first, which the simulator doesn't have, then the form is entered by hand.
-        app.navigationBars.buttons["Add account"].firstMatch.tap()
+        app.navigationBars.buttons["accounts.add-account"].firstMatch.tap()
         let cameraAlert = XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch
         if cameraAlert.waitForExistence(timeout: 5) {
             cameraAlert.buttons.element(boundBy: cameraAlert.buttons.count - 1).tap()
         }
-        let enterManually = app.buttons["Enter manually"].firstMatch
+        let enterManually = app.buttons["add-account.enter-manually"].firstMatch
         XCTAssertTrue(enterManually.waitForExistence(timeout: 20), "The QR scanner didn't show")
         try audit("QR scanner", types)
         enterManually.tap()
-        XCTAssertTrue(app.textFields["Secret"].waitForExistence(timeout: 20), "The add account form didn't show")
+        XCTAssertTrue(app.textFields["add-account.secret"].waitForExistence(timeout: 20), "The add account form didn't show")
         try audit("add account", types)
         closeSheet()
 
         openMenuItem("Sync from Ente Auth")
-        let email = app.textFields["Email"]
+        let email = app.textFields["ente.email"]
         XCTAssertTrue(email.waitForExistence(timeout: 20))
         // Nothing is kept after the test, so the screenshots that follow start signed out. The switch is only there
         // when the simulator has a passcode to protect the session with.
-        let staySignedIn = app.switches["Stay signed in"].firstMatch
+        let staySignedIn = app.switches["ente.stay-signed-in"].firstMatch
         for _ in 0..<4 where !staySignedIn.exists {
             app.swipeUp()
         }
@@ -146,11 +146,11 @@ final class AccessibilityAuditTests: XCTestCase {
         }
         email.tap()
         email.typeText("alice@example.com\n")
-        let password = app.secureTextFields["Password"]
+        let password = app.secureTextFields["ente.password"]
         XCTAssertTrue(password.waitForExistence(timeout: 20))
         password.tap()
         password.typeText("demo\n")
-        let addButton = app.navigationBars.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Add '")).firstMatch
+        let addButton = app.buttons["ente.add"].firstMatch
         XCTAssertTrue(addButton.waitForExistence(timeout: 30), "The Ente accounts didn't show")
         try audit("Ente accounts", types)
         closeSheet()
@@ -170,8 +170,10 @@ final class AccessibilityAuditTests: XCTestCase {
         }
     }
 
+    /// Taps an item of the account list's More menu. The menu is the system's, and its items don't keep their
+    /// identifiers, so they're found by their title.
     @MainActor private func openMenuItem(_ title: String) {
-        let more = app.navigationBars.buttons["More"].firstMatch
+        let more = app.navigationBars.buttons["OverflowBarButtonItem"].firstMatch
         XCTAssertTrue(more.waitForExistence(timeout: 10))
         more.tap()
         app.buttons[title].firstMatch.tap()

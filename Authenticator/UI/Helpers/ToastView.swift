@@ -27,7 +27,7 @@ struct ToastView: View {
         #if os(macOS)
         // A small banner at the bottom of the window, like the Mac's own status messages.
         Text(message)
-            .font(.callout)
+            .scaledFont(.callout)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 12)
@@ -39,7 +39,7 @@ struct ToastView: View {
         #else
         ZStack(alignment: .leading) {
             Text(message)
-                .font(.body)
+                .scaledFont(.body)
                 .multilineTextAlignment(.center)
                 // YubiBlue is a light green in dark mode, so white text would lose its contrast there.
                 .foregroundStyle(Color(.systemBackground))
@@ -56,7 +56,8 @@ struct ToastView: View {
 }
 
 struct ToastModifier: ViewModifier {
-    
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var isPresenting: Bool
     var message: String
     
@@ -66,7 +67,8 @@ struct ToastModifier: ViewModifier {
                 .onTapGesture {
                     isPresenting = false
                 }
-                .transition(AnyTransition.scale(scale: 0.8).combined(with: .opacity))
+                // Fades in and out without growing with Reduce Motion.
+                .transition(reduceMotion ? .opacity : AnyTransition.scale(scale: 0.8).combined(with: .opacity))
         }
     }
     
@@ -83,7 +85,7 @@ struct ToastModifier: ViewModifier {
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
                     .avoidingReservedRegions()
             }
-            .animation(.spring(), value: isPresenting)
+            .animation(reduceMotion ? .easeInOut(duration: 0.2) : .spring(), value: isPresenting)
     }
 }
 

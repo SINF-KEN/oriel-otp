@@ -76,7 +76,7 @@ struct MenuBarAccountsView: View {
             }
         }
         .padding(6)
-        .frame(width: 300)
+        .textScaledFrame(width: 300)
         .onAppear {
             guard !mainWindow.isVisible, !model.isStarted else { return }
             startedModel = true
@@ -117,7 +117,7 @@ private struct MenuBarAccountRow: View {
                         .lineLimit(1)
                     account.subTitle.map {
                         Text($0)
-                            .font(.caption)
+                            .scaledFont(.caption)
                             .foregroundStyle(isHovering ? .primary : .secondary)
                             .lineLimit(1)
                     }
@@ -131,7 +131,7 @@ private struct MenuBarAccountRow: View {
                         .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
                 } else {
                     Text(account.state == .expired ? "*** ***" : account.formattedCode ?? "*** ***")
-                        .font(.body.monospacedDigit().bold())
+                        .scaledFont(.body) { $0.monospacedDigit().bold() }
                         .privacySensitive()
                 }
             }

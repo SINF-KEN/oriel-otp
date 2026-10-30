@@ -28,31 +28,32 @@ struct AccountDetailView: View {
     let onDelete: () -> Void
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
 
     private let codeColor = Color(.secondaryLabel)
-    @ScaledMetric(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
-    @ScaledMetric(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
-    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
+    @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
+    @ScaledSize(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
+    @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
 
     var body: some View {
         VStack(spacing: 12) {
             Spacer()
             Text(String(account.title.first ?? "?"))
-                .font(.largeTitle)
+                .scaledFont(.largeTitle)
                 // Grows with the text, but not so much that the name and code go off screen.
                 .frame(width: min(iconSize, 120), height: min(iconSize, 120))
                 .background(account.iconColor)
                 .clipShape(Circle())
                 .accessibilityHidden(true)
             Text(account.title)
-                .font(.title2.weight(.medium))
+                .scaledFont(.title2) { $0.weight(.medium) }
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             account.subTitle.map {
                 Text($0)
-                    .font(.body)
+                    .scaledFont(.body)
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
@@ -63,12 +64,12 @@ struct AccountDetailView: View {
                     AccountLocationIcon(account: account)
                         .accessibilityHidden(true)
                 }
-                .font(.footnote)
+                .scaledFont(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
             }
             if !account.isInEnte && model.cloud.isEnabled {
                 Text(String(localized: "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.", comment: "Account details of a YubiKey account while signed in to Ente Auth"))
-                    .font(.footnote)
+                    .scaledFont(.footnote)
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 360)
@@ -82,6 +83,7 @@ struct AccountDetailView: View {
                     // Slide Over or half of a folded iPhone Duo.
                     Text(account.formattedCode ?? "*** ***")
                         .privacySensitive()
+                        .strikethrough(differentiateWithoutColor && account.state == .expired)
                         .font(.system(size: codeFontSize, weight: .bold))
                         .monospacedDigit()
                         .lineLimit(1)
@@ -99,6 +101,7 @@ struct AccountDetailView: View {
             .accessibilityLabel(account.spokenCode)
             .accessibilityValue(account.accessibilityCodeState)
             .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+            .accessibilityIdentifier("account-details.code")
             // The label is the code itself, which can't be said to Voice Control.
             .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
                                        String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
@@ -122,6 +125,7 @@ struct AccountDetailView: View {
                     Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
                 }
                 .accessibilityInputLabels(VoiceControlNames.calculate)
+                .accessibilityIdentifier("account-details.calculate")
                 .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
                 .disabled(!account.enableRefresh)
                 Button(action: { account.isPinned.toggle() }) {
@@ -129,6 +133,7 @@ struct AccountDetailView: View {
                           systemImage: account.isPinned ? "pin.slash" : "pin")
                 }
                 .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
+                .accessibilityIdentifier("account-details.pin")
             }
             ToolbarItemGroup(placement: .secondaryAction) {
                 CopyToYubiKeyButtons(account: account)
@@ -137,12 +142,14 @@ struct AccountDetailView: View {
                         Label(String(localized: "Rename", comment: "Menu"), systemImage: "square.and.pencil")
                     }
                     .help(String(localized: "Rename the account", comment: "Toolbar help"))
+                    .accessibilityIdentifier("account-details.rename")
                 }
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
                 .help(account.isInEnte ? String(localized: "Move the account to the trash in Ente Auth", comment: "Toolbar help")
                       : String(localized: "Delete the account from the YubiKey", comment: "Toolbar help"))
+                .accessibilityIdentifier("account-details.delete")
             }
         }
         .sheet(isPresented: $showEditing) {
@@ -170,6 +177,7 @@ struct AccountDetailView: View {
                 Label(String(localized: "Copy", comment: "Menu"), systemImage: "doc.on.doc")
             }
             .accessibilityInputLabels(VoiceControlNames.copy)
+            .accessibilityIdentifier("account-details.copy")
             .help(String(localized: "Copy the code", comment: "Mac row button help"))
             .disabled(account.state == .expired || account.otp == nil)
         }

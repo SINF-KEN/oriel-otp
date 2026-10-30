@@ -188,7 +188,7 @@ struct SmartCardConfigurationView: View {
 private struct SmartCardStatusView: View {
     
     let isEnabled: Bool
-    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 55
+    @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 55
 
     var body: some View {
         VStack(spacing: 10) {
@@ -197,7 +197,7 @@ private struct SmartCardStatusView: View {
                 .foregroundStyle(isEnabled ? Color(.systemGreen) : Color(.secondaryLabel))
                 .accessibilityHidden(true)
             Text(isEnabled ? String(localized: "Enabled", comment: "PIV extension enabled message") : String(localized: "Not Enabled", comment: "PIV extension not enabled message"))
-                .font(.headline)
+                .scaledFont(.headline)
         }
         .frame(maxWidth: .infinity)
         .padding(.bottom, 20)
@@ -219,18 +219,18 @@ private struct SmartCardHeaderRow: View {
             image
                 .resizable()
                 .scaledToFit()
-                .font(Font.title.weight(.semibold))
+                .scaledFont(.title) { $0.weight(.semibold) }
                 .padding(10)
                 .frame(width: 60, height: 60)
                 .foregroundStyle(.white)
                 .background(Color(.systemOrange))
                 .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .accessibilityHidden(true)
-            Text(title).font(.title2).bold()
+            Text(title).scaledFont(.title2).bold()
                 .accessibilityAddTraits(.isHeader)
                 .multilineTextAlignment(.center)
             Text(text)
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
@@ -278,7 +278,7 @@ private struct SmartCardCertificateRow: View {
     let symbol: String
     var action: (() -> Void)? = nil
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @ScaledMetric(relativeTo: .title2) private var symbolSize: CGFloat = 26
+    @ScaledSize(relativeTo: .title2) private var symbolSize: CGFloat = 26
 
     var body: some View {
         HStack {

@@ -96,6 +96,34 @@ Description:
 > Oriel OTP is an independent fork of Yubico Authenticator and isn't affiliated with Yubico or Ente. It has no
 > analytics, advertising or tracking.
 
+## Accessibility
+
+App Store Connect's [Accessibility Nutrition Labels](https://developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels/)
+are answered per platform, for the common tasks: add an account (QR code, by hand, from Ente Auth), read and copy a
+code, search, pin, rename, delete, sync with Ente Auth, the YubiKey settings and the app lock. What each feature
+covers and how it's tested is in [accessibility.md](accessibility.md); the work is tracked in
+[issue 57](https://github.com/SINF-KEN/oriel-otp/issues/57).
+
+| Feature | iPhone, iPad | Mac | Apple Watch |
+| --- | --- | --- | --- |
+| VoiceOver | Yes | Yes | Yes |
+| Voice Control | Yes | Yes | Not applicable on watchOS |
+| Larger Text | Yes | Yes (the app's own text size, up to 200%) | Yes |
+| Dark Interface | Yes | Yes | Yes (always dark) |
+| Differentiate Without Color Alone | Yes | Yes | Yes |
+| Sufficient Contrast | Yes | Yes | Yes |
+| Reduced Motion | Yes | Yes | Yes (nothing moves but the countdown) |
+| Captions | No: the app has no video | No | No |
+| Audio Descriptions | No: the app has no video | No | No |
+
+Claim only the features marked Yes, and only after checking them on a device with the release build: the tests
+run in the Simulator and on the Mac, not with a person using VoiceOver or Voice Control. Note in the review notes or
+here which checks were done on a device.
+
+Any video added to the app, the tutorial or the listing's in-app help needs captions and an audio description (or a
+text alternative with the same content) before it's released, so Captions and Audio Descriptions can be claimed
+then.
+
 ## Export compliance
 
 `ITSAppUsesNonExemptEncryption` is `false`. The app uses standard algorithms (libsodium for Ente sync), and App

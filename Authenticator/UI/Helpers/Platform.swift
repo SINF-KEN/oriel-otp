@@ -42,6 +42,16 @@ enum Platform {
         #endif
     }
 
+    /// Whether Reduce Motion is on, for animations started outside a view, which has
+    /// `accessibilityReduceMotion` in its environment.
+    @MainActor static var prefersReducedMotion: Bool {
+        #if os(iOS)
+        UIAccessibility.isReduceMotionEnabled
+        #else
+        NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        #endif
+    }
+
     enum Feedback {
         case success
         case error

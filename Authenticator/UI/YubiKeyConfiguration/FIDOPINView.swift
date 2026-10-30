@@ -29,26 +29,35 @@ struct FIDOPINView: View {
 
     var body: some View {
         SettingsView(image: Image(systemName: "lock.shield"), imageColor: Color(.systemPurple)) {
-            Text("FIDO PIN").font(.title2).bold()
+            Text("FIDO PIN").scaledFont(.title2).bold()
                 .accessibilityAddTraits(.isHeader)
 
             Text("To prevent unauthorized access the FIDO application can be protected by a PIN.")
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
             
+            // With a symbol, so it doesn't take the red to see it's a problem.
             if model.state.isBlocked() {
-                Text("PIN is temporary blocked. Remove and reinsert YubiKey to try again.")
-                    .font(.subheadline)
-                    .foregroundStyle(.red)
-                    .bold()
-                    .multilineTextAlignment(.center)
+                Label {
+                    Text("PIN is temporary blocked. Remove and reinsert YubiKey to try again.")
+                } icon: {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                }
+                .scaledFont(.subheadline)
+                .foregroundStyle(.red)
+                .bold()
+                .multilineTextAlignment(.center)
             }
             if model.state.isPermanentlyBlocked() {
-                Text("PIN is permanently blocked. Factory reset FIDO application to continue.")
-                    .font(.subheadline)
-                    .foregroundStyle(.red)
-                    .bold()
-                    .multilineTextAlignment(.center)
+                Label {
+                    Text("PIN is permanently blocked. Factory reset FIDO application to continue.")
+                } icon: {
+                    Image(systemName: "exclamationmark.octagon.fill")
+                }
+                .scaledFont(.subheadline)
+                .foregroundStyle(.red)
+                .bold()
+                .multilineTextAlignment(.center)
             }
         } buttons: {
             if showSetButton {
@@ -91,7 +100,7 @@ struct FIDOPINView: View {
     }
     
     func updateState() {
-        withAnimation {
+        withAnimation(.unlessReduceMotion) {
             switch model.state {
             case .unknown:
                 break
