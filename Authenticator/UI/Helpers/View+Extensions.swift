@@ -199,3 +199,16 @@ enum VoiceControlNames {
          String(localized: "Keyboard", comment: "Voice Control name for the Enter manually button, after its keyboard symbol")]
     }
 }
+
+extension View {
+    /// Centers the view in the space it's given, and scrolls it instead when it's taller, e.g. at the largest text
+    /// sizes or in landscape.
+    func scrollsWhenTooTall() -> some View {
+        GeometryReader { proxy in
+            ScrollView {
+                self.frame(maxWidth: .infinity, minHeight: proxy.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
+    }
+}

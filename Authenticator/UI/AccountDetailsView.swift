@@ -32,13 +32,16 @@ struct AccountDetailView: View {
 
     private let codeColor = Color(.secondaryLabel)
     @ScaledMetric(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
+    @ScaledMetric(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
+    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
 
     var body: some View {
         VStack(spacing: 12) {
             Spacer()
             Text(String(account.title.first ?? "?"))
                 .font(.largeTitle)
-                .frame(width: 80, height: 80)
+                // Grows with the text, but not so much that the name and code go off screen.
+                .frame(width: min(iconSize, 120), height: min(iconSize, 120))
                 .background(account.iconColor)
                 .clipShape(Circle())
                 .accessibilityHidden(true)
@@ -72,7 +75,7 @@ struct AccountDetailView: View {
             Button(action: copyCode) {
                 HStack(spacing: 10) {
                     statusIcon
-                        .frame(width: 28, height: 28)
+                        .frame(width: statusSize, height: statusSize)
                         .accessibilityHidden(true)
                     // Scales with Dynamic Type, and shrinks rather than truncating or wrapping in a narrow column such as
                     // Slide Over or half of a folded iPhone Duo.
@@ -101,7 +104,7 @@ struct AccountDetailView: View {
             Spacer()
         }
         .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .scrollsWhenTooTall()
         .avoidingReservedRegions()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -174,7 +177,7 @@ struct AccountDetailView: View {
         switch account.state {
         case .requiresCalculation, .expired:
             Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
-                .font(.system(size: 26))
+                .font(.system(size: statusSize * 26 / 28))
         case .countingdown(let remaining):
             PieProgressView(progress: remaining, color: codeColor)
         }
