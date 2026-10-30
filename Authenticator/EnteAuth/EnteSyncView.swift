@@ -340,14 +340,15 @@ private struct EnteCodeRow: View {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(isSelected ? Color.accentColor : Color(.tertiaryLabel))
                     .accessibilityHidden(true)
-                // Explicit label colors, a button in a form would otherwise tint them with the accent color.
+                // Explicit label colors, a button in a form would otherwise tint them with the accent color. An account
+                // that can't be added is lighter, but still readable.
                 VStack(alignment: .leading) {
                     Text(code.title)
-                        .foregroundStyle(Color(code.template == nil ? .tertiaryLabel : .label))
+                        .foregroundStyle(Color(code.template == nil ? .secondaryLabel : .label))
                     if let subtitle = code.subtitle {
                         Text(subtitle)
                             .font(.subheadline)
-                            .foregroundStyle(Color(code.template == nil ? .tertiaryLabel : .secondaryLabel))
+                            .foregroundStyle(Color(.secondaryLabel))
                     }
                     if let reason = code.unsupportedReason {
                         Text(reason)

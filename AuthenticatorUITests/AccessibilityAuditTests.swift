@@ -26,6 +26,7 @@ final class AccessibilityAuditTests: XCTestCase {
     private static let demoDate = "1798761612"
 
     private var app: XCUIApplication!
+    private var allowsNearlyPassingContrast = false
 
     @MainActor override func setUp() async throws {
         continueAfterFailure = true
@@ -40,9 +41,23 @@ final class AccessibilityAuditTests: XCTestCase {
         try auditMainScreens(for: [.dynamicType, .textClipped])
     }
 
+    /// In dark mode, text and icons have to stand out from their background as much as in light mode. Clipped text is
+    /// checked at the largest text size, where it would show.
+    @MainActor func testDarkAppearance() throws {
+        XCUIDevice.shared.appearance = .dark
+        // The screenshots that run next are taken in light mode.
+        addTeardownBlock { @MainActor in XCUIDevice.shared.appearance = .light }
+        app.launchArguments = ["-DemoDate", Self.demoDate]
+        app.launch()
+        try auditMainScreens(for: .contrast, allowsNearlyPassingContrast: true)
+    }
+
     /// Goes through the main screens and audits each: the account list and details, the Ente sign in and account list,
     /// Configuration, About, the tutorial, the app icons and the add account form.
-    @MainActor private func auditMainScreens(for types: XCUIAccessibilityAuditType) throws {
+    /// With `allowsNearlyPassingContrast`, text that's just short of the contrast it needs, like the system's secondary
+    /// labels in dark mode, isn't reported. With Increase Contrast it has to pass.
+    @MainActor private func auditMainScreens(for types: XCUIAccessibilityAuditType, allowsNearlyPassingContrast: Bool = false) throws {
+        self.allowsNearlyPassingContrast = allowsNearlyPassingContrast
         // The first account, which is on screen at every text size.
         let bank = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Bank,'")).firstMatch
         XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
@@ -139,7 +154,18 @@ final class AccessibilityAuditTests: XCTestCase {
         // Lets the sheet or push animation finish, so the audit sees the screen at rest.
         Thread.sleep(forTimeInterval: 1)
         let navigationBarButtons = app.navigationBars.buttons
+        let allowsNearlyPassingContrast = allowsNearlyPassingContrast
+        var failed = false
         try app.performAccessibilityAudit(for: types) { issue in
+            if issue.auditType == .contrast {
+                // Disabled controls are dimmed on purpose and don't need the contrast (WCAG 1.4.3).
+                if let element = issue.element, !element.isEnabled {
+                    return true
+                }
+                if allowsNearlyPassingContrast && issue.compactDescription.localizedCaseInsensitiveContains("nearly passed") {
+                    return true
+                }
+            }
             // The navigation bar's buttons keep their size, like the system's, and show the Large Content Viewer
             // when held instead.
             if issue.auditType == .dynamicType, let element = issue.element, element.elementType == .button,
@@ -147,8 +173,16 @@ final class AccessibilityAuditTests: XCTestCase {
                 return true
             }
             let element = issue.element.map { "\($0.elementType) '\($0.label)' '\($0.identifier)'" } ?? "no element"
-            XCTFail("\(screen): \(issue.compactDescription) – \(element)")
+            XCTFail("\(screen): \(issue.compactDescription) – \(element): \(issue.detailedDescription)")
+            failed = true
             return true
+        }
+        // Shows what the audit saw, in the test result.
+        if failed {
+            let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            attachment.name = "audit-\(screen)"
+            attachment.lifetime = .keepAlways
+            add(attachment)
         }
     }
 }

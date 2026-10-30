@@ -178,7 +178,8 @@ struct AddAccountView: View {
                 }
             }
             .formStyle(.grouped)
-            .navigationTitle(title)
+            // Untitled under the scanner, which has its own title, so VoiceOver doesn't find this one behind it.
+            .navigationTitle(mode == .scanning ? "" : title)
             .navigationBarTitleDisplayMode(.inline)
             // VoiceOver's escape gesture, a two-finger Z, does the same as Cancel.
             .accessibilityAction(.escape) { showAddAccount = false }

@@ -30,6 +30,14 @@ account row puts the code below the name at the accessibility sizes. The app loc
 size where three still fit across the smallest iPhone; held, they show the Large Content Viewer, like the navigation
 bar's buttons.
 
+## Dark Interface
+
+Colors are system colors or asset colors with a dark variant. Text on the accent color (the toast, the Yubico OTP
+icon, the Mac menu bar's highlighted row) uses the background color rather than white, as the accent is a light pink
+in dark mode. The tutorial and security key drawings have dark versions; the other images are SF Symbols or the
+gray YubiKey drawing, which reads on both. The QR scanner is dark in both appearances, over the camera. The watch app
+is always dark.
+
 ## Testing
 
 `AuthenticatorUITests/AccessibilityAuditTests.swift` runs Xcode's accessibility audit
@@ -38,6 +46,8 @@ and details, the Ente sign in and account list, Configuration, About, the tutori
 the add account form. It runs with the screenshots (`tools/screenshots.sh`, and the Screenshots workflow in CI), see
 [screenshots.md](screenshots.md).
 
+- `testDarkAppearance` switches the simulator to dark mode and fails for text or icons without enough contrast, and
+  for clipped text. It switches back to light mode for the screenshots.
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
