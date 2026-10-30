@@ -129,7 +129,8 @@ private struct CountdownRing: View {
                 .trim(from: 0, to: CGFloat(secondsLeft) / CGFloat(max(1, period)))
                 .stroke(
                     isEnding ? Color.orange : Color.accentColor,
-                    style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: isEnding && differentiateWithoutColor ? [2, 4] : []))
+                    style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: isEnding && differentiateWithoutColor ? [2, 4] : [])
+                )
                 .rotationEffect(.degrees(-90))
         }
         .frame(width: size, height: size)
