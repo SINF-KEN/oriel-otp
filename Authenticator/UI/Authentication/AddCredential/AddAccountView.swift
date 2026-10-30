@@ -20,11 +20,12 @@ import YubiKit
 import Combine
 
 /// Where a new account is saved: on the YubiKey, in Ente Auth, or both.
-struct AccountDestinations: OptionSet {
+struct AccountDestinations: OptionSet, Hashable {
     let rawValue: Int
     static let yubiKey = AccountDestinations(rawValue: 1 << 0)
     /// The Ente Auth vault on this device, which uploads it to Ente.
     static let ente = AccountDestinations(rawValue: 1 << 1)
+    static let both: AccountDestinations = [.yubiKey, .ente]
 }
 
 struct AddAccountView: View {
@@ -32,8 +33,8 @@ struct AddAccountView: View {
     @Binding var showAddAccount: Bool
     /// The new account, whether it requires touch and where to save it.
     var accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, AccountDestinations), Never>
-    /// Whether the account goes to the YubiKey, optionally to Ente Auth too, or to Ente Auth only.
-    private let toYubiKey: Bool
+    /// Where the account can be saved: on the YubiKey if one can be reached, in Ente Auth while an account is saved.
+    private let availableDestinations: AccountDestinations
 
     private enum EntryMode {
         case scanning, manual, prefilled
@@ -67,16 +68,26 @@ struct AddAccountView: View {
     #if os(macOS)
     @State private var qrCodeError: QRCodeReader.ReadError?
     #endif
-    @AppStorage("EnteAuth.AddNewAccounts") private var addToEnte = false
+    /// The last choice of where to save, the default when both can be chosen.
+    @AppStorage("AddAccount.Destinations") private var lastDestinations = AccountDestinations.yubiKey.rawValue
+    @State private var chosenDestinations: AccountDestinations
     // Adding to Ente Auth goes through the vault of the saved account, so it is only offered when there is one.
     private let enteEmail = EnteCloud.shared.email
     @FocusState private var focusedField: Field?
 
     init(showAddCredential: Binding<Bool>, accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, AccountDestinations), Never>,
-         oathURL: URL?, toYubiKey: Bool = true) {
+         oathURL: URL?, destinations: AccountDestinations) {
         _showAddAccount = showAddCredential
         self.accountSubject = accountSubject
-        self.toYubiKey = toYubiKey
+        availableDestinations = destinations
+        let defaults = UserDefaults.standard
+        // Before the choice, a switch added accounts to Ente Auth as well as the YubiKey.
+        if defaults.bool(forKey: "EnteAuth.AddNewAccounts") {
+            defaults.set(AccountDestinations.both.rawValue, forKey: "AddAccount.Destinations")
+            defaults.removeObject(forKey: "EnteAuth.AddNewAccounts")
+        }
+        let last = AccountDestinations(rawValue: defaults.object(forKey: "AddAccount.Destinations") as? Int ?? AccountDestinations.yubiKey.rawValue)
+        _chosenDestinations = State(initialValue: last.isEmpty || !destinations.isSuperset(of: last) ? .yubiKey : last)
         let template = oathURL.flatMap { try? YubiKitOATHSession.CredentialTemplate(otpauthURL: $0) }
         _template = State(initialValue: template)
         #if os(iOS)
@@ -120,7 +131,7 @@ struct AddAccountView: View {
                                 .focused($focusedField, equals: .secret)
                         }
                     }
-                    if toYubiKey {
+                    if destinations.contains(.yubiKey) {
                         Toggle(String(localized: "Require touch", comment: "Add account toggle"), isOn: $requiresTouch)
                     }
                 } header: {
@@ -135,25 +146,7 @@ struct AddAccountView: View {
                     }
                 }
 
-                if toYubiKey {
-                    Section {
-                        Toggle(String(localized: "Also add to Ente Auth", comment: "Add account toggle"),
-                               isOn: enteEmail == nil ? .constant(false) : $addToEnte)
-                            .disabled(enteEmail == nil)
-                    } footer: {
-                        if let enteEmail {
-                            Text(String(localized: "Saves the account in Ente Auth for \(enteEmail) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.", comment: "Add account Ente Auth footer. The placeholder is an email address."))
-                        } else {
-                            Text(String(localized: "To use this, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on.", comment: "Add account Ente Auth footer without a saved Ente session"))
-                        }
-                    }
-                } else if let enteEmail {
-                    Section {
-                        Label(String(localized: "Stored in Ente Auth", comment: "Where an account is stored"), systemImage: "cloud")
-                    } footer: {
-                        Text(String(localized: "The account is saved in Ente Auth for \(enteEmail) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
-                    }
-                }
+                destinationSection
 
                 if mode == .manual {
                     Section {
@@ -239,8 +232,60 @@ struct AddAccountView: View {
     }
 
     private var title: String {
-        toYubiKey ? String(localized: "Add account", comment: "Add account navigation title")
-            : String(localized: "Add to Ente Auth", comment: "Add account navigation title when adding to Ente Auth only")
+        availableDestinations == .ente ? String(localized: "Add to Ente Auth", comment: "Add account navigation title when adding to Ente Auth only")
+            : String(localized: "Add account", comment: "Add account navigation title")
+    }
+
+    private var isHOTP: Bool {
+        if mode == .manual { return kind == .hotp }
+        if case .hotp = template?.type { return true }
+        return false
+    }
+
+    /// Where the account is saved. A HOTP account is saved in one place only, as each copy would count its codes on
+    /// its own and they would fall out of step.
+    private var destinations: AccountDestinations {
+        guard availableDestinations == .both else { return availableDestinations }
+        return isHOTP && chosenDestinations == .both ? .yubiKey : chosenDestinations
+    }
+
+    @ViewBuilder private var destinationSection: some View {
+        if availableDestinations == .both, let enteEmail {
+            Section {
+                Picker(String(localized: "Save to", comment: "Add account picker of where the account is saved"),
+                       selection: Binding(get: { destinations }, set: { chosenDestinations = $0 })) {
+                    Text(String(localized: "YubiKey", comment: "Add account destination")).tag(AccountDestinations.yubiKey)
+                    Text(String(localized: "Ente Auth", comment: "Add account destination")).tag(AccountDestinations.ente)
+                    if !isHOTP {
+                        Text(String(localized: "YubiKey and Ente Auth", comment: "Add account destination")).tag(AccountDestinations.both)
+                    }
+                }
+            } footer: {
+                switch destinations {
+                case .ente:
+                    Text(String(localized: "The account is saved in Ente Auth for \(enteEmail) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
+                case .both:
+                    Text(String(localized: "Saves the account in Ente Auth for \(enteEmail) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.", comment: "Add account Ente Auth footer. The placeholder is an email address."))
+                default:
+                    if isHOTP {
+                        Text(String(localized: "A HOTP account is saved in one place only, as each copy would count its codes on its own.", comment: "Add account footer for a HOTP account"))
+                    } else {
+                        Text(String(localized: "A YubiKey never gives its accounts back, so it can't be copied to Ente Auth later. Choose YubiKey and Ente Auth to keep it in both.", comment: "Add account footer when adding to the YubiKey only"))
+                    }
+                }
+            }
+        } else if availableDestinations == .ente, let enteEmail {
+            Section {
+                Label(String(localized: "Stored in Ente Auth", comment: "Where an account is stored"), systemImage: "cloud")
+            } footer: {
+                Text(String(localized: "The account is saved in Ente Auth for \(enteEmail) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
+            }
+        } else if enteEmail == nil {
+            Section {
+            } footer: {
+                Text(String(localized: "To save accounts in Ente Auth too, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on.", comment: "Add account footer without a saved Ente session"))
+            }
+        }
     }
 
     #if os(iOS)
@@ -335,15 +380,11 @@ struct AddAccountView: View {
             errorMessage = error.localizedDescription
             return
         }
-        let destinations: AccountDestinations
-        if !toYubiKey {
-            destinations = .ente
-        } else if addToEnte && enteEmail != nil {
-            destinations = [.yubiKey, .ente]
-        } else {
-            destinations = .yubiKey
+        let destinations = destinations
+        if availableDestinations == .both {
+            lastDestinations = chosenDestinations.rawValue
         }
-        accountSubject.send((credential, toYubiKey && requiresTouch, destinations))
+        accountSubject.send((credential, destinations.contains(.yubiKey) && requiresTouch, destinations))
         showAddAccount = false
     }
 }

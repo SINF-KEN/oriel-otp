@@ -141,6 +141,37 @@ import YubiKit
     func addCloudAccount(_ template: YubiKitOATHSession.CredentialTemplate) throws -> EnteCloud.AddResult {
         try cloud.add(template)
     }
+
+    enum CopyToYubiKeyResult {
+        case copied, moved
+        /// The YubiKey has an account with the same name. Nothing was changed, also not in Ente Auth.
+        case alreadyOnYubiKey
+    }
+
+    /// Whether the Ente Auth account can be copied to a YubiKey. It can't if a YubiKey can't store it. A HOTP account
+    /// can only be moved, as a copy would count codes on its own and fall out of step with Ente Auth's.
+    func canCopyToYubiKey(_ account: Account, moving: Bool) -> Bool {
+        guard case .ente(let id) = account.location, moving || account.credential.type != .hotp else { return false }
+        return cloud.yubiKeyTemplate(of: id) != nil
+    }
+
+    /// Puts an Ente Auth account on the YubiKey. Moving it also moves it to Ente's trash, once it is on the YubiKey.
+    /// The completion isn't called when the YubiKey couldn't be reached, which `handle(error:)` reports.
+    func copyToYubiKey(_ account: Account, moving: Bool, completion: @escaping (CopyToYubiKeyResult) -> Void) {
+        guard case .ente(let id) = account.location, let template = cloud.yubiKeyTemplate(of: id) else { return }
+        addAccounts([template], requiresTouch: false) { [weak self] result in
+            if let error = result.error {
+                self?.sessionError = error.isOATHStorageFull ? OATHSessionError.storageFull(notAdded: [template.displayName]) : error
+            } else if result.added.isEmpty {
+                completion(.alreadyOnYubiKey)
+            } else if moving {
+                self?.cloud.delete(id)
+                completion(.moved)
+            } else {
+                completion(.copied)
+            }
+        }
+    }
     
     /// Refresh requests arriving within 100 ms of each other are coalesced. A single request refreshes
     /// only that account, several requests refresh all accounts.

@@ -370,6 +370,11 @@ import YubiKit
         edit(id) { $0.isPinned = isPinned }
     }
 
+    /// The credential to put the account on a YubiKey with, nil if a YubiKey can't store it.
+    func yubiKeyTemplate(of id: String) -> YubiKitOATHSession.CredentialTemplate? {
+        vault?.items.first { $0.id == id }?.rawData.flatMap { EnteCodeParser.parse(id: id, rawData: $0)?.template }
+    }
+
     private func code(of id: String) -> EnteCloudCode? {
         vault?.items.first { $0.id == id }?.rawData.flatMap(EnteCloudCode.init(rawData:))
     }

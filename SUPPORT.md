@@ -42,9 +42,10 @@ made offline wait on the device and are uploaded at the next sync; a clock next 
 uploaded yet.
 
 **Copying accounts from the YubiKey to Ente.**
-A YubiKey never gives its secrets back, so accounts already on it can't be copied. Turn on **Also add to Ente Auth**
-when adding an account. It needs **Stay signed in** from **Sync from Ente Auth**. For accounts already on the key,
-set up two-factor authentication again in the service's settings with the toggle on.
+A YubiKey never gives its secrets back, so accounts already on it can't be copied. Choose **YubiKey and Ente Auth**
+under **Save to** when adding an account. It needs **Stay signed in** from **Sync from Ente Auth**. For accounts
+already on the key, set up two-factor authentication again in the service's settings and save it to both. The other
+way works at any time: **Copy to YubiKey** or **Move to YubiKey** on an Ente Auth account.
 
 **Another app can't use the certificate on my YubiKey.**
 Under **Configuration > Smart card extension**, add the certificate to the device and allow notifications. When an

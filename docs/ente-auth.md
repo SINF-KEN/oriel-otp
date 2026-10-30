@@ -61,12 +61,17 @@ adding stops and an alert names the accounts that weren't added.
 
 ## Adding to Ente Auth
 
-A YubiKey never gives its OATH secrets back, so an account that is already on a key can't be copied to Ente.
-The app only has the secret while an account is being added. Turn on **Also add to Ente Auth** in the *Add account*
-sheet to save the account in Ente Auth as well. The choice is remembered.
+The *Add account* sheet has a **Save to** choice: **YubiKey**, **Ente Auth** or **YubiKey and Ente Auth**
+(`AccountDestinations`). It is offered when a YubiKey can be reached (NFC, or one plugged in) and you have signed in
+with **Stay signed in**. The last choice is remembered (`AddAccount.Destinations`; the earlier *Also add to Ente Auth*
+switch is carried over). Without a YubiKey to reach, the add button saves to Ente Auth; signed out, to the YubiKey.
 
-This goes through the [vault](#ente-auth-accounts-in-the-app), so it is offered once you have signed in with
-**Stay signed in**. After the account is on the YubiKey:
+A YubiKey never gives its OATH secrets back, so an account that is already on a key can't be copied to Ente. The app
+only has the secret while an account is being added, and the sheet says so when only the YubiKey is chosen. The
+account details of a YubiKey account say it too.
+
+Adding to Ente Auth goes through the [vault](#ente-auth-accounts-in-the-app). After the account is on the YubiKey (when
+it goes to both):
 
 1. If the vault has an account with the same name, nothing is added.
 2. The otpauth URL is JSON encoded like Ente's apps do and added to the vault, and the list shows it right away.
@@ -76,15 +81,25 @@ This goes through the [vault](#ente-auth-accounts-in-the-app), so it is offered 
 
 The secret uploaded may not be byte for byte the one in the QR code: YubiKit pads secrets shorter than 14 bytes
 with zeros and hashes ones longer than the HMAC block. HMAC does the same to its key, so the codes are identical.
-Steam accounts are added with Ente's `steam` type. A HOTP account added to both keeps two counters, which drift
-apart as each side is used.
+Steam accounts are added with Ente's `steam` type. A HOTP account is saved in one place only: two copies would keep
+two counters, which drift apart as each side is used, so *YubiKey and Ente Auth* isn't offered for it.
 
 If the YubiKey part fails, nothing is added to Ente.
 
-When no YubiKey can be reached (a Mac or iPad without one plugged in) the add button adds to Ente Auth only, and on
-iPhone **Add to Ente Auth** in the menu does the same. Choosing the YubiKey, Ente Auth or both on the add screen is
-[#46](https://github.com/SINF-KEN/oriel-otp/issues/46); the add sheet already passes where an account goes as
-`AccountDestinations`.
+## Copying or moving to the YubiKey
+
+An Ente Auth account can be put on the YubiKey at any time, from the account details, the row's context menu or, on
+the Mac, the Account menu:
+
+- **Copy to YubiKey** adds it to the YubiKey and keeps it in Ente Auth. It isn't offered for HOTP accounts, for the
+  same reason as above.
+- **Move to YubiKey** adds it to the YubiKey, then moves it to Ente's trash, like deleting it does, so Ente Auth can
+  still restore it.
+
+The credential is made the same way as **Sync from Ente Auth** makes it (`EnteCodeParser`), without requiring touch.
+Accounts the YubiKey can't store, such as ones with 10 digits, offer neither. If the YubiKey already has an account
+with the same name, nothing is changed in either place. If the YubiKey is full, an alert says so and the account stays
+in Ente Auth. The actions need a YubiKey to reach: NFC on iPhone, or one plugged in.
 
 ## Ente Auth accounts in the app
 

@@ -425,6 +425,35 @@ struct EnteVaultTests {
         #expect(cloud.hasPendingChanges)
     }
 
+    @Test func offersCopyingToTheYubiKeyWhenItCanStoreTheAccount() throws {
+        let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&algorithm=SHA256&digits=8&period=60",
+                                     "otpauth://hotp/VPN:alice?secret=JBSWY3DPEHPK3PXP&counter=5",
+                                     "otpauth://steam/Steam:alice?secret=JBSWY3DPEHPK3PXP",
+                                     "otpauth://totp/Long:alice?secret=JBSWY3DPEHPK3PXP&digits=10"])
+        let model = MainViewModel(cloud: cloud)
+        func account(_ title: String) throws -> Account { try #require(model.cloudAccounts.first { $0.title == title }) }
+
+        let github = try account("GitHub")
+        #expect(model.canCopyToYubiKey(github, moving: false))
+        #expect(model.canCopyToYubiKey(github, moving: true))
+        guard case .ente(let id) = github.location else { Issue.record("Not in Ente Auth"); return }
+        let template = try #require(cloud.yubiKeyTemplate(of: id))
+        #expect((template.issuer, template.name, template.digits) == ("GitHub", "alice", 8))
+        #expect(template.algorithm == .sha256)
+        #expect(template.type.period == 60)
+
+        // A copy of a HOTP account would count codes on its own, so it can only be moved.
+        let vpn = try account("VPN")
+        #expect(!model.canCopyToYubiKey(vpn, moving: false))
+        #expect(model.canCopyToYubiKey(vpn, moving: true))
+
+        // Steam codes are kept as a TOTP account named Steam, like the sync from Ente Auth does.
+        #expect(model.canCopyToYubiKey(try account("Steam"), moving: false))
+
+        // A YubiKey can't store 10 digits.
+        #expect(!model.canCopyToYubiKey(try account("Long"), moving: true))
+    }
+
     @Test func sortsTheAccountsByName() throws {
         let cloud = try cloud(with: ["otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP"])
         let model = MainViewModel(cloud: cloud)

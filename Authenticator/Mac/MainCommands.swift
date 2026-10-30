@@ -31,6 +31,8 @@ struct MainWindowMenuState: Equatable {
     var selectionCount = 0
     var isSelectionPinned = false
     var canRename = false
+    var canCopyToYubiKey = false
+    var canMoveToYubiKey = false
 }
 
 extension FocusedValues {
@@ -42,7 +44,7 @@ extension FocusedValues {
     static let shared = MainWindowCommands()
 
     enum Command: Equatable {
-        case addAccount, syncFromEnte, refresh, search, copyCode, togglePin, rename, delete
+        case addAccount, syncFromEnte, refresh, search, copyCode, togglePin, rename, copyToYubiKey, moveToYubiKey, delete
     }
 
     var pending: Command?
@@ -127,6 +129,14 @@ struct MainCommands: Commands {
                 commands.send(.rename)
             }
             .disabled(state?.canRename != true)
+            Button(String(localized: "Copy to YubiKey", comment: "Mac Account menu")) {
+                commands.send(.copyToYubiKey)
+            }
+            .disabled(state?.canCopyToYubiKey != true)
+            Button(String(localized: "Move to YubiKey", comment: "Mac Account menu")) {
+                commands.send(.moveToYubiKey)
+            }
+            .disabled(state?.canMoveToYubiKey != true)
             Divider()
             Button(selectionCount > 1 ? String(localized: "Delete Accounts…", comment: "Mac Account menu") : String(localized: "Delete…", comment: "Mac Account menu")) {
                 if isEditingText {
