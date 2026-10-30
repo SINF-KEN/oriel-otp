@@ -29,7 +29,9 @@ struct AccountRowView<Accessory: View>: View {
     /// Called when the code is tapped. Without it the code isn't tappable and a tap opens the row.
     private let copyCode: (() -> Void)?
 
-    @State private var pillOpacity: Double
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    /// An expired or not yet calculated code is dimmed, but not so much that it can't be read.
+    @State private var isDimmed: Bool
 
     @State private var animate: Bool = true
 
@@ -56,11 +58,7 @@ struct AccountRowView<Accessory: View>: View {
         self.showsLocation = showsLocation
         self.copyCode = copyCode
         self.accessory = accessory()
-        if account.state == .expired || account.otp == nil {
-            self.pillOpacity = 0.5
-        } else {
-            self.pillOpacity = 1.0
-        }
+        self.isDimmed = account.state == .expired || account.otp == nil
     }
 
     // At accessibility sizes the code goes below the name, so neither has to shrink or truncate to share one line.
@@ -87,7 +85,7 @@ struct AccountRowView<Accessory: View>: View {
                         if showsLocation {
                             AccountLocationIcon(account: account)
                                 .font(subtitleFont)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(secondaryStyle)
                         }
                     }
                     account.subTitle.map {
@@ -96,7 +94,7 @@ struct AccountRowView<Accessory: View>: View {
                             .lineLimit(isStacked ? 3 : 1)
                             .minimumScaleFactor(0.9)
                             .truncationMode(.tail)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(secondaryStyle)
                     }
                 }
             }
@@ -125,11 +123,7 @@ struct AccountRowView<Accessory: View>: View {
             // Not sure why we have to schedule this in the next runloop
             Task {
                 withAnimation {
-                    if state == .expired || account.otp == nil {
-                        pillOpacity = 0.5
-                    } else {
-                        pillOpacity = 1.0
-                    }
+                    isDimmed = state == .expired || account.otp == nil
                 }
             }
         }
@@ -139,6 +133,12 @@ struct AccountRowView<Accessory: View>: View {
         .onDisappear {
             animate = false
         }
+    }
+
+    // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
+    // Increase Contrast the way the system's label colors do, so the primary one is used then.
+    private var secondaryStyle: HierarchicalShapeStyle {
+        colorSchemeContrast == .increased ? .primary : .secondary
     }
 
     private var accessibilityValue: String {
@@ -151,6 +151,8 @@ struct AccountRowView<Accessory: View>: View {
             case .requiresCalculation, .expired:
                 Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
                     .font(.system(size: account.requiresTouch ? statusSize * 18 / 22 : statusSize))
+                    // In the code's color, as the pill is dimmed while it shows.
+                    .foregroundStyle(HierarchicalShapeStyle.primary)
                     .frame(width: statusSize, height: statusSize)
                     .padding(1)
                     .accessibilityHidden(true)
@@ -162,6 +164,7 @@ struct AccountRowView<Accessory: View>: View {
                     .padding(1)
                     .accessibilityHidden(true)
             }
+            // The code in the full color, the ring and outline lighter. The dimmed code still has a contrast of 4.5:1.
             ZStack {
                 if let otp = account.formattedCode {
                     Text(otp)
@@ -176,8 +179,10 @@ struct AccountRowView<Accessory: View>: View {
                 Text("888 888") // reserves the code width so the pill doesn't resize
                     .foregroundStyle(.clear)
                     .padding(.trailing, 4)
+                    .accessibilityHidden(true)
             }
             .font(codeFont)
+            .foregroundStyle(HierarchicalShapeStyle.primary)
         }
         .padding(.all, 4)
         .fixedSize() // keep the code on one line in a narrow sidebar; the title truncates instead
@@ -190,7 +195,12 @@ struct AccountRowView<Accessory: View>: View {
         .contentShape(Capsule())
         .accessibilityElement()
         .accessibilityLabel(account.spokenCode)
-        .opacity(pillOpacity)
+        .opacity(isDimmed ? dimmedOpacity : 1)
+    }
+
+    // Not dimmed at all with Increase Contrast; the symbol before the code still says it's expired.
+    private var dimmedOpacity: Double {
+        colorSchemeContrast == .increased ? 1 : 0.7
     }
 }
 

@@ -448,8 +448,10 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
             UIView.animate(withDuration: 0.7) {
                 self.permissionView.alpha = 1
                 self.errorOverlay?.alpha = 1
-                self.textLabel.textColor = .darkGray
+                // Without a camera there's nothing to point.
+                self.textLabel.alpha = 0
             }
+            textLabel.isAccessibilityElement = false
         }
     }
     

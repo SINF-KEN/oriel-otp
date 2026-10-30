@@ -42,7 +42,8 @@ struct VersionHistoryView: View {
                         .font(.body)
                 }
                 .frame(maxWidth: .infinity)
-                .listRowBackground(Color(.sheetBackground))
+                // On the list's own background, so it stands as a header.
+                .listRowBackground(Color.clear)
             }
             Section {
                 ForEach(VersionHistoryView.changes) { change in

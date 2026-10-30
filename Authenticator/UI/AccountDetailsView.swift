@@ -27,6 +27,7 @@ struct AccountDetailView: View {
     let account: Account
     let onDelete: () -> Void
 
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
 
@@ -85,7 +86,8 @@ struct AccountDetailView: View {
                         .monospacedDigit()
                         .lineLimit(1)
                         .minimumScaleFactor(0.4)
-                        .opacity(account.state == .expired ? 0.4 : 1.0)
+                        // Not dimmed with Increase Contrast; the symbol before it still says it's expired.
+                        .opacity(account.state == .expired && colorSchemeContrast != .increased ? 0.4 : 1.0)
                 }
                 .foregroundStyle(codeColor)
                 .padding(.vertical, 12)
