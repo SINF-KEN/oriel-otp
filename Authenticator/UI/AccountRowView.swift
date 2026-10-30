@@ -26,6 +26,8 @@ struct AccountRowView<Accessory: View>: View {
     private let showsLocation: Bool
     // Shown before the code, e.g. buttons on the Mac while the pointer is over the row.
     private let accessory: Accessory
+    /// Called when the code is tapped. Without it the code isn't tappable and a tap opens the row.
+    private let copyCode: (() -> Void)?
 
     @State private var pillOpacity: Double
 
@@ -49,9 +51,10 @@ struct AccountRowView<Accessory: View>: View {
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
     
-    init(account: Account, showsLocation: Bool = false, @ViewBuilder accessory: () -> Accessory) {
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, @ViewBuilder accessory: () -> Accessory) {
         self.account = account
         self.showsLocation = showsLocation
+        self.copyCode = copyCode
         self.accessory = accessory()
         if account.state == .expired || account.otp == nil {
             self.pillOpacity = 0.5
@@ -101,7 +104,14 @@ struct AccountRowView<Accessory: View>: View {
                 Spacer()
             }
             accessory
-            codePill
+            if let copyCode {
+                // Borderless so the list gives the tap to the code instead of opening the account.
+                Button(action: copyCode) { codePill }
+                    .buttonStyle(.borderless)
+                    .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+            } else {
+                codePill
+            }
         }
         .contentShape(Rectangle())
         .onChange(of: account.state) { _, state in
@@ -165,7 +175,8 @@ struct AccountRowView<Accessory: View>: View {
             Capsule()
                 .stroke(pillColor, lineWidth: 1)
         }
-        // Not a button: copying is one of the row's actions, in its context menu and swipe actions.
+        // Tapping the code copies it; copying is also in the row's context menu and swipe actions.
+        .contentShape(Capsule())
         .accessibilityElement()
         .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
         .opacity(pillOpacity)
@@ -173,8 +184,8 @@ struct AccountRowView<Accessory: View>: View {
 }
 
 extension AccountRowView where Accessory == EmptyView {
-    init(account: Account, showsLocation: Bool = false) {
-        self.init(account: account, showsLocation: showsLocation) { EmptyView() }
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil) {
+        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode) { EmptyView() }
     }
 }
 
