@@ -84,7 +84,7 @@ nonisolated struct EnteAuthenticatorEntity: Decodable, Sendable, Equatable {
 
 // MARK: - Client
 
-/// The few endpoints of Ente's API needed to sign in, read authenticator codes and add new ones.
+/// The few endpoints of Ente's API needed to sign in and to read, add, change and delete authenticator codes.
 nonisolated struct EnteAPIClient: Sendable {
 
     static let defaultServer = URL(string: "https://api.ente.io")!
@@ -175,9 +175,21 @@ nonisolated struct EnteAPIClient: Sendable {
         return response.diff
     }
 
-    func createAuthenticatorEntity(token: String, encryptedData: String, header: String) async throws {
-        let _: Empty = try await send("POST", "/authenticator/entity", token: token,
-                                      body: ["encryptedData": encryptedData, "header": header])
+    /// Returns the new entity, with the id and time the server gave it.
+    @discardableResult
+    func createAuthenticatorEntity(token: String, encryptedData: String, header: String) async throws -> EnteAuthenticatorEntity {
+        try await send("POST", "/authenticator/entity", token: token, body: ["encryptedData": encryptedData, "header": header])
+    }
+
+    /// Replaces the data of an entity. Ente's server answers without the entity, its new time comes with the next diff.
+    func updateAuthenticatorEntity(token: String, id: String, encryptedData: String, header: String) async throws {
+        let _: Empty = try await send("PUT", "/authenticator/entity", token: token,
+                                      body: ["id": id, "encryptedData": encryptedData, "header": header])
+    }
+
+    /// Deletes an entity for good. Other devices see it in the diff with `isDeleted` set.
+    func deleteAuthenticatorEntity(token: String, id: String) async throws {
+        let _: Empty = try await send("DELETE", "/authenticator/entity", token: token, query: ["id": id])
     }
 
     // MARK: - Transport

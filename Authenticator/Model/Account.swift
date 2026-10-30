@@ -19,11 +19,18 @@ import SwiftUI
 import YubiKit
 
 @Observable class Account {
-    
+
     enum AccountState: Equatable {
         case requiresCalculation
         case countingdown(Double)
         case expired
+    }
+
+    /// Where the account is stored and its codes are calculated.
+    enum Location: Equatable {
+        case yubiKey
+        /// In the Ente Auth vault on this device, with the id of the vault item. Its codes are calculated by the app.
+        case ente(id: String)
     }
 
     var otp: OATHSession.OTP?
@@ -39,8 +46,17 @@ import YubiKit
     @ObservationIgnored var onPinnedChange: ((Account) -> Void)?
     
     var id = UUID()
-    var accountId: String { credential.id }
+    /// Identifies the account in the list. An account can be on the YubiKey and in Ente Auth with the same name.
+    var accountId: String {
+        switch location {
+        case .yubiKey: credential.id
+        case .ente(let id): "ente/" + id
+        }
+    }
     var credential: OATHSession.Credential
+    let location: Location
+    /// An Ente Auth account changed here that hasn't been uploaded yet.
+    var isPendingSync = false
     var keyVersion: Version
     var color: Color = .red
     var enableRefresh: Bool = true
@@ -49,9 +65,10 @@ import YubiKit
     @ObservationIgnored private var connectionType: OATHSession.ConnectionType
     @ObservationIgnored private var calculateCompletion: ((OATHSession.OTP) -> ())? = nil
     
-    init(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, requestRefresh: @escaping (Account) -> Void, connectionType: OATHSession.ConnectionType, isPinned: Bool) {
+    init(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, requestRefresh: @escaping (Account) -> Void, connectionType: OATHSession.ConnectionType, isPinned: Bool, location: Location = .yubiKey) {
 
         self.credential = credential
+        self.location = location
         title = credential.title
         subTitle = credential.subTitle
         self.isPinned = isPinned
@@ -75,6 +92,11 @@ import YubiKit
         requestRefresh(self)
     }
     
+    var isInEnte: Bool { location != .yubiKey }
+
+    /// Renaming on a YubiKey needs firmware 5.3 or later.
+    var canRename: Bool { isInEnte || keyVersion >= Version("5.3.0")! }
+
     func updateTitles() {
         title = credential.title
         subTitle = credential.subTitle
@@ -165,8 +187,10 @@ extension Account: Comparable {
         return lhs.accountId.lowercased() == rhs.accountId.lowercased()
     }
 
+    /// By name, the YubiKey's account first when the same name is in Ente Auth too.
     static func < (lhs: Account, rhs: Account) -> Bool {
-        return lhs.accountId.lowercased() < rhs.accountId.lowercased()
+        return (lhs.credential.id.lowercased(), lhs.isInEnte ? 1 : 0, lhs.accountId.lowercased())
+            < (rhs.credential.id.lowercased(), rhs.isInEnte ? 1 : 0, rhs.accountId.lowercased())
     }
 }
 

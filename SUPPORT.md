@@ -33,7 +33,13 @@ the codes; you can choose to save it on this device.
 **Ente sync doesn't add some accounts.**
 Accounts in Ente's trash are left out, and accounts with the same name as one already on the YubiKey are skipped.
 Accounts the app can't read are listed with the reason. See [Syncing accounts from Ente Auth](docs/ente-auth.md)
-for details. The sync never changes anything in Ente.
+for details. Copying onto the YubiKey doesn't change anything in Ente. Accounts you add, rename, pin or delete
+in the app's list while signed in are changed in Ente Auth too.
+
+**An Ente Auth account change was undone.**
+If the same account was changed on another device before this one synced, the other device's change wins. Changes
+made offline wait on the device and are uploaded at the next sync; a clock next to the account means it hasn't been
+uploaded yet.
 
 **Copying accounts from the YubiKey to Ente.**
 A YubiKey never gives its secrets back, so accounts already on it can't be copied. Turn on **Also add to Ente Auth**

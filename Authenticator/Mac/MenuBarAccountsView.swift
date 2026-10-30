@@ -35,7 +35,7 @@ struct MenuBarAccountsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if !model.accountsLoaded {
+            if !model.hasAccounts {
                 Label(model.isKeyPluggedIn ? String(localized: "Reading YubiKey…", comment: "Mac menu bar") : String(localized: "Insert YubiKey"),
                       image: "securitykey")
                     .foregroundStyle(.secondary)

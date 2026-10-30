@@ -143,7 +143,8 @@ enum EnteAuthenticatorSyncError: Error, LocalizedError {
     }
 }
 
-/// Reads the accounts stored in Ente Auth and adds new ones. Nothing is ever changed or deleted on Ente's server.
+/// Reads the accounts stored in Ente Auth, and encrypts and decrypts them. The vault (`EnteVault`) uses it to keep a
+/// copy on the device and to write changes back.
 nonisolated enum EnteAuthenticatorSync {
 
     static let pageSize = 500
@@ -195,20 +196,35 @@ nonisolated enum EnteAuthenticatorSync {
 
     /// Returns the decrypted data of each entity, nil for an entity that couldn't be decrypted.
     @concurrent static func decryptedEntities(api: EnteAPIClient, token: String, authenticatorKey: Data) async throws -> [(id: String, rawData: String?)] {
-        try await allEntities(api: api, token: token).map { entity in
-            guard let encryptedData = entity.encryptedData.flatMap({ Data(enteBase64: $0) }),
-                  let header = entity.header.flatMap({ Data(enteBase64: $0) }),
-                  let decrypted = try? EnteCrypto.secretStreamDecrypt(encryptedData, header: header, key: authenticatorKey) else {
-                return (entity.id, nil)
-            }
-            return (entity.id, String(data: decrypted, encoding: .utf8))
+        try await allEntities(api: api, token: token).map { ($0.id, decrypt($0, authenticatorKey: authenticatorKey)) }
+    }
+
+    /// The plain text of an entity, nil if it is deleted or couldn't be decrypted.
+    static func decrypt(_ entity: EnteAuthenticatorEntity, authenticatorKey: Data) -> String? {
+        guard let encryptedData = entity.encryptedData.flatMap({ Data(enteBase64: $0) }),
+              let header = entity.header.flatMap({ Data(enteBase64: $0) }),
+              let decrypted = try? EnteCrypto.secretStreamDecrypt(encryptedData, header: header, key: authenticatorKey) else {
+            return nil
         }
+        return String(data: decrypted, encoding: .utf8)
+    }
+
+    /// Encrypts the plain text of an entity, returning the cipher text and header the way the API takes them.
+    static func encrypt(_ rawData: String, authenticatorKey: Data) throws -> (encryptedData: String, header: String) {
+        let (header, cipherText) = try EnteCrypto.secretStreamEncrypt(Data(rawData.utf8), key: authenticatorKey)
+        return (cipherText.base64EncodedString(), header.base64EncodedString())
     }
 
     /// Pages through the diff from the beginning and keeps the latest version of each entity.
     static func allEntities(api: EnteAPIClient, token: String) async throws -> [EnteAuthenticatorEntity] {
+        try await changes(api: api, token: token, since: 0).entities.filter { !$0.isDeleted }
+    }
+
+    /// Pages through the diff from `sinceTime` and keeps the latest version of each entity that changed, deleted
+    /// ones included. Returns them with the time to ask from next time, which is `sinceTime` if nothing changed.
+    static func changes(api: EnteAPIClient, token: String, since sinceTime: Int64) async throws -> (entities: [EnteAuthenticatorEntity], latest: Int64) {
         var latest = [String: EnteAuthenticatorEntity]()
-        var sinceTime: Int64 = 0
+        var sinceTime = sinceTime
         while true {
             let page = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: pageSize) }
             for entity in page where entity.updatedAt >= latest[entity.id]?.updatedAt ?? .min {
@@ -216,34 +232,16 @@ nonisolated enum EnteAuthenticatorSync {
             }
             let maxUpdatedAt = page.map(\.updatedAt).max() ?? sinceTime
             // Stop on a short page, and if the server doesn't move forward so a misbehaving server can't loop forever.
-            guard page.count == pageSize, maxUpdatedAt > sinceTime else { break }
+            guard page.count == pageSize, maxUpdatedAt > sinceTime else {
+                sinceTime = max(sinceTime, maxUpdatedAt)
+                break
+            }
             sinceTime = maxUpdatedAt
         }
-        return latest.values.filter { !$0.isDeleted }
+        return (Array(latest.values), sinceTime)
     }
 
-    enum AddResult: Equatable {
-        case added
-        case alreadyPresent
-    }
-
-    /// Encrypts the account with the authenticator key and adds it to Ente Auth, unless Ente already has an
-    /// account with the same name.
-    @MainActor static func add(_ template: YubiKitOATHSession.CredentialTemplate, api: EnteAPIClient, token: String,
-                               authenticatorKey: Data) async throws -> AddResult {
-        let existing = try await codes(api: api, token: token, authenticatorKey: authenticatorKey)
-        let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
-                                                period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
-        guard !existing.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
-        let (header, encryptedData) = try EnteCrypto.secretStreamEncrypt(try EnteCodeExporter.rawData(for: template), key: authenticatorKey)
-        try await signedIn {
-            try await api.createAuthenticatorEntity(token: token, encryptedData: encryptedData.base64EncodedString(),
-                                                    header: header.base64EncodedString())
-        }
-        return .added
-    }
-
-    private static func signedIn<T>(_ operation: () async throws -> T) async throws -> T {
+    static func signedIn<T>(_ operation: () async throws -> T) async throws -> T {
         do {
             return try await operation()
         } catch EnteAPIError.http(statusCode: 401) {

@@ -31,6 +31,9 @@ import SwiftUI
 /// The accounts cover the cases the sync handles: an account that is also on the demo YubiKey, a Steam account, a '#'
 /// in a name, Ente's export format, one in Ente's trash, a deleted one and one the YubiKey can't store.
 ///
+/// Entities can be added, changed and deleted like on Ente's server. Each change gets a later `updatedAt`, and the
+/// diff returns the entities changed after `sinceTime`, oldest first, so the app's incremental sync can be tried.
+///
 /// Each `*.new.ente.test` host is an account of its own that has never used Ente Auth: it has no authenticator key
 /// and no accounts until the app creates the key.
 nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
@@ -114,7 +117,10 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     private let encryptedToken: String
     private let token: String
     private var authenticatorKey: [String: Any]?
-    private let entities: [[String: Any]]
+    /// The rows of the entity table, like Ente's server keeps them: deleted entities stay, without their data.
+    private var entities: [[String: Any]]
+    /// The `updatedAt` of the latest change, so every change is later than all before it.
+    private var clock: Int64 = 0
 
     var hasAuthenticatorKey: Bool {
         lock.withLock { authenticatorKey != nil }
@@ -150,6 +156,7 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         authenticatorKey = ["encryptedKey": encryptedAuthenticatorKey.cipherText.base64EncodedString(),
                             "header": encryptedAuthenticatorKey.nonce.base64EncodedString()]
         entities = Self.demoEntities(key: key)
+        clock = entities.map(Self.updatedAt).max() ?? 0
     }
 
     func respond(to request: URLRequest) -> (Int, Any) {
@@ -204,14 +211,52 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             return (200, [:])
         case ("GET", "/authenticator/entity/diff"):
             guard authorized else { return (401, [:]) }
-            let sinceTime = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?
-                .queryItems?.first { $0.name == "sinceTime" }?.value.flatMap(Int64.init) ?? 0
-            return (200, ["diff": sinceTime == 0 ? entities : [], "timestamp": 1_000_000])
+            let query = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems ?? []
+            let sinceTime = query.first { $0.name == "sinceTime" }?.value.flatMap(Int64.init) ?? 0
+            let limit = query.first { $0.name == "limit" }?.value.flatMap(Int.init) ?? 500
+            let diff = entities.filter { Self.updatedAt($0) > sinceTime }.sorted { Self.updatedAt($0) < Self.updatedAt($1) }
+            return (200, ["diff": Array(diff.prefix(limit))])
+        case ("POST", "/authenticator/entity"):
+            guard authorized else { return (401, [:]) }
+            guard let encryptedData = body["encryptedData"] as? String, let header = body["header"] as? String else { return (400, [:]) }
+            let entity = row(UUID().uuidString.lowercased(), encryptedData: encryptedData, header: header)
+            entities.append(entity)
+            return (200, entity)
+        case ("PUT", "/authenticator/entity"):
+            guard authorized else { return (401, [:]) }
+            guard let id = body["id"] as? String, let encryptedData = body["encryptedData"] as? String,
+                  let header = body["header"] as? String else { return (400, [:]) }
+            guard entities.contains(where: { $0["id"] as? String == id && $0["isDeleted"] as? Bool == false }) else { return (404, [:]) }
+            entities.removeAll { $0["id"] as? String == id }
+            entities.append(row(id, encryptedData: encryptedData, header: header))
+            return (200, [:])
+        case ("DELETE", "/authenticator/entity"):
+            guard authorized else { return (401, [:]) }
+            let id = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?
+                .queryItems?.first { $0.name == "id" }?.value ?? ""
+            guard entities.contains(where: { $0["id"] as? String == id && $0["isDeleted"] as? Bool == false }) else { return (404, [:]) }
+            entities.removeAll { $0["id"] as? String == id }
+            entities.append(row(id, encryptedData: nil, header: nil))
+            return (200, [:])
         case ("POST", "/users/logout"):
             return (200, [:])
         default:
             return (404, [:])
         }
+    }
+
+    private static func updatedAt(_ entity: [String: Any]) -> Int64 {
+        (entity["updatedAt"] as? NSNumber)?.int64Value ?? 0
+    }
+
+    /// A new version of an entity, later than every other. Deleted entities have no data.
+    private func row(_ id: String, encryptedData: String?, header: String?) -> [String: Any] {
+        clock += 1
+        let updatedAt = clock
+        var entity: [String: Any] = ["id": id, "isDeleted": encryptedData == nil, "createdAt": updatedAt, "updatedAt": updatedAt]
+        entity["encryptedData"] = encryptedData
+        entity["header"] = header
+        return entity
     }
 
     /// Whether the email has a tag like "+2fa" before the "@".

@@ -166,7 +166,18 @@ final class OATHSession: Sendable {
         var isSteam: Bool {
             type == .totp && issuer?.lowercased() == "steam"
         }
-        fileprivate let yubiKitCredential: YubiKitOATHSession.Credential
+        /// Nil for an account that isn't on a YubiKey.
+        fileprivate let yubiKitCredential: YubiKitOATHSession.Credential?
+
+        /// An account that isn't on a YubiKey, e.g. one in the Ente Auth vault.
+        init(type: CredentialType, issuer: String?, accountName: String, period: UInt) {
+            self.type = type
+            self.issuer = issuer
+            self.accountName = accountName
+            self.period = type == .totp ? period : 0
+            self.requiresTouch = false
+            self.yubiKitCredential = nil
+        }
 
         fileprivate init(yubiKitCredential: YubiKitOATHSession.Credential, requiresTouch: Bool? = nil) {
             switch yubiKitCredential.type {
@@ -284,14 +295,19 @@ final class OATHSession: Sendable {
         return result
     }
 
+    private func yubiKitCredential(of credential: Credential) throws -> YubiKitOATHSession.Credential {
+        guard let yubiKitCredential = credential.yubiKitCredential else { throw OATHSessionError.credentialNotFound }
+        return yubiKitCredential
+    }
+
     func deleteCredential(_ credential: Credential) async throws {
-        try await session.deleteCredential(credential.yubiKitCredential)
+        try await session.deleteCredential(try yubiKitCredential(of: credential))
     }
 
     /// Renames the credential and returns it with its new name.
     func renameCredential(_ credential: Credential, issuer: String, accountName: String) async throws -> Credential {
         let newIssuer = issuer.isEmpty ? nil : issuer
-        try await session.renameCredential(credential.yubiKitCredential, newName: accountName, newIssuer: newIssuer)
+        try await session.renameCredential(try yubiKitCredential(of: credential), newName: accountName, newIssuer: newIssuer)
         let key = OATHCredentialId.key(accountName: accountName, issuer: newIssuer, period: credential.period, isTOTP: credential.type == .totp)
         guard let renamed = try await session.listCredentials().first(where: { $0.id == Data(key.utf8) }) else {
             throw OATHSessionError.credentialNotFound
@@ -309,10 +325,10 @@ final class OATHSession: Sendable {
 
     func calculate(credential: Credential, timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> OTP {
         if credential.isSteam {
-            let (code, validity) = try await session.calculateSteamTOTP(credential: credential.yubiKitCredential)
+            let (code, validity) = try await session.calculateSteamTOTP(credential: try yubiKitCredential(of: credential))
             return OTP(code: code, validity: validity)
         } else {
-            return try await session.calculateCredentialCode(for: credential.yubiKitCredential, timestamp: timestamp).otp
+            return try await session.calculateCredentialCode(for: try yubiKitCredential(of: credential), timestamp: timestamp).otp
         }
     }
 
