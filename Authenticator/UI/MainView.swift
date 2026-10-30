@@ -23,6 +23,7 @@ struct MainView: View {
     
     @Environment(\.scenePhase) var scenePhase
     @Environment(\.accessibilityVoiceOverEnabled) var isVoiceOverEnabled
+    @Environment(\.textScale) private var textScale
     @Environment(ToastPresenter.self) var toastPresenter
     @Environment(NotificationsViewModel.self) var notificationsViewModel
     
@@ -55,7 +56,7 @@ struct MainView: View {
     @State var accountsToDelete: [Account] = []
     @State var accountToRename: Account?
     @State var quickActions = QuickActionCenter.shared
-    @ScaledMetric(relativeTo: .largeTitle) private var placeholderSize: CGFloat = 64
+    @ScaledSize(relativeTo: .largeTitle) private var placeholderSize: CGFloat = 64
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
     var insertYubiKeyMessage: String {
@@ -235,6 +236,8 @@ struct MainView: View {
         return NavigationSplitView {
             accountList
             #if os(macOS)
+            // Here rather than for the whole window, so the search field keeps the system's size.
+            .scaledBodyFont()
             .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
             .searchFocusedIfAvailable($isSearchFocused)
             // Return copies the selected account's code, Delete deletes the selected accounts.
@@ -266,13 +269,14 @@ struct MainView: View {
             #else
             .navigationTitle(model.hasAccounts ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
             #endif
-            .navigationSplitViewColumnWidth(min: 320, ideal: 360)
+            .navigationSplitViewColumnWidth(min: 320 * textScale, ideal: 360 * textScale)
         } detail: {
             if let selectedAccount {
                 AccountDetailView(account: selectedAccount) {
                     selectedAccountID = nil
                 }
                 .id(selectedAccount.accountId)
+                .scaledBodyFont()
             } else {
                 Image(systemName: "person.crop.circle")
                     .font(.system(size: placeholderSize))
@@ -297,6 +301,7 @@ struct MainView: View {
         }
         .sheet(isPresented: $showAddAccount) {
             AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL, destinations: addAccountDestinations)
+                .scaledBodyFont()
                 .appLockCover()
         }
         .sheet(isPresented: $showEnteSync) {
@@ -305,6 +310,7 @@ struct MainView: View {
                          canAddToYubiKey: DeviceCapabilities.supportsNFC || model.isKeyPluggedIn) { templates, requiresTouch in
                 importAccounts(templates, requiresTouch: requiresTouch)
             }
+            .scaledBodyFont()
             .appLockCover()
         }
         // Sheets rather than full-screen covers, so they read as a task on top of the account list and can be swiped away.
@@ -315,11 +321,13 @@ struct MainView: View {
                 }.onDisappear {
                     model.start()
                 }
+                .scaledBodyFont()
                 .appLockCover()
         }
         // Rename from the Mac's menu bar, or from a row's VoiceOver actions.
         .sheet(item: $accountToRename) { account in
             EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
+                .scaledBodyFont()
                 .appLockCover()
         }
         .sheet(isPresented: $showAbout) {
@@ -329,6 +337,7 @@ struct MainView: View {
                 }.onDisappear {
                     model.start()
                 }
+                .scaledBodyFont()
                 .appLockCover()
         }
         .alert(String(localized: "Enter password", comment: "Password alert"), isPresented: $model.presentPasswordEntry) {
@@ -384,7 +393,7 @@ struct MainView: View {
             commands.pending = nil
             perform(command)
         }
-        .frame(minWidth: 640, minHeight: 420)
+        .textScaledFrame(minWidth: 640, minHeight: 420)
         #endif
     }
 
@@ -452,7 +461,7 @@ struct MainView: View {
             if !model.accountsLoaded && !model.cloudAccounts.isEmpty && searchText.isEmpty {
                 // The Ente Auth accounts are listed, the YubiKey's join them once it has been read.
                 Label(insertYubiKeyMessage, image: "securitykey")
-                    .font(.footnote)
+                    .scaledFont(.footnote)
                     .foregroundStyle(.secondary)
                     .listRowSeparator(.hidden)
             }
@@ -492,7 +501,7 @@ struct MainView: View {
             ToolbarItem(placement: .principal) {
                 // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
                 Text(verbatim: "Oriel OTP")
-                    .font(.headline)
+                    .scaledFont(.headline)
                     .foregroundStyle(Color("YubiGreen"))
                     .accessibilityHidden(true)
             }

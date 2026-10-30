@@ -20,7 +20,7 @@ import SwiftUI
 struct AppLockView: View {
 
     private var lock: AppLock { .shared }
-    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
+    @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
 
     var body: some View {
         VStack(spacing: 24) {
@@ -30,7 +30,7 @@ struct AppLockView: View {
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
             Text(String(localized: "Oriel OTP is locked", comment: "App lock screen title"))
-                .font(.title2.bold())
+                .scaledFont(.title2) { $0.bold() }
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             if lock.isUnavailable {
@@ -120,7 +120,7 @@ private struct AppLockCodePad: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     // The keys grow with the text, up to a size where three still fit across the smallest iPhone. Beyond that the
     // digits stop growing and show in the Large Content Viewer when held.
-    @ScaledMetric(relativeTo: .title) private var scaledKeySize: CGFloat = 72
+    @ScaledSize(relativeTo: .title) private var scaledKeySize: CGFloat = 72
     private var keySize: CGFloat { min(scaledKeySize, 96) }
 
     private let rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
@@ -151,7 +151,7 @@ private struct AppLockCodePad: View {
                     key("0")
                     Button(action: deleteDigit) {
                         Image(systemName: "delete.backward")
-                            .font(.title2)
+                            .scaledFont(.title2)
                             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                             .frame(width: keySize, height: keySize)
                             .contentShape(.rect)
@@ -186,7 +186,7 @@ private struct AppLockCodePad: View {
             add(digit)
         } label: {
             Text(verbatim: digit)
-                .font(.title.weight(.regular))
+                .scaledFont(.title) { $0.weight(.regular) }
                 .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                 .frame(width: keySize, height: keySize)
                 .background(Color.secondary.opacity(0.18), in: Circle())

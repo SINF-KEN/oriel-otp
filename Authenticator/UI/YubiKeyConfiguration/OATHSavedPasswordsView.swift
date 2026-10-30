@@ -30,11 +30,11 @@ struct OATHSavedPasswordsView: View {
         SettingsView(image: image, imageColor: imageColor) {
             Text("Clear saved OATH passwords")
                 .multilineTextAlignment(.center)
-                .font(.title2)
+                .scaledFont(.title2)
                 .bold()
                 .opacity(passwordsHasBeenCleared ? 0.2 : 1.0)
             Text("Clear passwords saved on this device. This will prompt for a password next time a password protected YubiKey is used.")
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
                 .opacity(passwordsHasBeenCleared ? 0.2 : 1.0)
         } buttons: {

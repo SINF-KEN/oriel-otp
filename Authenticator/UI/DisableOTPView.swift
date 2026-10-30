@@ -26,7 +26,7 @@ struct DisableOTPView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 5) {
-                Text("Yubico OTP enabled").font(.title).bold()
+                Text("Yubico OTP enabled").scaledFont(.title).bold()
                     .accessibilityAddTraits(.isHeader)
                 Text("This YubiKey has Yubico OTP enabled which makes it appear as an external keyboard to the iPhone. Unfortunately this causes problem with the normal on-screen keyboard.")
                 Spacer().frame(height: 15)
@@ -41,7 +41,7 @@ struct DisableOTPView: View {
                 .prominentActionButtonStyle()
                 .disabled(model.isConfigurationLocked || model.isDisablingOTP)
                 Text("Disabling Yubico OTP will prevent the YubiKey from appearing as a keyboard. If you don’t use Yubico OTP this is the recommended solution. This can be re-enabled from the settings page.")
-                    .font(.footnote)
+                    .scaledFont(.footnote)
                     .foregroundStyle(.secondary)
                 Spacer().frame(height: 25)
                 Button {
@@ -52,7 +52,7 @@ struct DisableOTPView: View {
                 }
                 .secondaryActionButtonStyle()
                 Text("While the YubiKey is inserted the on-screen keyboard will not appear. To show the keyboard you will have to remove the YubiKey and then re-insert it.")
-                    .font(.footnote)
+                    .scaledFont(.footnote)
                     .foregroundStyle(.secondary)
                 Spacer()
             }

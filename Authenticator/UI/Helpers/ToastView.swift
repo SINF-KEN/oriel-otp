@@ -27,7 +27,7 @@ struct ToastView: View {
         #if os(macOS)
         // A small banner at the bottom of the window, like the Mac's own status messages.
         Text(message)
-            .font(.callout)
+            .scaledFont(.callout)
             .multilineTextAlignment(.center)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 12)
@@ -39,7 +39,7 @@ struct ToastView: View {
         #else
         ZStack(alignment: .leading) {
             Text(message)
-                .font(.body)
+                .scaledFont(.body)
                 .multilineTextAlignment(.center)
                 // YubiBlue is a light green in dark mode, so white text would lose its contrast there.
                 .foregroundStyle(Color(.systemBackground))

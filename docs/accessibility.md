@@ -30,6 +30,19 @@ account row puts the code below the name at the accessibility sizes. The app loc
 size where three still fit across the smallest iPhone; held, they show the Large Content Viewer, like the navigation
 bar's buttons.
 
+macOS has no text size that apps can follow (System Settings' text size is only for some of Apple's apps), and on the
+Mac SwiftUI's text styles and `@ScaledMetric` don't change with `dynamicTypeSize`. So the Mac app has its own text
+size, from 100% to 200%: View > Make Text Bigger (⌘+), Make Text Smaller (⌘−) and Actual Size (⌘0), and Settings >
+General > Text size. It scales the text styles (`scaledFont(_:)` in place of `font(_:)` with a text style), the
+default font of each window (`appTextSize()`), sizes beside text (`@ScaledSize`, which is `@ScaledMetric` on iOS),
+and the windows, sheets, sidebar and menu bar extra (`textScaledFrame`), so larger text gets more room instead of
+wrapping in a narrow column, up to the size of the screen. A few things keep the system's size, as on iOS: the toolbar,
+the search field, menus and alerts.
+
+Two things that don't follow the window's font on the Mac: a list sets the system font on the text in its rows, so the
+settings lists are grouped forms there (`SettingsList`); and a button's label keeps the system font unless it sets one,
+so forms use `scaledButtonLabels()`. Use these in new Mac views, and `scaledFont(_:)` rather than `font(.body)`.
+
 ## Dark Interface
 
 Colors are system colors or asset colors with a dark variant. Text on the accent color (the toast, the Yubico OTP

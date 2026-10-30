@@ -33,27 +33,27 @@ struct AccountDetailView: View {
     @State private var showDeleteConfirmation = false
 
     private let codeColor = Color(.secondaryLabel)
-    @ScaledMetric(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
-    @ScaledMetric(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
-    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
+    @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
+    @ScaledSize(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
+    @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
 
     var body: some View {
         VStack(spacing: 12) {
             Spacer()
             Text(String(account.title.first ?? "?"))
-                .font(.largeTitle)
+                .scaledFont(.largeTitle)
                 // Grows with the text, but not so much that the name and code go off screen.
                 .frame(width: min(iconSize, 120), height: min(iconSize, 120))
                 .background(account.iconColor)
                 .clipShape(Circle())
                 .accessibilityHidden(true)
             Text(account.title)
-                .font(.title2.weight(.medium))
+                .scaledFont(.title2) { $0.weight(.medium) }
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             account.subTitle.map {
                 Text($0)
-                    .font(.body)
+                    .scaledFont(.body)
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
@@ -64,12 +64,12 @@ struct AccountDetailView: View {
                     AccountLocationIcon(account: account)
                         .accessibilityHidden(true)
                 }
-                .font(.footnote)
+                .scaledFont(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
             }
             if !account.isInEnte && model.cloud.isEnabled {
                 Text(String(localized: "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.", comment: "Account details of a YubiKey account while signed in to Ente Auth"))
-                    .font(.footnote)
+                    .scaledFont(.footnote)
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 360)

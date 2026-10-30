@@ -57,11 +57,12 @@ struct EnteSyncView: View {
                 }
             }
             .formStyle(.grouped)
+            .scaledButtonLabels()
             // Scrolling puts the keyboard away, so the footers under it can be read.
             .scrollDismissesKeyboard(.immediately)
             .disabled(model.isBusy)
             #if os(macOS)
-            .frame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
             .navigationTitle(String(localized: "Ente Auth", comment: "Ente sync navigation title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -355,16 +356,16 @@ private struct EnteCodeRow: View {
                         .foregroundStyle(Color(code.template == nil ? .secondaryLabel : .label))
                     if let subtitle = code.subtitle {
                         Text(subtitle)
-                            .font(.subheadline)
+                            .scaledFont(.subheadline)
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                     if let reason = code.unsupportedReason {
                         Label(reason, systemImage: "exclamationmark.triangle.fill")
-                            .font(.footnote)
+                            .scaledFont(.footnote)
                             .foregroundStyle(.red)
                     } else if isOnYubiKey {
                         Text(String(localized: "Already on YubiKey", comment: "Ente sync account already on YubiKey"))
-                            .font(.footnote)
+                            .scaledFont(.footnote)
                             .foregroundStyle(Color(.secondaryLabel))
                     }
                 }

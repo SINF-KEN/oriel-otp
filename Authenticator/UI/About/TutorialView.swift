@@ -80,7 +80,7 @@ struct TutorialView: View {
             VStack {
                 Text(tutorialPage.title)
                     .multilineTextAlignment(.center)
-                    .font(.title)
+                    .scaledFont(.title)
                     .bold()
                     .accessibilityAddTraits(.isHeader)
                 // The drawings are larger than the screen, so they're scaled down to fit.

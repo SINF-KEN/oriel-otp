@@ -25,7 +25,7 @@ struct AboutView: View {
     
     var body: some View {
         NavigationStack {
-            List {
+            SettingsList {
                 VStack(alignment: .center) {
                     Image(.icon)
                         .resizable()
@@ -35,10 +35,10 @@ struct AboutView: View {
                         .padding(15)
                         .accessibilityHidden(true)
                     Text(verbatim: "Oriel OTP")
-                        .font(.title)
+                        .scaledFont(.title)
                         .multilineTextAlignment(.center)
                     Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
-                        .font(.body)
+                        .scaledFont(.body)
                     AboutLanguageView()
                 }
                 .frame(maxWidth: .infinity)
@@ -144,7 +144,7 @@ struct AboutLanguageView: View {
         if shouldShowLanguageNote {
             Text("This translation is a community effort. To suggest a correction, [open an issue on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).")
                 .multilineTextAlignment(.center)
-                .font(.footnote)
+                .scaledFont(.footnote)
                 .foregroundStyle(.secondary)
                 .padding(.top, 15)
         } else {

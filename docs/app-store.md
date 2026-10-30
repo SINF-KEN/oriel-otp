@@ -108,7 +108,7 @@ covers and how it's tested is in [accessibility.md](accessibility.md); the work 
 | --- | --- | --- | --- |
 | VoiceOver | Yes | Yes | Yes |
 | Voice Control | Yes | Yes | Not applicable on watchOS |
-| Larger Text | Yes | No (macOS has no app text size the app can follow) | Yes |
+| Larger Text | Yes | Yes (the app's own text size, up to 200%) | Yes |
 | Dark Interface | Yes | Yes | Yes (always dark) |
 | Differentiate Without Color Alone | Yes | Yes | Yes |
 | Sufficient Contrast | Yes | Yes | Yes |

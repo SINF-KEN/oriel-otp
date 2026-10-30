@@ -38,17 +38,17 @@ struct AccountRowView<Accessory: View>: View {
 
     // Mac lists are denser, with smaller text.
     #if os(macOS)
-    @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 28
-    @ScaledMetric(relativeTo: .body) private var statusSize: CGFloat = 16
-    private let titleFont = Font.body.weight(.medium)
-    private let subtitleFont = Font.subheadline
-    private let codeFont = Font.title3.monospacedDigit().bold()
+    @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 28
+    @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 16
+    private let titleStyle = Font.TextStyle.body
+    private let subtitleStyle = Font.TextStyle.subheadline
+    private let codeStyle = Font.TextStyle.title3
     #else
-    @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 40
-    @ScaledMetric(relativeTo: .body) private var statusSize: CGFloat = 22
-    private let titleFont = Font.subheadline.weight(.medium)
-    private let subtitleFont = Font.footnote
-    private let codeFont = Font.body.monospacedDigit().bold()
+    @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 40
+    @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 22
+    private let titleStyle = Font.TextStyle.subheadline
+    private let subtitleStyle = Font.TextStyle.footnote
+    private let codeStyle = Font.TextStyle.body
     #endif
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
@@ -70,6 +70,7 @@ struct AccountRowView<Accessory: View>: View {
         layout {
             HStack {
                 Text(String(account.title.first ?? "?"))
+                    .scaledFont(.body)
                     // Grows with the text, but not so much that it crowds the name out.
                     .frame(width: min(iconSize, 64), height: min(iconSize, 64))
                     .background(account.iconColor)
@@ -79,19 +80,19 @@ struct AccountRowView<Accessory: View>: View {
                 VStack(alignment: .leading) {
                     HStack(spacing: 4) {
                         Text(account.title)
-                            .font(titleFont)
+                            .scaledFont(titleStyle) { $0.weight(.medium) }
                             .lineLimit(isStacked ? 3 : 1)
                             .minimumScaleFactor(0.9)
                             .truncationMode(.tail)
                         if showsLocation {
                             AccountLocationIcon(account: account)
-                                .font(subtitleFont)
+                                .scaledFont(subtitleStyle)
                                 .foregroundStyle(secondaryStyle)
                         }
                     }
                     account.subTitle.map {
                         Text($0)
-                            .font(subtitleFont)
+                            .scaledFont(subtitleStyle)
                             .lineLimit(isStacked ? 3 : 1)
                             .minimumScaleFactor(0.9)
                             .truncationMode(.tail)
@@ -186,7 +187,7 @@ struct AccountRowView<Accessory: View>: View {
                     .padding(.trailing, 4)
                     .accessibilityHidden(true)
             }
-            .font(codeFont)
+            .scaledFont(codeStyle) { $0.monospacedDigit().bold() }
             .foregroundStyle(HierarchicalShapeStyle.primary)
         }
         .padding(.all, 4)

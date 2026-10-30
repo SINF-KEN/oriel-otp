@@ -29,11 +29,11 @@ struct FIDOPINView: View {
 
     var body: some View {
         SettingsView(image: Image(systemName: "lock.shield"), imageColor: Color(.systemPurple)) {
-            Text("FIDO PIN").font(.title2).bold()
+            Text("FIDO PIN").scaledFont(.title2).bold()
                 .accessibilityAddTraits(.isHeader)
 
             Text("To prevent unauthorized access the FIDO application can be protected by a PIN.")
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
             
             // With a symbol, so it doesn't take the red to see it's a problem.
@@ -43,7 +43,7 @@ struct FIDOPINView: View {
                 } icon: {
                     Image(systemName: "exclamationmark.triangle.fill")
                 }
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .foregroundStyle(.red)
                 .bold()
                 .multilineTextAlignment(.center)
@@ -54,7 +54,7 @@ struct FIDOPINView: View {
                 } icon: {
                     Image(systemName: "exclamationmark.octagon.fill")
                 }
-                .font(.subheadline)
+                .scaledFont(.subheadline)
                 .foregroundStyle(.red)
                 .bold()
                 .multilineTextAlignment(.center)
