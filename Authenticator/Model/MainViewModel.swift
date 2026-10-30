@@ -21,8 +21,13 @@ import YubiKit
 
 
 @Observable class MainViewModel {
-    
-    var accounts: [Account] = []
+
+    /// The accounts on the YubiKey that was read last.
+    private(set) var keyAccounts: [Account] = []
+    /// The accounts in the Ente Auth vault on this device, whose codes the app calculates.
+    private(set) var cloudAccounts: [Account] = []
+    /// The accounts of both, by name.
+    var accounts: [Account] { (keyAccounts + cloudAccounts).sorted() }
     var pinnedAccounts: [Account] { accounts.filter(\.isPinned) }
     var otherAccounts: [Account] { accounts.filter { !$0.isPinned } }
     var accountsLoaded: Bool = false
@@ -58,9 +63,83 @@ import YubiKit
     @ObservationIgnored private var favorites: Set<String> = []
 
     @ObservationIgnored private var refreshRequestCount = 0
-    
-    init() {
+
+    @ObservationIgnored let cloud: EnteCloud
+    /// The vault code each cloud account was made from, by account id.
+    @ObservationIgnored private var cloudCodes: [String: EnteCloudCode] = [:]
+
+    init(cloud: EnteCloud = .shared) {
+        self.cloud = cloud
         self.favorites = favoritesStorage.readFavorites()
+        cloud.onChange = { [weak self] in self?.updateCloudAccounts() }
+        updateCloudAccounts()
+    }
+
+    /// Whether there are accounts to list, from a YubiKey or Ente Auth.
+    var hasAccounts: Bool { accountsLoaded || !cloudAccounts.isEmpty }
+
+    // MARK: - Ente Auth
+
+    /// Makes the accounts for the vault's entries, keeping the ones whose account didn't change so their codes stay.
+    private func updateCloudAccounts() {
+        var codes = [String: EnteCloudCode]()
+        let previous = Dictionary(cloudAccounts.map { ($0.accountId, $0) }, uniquingKeysWith: { first, _ in first })
+        cloudAccounts = cloud.accounts.map { entry in
+            let accountId = "ente/" + entry.id
+            codes[accountId] = entry.code
+            if let account = previous[accountId], let code = cloudCodes[accountId], code.isSameAccount(as: entry.code) {
+                account.isPendingSync = entry.isPending
+                if account.isPinned != entry.code.isPinned {
+                    account.isPinned = entry.code.isPinned
+                }
+                return account
+            }
+            return cloudAccount(id: entry.id, code: entry.code, isPending: entry.isPending)
+        }
+        cloudCodes = codes
+    }
+
+    private func cloudAccount(id: String, code: EnteCloudCode, isPending: Bool) -> Account {
+        let credential = OATHSession.Credential(type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
+                                                period: UInt(code.period))
+        let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
+        // Calculated like on a YubiKey that is plugged in: a new code is calculated when one expires.
+        let account = Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
+                              keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCloudCode(for: $0) },
+                              connectionType: .wired, isPinned: code.isPinned, location: .ente(id: id))
+        account.isPendingSync = isPending
+        account.onPinnedChange = { [weak self] account in
+            self?.cloud.setPinned(id, account.isPinned)
+        }
+        return account
+    }
+
+    private func calculateCloudCode(for account: Account) {
+        guard case .ente(let id) = account.location, let code = cloudCodes[account.accountId] else { return }
+        if code.kind == .hotp {
+            guard let otp = cloud.nextHOTPCode(id) else { return }
+            account.update(otp: OATHSession.OTP(code: otp, validity: DateInterval(start: AppClock.now, end: .distantFuture)))
+        } else {
+            // A refresh scheduled for when the code expires can fire a moment early. It still gets the next code.
+            var date = AppClock.now
+            if let end = account.otp?.validity.end, end > date, end.timeIntervalSince(date) < 1 {
+                date = end
+            }
+            let (otp, validity) = code.code(at: date)
+            account.update(otp: OATHSession.OTP(code: otp, validity: validity))
+        }
+    }
+
+    /// Calculates the codes of the time-based Ente Auth accounts again, e.g. after the app was in the background.
+    private func refreshCloudCodes() {
+        for account in cloudAccounts where account.credential.type == .totp {
+            calculateCloudCode(for: account)
+        }
+    }
+
+    /// Adds an account to the Ente Auth vault and uploads it.
+    func addCloudAccount(_ template: YubiKitOATHSession.CredentialTemplate) throws -> EnteCloud.AddResult {
+        try cloud.add(template)
     }
     
     /// Refresh requests arriving within 100 ms of each other are coalesced. A single request refreshes
@@ -111,13 +190,14 @@ import YubiKit
     }
     
     private func stopObservingPinnedState() {
-        accounts.forEach { $0.onPinnedChange = nil }
+        keyAccounts.forEach { $0.onPinnedChange = nil }
     }
-    
+
     func start() {
         // start() is called again to retry after a connection error.
         tickTask?.cancel()
         sessionTask?.cancel()
+        refreshCloudCodes()
 
         tickTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -137,7 +217,7 @@ import YubiKit
                     // stop() was called while the YubiKey was inserted and start() may have been called since.
                     guard !Task.isCancelled else { return }
                     self?.stopObservingPinnedState()
-                    self?.accounts.removeAll()
+                    self?.keyAccounts.removeAll()
                     self?.accountsLoaded = false
                     self?.keyVersion = nil
                     self?.isKeyPluggedIn = false
@@ -168,11 +248,15 @@ import YubiKit
     /// Whether ``start()`` has been called and ``stop()`` hasn't since.
     var isStarted: Bool { sessionTask != nil }
 
-    /// Reads the accounts and codes from the inserted YubiKey again.
+    /// Reads the accounts and codes from the inserted YubiKey again, and syncs with Ente Auth.
     func refresh() {
+        Task { await cloud.sync(reportsErrors: true) }
         guard isStarted, accountsLoaded else { return }
         Task { await updateAccounts() }
     }
+
+    /// Whether there is something to refresh: a YubiKey that was read, or Ente Auth accounts to sync.
+    var canRefresh: Bool { accountsLoaded || cloud.isEnabled }
 
     func stop() {
         sessionTask?.cancel()
@@ -182,7 +266,7 @@ import YubiKit
         tickTask = nil
 
         stopObservingPinnedState()
-        accounts.removeAll()
+        keyAccounts.removeAll()
         accountsLoaded = false
         keyVersion = nil
         isKeyPluggedIn = false
@@ -217,7 +301,7 @@ import YubiKit
             }
             let otp = try await session.calculate(credential: account.credential)
             
-            if let account = (accounts.filter { $0.accountId == account.accountId }).first {
+            if let account = (keyAccounts.filter { $0.accountId == account.accountId }).first {
                 account.update(otp: otp)
             }
 
@@ -249,7 +333,7 @@ import YubiKit
                 }
             }
             
-            self.accounts = updatedAccounts.sorted()
+            self.keyAccounts = updatedAccounts
             
             updatedAccounts.forEach { account in
                 account.onPinnedChange = { [weak self] account in
@@ -273,7 +357,7 @@ import YubiKit
     }
     
     private func account(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, connectionType: OATHSession.ConnectionType) -> Account {
-        if let account = (accounts.filter { $0.credential.id == credential.id }).first {
+        if let account = (keyAccounts.filter { $0.credential.id == credential.id }).first {
             account.update(otp: code)
             return account
         } else {
@@ -330,6 +414,11 @@ import YubiKit
     }
 
     func renameAccount(_ account: Account, issuer: String, accountName: String, completion: @escaping () -> Void) {
+        if case .ente(let id) = account.location {
+            cloud.rename(id, issuer: issuer, accountName: accountName)
+            completion()
+            return
+        }
         Task {
             do {
                 let wasPinned = account.isPinned
@@ -350,12 +439,18 @@ import YubiKit
         }
     }
     
+    /// Deletes the account from the YubiKey, or moves an Ente Auth account to Ente's trash.
     func deleteAccount(_ account: Account, completion: @escaping () -> Void) {
+        if case .ente(let id) = account.location {
+            cloud.delete(id)
+            completion()
+            return
+        }
         Task {
             do {
                 let session = try await OATHSessionHandler.shared.anySession()
                 try await session.deleteCredential(account.credential)
-                accounts.removeAll { $0.accountId == account.accountId }
+                keyAccounts.removeAll { $0.accountId == account.accountId }
                 session.endNFC(message: String(localized: "Account deleted", comment: "OATH NFC account deleted"))
                 completion()
             } catch {

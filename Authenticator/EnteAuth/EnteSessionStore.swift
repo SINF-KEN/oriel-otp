@@ -18,7 +18,7 @@ import Foundation
 import LocalAuthentication
 import YubiKit
 
-/// What's needed to read and add accounts without signing in again: the auth token and the authenticator key.
+/// What's needed to read and change accounts without signing in again: the auth token and the authenticator key.
 /// The master key and the password are never stored.
 nonisolated struct EnteSavedSession: Codable, Sendable, Equatable {
     let server: URL
@@ -157,34 +157,13 @@ struct EnteSessionStore {
     /// Signs out: forgets the account on this device, then asks Ente's server to end the session. The token is
     /// unlocked first so the session can be ended; if that's cancelled the account is still forgotten here. Returns
     /// once nothing is left on the device, without waiting for the server, which only ever sees the old token.
-    @MainActor func signOut(watch: WatchAccountSync = .shared) async {
+    /// The copy of the accounts in the vault is deleted too, with changes that weren't uploaded yet.
+    @MainActor func signOut(watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) async {
         let saved = savedAccount?.hasSession == true ? try? await read() : nil
         remove()
+        cloud.remove()
         watch.disable()
         guard let saved, let api = try? EnteAPIClient(server: saved.server) else { return }
         Task { try? await api.logout(token: saved.token) }
-    }
-
-    /// Adds an account to Ente Auth with the saved session, after asking for Face ID, Touch ID or the passcode.
-    /// A session the server no longer accepts, e.g. one revoked from another device, is forgotten but the account
-    /// is kept, so signing in again only needs the password. When the accounts are shown on Apple Watch, the watch
-    /// gets the new list too.
-    @MainActor func add(_ template: YubiKitOATHSession.CredentialTemplate) async throws -> EnteAuthenticatorSync.AddResult {
-        do {
-            let saved = try await unlock()
-            let api = try EnteAPIClient(server: saved.server)
-            let result = try await EnteAuthenticatorSync.add(template, api: api, token: saved.token, authenticatorKey: saved.authenticatorKey)
-            if result == .added, WatchAccountSync.shared.isEnabled {
-                // The account is already in Ente, so a failed refresh only leaves the watch a sync behind.
-                if let codes = try? await EnteAuthenticatorSync.codes(api: api, token: saved.token, authenticatorKey: saved.authenticatorKey) {
-                    WatchAccountSync.shared.send(codes)
-                }
-            }
-            return result
-        } catch EnteAuthenticatorSyncError.signedOut {
-            forgetSession()
-            WatchAccountSync.shared.disable()
-            throw EnteAuthenticatorSyncError.signedOut
-        }
     }
 }

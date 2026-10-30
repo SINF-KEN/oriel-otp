@@ -30,10 +30,11 @@ import Testing
         configuration.protocolClasses = protocols
         // The session is kept in memory: the Mac build CI tests is signed without the keychain access group.
         let defaults = makeTestDefaults()
-        let model = EnteSyncViewModel(existingCredentialIds: [],
-                                      store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                                      defaults: defaults, session: URLSession(configuration: configuration),
-                                      watch: WatchAccountSync(defaults: defaults))
+        let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
+        let session = URLSession(configuration: configuration)
+        let watch = WatchAccountSync(defaults: defaults)
+        let model = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session, watch: watch,
+                                      cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch))
         model.server = FakeEnteServer.server.absoluteString
         return model
     }

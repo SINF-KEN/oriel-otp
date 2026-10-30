@@ -28,9 +28,11 @@ struct EnteSyncViewModelTests {
 
     private func model(codes: [String], onYubiKey: [String] = [], capacity: Int?) -> EnteSyncViewModel {
         let existing = Set(onYubiKey.map { "\($0):alice" })
-        let model = EnteSyncViewModel(existingCredentialIds: existing, capacity: capacity,
-                                      store: EnteSessionStore(service: "EnteSyncViewModelTests"),
-                                      defaults: UserDefaults(suiteName: "EnteSyncViewModelTests")!)
+        let store = EnteSessionStore(service: "EnteSyncViewModelTests")
+        let defaults = UserDefaults(suiteName: "EnteSyncViewModelTests")!
+        let watch = WatchAccountSync(defaults: defaults)
+        let model = EnteSyncViewModel(existingCredentialIds: existing, capacity: capacity, store: store, defaults: defaults, watch: watch,
+                                      cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch))
         model.codes = codes.map(code)
         return model
     }

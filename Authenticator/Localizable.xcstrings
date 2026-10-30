@@ -771,6 +771,35 @@
         }
       }
     },
+    "Accounts on the YubiKey are deleted from it. Accounts in Ente Auth are moved to its trash on all your devices, where the Ente Auth app can restore them." : {
+      "comment" : "Delete several accounts alert when some are in Ente Auth",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten auf dem YubiKey werden von ihm gelöscht. Konten in Ente Auth werden auf allen Ihren Geräten in den Papierkorb verschoben, aus dem die Ente-Auth-App sie wiederherstellen kann."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les comptes de la YubiKey en sont supprimés. Les comptes d’Ente Auth sont placés dans sa corbeille sur tous vos appareils, d’où l’app Ente Auth peut les restaurer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyのアカウントはYubiKeyから削除されます。Ente Authのアカウントはすべてのデバイスでゴミ箱に移動され、Ente Authアプリで復元できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty na YubiKey sa z neho odstránia. Účty v Ente Auth sa na všetkých vašich zariadeniach presunú do koša, odkiaľ ich aplikácia Ente Auth dokáže obnoviť."
+          }
+        }
+      }
+    },
     "Accounts that require touch will need an extra NFC tap to calculate its code. Bypassing it minimizes the number of NFC taps needed." : {
       "comment" : "NFC settings footer",
       "localizations" : {
@@ -1003,6 +1032,35 @@
         }
       }
     },
+    "Add an account to Ente Auth" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto zu Ente Auth hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un compte à Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authにアカウントを追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať účet do Ente Auth"
+          }
+        }
+      }
+    },
     "Add an account to the YubiKey" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -1028,6 +1086,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pridať účet do YubiKey"
+          }
+        }
+      }
+    },
+    "Add to Ente Auth" : {
+      "comment" : "Main view menu item, and the add account title when adding to Ente Auth only",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Ente Auth hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authに追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať do Ente Auth"
           }
         }
       }
@@ -4785,6 +4872,35 @@
         }
       }
     },
+    "Move the account to the trash in Ente Auth" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto in den Papierkorb von Ente Auth verschieben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placer le compte dans la corbeille d’Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをEnte Authのゴミ箱に移動"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presunúť účet do koša v Ente Auth"
+          }
+        }
+      }
+    },
     "NFC not supported on this device" : {
       "comment" : "Internal error message not to be displayed to the user.",
       "localizations" : {
@@ -5097,6 +5213,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Žiadne certifikáty na YubiKey"
+          }
+        }
+      }
+    },
+    "No matching accounts" : {
+      "comment" : "Search without results when Ente Auth accounts are listed too",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine passenden Konten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte correspondant"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一致するアカウントがありません"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Žiadne zodpovedajúce účty"
           }
         }
       }
@@ -8665,6 +8810,93 @@
         }
       }
     },
+    "Stored in Ente Auth" : {
+      "comment" : "Where an account is stored",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ente Auth gespeichert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistré dans Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authに保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložené v Ente Auth"
+          }
+        }
+      }
+    },
+    "Stored in Ente Auth, not synced yet" : {
+      "comment" : "Where an account is stored, for an Ente Auth account with changes that haven't been uploaded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In Ente Auth gespeichert, noch nicht synchronisiert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistré dans Ente Auth, pas encore synchronisé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authに保存（未同期）"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložené v Ente Auth, zatiaľ nesynchronizované"
+          }
+        }
+      }
+    },
+    "Stored on YubiKey" : {
+      "comment" : "Where an account is stored",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem YubiKey gespeichert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistré sur la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyに保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložené na YubiKey"
+          }
+        }
+      }
+    },
     "String to Data conversion error" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9240,6 +9472,35 @@
         }
       }
     },
+    "The account is saved in Ente Auth for %@ and appears on your other devices." : {
+      "comment" : "Add account footer when adding to Ente Auth only. The placeholder is an email address.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Konto wird in Ente Auth für %@ gespeichert und erscheint auf Ihren anderen Geräten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le compte est enregistré dans Ente Auth pour %@ et apparaît sur vos autres appareils."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントは%@のEnte Authに保存され、ほかのデバイスにも表示されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účet sa uloží do Ente Auth pre %@ a zobrazí sa aj na vašich ostatných zariadeniach."
+          }
+        }
+      }
+    },
     "The account isn't on the plugged-in YubiKey." : {
       "comment" : "Mac Shortcuts error",
       "localizations" : {
@@ -9558,31 +9819,60 @@
         }
       }
     },
-    "The session and the key are deleted from this device. Your accounts stay in Ente Auth." : {
-      "comment" : "Ente sign out confirmation message",
+    "The session, the key and the copy of your accounts are deleted from this device. Some changes made here haven't been synced with Ente Auth yet and will be lost." : {
+      "comment" : "Ente sign out confirmation message with changes that weren't uploaded",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Sitzung und der Schlüssel werden von diesem Gerät gelöscht. Ihre Konten bleiben in Ente Auth."
+            "value" : "Die Sitzung, der Schlüssel und die Kopie Ihrer Konten werden von diesem Gerät gelöscht. Einige hier vorgenommene Änderungen wurden noch nicht mit Ente Auth synchronisiert und gehen verloren."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La session et la clé sont supprimées de cet appareil. Vos comptes restent dans Ente Auth."
+            "value" : "La session, la clé et la copie de vos comptes sont supprimées de cet appareil. Certaines modifications faites ici n’ont pas encore été synchronisées avec Ente Auth et seront perdues."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションと鍵はこのデバイスから削除されます。アカウントはEnte Authに残ります。"
+            "value" : "セッション、鍵、アカウントのコピーはこのデバイスから削除されます。ここで行った一部の変更はまだEnte Authと同期されていないため、失われます。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Relácia a kľúč sa z tohto zariadenia odstránia. Vaše účty zostanú v Ente Auth."
+            "value" : "Relácia, kľúč a kópia vašich účtov sa z tohto zariadenia odstránia. Niektoré zmeny urobené tu ešte neboli synchronizované s Ente Auth a stratia sa."
+          }
+        }
+      }
+    },
+    "The session, the key and the copy of your accounts are deleted from this device. Your accounts stay in Ente Auth." : {
+      "comment" : "Ente sign out confirmation message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sitzung, der Schlüssel und die Kopie Ihrer Konten werden von diesem Gerät gelöscht. Ihre Konten bleiben in Ente Auth."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La session, la clé et la copie de vos comptes sont supprimées de cet appareil. Vos comptes restent dans Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "セッション、鍵、アカウントのコピーはこのデバイスから削除されます。アカウントはEnte Authに残ります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relácia, kľúč a kópia vašich účtov sa z tohto zariadenia odstránia. Vaše účty zostanú v Ente Auth."
           }
         }
       }
@@ -9844,6 +10134,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tento účet sa nepodarilo načítať."
+          }
+        }
+      }
+    },
+    "This moves the account to the trash in Ente Auth on all your devices. You can restore it in the Ente Auth app." : {
+      "comment" : "Delete account alert for an account in Ente Auth",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dadurch wird das Konto auf allen Ihren Geräten in den Papierkorb von Ente Auth verschoben. Sie können es in der Ente-Auth-App wiederherstellen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le compte sera placé dans la corbeille d’Ente Auth sur tous vos appareils. Vous pourrez le restaurer dans l’app Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアカウントはすべてのデバイスでEnte Authのゴミ箱に移動されます。Ente Authアプリで復元できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Týmto sa účet na všetkých vašich zariadeniach presunie do koša v Ente Auth. Obnoviť ho môžete v aplikácii Ente Auth."
           }
         }
       }
@@ -11219,31 +11538,60 @@
         }
       }
     },
-    "Your Ente Auth accounts are end-to-end encrypted. They are downloaded and decrypted on this device so you can choose credentials to add to your YubiKey. Your password never leaves this device, and the app does not change your Ente Auth OTP records." : {
+    "Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too." : {
       "comment" : "Ente sign in footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Deine Ente-Auth-Konten sind Ende-zu-Ende-verschlüsselt. Sie werden auf dieses Gerät geladen und hier entschlüsselt, damit du Zugangsdaten für deinen YubiKey auswählen kannst. Dein Passwort verlässt dieses Gerät nie, und die App ändert deine OTP-Einträge in Ente Auth nicht."
+            "state" : "translated",
+            "value" : "Ihre Ente-Auth-Konten sind Ende-zu-Ende-verschlüsselt und werden nur auf diesem Gerät entschlüsselt, und Ihr Passwort verlässt es nie. Wenn Sie angemeldet bleiben, werden die Konten auf diesem Gerät aufbewahrt und mit denen Ihres YubiKey aufgelistet, und Konten, die Sie hier hinzufügen, umbenennen, anheften oder löschen, werden auch in Ente Auth geändert."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vos comptes Ente Auth sont chiffrés de bout en bout. Ils sont téléchargés et déchiffrés sur cet appareil pour que vous puissiez choisir les identifiants à ajouter à votre YubiKey. Votre mot de passe ne quitte jamais cet appareil, et l'app ne modifie pas vos enregistrements OTP dans Ente Auth."
+            "state" : "translated",
+            "value" : "Vos comptes Ente Auth sont chiffrés de bout en bout et ne sont déchiffrés que sur cet appareil, que votre mot de passe ne quitte jamais. Si vous restez connecté, les comptes sont conservés sur cet appareil et affichés avec ceux de votre YubiKey, et les comptes que vous ajoutez, renommez, épinglez ou supprimez ici sont aussi modifiés dans Ente Auth."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Ente Auth のアカウントはエンドツーエンドで暗号化されています。YubiKey に追加する認証情報を選べるよう、このデバイスにダウンロードされて復号されます。パスワードがこのデバイスの外に送信されることはなく、アプリが Ente Auth の OTP レコードを変更することもありません。"
+            "state" : "translated",
+            "value" : "Ente Authのアカウントはエンドツーエンドで暗号化され、このデバイスでのみ復号されます。パスワードがこのデバイスから送信されることはありません。サインインしたままにすると、アカウントはこのデバイスに保存されてYubiKeyのアカウントと一緒に表示され、ここで追加、名前変更、ピン留め、削除したアカウントはEnte Authでも変更されます。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Vaše účty Ente Auth sú šifrované end-to-end. Stiahnu sa a dešifrujú v tomto zariadení, aby ste mohli vybrať prihlasovacie údaje na pridanie do YubiKey. Vaše heslo nikdy neopustí toto zariadenie a aplikácia nemení vaše záznamy OTP v Ente Auth."
+            "state" : "translated",
+            "value" : "Vaše účty Ente Auth sú šifrované end-to-end a dešifrujú sa iba na tomto zariadení, ktoré vaše heslo nikdy neopustí. Ak zostanete prihlásení, účty sa uchovajú na tomto zariadení a zobrazia sa spolu s účtami na YubiKey a účty, ktoré tu pridáte, premenujete, pripnete alebo odstránite, sa zmenia aj v Ente Auth."
+          }
+        }
+      }
+    },
+    "Your Ente Auth accounts are kept on this device, encrypted, and listed with your YubiKey's, so their codes work offline. They are synced with Ente when the app opens, after each change and when you refresh the list. Choose Sync accounts to pick ones to add to your YubiKey." : {
+      "comment" : "Ente saved session footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Ente-Auth-Konten werden verschlüsselt auf diesem Gerät aufbewahrt und mit denen Ihres YubiKey aufgelistet, sodass ihre Codes auch offline funktionieren. Sie werden mit Ente synchronisiert, wenn die App geöffnet wird, nach jeder Änderung und wenn Sie die Liste aktualisieren. Wählen Sie „Konten synchronisieren“, um Konten für Ihren YubiKey auszuwählen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos comptes Ente Auth sont conservés chiffrés sur cet appareil et affichés avec ceux de votre YubiKey, leurs codes fonctionnent donc hors ligne. Ils sont synchronisés avec Ente à l’ouverture de l’app, après chaque modification et quand vous actualisez la liste. Choisissez « Synchroniser les comptes » pour en choisir à ajouter à votre YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authのアカウントは暗号化されてこのデバイスに保存され、YubiKeyのアカウントと一緒に表示されるため、オフラインでもコードを使えます。アプリを開いたとき、変更のたび、リストを更新したときにEnteと同期されます。YubiKeyに追加するアカウントを選ぶには「アカウントを同期」を選択します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaše účty Ente Auth sa uchovávajú zašifrované na tomto zariadení a zobrazujú sa spolu s účtami na YubiKey, takže ich kódy fungujú aj offline. S Ente sa synchronizujú pri otvorení aplikácie, po každej zmene a keď obnovíte zoznam. Ak chcete vybrať účty na pridanie do YubiKey, zvoľte Synchronizovať účty."
           }
         }
       }
@@ -11363,60 +11711,60 @@
         }
       }
     },
-    "Your session and the key that decrypts your Ente Auth accounts are kept in this Mac's keychain, protected by Touch ID or your Mac's password. Your Ente password is never stored." : {
+    "Your session and the key that decrypts your Ente Auth accounts are kept in this Mac's keychain, protected by Touch ID or your Mac's password. A copy of the accounts is kept on this Mac, encrypted with a key that never leaves it. Your Ente password is never stored." : {
       "comment" : "Mac Ente settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Mac gespeichert, geschützt durch Touch ID oder das Passwort Ihres Mac. Ihr Ente-Passwort wird nie gespeichert."
+            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Mac gespeichert, geschützt durch Touch ID oder das Passwort Ihres Mac. Eine Kopie der Konten wird auf diesem Mac aufbewahrt, verschlüsselt mit einem Schlüssel, der ihn nie verlässt. Ihr Ente-Passwort wird nie gespeichert."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre session et la clé qui déchiffre vos comptes Ente Auth sont conservées dans le trousseau de ce Mac, protégées par Touch ID ou le mot de passe de votre Mac. Votre mot de passe Ente n’est jamais enregistré."
+            "value" : "Votre session et la clé qui déchiffre vos comptes Ente Auth sont conservées dans le trousseau de ce Mac, protégées par Touch ID ou le mot de passe de votre Mac. Une copie des comptes est conservée sur ce Mac, chiffrée avec une clé qui ne le quitte jamais. Votre mot de passe Ente n’est jamais enregistré."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションとEnte Authのアカウントを復号する鍵は、Touch IDまたはMacのパスワードで保護されてこのMacのキーチェーンに保存されます。Enteのパスワードは保存されません。"
+            "value" : "セッションとEnte Authのアカウントを復号する鍵は、Touch IDまたはMacのパスワードで保護されてこのMacのキーチェーンに保存されます。アカウントのコピーは、このMacから出ることのない鍵で暗号化されてこのMacに保存されます。Enteのパスワードは保存されません。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vaša relácia a kľúč, ktorý dešifruje vaše účty Ente Auth, sú uložené v kľúčenke tohto Macu, chránené Touch ID alebo heslom vášho Macu. Vaše heslo k Ente sa nikdy neukladá."
+            "value" : "Vaša relácia a kľúč, ktorý dešifruje vaše účty Ente Auth, sú uložené v kľúčenke tohto Macu, chránené Touch ID alebo heslom vášho Macu. Kópia účtov sa uchováva na tomto Macu, zašifrovaná kľúčom, ktorý ho nikdy neopustí. Vaše heslo k Ente sa nikdy neukladá."
           }
         }
       }
     },
-    "Your session and the key that decrypts your Ente Auth accounts are kept in this device's keychain, protected by Face ID or Touch ID. Your Ente password is never stored." : {
+    "Your session and the key that decrypts your Ente Auth accounts are kept in this device's keychain, protected by Face ID or Touch ID. A copy of the accounts is kept on this device, encrypted with a key that never leaves it. Your Ente password is never stored." : {
       "comment" : "Ente settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Geräts gespeichert, geschützt durch Face ID oder Touch ID. Ihr Ente-Passwort wird nie gespeichert."
+            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Geräts gespeichert, geschützt durch Face ID oder Touch ID. Eine Kopie der Konten wird auf diesem Gerät aufbewahrt, verschlüsselt mit einem Schlüssel, der es nie verlässt. Ihr Ente-Passwort wird nie gespeichert."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Votre session et la clé qui déchiffre vos comptes Ente Auth sont conservées dans le trousseau de cet appareil, protégées par Face ID ou Touch ID. Votre mot de passe Ente n’est jamais enregistré."
+            "value" : "Votre session et la clé qui déchiffre vos comptes Ente Auth sont conservées dans le trousseau de cet appareil, protégées par Face ID ou Touch ID. Une copie des comptes est conservée sur cet appareil, chiffrée avec une clé qui ne le quitte jamais. Votre mot de passe Ente n’est jamais enregistré."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "セッションとEnte Authのアカウントを復号する鍵は、Face IDまたはTouch IDで保護されてこのデバイスのキーチェーンに保存されます。Enteのパスワードは保存されません。"
+            "value" : "セッションとEnte Authのアカウントを復号する鍵は、Face IDまたはTouch IDで保護されてこのデバイスのキーチェーンに保存されます。アカウントのコピーは、このデバイスから出ることのない鍵で暗号化されてこのデバイスに保存されます。Enteのパスワードは保存されません。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vaša relácia a kľúč, ktorý dešifruje vaše účty Ente Auth, sú uložené v kľúčenke tohto zariadenia, chránené Face ID alebo Touch ID. Vaše heslo k Ente sa nikdy neukladá."
+            "value" : "Vaša relácia a kľúč, ktorý dešifruje vaše účty Ente Auth, sú uložené v kľúčenke tohto zariadenia, chránené Face ID alebo Touch ID. Kópia účtov sa uchováva na tomto zariadení, zašifrovaná kľúčom, ktorý ho nikdy neopustí. Vaše heslo k Ente sa nikdy neukladá."
           }
         }
       }

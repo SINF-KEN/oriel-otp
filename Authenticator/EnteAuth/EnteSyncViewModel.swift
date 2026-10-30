@@ -59,15 +59,18 @@ import YubiKit
     @ObservationIgnored private let session: URLSession
     @ObservationIgnored private var task: Task<Void, Never>?
     @ObservationIgnored let watch: WatchAccountSync
+    /// Keeps the accounts of a saved session on the device and syncs them.
+    @ObservationIgnored private let cloud: EnteCloud
 
     init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard,
-         session: URLSession = .shared, watch: WatchAccountSync = .shared) {
+         session: URLSession = .shared, watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) {
         self.existingCredentialIds = existingCredentialIds
         self.capacity = capacity
         self.store = store
         self.defaults = defaults
         self.session = session
         self.watch = watch
+        self.cloud = cloud
         self.server = defaults.string(forKey: Self.serverKey) ?? ""
         // Staying signed in is the default where the device can protect the session, like in Ente's own apps.
         self.staySignedIn = store.canSave
@@ -243,11 +246,14 @@ import YubiKit
             }
             signedInEmail = flow.email
             if saveSession, let authenticatorKey {
-                try store.save(EnteSavedSession(server: api.server, email: flow.email, token: keys.token, authenticatorKey: authenticatorKey))
+                let saved = EnteSavedSession(server: api.server, email: flow.email, token: keys.token, authenticatorKey: authenticatorKey)
+                try store.save(saved)
                 isSessionSaved = true
+                cloud.use(saved)
             } else {
                 // An account kept from an earlier session isn't signed in any more.
                 store.remove()
+                cloud.remove()
             }
             try await loadCodes(api: api, token: keys.token, authenticatorKey: authenticatorKey)
         }
@@ -293,6 +299,7 @@ import YubiKit
             token = saved.token
             signedInEmail = saved.email
             isSessionSaved = true
+            cloud.use(saved)
             try await loadCodes(api: api, token: saved.token, authenticatorKey: saved.authenticatorKey)
         } catch EnteAuthenticatorSyncError.signedOut {
             // The session was revoked, e.g. from another device, or Face ID or Touch ID changed. The account is kept
@@ -323,14 +330,16 @@ import YubiKit
             // waits for the unlock, so the account it saves isn't deleted with this one.
             let store = store
             let watch = watch
+            let cloud = cloud
             isBusy = true
             Task {
-                await store.signOut(watch: watch)
+                await store.signOut(watch: watch, cloud: cloud)
                 isBusy = false
             }
         } else {
             revokeSession()
             store.remove()
+            cloud.remove()
             watch.disable()
         }
         isSessionSaved = false
@@ -361,8 +370,12 @@ import YubiKit
         Task { try? await api.logout(token: token) }
     }
 
+    /// Reads the accounts. With a saved session they come from the vault, after syncing it.
     private func loadCodes(api: EnteAPIClient, token: String, authenticatorKey: Data?) async throws {
-        if let authenticatorKey {
+        if isSessionSaved {
+            try await cloud.syncNow()
+            codes = cloud.codes
+        } else if let authenticatorKey {
             codes = try await EnteAuthenticatorSync.codes(api: api, token: token, authenticatorKey: authenticatorKey)
         } else {
             codes = []
