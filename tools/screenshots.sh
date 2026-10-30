@@ -69,3 +69,20 @@ for new in "$work"/screenshots/*.png; do
     cp "$new" "$old"
     echo "Updated $old"
 done
+
+# The contrast audits that need the simulator's settings, which the screenshots are taken without: dark mode, and
+# Increase Contrast in light and dark mode. Each runs only the test that checks it.
+audit() {
+    local appearance=$1 increase_contrast=$2 test=$3
+    xcrun simctl ui "$udid" appearance "$appearance"
+    xcrun simctl ui "$udid" increase_contrast "$increase_contrast"
+    TEST_RUNNER_APPEARANCE="$appearance" TEST_RUNNER_INCREASE_CONTRAST="$increase_contrast" xcodebuild test-without-building \
+        -project OrielOTP.xcodeproj -scheme Screenshots -destination "id=$udid" \
+        -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} \
+        -only-testing:"OrielOTPUITests/AccessibilityAuditTests/$test" \
+        ${RESULT_BUNDLE_PATH:+-resultBundlePath "${RESULT_BUNDLE_PATH%.xcresult}-$test-$appearance.xcresult"} \
+        | "${formatter[@]}"
+}
+audit dark disabled testDarkAppearance
+audit light enabled testIncreasedContrast
+audit dark enabled testIncreasedContrast

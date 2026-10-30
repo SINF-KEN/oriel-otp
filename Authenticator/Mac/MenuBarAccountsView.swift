@@ -137,7 +137,7 @@ private struct MenuBarAccountRow: View {
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .foregroundStyle(isHovering ? Color.white : Color.primary)
+            .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
             .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
             .contentShape(Rectangle())
         }
@@ -149,6 +149,12 @@ private struct MenuBarAccountRow: View {
                             : account.spokenCode)
         .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
     }
+}
+
+private extension Color {
+    /// Text on the accent color: white on the dark red of light mode, dark on the light pink of dark mode, where white
+    /// would be unreadable.
+    static let onAccent = Color(nsColor: .textBackgroundColor)
 }
 
 private struct MenuBarButton: View {
@@ -167,7 +173,7 @@ private struct MenuBarButton: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .foregroundStyle(isHovering ? Color.white : Color.primary)
+                .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
                 .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
                 .contentShape(Rectangle())
         }

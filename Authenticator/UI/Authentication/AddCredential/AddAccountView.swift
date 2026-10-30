@@ -101,6 +101,24 @@ struct AddAccountView: View {
     }
 
     var body: some View {
+        Group {
+            // The form isn't there under the scanner, so VoiceOver can't find it behind it.
+            #if os(iOS)
+            if mode == .scanning {
+                scanner
+            } else {
+                form
+            }
+            #else
+            form
+            #endif
+        }
+        .onDisappear {
+            accountSubject.send((nil, true, []))
+        }
+    }
+
+    private var form: some View {
         NavigationStack {
             Form {
                 #if os(macOS)
@@ -183,15 +201,11 @@ struct AddAccountView: View {
             // VoiceOver's escape gesture, a two-finger Z, does the same as Cancel.
             .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
-                // Left out while the scanner covers the form: the bar's buttons would still be reachable with
-                // VoiceOver behind it, as hiding the form doesn't hide them.
-                if mode != .scanning {
-                    ToolbarItem(placement: .cancellationAction) {
-                        CancelButton { showAddAccount = false }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        ConfirmButton(String(localized: "Save")) { save() }
-                    }
+                ToolbarItem(placement: .cancellationAction) {
+                    CancelButton { showAddAccount = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    ConfirmButton(String(localized: "Save")) { save() }
                 }
             }
             #if os(macOS)
@@ -225,18 +239,6 @@ struct AddAccountView: View {
                 Text(error.localizedDescription)
             }
             #endif
-        }
-        // Covered by the scanner, so VoiceOver shouldn't reach it either.
-        .accessibilityHidden(mode == .scanning)
-        #if os(iOS)
-        .overlay {
-            if mode == .scanning {
-                scanner
-            }
-        }
-        #endif
-        .onDisappear {
-            accountSubject.send((nil, true, []))
         }
     }
 
@@ -309,6 +311,9 @@ struct AddAccountView: View {
             .ignoresSafeArea()
             .navigationTitle(String(localized: "Add account", comment: "Add account navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            // A black bar, so the white title is on black rather than on whatever the camera shows.
+            .toolbarBackground(.black, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
