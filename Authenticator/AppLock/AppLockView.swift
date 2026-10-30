@@ -20,12 +20,13 @@ import SwiftUI
 struct AppLockView: View {
 
     private var lock: AppLock { .shared }
+    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
 
     var body: some View {
         VStack(spacing: 24) {
             Spacer(minLength: 0)
             Image(systemName: "lock.fill")
-                .font(.system(size: 40, weight: .semibold))
+                .font(.system(size: iconSize, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
             Text(String(localized: "Oriel OTP is locked", comment: "App lock screen title"))
@@ -57,7 +58,7 @@ struct AppLockView: View {
             Spacer(minLength: 0)
         }
         .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .scrollsWhenTooTall()
         .background(Color(.systemBackground))
     }
 }
@@ -110,6 +111,10 @@ private struct AppLockCodePad: View {
     @State private var code = ""
     @State private var wrongAttempts = 0
     @FocusState private var isFocused: Bool
+    // The keys grow with the text, up to a size where three still fit across the smallest iPhone. Beyond that the
+    // digits stop growing and show in the Large Content Viewer when held.
+    @ScaledMetric(relativeTo: .title) private var scaledKeySize: CGFloat = 72
+    private var keySize: CGFloat { min(scaledKeySize, 96) }
 
     private let rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
 
@@ -134,15 +139,17 @@ private struct AppLockCodePad: View {
                     }
                 }
                 GridRow {
-                    Color.clear.frame(width: 72, height: 72)
+                    Color.clear.frame(width: keySize, height: keySize)
                     key("0")
                     Button(action: deleteDigit) {
                         Image(systemName: "delete.backward")
                             .font(.title2)
-                            .frame(width: 72, height: 72)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                            .frame(width: keySize, height: keySize)
                             .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityShowsLargeContentViewer()
                     .accessibilityLabel(String(localized: "Delete", comment: "App lock number pad delete button"))
                     .accessibilityInputLabels([String(localized: "Delete", comment: "App lock number pad delete button"),
                                                String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")])
@@ -171,11 +178,13 @@ private struct AppLockCodePad: View {
         } label: {
             Text(verbatim: digit)
                 .font(.title.weight(.regular))
-                .frame(width: 72, height: 72)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                .frame(width: keySize, height: keySize)
                 .background(Color.secondary.opacity(0.18), in: Circle())
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
+        .accessibilityShowsLargeContentViewer { Text(verbatim: digit) }
         // Typed as soon as the finger lifts, like the system's passcode keys.
         .accessibilityAddTraits(.isKeyboardKey)
     }
