@@ -114,6 +114,11 @@ struct AccountRowView<Accessory: View>: View {
             }
         }
         .contentShape(Rectangle())
+        // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
+        // code is copied with the row's Copy action.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(account.accessibilityLabel)
+        .accessibilityValue(accessibilityValue)
         .onChange(of: account.state) { _, state in
             // Not sure why we have to schedule this in the next runloop
             Task {
@@ -132,6 +137,10 @@ struct AccountRowView<Accessory: View>: View {
         .onDisappear {
             animate = false
         }
+    }
+
+    private var accessibilityValue: String {
+        showsLocation ? account.accessibilityCodeState + ", " + account.locationDescription : account.accessibilityCodeState
     }
 
     private var codePill: some View {
@@ -178,7 +187,7 @@ struct AccountRowView<Accessory: View>: View {
         // Tapping the code copies it; copying is also in the row's context menu and swipe actions.
         .contentShape(Capsule())
         .accessibilityElement()
-        .accessibilityLabel(account.state == .expired ? String(localized: "Code expired", comment: "Accessibility label") : account.formattedCode ?? String(localized: "Code not calculated", comment: "Accessibility label"))
+        .accessibilityLabel(account.spokenCode)
         .opacity(pillOpacity)
     }
 }
@@ -207,6 +216,36 @@ struct AccountLocationIcon: View {
 }
 
 extension Account {
+    /// The code for VoiceOver, read digit by digit, e.g. "1 2 3, 4 5 6" rather than "one hundred twenty-three".
+    var spokenCode: String {
+        if state == .expired {
+            return String(localized: "Code expired", comment: "Accessibility label")
+        }
+        guard let code = formattedCode else {
+            return String(localized: "Code not calculated", comment: "Accessibility label")
+        }
+        return Self.spokenDigits(code)
+    }
+
+    /// Splits each group of a code into its characters, so VoiceOver reads them one by one with a pause between groups.
+    static func spokenDigits(_ code: String) -> String {
+        code.split(separator: " ").map { $0.map(String.init).joined(separator: " ") }.joined(separator: ", ")
+    }
+
+    /// The issuer, account name and code, as one sentence for VoiceOver.
+    var accessibilityLabel: String {
+        ([title] + [subTitle].compactMap { $0 } + [spokenCode]).joined(separator: ", ")
+    }
+
+    /// How long the code is valid for, or what's needed to get one.
+    var accessibilityCodeState: String {
+        if case .countingdown = state, let secondsLeft {
+            return String(localized: "\(secondsLeft) seconds left", comment: "VoiceOver, time until the code changes")
+        }
+        return requiresTouch ? String(localized: "Requires touch", comment: "Mac menu bar help")
+            : String(localized: "Calculate to get a code", comment: "VoiceOver, an account whose code hasn't been calculated")
+    }
+
     var locationDescription: String {
         if !isInEnte {
             String(localized: "Stored on YubiKey", comment: "Where an account is stored")

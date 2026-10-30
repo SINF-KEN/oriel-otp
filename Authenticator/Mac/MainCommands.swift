@@ -203,7 +203,4 @@ enum AppWindow {
     static let tutorial = "tutorial"
 }
 
-// For the rename sheet.
-extension Account: Identifiable {}
-
 #endif

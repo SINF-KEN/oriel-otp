@@ -177,6 +177,8 @@ struct AddAccountView: View {
             .formStyle(.grouped)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
+            // VoiceOver's escape gesture, a two-finger Z, does the same as Cancel.
+            .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { showAddAccount = false }
@@ -300,6 +302,7 @@ struct AddAccountView: View {
             .ignoresSafeArea()
             .navigationTitle(String(localized: "Add account", comment: "Add account navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { showAddAccount = false }

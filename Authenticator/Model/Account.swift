@@ -140,6 +140,13 @@ import YubiKit
         }
     }
     
+    /// Whole seconds until a time-based code changes, rounded up so it reads 1 until the code has expired.
+    var secondsLeft: Int? {
+        guard credential.type == .totp, let validity = otp?.validity else { return nil }
+        let timeLeft = validity.end.timeIntervalSince(AppClock.now)
+        return timeLeft > 0 ? Int(timeLeft.rounded(.up)) : nil
+    }
+
     var iconColor: Color {
 #if DEBUG
         // return hard coded nice looking colors for app store screen shots
@@ -181,6 +188,9 @@ import YubiKit
         }
     }
 }
+
+// For the rename sheet.
+extension Account: Identifiable {}
 
 extension Account: Comparable {
     static func == (lhs: Account, rhs: Account) -> Bool {

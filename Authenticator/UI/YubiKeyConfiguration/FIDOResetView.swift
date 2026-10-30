@@ -38,6 +38,7 @@ struct FIDOResetView: View {
     var body: some View {
         SettingsView(image: image, imageColor: imageColor) {
             Text("Reset FIDO application").font(.title2).bold().opacity(keyHasBeenReset ? 0.2 : 1.0)
+                .accessibilityAddTraits(.isHeader)
             ProgressView(value: progress, total: 1.0).opacity(keyHasBeenReset ? 0.2 : 1.0)
             Text(messageText).font(.subheadline).multilineTextAlignment(.center).opacity(keyHasBeenReset ? 0.2 : 1.0)
         } buttons: {

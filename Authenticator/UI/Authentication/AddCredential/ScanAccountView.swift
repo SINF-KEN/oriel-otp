@@ -215,6 +215,13 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         }
     }
     
+    // VoiceOver starts on the instructions rather than somewhere in the camera preview.
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        guard window != nil else { return }
+        UIAccessibility.post(notification: .screenChanged, argument: textLabel)
+    }
+
     override func layoutSubviews() {
         // Before super, so the content guide constraints updated here apply in this layout pass.
         if bounds.size != lastLayoutSize || contentRect != lastContentRect {
@@ -395,6 +402,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         }
         
         self.errorOverlay?.isHidden = true
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "QR code scanned", comment: "VoiceOver announcement after scanning a QR code"))
         UIView.animate(withDuration: 0.2) {
             self.textLabel.text = Self.scanMessage
             self.checkboxImageView.alpha = 1
@@ -418,6 +426,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     }
     
     private func showError(_ message: String) {
+        UIAccessibility.post(notification: .announcement, argument: message)
         UIView.animate(withDuration: 0.5) {
             self.errorOverlay?.alpha = 1
             self.textLabel.text = message
@@ -435,6 +444,7 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
     private func showPermissionError() {
         if self.permissionView.isHidden {
             self.permissionView.isHidden = false
+            UIAccessibility.post(notification: .layoutChanged, argument: permissionView)
             UIView.animate(withDuration: 0.7) {
                 self.permissionView.alpha = 1
                 self.errorOverlay?.alpha = 1

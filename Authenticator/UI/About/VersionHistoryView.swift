@@ -50,6 +50,9 @@ struct VersionHistoryView: View {
                 }
             }
         }
+        .accessibilityAction(.escape) {
+            if presentedFromMainView { dismiss() }
+        }
         .toolbar {
             if presentedFromMainView {
                 ToolbarItem(placement: .cancellationAction) {
