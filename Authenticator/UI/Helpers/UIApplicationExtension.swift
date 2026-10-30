@@ -25,4 +25,10 @@ extension Bundle {
     nonisolated var appBuildNumber: String {
         return object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? ""
     }
+    /// The short SHA of the commit the app was built from. Release builds get it from the `ORIEL_COMMIT` build
+    /// setting (the TestFlight workflow and `orielotp build` set it); other builds don't have one.
+    nonisolated var appCommit: String? {
+        guard let commit = object(forInfoDictionaryKey: "OrielCommit") as? String, !commit.isEmpty else { return nil }
+        return commit
+    }
 }

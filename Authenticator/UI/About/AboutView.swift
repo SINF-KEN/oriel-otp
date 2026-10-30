@@ -39,6 +39,13 @@ struct AboutView: View {
                         .multilineTextAlignment(.center)
                     Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
                         .scaledFont(.body)
+                    if let commit = Bundle.main.appCommit {
+                        Text(verbatim: commit)
+                            .scaledFont(.footnote) { $0.monospaced() }
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                            .accessibilityIdentifier("about.commit")
+                    }
                     AboutLanguageView()
                 }
                 .frame(maxWidth: .infinity)
