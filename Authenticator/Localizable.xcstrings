@@ -396,6 +396,35 @@
         }
       }
     },
+    "A HOTP account is saved in one place only, as each copy would count its codes on its own." : {
+      "comment" : "Add account footer for a HOTP account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein HOTP-Konto wird nur an einem Ort gespeichert, da jede Kopie ihre Codes selbst zählen würde."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un compte HOTP n’est enregistré qu’à un seul endroit, car chaque copie compterait ses codes de son côté."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HOTPアカウントは1か所にのみ保存されます。コピーごとにコードを別々に数えてしまうためです。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účet HOTP sa ukladá len na jedno miesto, pretože každá kópia by počítala svoje kódy samostatne."
+          }
+        }
+      }
+    },
     "A PIN must be at least %llu characters long and may contain letters, numbers and special characters." : {
       "localizations" : {
         "de" : {
@@ -448,6 +477,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN kód musí mať aspoň %llu znakov, musí obsahovať aspoň 2 jedinečné znaky a nesmie byť bežne používaným PIN kódom ako napríklad „123456“. Môže obsahovať písmená, číslice a špeciálne znaky."
+          }
+        }
+      }
+    },
+    "A YubiKey never gives its accounts back, so it can't be copied to Ente Auth later. Choose YubiKey and Ente Auth to keep it in both." : {
+      "comment" : "Add account footer when adding to the YubiKey only",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein YubiKey gibt seine Konten nie wieder heraus, daher kann es später nicht zu Ente Auth kopiert werden. Wählen Sie „YubiKey und Ente Auth“, um es an beiden Orten zu behalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une YubiKey ne rend jamais ses comptes, il ne pourra donc pas être copié dans Ente Auth plus tard. Choisissez « YubiKey et Ente Auth » pour le garder aux deux endroits."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyはアカウントを取り出せないため、後からEnte Authにコピーすることはできません。両方に保存するには「YubiKeyとEnte Auth」を選択してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey svoje účty nikdy nevydá, takže ho neskôr nebude možné skopírovať do Ente Auth. Ak ho chcete mať na oboch miestach, vyberte YubiKey a Ente Auth."
+          }
+        }
+      }
+    },
+    "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth." : {
+      "comment" : "Account details of a YubiKey account while signed in to Ente Auth",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein YubiKey gibt seine Konten nie wieder heraus, daher kann dieses Konto nicht zu Ente Auth kopiert werden. Um ein Konto an beiden Orten zu behalten, fügen Sie es erneut hinzu und wählen Sie „YubiKey und Ente Auth“."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une YubiKey ne rend jamais ses comptes, ce compte ne peut donc pas être copié dans Ente Auth. Pour garder un compte aux deux endroits, ajoutez-le à nouveau en choisissant « YubiKey et Ente Auth »."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyはアカウントを取り出せないため、このアカウントはEnte Authにコピーできません。両方に保存するには、もう一度追加して「YubiKeyとEnte Auth」を選択してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey svoje účty nikdy nevydá, takže tento účet nie je možné skopírovať do Ente Auth. Ak chcete mať účet na oboch miestach, pridajte ho znova a vyberte YubiKey a Ente Auth."
           }
         }
       }
@@ -1423,89 +1510,60 @@
         }
       }
     },
-    "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this Mac, and nothing in Ente Auth is changed." : {
+    "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nWith Stay signed in, your Ente Auth accounts are listed here too, and changes you make are saved in Ente Auth. Your Ente Auth data is decrypted on this Mac." : {
       "comment" : "Mac tutorial",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sie nutzen bereits Ente Auth? Wählen Sie „Ablage“ > „Mit Ente Auth synchronisieren“, melden Sie sich an und wählen Sie die Konten aus, die auf Ihren YubiKey sollen.\n\nIhre Ente-Auth-Daten werden auf diesem Mac entschlüsselt, und in Ente Auth wird nichts geändert."
+            "value" : "Sie nutzen bereits Ente Auth? Wählen Sie „Ablage“ > „Mit Ente Auth synchronisieren“, melden Sie sich an und wählen Sie die Konten aus, die auf Ihren YubiKey sollen.\n\nMit „Angemeldet bleiben“ werden Ihre Ente-Auth-Konten auch hier angezeigt, und Ihre Änderungen werden in Ente Auth gespeichert. Ihre Ente-Auth-Daten werden auf diesem Mac entschlüsselt."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous utilisez déjà Ente Auth ? Choisissez Fichier > Synchroniser depuis Ente Auth, connectez-vous et choisissez les comptes à ajouter à votre YubiKey.\n\nVos données Ente Auth sont déchiffrées sur ce Mac, et rien n’est modifié dans Ente Auth."
+            "value" : "Vous utilisez déjà Ente Auth ? Choisissez Fichier > Synchroniser depuis Ente Auth, connectez-vous et choisissez les comptes à ajouter à votre YubiKey.\n\nAvec Rester connecté, vos comptes Ente Auth sont aussi listés ici, et vos modifications sont enregistrées dans Ente Auth. Vos données Ente Auth sont déchiffrées sur ce Mac."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Auth をお使いですか？「ファイル」>「Ente Authから同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\nEnte Auth のデータはこの Mac 上で復号され、Ente Auth の内容は変更されません。"
+            "value" : "Ente Auth をお使いですか？「ファイル」>「Ente Authから同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\n「ログインしたままにする」をオンにすると、Ente Auth のアカウントもここに表示され、変更は Ente Auth に保存されます。Ente Auth のデータはこの Mac 上で復号されます。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Už používate Ente Auth? Vyberte Súbor > Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nVaše údaje z Ente Auth sa dešifrujú v tomto Macu a v Ente Auth sa nič nezmení."
+            "value" : "Už používate Ente Auth? Vyberte Súbor > Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nSo zapnutou možnosťou Zostať prihlásený sa tu zobrazia aj vaše účty z Ente Auth a vaše zmeny sa uložia do Ente Auth. Vaše údaje z Ente Auth sa dešifrujú v tomto Macu."
           }
         }
       }
     },
-    "Already use Ente Auth? Choose Sync from Ente Auth in the account list menu, sign in and pick the accounts to add to your YubiKey.\n\nYour Ente Auth data is decrypted on this device, and nothing in Ente Auth is changed." : {
+    "Already use Ente Auth? Choose Sync from Ente Auth in the account list menu, sign in and pick the accounts to add to your YubiKey.\n\nWith Stay signed in, your Ente Auth accounts are listed here too, and changes you make are saved in Ente Auth. Your Ente Auth data is decrypted on this device." : {
       "comment" : "Tutorial",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du nutzt schon Ente Auth? Wähle im Menü der Kontenliste „Aus Ente Auth synchronisieren“, melde dich an und wähle die Konten aus, die auf deinen YubiKey sollen.\n\nDeine Ente-Auth-Daten werden auf diesem Gerät entschlüsselt, und in Ente Auth wird nichts geändert."
+            "value" : "Du nutzt schon Ente Auth? Wähle im Menü der Kontenliste „Aus Ente Auth synchronisieren“, melde dich an und wähle die Konten aus, die auf deinen YubiKey sollen.\n\nMit „Angemeldet bleiben“ werden deine Ente-Auth-Konten auch hier angezeigt, und deine Änderungen werden in Ente Auth gespeichert. Deine Ente-Auth-Daten werden auf diesem Gerät entschlüsselt."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vous utilisez déjà Ente Auth ? Choisissez Synchroniser depuis Ente Auth dans le menu de la liste des comptes, connectez-vous et choisissez les comptes à ajouter à votre YubiKey.\n\nVos données Ente Auth sont déchiffrées sur cet appareil, et rien n’est modifié dans Ente Auth."
+            "value" : "Vous utilisez déjà Ente Auth ? Choisissez Synchroniser depuis Ente Auth dans le menu de la liste des comptes, connectez-vous et choisissez les comptes à ajouter à votre YubiKey.\n\nAvec Rester connecté, vos comptes Ente Auth sont aussi listés ici, et vos modifications sont enregistrées dans Ente Auth. Vos données Ente Auth sont déchiffrées sur cet appareil."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Auth をお使いですか？アカウント一覧のメニューから「Ente Auth から同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\nEnte Auth のデータはこのデバイス上で復号され、Ente Auth の内容は変更されません。"
+            "value" : "Ente Auth をお使いですか？アカウント一覧のメニューから「Ente Auth から同期」を選んでサインインし、YubiKey に追加するアカウントを選んでください。\n\n「ログインしたままにする」をオンにすると、Ente Auth のアカウントもここに表示され、変更は Ente Auth に保存されます。Ente Auth のデータはこのデバイス上で復号されます。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Už používate Ente Auth? V ponuke zoznamu účtov vyberte Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nVaše údaje z Ente Auth sa dešifrujú v tomto zariadení a v Ente Auth sa nič nezmení."
-          }
-        }
-      }
-    },
-    "Also add to Ente Auth" : {
-      "comment" : "Add account toggle",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auch zu Ente Auth hinzufügen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter aussi à Ente Auth"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ente Authにも追加"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pridať aj do Ente Auth"
+            "value" : "Už používate Ente Auth? V ponuke zoznamu účtov vyberte Synchronizovať z Ente Auth, prihláste sa a vyberte účty, ktoré chcete pridať do YubiKey.\n\nSo zapnutou možnosťou Zostať prihlásený sa tu zobrazia aj vaše účty z Ente Auth a vaše zmeny sa uložia do Ente Auth. Vaše údaje z Ente Auth sa dešifrujú v tomto zariadení."
           }
         }
       }
@@ -2370,6 +2428,35 @@
         }
       }
     },
+    "Copied to the YubiKey" : {
+      "comment" : "Toast after copying an Ente Auth account to the YubiKey",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf den YubiKey kopiert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copié sur la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyにコピーしました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skopírované do YubiKey"
+          }
+        }
+      }
+    },
     "Copies the code" : {
       "comment" : "Mac menu bar accessibility hint",
       "localizations" : {
@@ -2598,6 +2685,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopírovať kód pre ${account}"
+          }
+        }
+      }
+    },
+    "Copy to YubiKey" : {
+      "comment" : "Menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf YubiKey kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copier sur la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyにコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopírovať do YubiKey"
           }
         }
       }
@@ -4901,6 +5017,64 @@
         }
       }
     },
+    "Move to YubiKey" : {
+      "comment" : "Menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf YubiKey verschieben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer sur la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyに移動"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presunúť do YubiKey"
+          }
+        }
+      }
+    },
+    "Moved to the YubiKey. Ente Auth keeps it in the trash." : {
+      "comment" : "Toast after moving an Ente Auth account to the YubiKey",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf den YubiKey verschoben. Ente Auth behält es im Papierkorb."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacé sur la YubiKey. Ente Auth le garde dans la corbeille."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyに移動しました。Ente Authではゴミ箱に残ります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presunuté do YubiKey. Ente Auth ho ponechá v koši."
+          }
+        }
+      }
+    },
     "NFC not supported on this device" : {
       "comment" : "Internal error message not to be displayed to the user.",
       "localizations" : {
@@ -6910,6 +7084,64 @@
         }
       }
     },
+    "Put the account on the YubiKey and keep it in Ente Auth" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Konto auf den YubiKey legen und in Ente Auth behalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre le compte sur la YubiKey et le garder dans Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをYubiKeyに保存し、Ente Authにも残します"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť účet do YubiKey a ponechať ho v Ente Auth"
+          }
+        }
+      }
+    },
+    "Put the account on the YubiKey and move it to the trash in Ente Auth" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Konto auf den YubiKey legen und in Ente Auth in den Papierkorb verschieben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mettre le compte sur la YubiKey et le placer dans la corbeille d’Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをYubiKeyに保存し、Ente Authではゴミ箱に移動します"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť účet do YubiKey a v Ente Auth ho presunúť do koša"
+          }
+        }
+      }
+    },
     "QR code" : {
       "comment" : "Mac add account section header",
       "localizations" : {
@@ -7740,6 +7972,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uložiť heslo?"
+          }
+        }
+      }
+    },
+    "Save to" : {
+      "comment" : "Add account picker of where the account is saved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichern auf"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer sur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存先"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť do"
           }
         }
       }
@@ -9300,6 +9561,35 @@
         }
       }
     },
+    "The YubiKey already has an account with this name. Nothing was changed." : {
+      "comment" : "Toast when copying an Ente Auth account to a YubiKey that has one with the same name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der YubiKey hat bereits ein Konto mit diesem Namen. Es wurde nichts geändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La YubiKey a déjà un compte portant ce nom. Rien n’a été modifié."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyには同じ名前のアカウントがすでにあります。何も変更されていません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey už má účet s týmto názvom. Nič sa nezmenilo."
+          }
+        }
+      }
+    },
     "The YubiKey has no more storage for OATH accounts." : {
       "localizations" : {
         "de" : {
@@ -10480,6 +10770,35 @@
         }
       }
     },
+    "To save accounts in Ente Auth too, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on." : {
+      "comment" : "Add account footer without a saved Ente session",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um Konten auch in Ente Auth zu speichern, wählen Sie im Menü „Aus Ente Auth synchronisieren“ und melden Sie sich mit aktiviertem „Angemeldet bleiben“ an."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour enregistrer aussi des comptes dans Ente Auth, choisissez « Synchroniser depuis Ente Auth » dans le menu et connectez-vous avec « Rester connecté » activé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authにもアカウントを保存するには、メニューで「Ente Auth から同期」を選び、「ログインしたままにする」をオンにしてサインインしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ak chcete účty ukladať aj do Ente Auth, v menu vyberte Synchronizovať z Ente Auth a prihláste sa so zapnutou možnosťou Zostať prihlásený."
+          }
+        }
+      }
+    },
     "To scan a QR code, allow Oriel OTP to use the camera in Settings." : {
       "comment" : "Scan QR code camera error message",
       "localizations" : {
@@ -10505,35 +10824,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ak chcete naskenovať QR kód, povoľte aplikácii Oriel OTP v Nastaveniach prístup ku kamere."
-          }
-        }
-      }
-    },
-    "To use this, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on." : {
-      "comment" : "Add account Ente Auth footer without a saved Ente session",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wählen Sie dazu im Menü „Mit Ente Auth synchronisieren“ und melden Sie sich mit aktiviertem „Angemeldet bleiben“ an."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pour l’utiliser, choisissez Synchroniser depuis Ente Auth dans le menu et connectez-vous avec Rester connecté activé."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "使用するには、メニューから「Ente Authから同期」を選び、「サインインしたままにする」をオンにしてサインインしてください。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ak to chcete použiť, v ponuke vyberte Synchronizovať z Ente Auth a prihláste sa so zapnutou voľbou Zostať prihlásený."
           }
         }
       }
@@ -11823,6 +12113,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Účet YubiKey"
+          }
+        }
+      }
+    },
+    "YubiKey and Ente Auth" : {
+      "comment" : "Add account destination",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey und Ente Auth"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey et Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyとEnte Auth"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKey a Ente Auth"
           }
         }
       }
