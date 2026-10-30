@@ -20,8 +20,9 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        # The checkouts' workspace-state.json format belongs to the Xcode that wrote it.
-        xcode=$(xcodebuild -version | awk '/Build version/ { print $3 }')
+        # The checkouts' workspace-state.json format belongs to the Xcode that wrote it. The build version is read
+        # from the Xcode bundle: the first xcodebuild on a fresh runner takes over a minute to start.
+        xcode=$(/usr/libexec/PlistBuddy -c 'Print :ProductBuildVersion' "$(xcode-select -p)/../version.plist")
         echo "path=$RUNNER_TEMP/SourcePackages" >> "$GITHUB_OUTPUT"
         # hashFiles() runs in a helper process with a fixed two-minute limit, which a busy runner has exceeded.
         resolved=$(shasum -a 256 OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved \

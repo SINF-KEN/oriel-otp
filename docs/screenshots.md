@@ -72,15 +72,16 @@ CI doesn't run this script yet.
 
 ## In CI
 
-`.github/workflows/screenshots.yml` runs both scripts when the app, the tests or the scripts change:
+`.github/workflows/screenshots.yml` runs both scripts, on two runners at the same time, when the app, the tests or the
+scripts change:
 
-- On pull requests, the screenshots are uploaded as the `screenshots` artifact of the run, so UI changes can be
-  looked at before merging.
-- On `main`, changed screenshots are committed as "Update the README screenshots" and force-pushed to the
-  `bot/screenshots` branch, and the run's summary links to a new pull request from it. `main` only takes pull
-  requests and Actions isn't allowed to open them here, so a maintainer opens it, which also runs the required
-  `build` check. When nothing changed, nothing is pushed. The workflow can also be started by hand from the
-  Actions tab.
+- The screenshots are uploaded as the `screenshots-ios` and `screenshots-macos` artifacts of the run, so UI changes
+  can be looked at before merging.
+- On `main`, a last job puts both sets together, and changed screenshots are committed as "Update the README
+  screenshots" and force-pushed to the `bot/screenshots` branch, and the run's summary links to a new pull request
+  from it. `main` only takes pull requests and Actions isn't allowed to open them here, so a maintainer opens it,
+  which also runs the required `build` check. When nothing changed, nothing is pushed. The workflow can also be
+  started by hand from the Actions tab.
 
 Different simulator models and iOS versions render slightly differently, so CI's screenshots are the reference. A
 screenshot committed from a different simulator may be replaced by CI's once.
