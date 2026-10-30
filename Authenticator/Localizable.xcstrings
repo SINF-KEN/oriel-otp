@@ -204,6 +204,41 @@
         }
       }
     },
+    "%lld of %lld digits entered" : {
+      "comment" : "App lock code dots for VoiceOver",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld digits entered"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld von %2$lld Ziffern eingegeben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld chiffres saisis sur %2$lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%2$lld桁中%1$lld桁入力済み"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadané %1$lld z %2$lld číslic"
+          }
+        }
+      }
+    },
     "%lld of %lld free" : {
       "comment" : "Ente sync free space. The placeholders are the free and total number of accounts the YubiKey can hold.",
       "localizations" : {
@@ -364,6 +399,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "*** *** "
+          }
+        }
+      }
+    },
+    "4-digit code" : {
+      "comment" : "App lock method",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4-stelliger Code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code à 4 chiffres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4桁のコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4-miestny kód"
+          }
+        }
+      }
+    },
+    "6-digit code" : {
+      "comment" : "App lock method",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6-stelliger Code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code à 6 chiffres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6桁のコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "6-miestny kód"
           }
         }
       }
@@ -1597,6 +1690,35 @@
         }
       }
     },
+    "App lock" : {
+      "comment" : "App lock settings section header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App-Sperre"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrouillage de l’app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリのロック"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uzamknutie aplikácie"
+          }
+        }
+      }
+    },
     "Application" : {
       "localizations" : {
         "de" : {
@@ -1621,6 +1743,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aplikácia"
+          }
+        }
+      }
+    },
+    "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth." : {
+      "comment" : "App lock settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird abgefragt, wenn die App geöffnet wird oder aus dem Hintergrund zurückkehrt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Lösche die App, Deine Konten bleiben auf Deinem YubiKey und in Ente Auth."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demandé à l’ouverture de l’app ou à son retour au premier plan. Un code ou un mot de passe oublié ne peut pas être récupéré : supprimez l’app, vos comptes restent sur votre YubiKey et dans Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリを開いたとき、またはバックグラウンドから戻ったときに求められます。忘れたコードやパスワードは復元できません。アプリを削除してください。アカウントはYubiKeyとEnte Authに残っています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyžaduje sa pri otvorení aplikácie alebo pri návrate z pozadia. Zabudnutý kód alebo heslo sa nedá obnoviť: odstráňte aplikáciu, vaše účty zostanú na YubiKey a v Ente Auth."
+          }
+        }
+      }
+    },
+    "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth." : {
+      "comment" : "Mac app lock settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird abgefragt, wenn die App geöffnet wird, der Bildschirm gesperrt wird oder der Mac in den Ruhezustand wechselt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Lösche die App, Deine Konten bleiben auf Deinem YubiKey und in Ente Auth."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demandé à l’ouverture de l’app, au verrouillage de l’écran ou à la mise en veille du Mac. Un code ou un mot de passe oublié ne peut pas être récupéré : supprimez l’app, vos comptes restent sur votre YubiKey et dans Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリを開いたとき、画面がロックされたとき、Macがスリープしたときに求められます。忘れたコードやパスワードは復元できません。アプリを削除してください。アカウントはYubiKeyとEnte Authに残っています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vyžaduje sa pri otvorení aplikácie, uzamknutí obrazovky alebo uspaní Macu. Zabudnutý kód alebo heslo sa nedá obnoviť: odstráňte aplikáciu, vaše účty zostanú na YubiKey a v Ente Auth."
           }
         }
       }
@@ -1856,6 +2036,64 @@
         }
       }
     },
+    "Change code" : {
+      "comment" : "App lock setting button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code ändern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードを変更"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmeniť kód"
+          }
+        }
+      }
+    },
+    "Change how Oriel OTP is locked" : {
+      "comment" : "Face ID reason when changing the app lock",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändern, wie Oriel OTP gesperrt wird"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le verrouillage d’Oriel OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPのロック方法を変更"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmeniť spôsob uzamknutia Oriel OTP"
+          }
+        }
+      }
+    },
     "Change PIN" : {
       "localizations" : {
         "de" : {
@@ -1937,6 +2175,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Skontrolujte e-mail"
+          }
+        }
+      }
+    },
+    "Choose a %lld-digit code" : {
+      "comment" : "App lock change prompt. The placeholder is 4 or 6.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle einen %lld-stelligen Code"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un code à %lld chiffres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld桁のコードを設定してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zvoľte %lld-miestny kód"
+          }
+        }
+      }
+    },
+    "Choose a password of at least 4 characters" : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Passwort mit mindestens 4 Zeichen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un mot de passe d’au moins 4 caractères"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4文字以上のパスワードを設定してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zvoľte heslo s aspoň 4 znakmi"
           }
         }
       }
@@ -3151,6 +3447,35 @@
         }
       }
     },
+    "Device passcode" : {
+      "comment" : "App lock method on a device without Face ID or Touch ID",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerätecode"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code de l’appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "デバイスのパスコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kód zariadenia"
+          }
+        }
+      }
+    },
     "Device type" : {
       "localizations" : {
         "de" : {
@@ -3554,6 +3879,64 @@
         }
       }
     },
+    "Enter the code again" : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib den Code erneut ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez à nouveau le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードをもう一度入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte kód znova"
+          }
+        }
+      }
+    },
+    "Enter the password again" : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib das Passwort erneut ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez à nouveau le mot de passe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードをもう一度入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte heslo znova"
+          }
+        }
+      }
+    },
     "Enter the PIN to access the certificate." : {
       "comment" : "PIV extension enter PIN message",
       "localizations" : {
@@ -3666,6 +4049,122 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Zadajte overovací kód, ktorý Ente poslal na %@."
+          }
+        }
+      }
+    },
+    "Enter your code" : {
+      "comment" : "App lock screen prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Deinen Code ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez votre code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte kód"
+          }
+        }
+      }
+    },
+    "Enter your current code" : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Deinen aktuellen Code ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez votre code actuel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のコードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte aktuálny kód"
+          }
+        }
+      }
+    },
+    "Enter your current password" : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Dein aktuelles Passwort ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez votre mot de passe actuel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のパスワードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte aktuálne heslo"
+          }
+        }
+      }
+    },
+    "Enter your password" : {
+      "comment" : "App lock screen prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Dein Passwort ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez votre mot de passe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte heslo"
           }
         }
       }
@@ -4932,6 +5431,64 @@
         }
       }
     },
+    "Lock with" : {
+      "comment" : "App lock setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sperren mit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verrouiller avec"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ロック方法"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uzamknúť pomocou"
+          }
+        }
+      }
+    },
+    "Mac password" : {
+      "comment" : "App lock method on a Mac without Touch ID",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac-Passwort"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe du Mac"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Macのパスワード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heslo Macu"
+          }
+        }
+      }
+    },
     "Manage PIN" : {
       "localizations" : {
         "de" : {
@@ -5822,6 +6379,35 @@
         }
       }
     },
+    "Off" : {
+      "comment" : "App lock method",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypnuté"
+          }
+        }
+      }
+    },
     "OK" : {
       "comment" : "OK button in error alert.\nPassword alert",
       "localizations" : {
@@ -6136,6 +6722,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pomocník Oriel OTP"
+          }
+        }
+      }
+    },
+    "Oriel OTP is locked" : {
+      "comment" : "App lock screen title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP ist gesperrt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP est verrouillé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPはロックされています"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP je uzamknutý"
           }
         }
       }
@@ -9475,6 +10090,35 @@
         }
       }
     },
+    "The codes didn't match. Choose a code." : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Codes stimmen nicht überein. Wähle einen Code."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les codes ne correspondent pas. Choisissez un code."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードが一致しません。コードを設定してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kódy sa nezhodujú. Zvoľte kód."
+          }
+        }
+      }
+    },
     "The FIDO application of your YubiKey has been reset to factory defaults." : {
       "comment" : "FIDO reset view",
       "localizations" : {
@@ -9529,6 +10173,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aplikácia OATH je na tomto YubiKey vypnutá alebo nie je podporovaná."
+          }
+        }
+      }
+    },
+    "The passwords didn't match. Choose a password." : {
+      "comment" : "App lock change prompt",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Passwörter stimmen nicht überein. Wähle ein Passwort."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mots de passe ne correspondent pas. Choisissez un mot de passe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードが一致しません。パスワードを設定してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heslá sa nezhodujú. Zvoľte heslo."
           }
         }
       }
@@ -10909,6 +11582,35 @@
         }
       }
     },
+    "Too many attempts. Try again in %@." : {
+      "comment" : "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu viele Versuche. Versuche es in %@ erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trop de tentatives. Réessayez dans %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "試行回数が多すぎます。%@後にもう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Príliš veľa pokusov. Skúste to znova o %@."
+          }
+        }
+      }
+    },
     "Too many attempts. Try again later." : {
       "comment" : "Ente sign in error",
       "localizations" : {
@@ -11249,6 +11951,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Neznáma chyba."
+          }
+        }
+      }
+    },
+    "Unlock Oriel OTP" : {
+      "comment" : "Face ID reason when unlocking the app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTP entsperren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déverrouiller Oriel OTP"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPのロックを解除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odomknúť Oriel OTP"
+          }
+        }
+      }
+    },
+    "Unlock with %@" : {
+      "comment" : "App lock screen button. The placeholder is Face ID, Touch ID or Device passcode.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit %@ entsperren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déverrouiller avec %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@でロック解除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odomknúť pomocou %@"
+          }
+        }
+      }
+    },
+    "Unlock your device to open Oriel OTP." : {
+      "comment" : "App lock screen before the device was first unlocked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entsperre Dein Gerät, um Oriel OTP zu öffnen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déverrouillez votre appareil pour ouvrir Oriel OTP."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPを開くにはデバイスのロックを解除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ak chcete otvoriť Oriel OTP, odomknite zariadenie."
           }
         }
       }
