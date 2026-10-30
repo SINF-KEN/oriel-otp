@@ -111,11 +111,14 @@ struct AddAccountView: View {
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Add account field")) {
                         TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer)
+                            // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
+                            .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
                             .submitLabel(.next)
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
                         TextField(String("john@doe.com"), text: $accountName)
+                            .accessibilityLabel(String(localized: "Account name", comment: "Add account field"))
                             .textContentType(.username)
                             .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
@@ -177,12 +180,18 @@ struct AddAccountView: View {
             .formStyle(.grouped)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
+            // VoiceOver's escape gesture, a two-finger Z, does the same as Cancel.
+            .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    CancelButton { showAddAccount = false }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    ConfirmButton(String(localized: "Save")) { save() }
+                // Left out while the scanner covers the form: the bar's buttons would still be reachable with
+                // VoiceOver behind it, as hiding the form doesn't hide them.
+                if mode != .scanning {
+                    ToolbarItem(placement: .cancellationAction) {
+                        CancelButton { showAddAccount = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        ConfirmButton(String(localized: "Save")) { save() }
+                    }
                 }
             }
             #if os(macOS)
@@ -300,6 +309,7 @@ struct AddAccountView: View {
             .ignoresSafeArea()
             .navigationTitle(String(localized: "Add account", comment: "Add account navigation title"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { showAddAccount = false }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CloseButton { showAddAccount = false }
@@ -308,6 +318,7 @@ struct AddAccountView: View {
                     Button { mode = .manual } label: {
                         Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
                     }
+                    .accessibilityInputLabels(VoiceControlNames.enterManually)
                 }
             }
         }

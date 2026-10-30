@@ -40,6 +40,7 @@ struct OTPConfigurationView: View {
     var body: some View {
         SettingsView(image: Image(systemName: "ellipsis.rectangle"), imageColor: Color(.systemBlue)) {
             Text("One-Time Password").font(.title2).bold()
+                .accessibilityAddTraits(.isHeader)
             Text(description)
                 .font(.subheadline)
                 .multilineTextAlignment(.center)

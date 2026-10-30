@@ -36,6 +36,7 @@ struct TokenRequestView: View {
     @State private var error: TokenRequestViewModel.TokenError? = nil
 
     @ScaledMetric(relativeTo: .body) private var iconColumnWidth: CGFloat = 35
+    @ScaledMetric(relativeTo: .largeTitle) private var completedIconSize: CGFloat = 64
     
     init(userInfo: [AnyHashable: Any]?) {
         self.userInfo = userInfo
@@ -56,6 +57,10 @@ struct TokenRequestView: View {
             .avoidingReservedRegions()
             .navigationTitle(String(localized: "Unlock YubiKey"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) {
+                if !isCompleted { model.cancel() }
+                dismiss()
+            }
             .toolbar {
                 if isCompleted {
                     ToolbarItem(placement: .confirmationAction) {
@@ -166,7 +171,7 @@ struct TokenRequestView: View {
     private var completedView: some View {
         VStack(spacing: 16) {
             Image(systemName: "checkmark.circle")
-                .font(.system(size: 64))
+                .font(.system(size: completedIconSize))
                 .foregroundStyle(Color(.color11))
                 .accessibilityHidden(true)
             Text(Self.completedMessage)

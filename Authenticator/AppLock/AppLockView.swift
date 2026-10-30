@@ -20,17 +20,19 @@ import SwiftUI
 struct AppLockView: View {
 
     private var lock: AppLock { .shared }
+    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
 
     var body: some View {
         VStack(spacing: 24) {
             Spacer(minLength: 0)
             Image(systemName: "lock.fill")
-                .font(.system(size: 40, weight: .semibold))
+                .font(.system(size: iconSize, weight: .semibold))
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
             Text(String(localized: "Oriel OTP is locked", comment: "App lock screen title"))
                 .font(.title2.bold())
                 .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
             if lock.isUnavailable {
                 Text(String(localized: "Unlock your device to open Oriel OTP.", comment: "App lock screen before the device was first unlocked"))
                     .foregroundStyle(.secondary)
@@ -56,7 +58,7 @@ struct AppLockView: View {
             Spacer(minLength: 0)
         }
         .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .scrollsWhenTooTall()
         .background(Color(.systemBackground))
     }
 }
@@ -71,6 +73,10 @@ struct AppLockSecretEntry: View {
     let submit: (String) -> Bool
 
     private var lock: AppLock { .shared }
+
+    /// Announced for VoiceOver, which can't see the dots shake.
+    static let wrongCodeMessage = String(localized: "Wrong code. Try again.", comment: "VoiceOver announcement after a wrong app lock code")
+    static let wrongPasswordMessage = String(localized: "Wrong password. Try again.", comment: "VoiceOver announcement after a wrong app lock password")
 
     var body: some View {
         VStack(spacing: 20) {
@@ -105,6 +111,10 @@ private struct AppLockCodePad: View {
     @State private var code = ""
     @State private var wrongAttempts = 0
     @FocusState private var isFocused: Bool
+    // The keys grow with the text, up to a size where three still fit across the smallest iPhone. Beyond that the
+    // digits stop growing and show in the Large Content Viewer when held.
+    @ScaledMetric(relativeTo: .title) private var scaledKeySize: CGFloat = 72
+    private var keySize: CGFloat { min(scaledKeySize, 96) }
 
     private let rows = [["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]
 
@@ -129,16 +139,20 @@ private struct AppLockCodePad: View {
                     }
                 }
                 GridRow {
-                    Color.clear.frame(width: 72, height: 72)
+                    Color.clear.frame(width: keySize, height: keySize)
                     key("0")
                     Button(action: deleteDigit) {
                         Image(systemName: "delete.backward")
                             .font(.title2)
-                            .frame(width: 72, height: 72)
+                            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                            .frame(width: keySize, height: keySize)
                             .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
+                    .accessibilityShowsLargeContentViewer()
                     .accessibilityLabel(String(localized: "Delete", comment: "App lock number pad delete button"))
+                    .accessibilityInputLabels([String(localized: "Delete", comment: "App lock number pad delete button"),
+                                               String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")])
                     .opacity(code.isEmpty ? 0 : 1)
                     .disabled(code.isEmpty)
                 }
@@ -164,11 +178,15 @@ private struct AppLockCodePad: View {
         } label: {
             Text(verbatim: digit)
                 .font(.title.weight(.regular))
-                .frame(width: 72, height: 72)
+                .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+                .frame(width: keySize, height: keySize)
                 .background(Color.secondary.opacity(0.18), in: Circle())
                 .contentShape(Circle())
         }
         .buttonStyle(.plain)
+        .accessibilityShowsLargeContentViewer { Text(verbatim: digit) }
+        // Typed as soon as the finger lifts, like the system's passcode keys.
+        .accessibilityAddTraits(.isKeyboardKey)
     }
 
     private func add(_ digits: String) {
@@ -181,6 +199,7 @@ private struct AppLockCodePad: View {
             try? await Task.sleep(for: .milliseconds(120))
             if !submit(entered) {
                 Platform.notify(.error)
+                AccessibilityNotification.Announcement(AppLockSecretEntry.wrongCodeMessage).post()
                 withAnimation(.default) { wrongAttempts += 1 }
             }
             code = ""
@@ -220,6 +239,7 @@ private struct AppLockPasswordField: View {
         guard !password.isEmpty else { return }
         if !submit(password) {
             Platform.notify(.error)
+            AccessibilityNotification.Announcement(AppLockSecretEntry.wrongPasswordMessage).post()
             withAnimation(.default) { wrongAttempts += 1 }
         }
         password = ""
@@ -271,6 +291,8 @@ extension View {
         window = UIWindow(windowScene: windowScene)
         window.windowLevel = .alert + 1
         window.rootViewController = UIHostingController(rootView: AppLockView())
+        // VoiceOver stays on the lock screen and can't reach the app's window behind it.
+        window.rootViewController?.view.accessibilityViewIsModal = true
         update(animated: false)
         observe()
     }
@@ -279,9 +301,14 @@ extension View {
     /// screen is there before the app switcher takes its snapshot.
     func update(animated: Bool) {
         if AppLock.shared.isLocked {
+            let wasHidden = window.isHidden
             window.alpha = 1
             window.isHidden = false
             window.makeKey()
+            // Moves VoiceOver to the lock screen, so it doesn't stay on the app behind it.
+            if wasHidden {
+                UIAccessibility.post(notification: .screenChanged, argument: nil)
+            }
         } else if !window.isHidden {
             let window = window
             UIView.animate(withDuration: animated ? 0.2 : 0) {
@@ -290,6 +317,7 @@ extension View {
                 guard !AppLock.shared.isLocked else { return }
                 window.isHidden = true
                 window.windowScene?.windows.first { $0 !== window && !$0.isHidden }?.makeKey()
+                UIAccessibility.post(notification: .screenChanged, argument: nil)
             }
         }
     }

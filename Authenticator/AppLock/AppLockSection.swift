@@ -144,9 +144,10 @@ private struct AppLockChangeView: View {
                 Spacer(minLength: 0)
             }
             .padding(24)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .scrollsWhenTooTall()
             .navigationTitle(String(localized: "App lock", comment: "App lock settings section header"))
             .navigationBarTitleDisplayMode(.inline)
+            .accessibilityAction(.escape) { done(nil) }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     CancelButton { done(nil) }

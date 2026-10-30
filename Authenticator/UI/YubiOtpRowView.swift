@@ -22,6 +22,7 @@ struct YubiOtpRowView: View {
 
     @Environment(ToastPresenter.self) var toastPresenter
     var otp: String
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     
     var body: some View {
         HStack {
@@ -32,11 +33,13 @@ struct YubiOtpRowView: View {
                 .background(Color.accentColor)
                 .clipShape(.circle)
                 .padding(.trailing, 5)
+                .accessibilityHidden(true)
             VStack(alignment: .leading) {
                 Text(otp)
                     .privacySensitive()
                     .font(.subheadline.weight(.medium))
-                    .lineLimit(1)
+                    // Wraps at the accessibility sizes instead of shrinking back to the default size.
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                     .minimumScaleFactor(0.1)
             }
         }
@@ -48,5 +51,9 @@ struct YubiOtpRowView: View {
         .onLongPressGesture {
             toastPresenter.copyToClipboard(otp)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        .accessibilityAction { toastPresenter.copyToClipboard(otp) }
     }
 }

@@ -188,11 +188,12 @@ struct SmartCardConfigurationView: View {
 private struct SmartCardStatusView: View {
     
     let isEnabled: Bool
-    
+    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 55
+
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: isEnabled ? "checkmark.circle.fill" : "minus.circle.fill")
-                .font(.system(size: 55))
+                .font(.system(size: iconSize))
                 .foregroundStyle(isEnabled ? Color(.systemGreen) : Color(.secondaryLabel))
                 .accessibilityHidden(true)
             Text(isEnabled ? String(localized: "Enabled", comment: "PIV extension enabled message") : String(localized: "Not Enabled", comment: "PIV extension not enabled message"))
@@ -226,6 +227,7 @@ private struct SmartCardHeaderRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
                 .accessibilityHidden(true)
             Text(title).font(.title2).bold()
+                .accessibilityAddTraits(.isHeader)
                 .multilineTextAlignment(.center)
             Text(text)
                 .font(.subheadline)
@@ -275,11 +277,14 @@ private struct SmartCardCertificateRow: View {
     let name: String
     let symbol: String
     var action: (() -> Void)? = nil
-    
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .title2) private var symbolSize: CGFloat = 26
+
     var body: some View {
         HStack {
             Text(name)
-                .lineLimit(1)
+                // Wraps at the accessibility sizes, where one line would only fit a few characters.
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 1)
                 .truncationMode(.tail)
             Spacer()
             if let action {
@@ -296,7 +301,7 @@ private struct SmartCardCertificateRow: View {
     
     private var symbolImage: some View {
         Image(systemName: symbol)
-            .font(.system(size: 26, weight: .light))
+            .font(.system(size: symbolSize, weight: .light))
     }
 }
 #endif
