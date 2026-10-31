@@ -41,6 +41,8 @@ import Foundation
         @ObservationIgnored private let session: WCSession?
     #endif
     @ObservationIgnored private let defaults: UserDefaults
+    /// The accounts that couldn't be sent, e.g. before the session was activated. Sent once it is.
+    @ObservationIgnored private var unsentAccounts: [OTPAccount]?
 
     #if os(iOS)
         init(session: WCSession? = WCSession.isSupported() ? .default : nil, defaults: UserDefaults = .standard) {
@@ -75,6 +77,7 @@ import Foundation
         guard isEnabled || defaults.bool(forKey: Self.pendingClearKey) else { return }
         isEnabled = false
         defaults.removeObject(forKey: Self.enabledKey)
+        unsentAccounts = nil
         if update([]) {
             defaults.removeObject(forKey: Self.pendingClearKey)
         } else {
@@ -87,7 +90,8 @@ import Foundation
     /// counter in step with Ente.
     func send(_ codes: [EnteCode]) {
         guard isEnabled else { return }
-        update(Self.accounts(from: codes, favorites: FavoritesStorage().readFavorites()))
+        let accounts = Self.accounts(from: codes, favorites: FavoritesStorage().readFavorites())
+        unsentAccounts = update(accounts) ? nil : accounts
     }
 
     /// The accounts for the watch, pinned in Ente Auth or marked as favorite in this app.
@@ -120,6 +124,9 @@ import Foundation
             isWatchAvailable = session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
             if !isEnabled && defaults.bool(forKey: Self.pendingClearKey) && update([]) {
                 defaults.removeObject(forKey: Self.pendingClearKey)
+            }
+            if isEnabled, let unsentAccounts, update(unsentAccounts) {
+                self.unsentAccounts = nil
             }
         }
     #endif

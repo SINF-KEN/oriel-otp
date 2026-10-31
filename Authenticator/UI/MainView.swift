@@ -184,6 +184,13 @@ struct MainView: View {
         .onChange(of: quickActions.pending, initial: true) { _, _ in
             performPendingQuickAction()
         }
+        // One that came while the app was locked. On the Mac the app locks without going to the background, so
+        // becoming active doesn't do it.
+        .onChange(of: AppLock.shared.isLocked) { _, isLocked in
+            if !isLocked {
+                performPendingQuickAction()
+            }
+        }
         .onChange(of: model.showTouchToast) { _, showToast in
             let message = String(localized: "Touch the button on the YubiKey now.", comment: "Prompt to touch the YubiKey")
             if showToast {

@@ -148,6 +148,9 @@ import YubiKit
         didAskToUnlock = true
         if vault?.belongs(to: session) != true {
             replaceVault(with: EnteVault(email: session.email, server: session.server))
+        } else {
+            // A sync that changes nothing doesn't send them, and they may have changed while the session was locked.
+            watch.send(codes)
         }
         startMonitoringNetwork()
     }
