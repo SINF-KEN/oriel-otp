@@ -259,7 +259,7 @@ private struct AppLockPasswordField: View {
 }
 
 /// Shakes sideways each time `animatableData` goes up by one.
-private struct Shake: GeometryEffect {
+nonisolated private struct Shake: GeometryEffect {
     var animatableData: CGFloat
 
     func effectValue(size: CGSize) -> ProjectionTransform {
