@@ -26,21 +26,41 @@ enum TouchPrompt {
 
     private static let identifier = "io.github.sinf-ken.OrielOTP.touch"
 
+    /// Whether the notification should be up, i.e. `show()` was called and `hide()` hasn't been since. `hide()` can
+    /// come before the notification has been added, e.g. while permission is being asked for.
+    private static var isShown = false
+    /// Changes with every `show()` and `hide()`, so only the latest `show()` adds the notification.
+    private static var generation = 0
+
     static func show(for accountTitle: String) {
         guard !NSApp.isActive else { return }
         let center = UNUserNotificationCenter.current()
+        isShown = true
+        generation += 1
+        let generation = generation
         Task {
             // Asked the first time it's needed, so the request comes with a reason.
-            guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true else { return }
+            guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true,
+                  generation == Self.generation else { return }
             let content = UNMutableNotificationContent()
             content.title = String(localized: "Touch your YubiKey", comment: "Mac notification title")
             content.body = String(localized: "Touch the button on the YubiKey to get the code for \(accountTitle).", comment: "Mac notification. The placeholder is the account name.")
             content.interruptionLevel = .timeSensitive
             try? await center.add(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
+            // Hidden while it was being added.
+            if !isShown {
+                remove()
+            }
         }
     }
 
     static func hide() {
+        isShown = false
+        generation += 1
+        remove()
+    }
+
+    private static func remove() {
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [identifier])
         center.removeDeliveredNotifications(withIdentifiers: [identifier])
