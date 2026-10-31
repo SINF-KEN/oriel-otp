@@ -48,7 +48,8 @@ final class ScreenshotTests: XCTestCase {
         try save("account-details")
         app.navigationBars.buttons.element(boundBy: 0).tap()
 
-        app.navigationBars.buttons["OverflowBarButtonItem"].firstMatch.tap()
+        // Named TopOverflowBarButtonItem from iOS 27.2.
+        app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch.tap()
         // The More menu's items are the system's, which don't keep their identifiers.
         app.buttons["Sync from Ente Auth"].firstMatch.tap()
         // The sign in screen isn't kept: its focused field's blinking cursor would make every run different.

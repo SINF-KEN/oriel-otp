@@ -218,7 +218,7 @@ struct CopyToYubiKeyButtons: View {
             }
             if model.canCopyToYubiKey(account, moving: true) {
                 Button(action: { Self.copy(account, moving: true, model: model, toastPresenter: toastPresenter) }) {
-                    Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.right.square")
+                    Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.forward.square")
                 }
                 .help(String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help"))
                 .disabled(!canReachYubiKey)

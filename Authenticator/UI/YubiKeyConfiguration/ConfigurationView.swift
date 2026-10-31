@@ -26,11 +26,7 @@ struct ConfigurationView: View {
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
     var insertYubiKeyMessage: String {
-        if DeviceCapabilities.supportsNFC {
-            String(localized: "Insert YubiKey") + " " + "\(!isVoiceOverEnabled ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
-        } else {
-            String(localized: "Insert YubiKey")
-        }
+        .insertYubiKey(isVoiceOverEnabled: isVoiceOverEnabled)
     }
     
     var body: some View {

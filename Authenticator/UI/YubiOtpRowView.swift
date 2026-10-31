@@ -51,7 +51,9 @@ struct YubiOtpRowView: View {
         .onLongPressGesture {
             toastPresenter.copyToClipboard(otp)
         }
-        .accessibilityElement(children: .combine)
+        // Named rather than read out: the OTP is 44 letters that VoiceOver would run together into one word.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Yubico OTP"))
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
         .accessibilityAction { toastPresenter.copyToClipboard(otp) }

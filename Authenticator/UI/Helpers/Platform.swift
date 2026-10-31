@@ -106,6 +106,7 @@ extension NSColor {
 // using them without checking the platform each time.
 enum UIKeyboardType {
     case asciiCapable
+    case asciiCapableNumberPad
     case emailAddress
     case numberPad
     case numbersAndPunctuation

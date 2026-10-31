@@ -21,6 +21,7 @@ import SwiftUI
 struct AccountRowView<Accessory: View>: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.layoutDirection) private var layoutDirection
     var account: Account
     /// Shows whether the account is on the YubiKey or in Ente Auth, for lists that have both.
     private let showsLocation: Bool
@@ -201,9 +202,14 @@ struct AccountRowView<Accessory: View>: View {
 
     /// The issuer in bold, then the account name, e.g. "GitHub · alice@example.com".
     private var nameLine: Text {
-        let title = Text(account.title.leftToRightIfAddress).fontWeight(.semibold).foregroundStyle(.primary)
-        guard let subTitle = account.subTitle else { return title }
-        return Text("\(title) · \(Text(subTitle.leftToRightIfAddress).foregroundStyle(secondaryStyle))", comment: "An account's issuer and name on one line, in the account list with larger text")
+        guard let subTitle = account.subTitle else {
+            return Text(account.title.leftToRightIfAddress).fontWeight(.semibold).foregroundStyle(.primary)
+        }
+        // Each name in its own direction, and the line in the app's, so the issuer comes first whatever script the
+        // names are in: "بنك · alice" in English, and "GitHub · علي" read from the right in Arabic.
+        let mark = String.directionMark(rightToLeft: layoutDirection == .rightToLeft)
+        let title = Text(mark + account.title.isolated).fontWeight(.semibold).foregroundStyle(.primary)
+        return Text("\(title) · \(Text(subTitle.isolated).foregroundStyle(secondaryStyle))", comment: "An account's issuer and name on one line, in the account list with larger text")
     }
 
     private var headlineCode: some View {
@@ -235,7 +241,7 @@ struct AccountRowView<Accessory: View>: View {
     }
 
     private var accessibilityValue: String {
-        showsLocation ? account.accessibilityCodeState + ", " + account.locationDescription : account.accessibilityCodeState
+        showsLocation ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription : account.accessibilityCodeState
     }
 
     private var codePill: some View {
@@ -345,7 +351,7 @@ extension Account {
 
     /// The issuer, account name and code, as one sentence for VoiceOver.
     var accessibilityLabel: String {
-        ([title] + [subTitle].compactMap { $0 } + [spokenCode]).joined(separator: ", ")
+        ([title] + [subTitle].compactMap { $0 } + [spokenCode]).joined(separator: String.accessibilitySeparator)
     }
 
     /// How long the code is valid for, or what's needed to get one.
@@ -389,14 +395,19 @@ struct PieProgressView<Style: ShapeStyle>: View {
         // Steps once a second with Reduce Motion, rather than turning all the time.
         Rectangle()
             .fill(color)
-            .mask { ProgressLayerView(kind: .pie, progress: progress, animate: animate && !reduceMotion) }
+            .mask {
+                ProgressLayerView(kind: .pie, progress: progress, animate: animate && !reduceMotion)
+                    // Turns clockwise in Arabic and Hebrew too, like a clock, which isn't mirrored.
+                    .environment(\.layoutDirection, .leftToRight)
+            }
     }
 }
 
-/// The time left as a bar that empties from the right, for the account list with larger text.
+/// The time left as a bar that empties from the trailing end, for the account list with larger text.
 struct BarProgressView<Style: ShapeStyle>: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.layoutDirection) private var layoutDirection
     let progress: Double
     let color: Style
     let animate: Bool
@@ -404,7 +415,13 @@ struct BarProgressView<Style: ShapeStyle>: View {
     var body: some View {
         Rectangle()
             .fill(color)
-            .mask { ProgressLayerView(kind: .bar, progress: progress, animate: animate && !reduceMotion) }
+            .mask {
+                // Drawn from the leading end by the layer itself, so it doesn't depend on whether SwiftUI mirrors the
+                // platform view: from the right in Arabic and Hebrew.
+                ProgressLayerView(kind: .bar, progress: progress, animate: animate && !reduceMotion,
+                                  rightToLeft: layoutDirection == .rightToLeft)
+                    .environment(\.layoutDirection, .leftToRight)
+            }
     }
 }
 
@@ -421,17 +438,18 @@ private struct ProgressLayerView: PlatformViewRepresentable {
     let kind: ProgressLayerHostView.Kind
     let progress: Double
     let animate: Bool
+    var rightToLeft = false
 
     #if os(iOS)
     func makeUIView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
-    func updateUIView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate) }
+    func updateUIView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate, rightToLeft: rightToLeft) }
     #else
     func makeNSView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
-    func updateNSView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate) }
+    func updateNSView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate, rightToLeft: rightToLeft) }
     #endif
 }
 
-/// A pie that turns from the top, or a bar that empties from the right, in an opaque color for a mask.
+/// A pie that turns from the top, or a bar that empties from the trailing end, in an opaque color for a mask.
 private final class ProgressLayerHostView: PlatformView {
 
     enum Kind {
@@ -444,6 +462,8 @@ private final class ProgressLayerHostView: PlatformView {
     // part that's left.
     private let shapeLayer = CAShapeLayer()
     private var progress: Double = 0
+    /// Whether the bar starts at the right, for Arabic and Hebrew.
+    private var rightToLeft = false
 
     init(kind: Kind) {
         self.kind = kind
@@ -507,13 +527,18 @@ private final class ProgressLayerHostView: PlatformView {
     }
 
     private func barPath(progress: Double) -> CGPath {
-        let rect = CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width * min(max(progress, 0), 1), height: bounds.height)
+        let width = bounds.width * min(max(progress, 0), 1)
+        let rect = CGRect(x: rightToLeft ? bounds.maxX - width : bounds.minX, y: bounds.minY, width: width, height: bounds.height)
         let cornerRadius = min(rect.width, rect.height) / 2
         return CGPath(roundedRect: rect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
     }
 
     /// Refills at once, and otherwise runs to the new value in the second until the next one.
-    func update(progress: Double, animate: Bool) {
+    func update(progress: Double, animate: Bool, rightToLeft: Bool = false) {
+        if rightToLeft != self.rightToLeft {
+            self.rightToLeft = rightToLeft
+            updateShape()
+        }
         guard progress != self.progress else { return }
         self.progress = progress
         let keyPath = kind == .pie ? "strokeEnd" : "path"

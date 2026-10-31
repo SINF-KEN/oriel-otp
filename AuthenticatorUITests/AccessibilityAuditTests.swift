@@ -41,6 +41,17 @@ final class AccessibilityAuditTests: XCTestCase {
         try auditMainScreens(for: [.dynamicType, .textClipped])
     }
 
+    /// Laid out right to left, as in Arabic and Hebrew, no text may be cut off. The app isn't in either language yet,
+    /// so this uses the right-to-left pseudolanguage: English text in a mirrored layout. At the largest text size, like
+    /// `testLargestTextSize`: at the default size the audit only warns that text might be cut off at larger sizes.
+    @MainActor func testRightToLeft() throws {
+        app.launchArguments = ["-DemoDate", Self.demoDate,
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
+                               "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES"]
+        app.launch()
+        try auditMainScreens(for: .textClipped)
+    }
+
     /// In light mode, text and icons have to stand out from their background.
     @MainActor func testLightAppearance() throws {
         app.launchArguments = ["-DemoDate", Self.demoDate]
@@ -81,7 +92,8 @@ final class AccessibilityAuditTests: XCTestCase {
         XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try audit("account list", types)
 
-        bank.tap()
+        // On the name, near the top: at the larger sizes the middle of the row is the code, which copies it.
+        bank.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
         XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try audit("account details", types)
         app.navigationBars.buttons.element(boundBy: 0).tap()
@@ -173,7 +185,8 @@ final class AccessibilityAuditTests: XCTestCase {
     /// Taps an item of the account list's More menu. The menu is the system's, and its items don't keep their
     /// identifiers, so they're found by their title.
     @MainActor private func openMenuItem(_ title: String) {
-        let more = app.navigationBars.buttons["OverflowBarButtonItem"].firstMatch
+        // Named TopOverflowBarButtonItem from iOS 27.2.
+        let more = app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch
         XCTAssertTrue(more.waitForExistence(timeout: 10))
         more.tap()
         app.buttons[title].firstMatch.tap()

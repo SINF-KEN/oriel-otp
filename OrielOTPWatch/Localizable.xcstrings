@@ -159,6 +159,35 @@
           }
         }
       }
+    },
+    ", " : {
+      "comment" : "Separator between the parts of a VoiceOver label, e.g. the issuer, the account name and the code. Keep the space after it if your language uses one.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ", "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ", "
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "、"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ", "
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
