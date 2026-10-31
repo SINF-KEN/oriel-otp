@@ -24,6 +24,8 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
     private let lock = NSLock()
     private var _configuration: AppLockConfiguration?
     private var _isUnavailable = false
+    private var _loadError: Error?
+    private var _saveError: Error?
 
     var configuration: AppLockConfiguration? {
         get { lock.withLock { _configuration } }
@@ -35,12 +37,26 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         set { lock.withLock { _isUnavailable = newValue } }
     }
 
+    /// Thrown by `load()`, e.g. a keychain error or data that can't be decoded.
+    var loadError: Error? {
+        get { lock.withLock { _loadError } }
+        set { lock.withLock { _loadError = newValue } }
+    }
+
+    /// Thrown by `save(_:)`, which then keeps the lock it had, like the keychain does.
+    var saveError: Error? {
+        get { lock.withLock { _saveError } }
+        set { lock.withLock { _saveError = newValue } }
+    }
+
     func load() throws -> AppLockConfiguration? {
         if isUnavailable { throw AppLockUnavailableError() }
+        if let loadError { throw loadError }
         return configuration
     }
 
     func save(_ configuration: AppLockConfiguration?) throws {
+        if let saveError { throw saveError }
         self.configuration = configuration
     }
 }
@@ -190,6 +206,43 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(!lock.isUnavailable)
         #expect(lock.isLocked)
         #expect(lock.unlock(with: "1234"))
+    }
+
+    @Test func staysLockedWhenTheKeychainFails() throws {
+        try makeLock().setMethod(.code4, secret: "1234")
+        storage.loadError = SecureStoreError.unhandledError(message: "keychain failed")
+        let lock = makeLock()
+        #expect(lock.isLocked)
+        #expect(lock.isUnavailable)
+        #expect(storage.configuration != nil)
+
+        storage.loadError = nil
+        lock.didBecomeActive()
+        #expect(lock.isLocked)
+        #expect(lock.unlock(with: "1234"))
+    }
+
+    @Test func lockThatCantBeDecodedIsForgotten() throws {
+        try makeLock().setMethod(.code4, secret: "1234")
+        storage.loadError = DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "corrupt"))
+        let lock = makeLock()
+        #expect(!lock.isLocked)
+        #expect(lock.method == .off)
+        #expect(storage.configuration == nil)
+    }
+
+    @Test func failedChangeKeepsTheOldLock() throws {
+        let lock = makeLock()
+        try lock.setMethod(.code4, secret: "1234")
+        storage.saveError = SecureStoreError.unhandledError(message: "keychain failed")
+        #expect(throws: SecureStoreError.self) { try lock.setMethod(.password, secret: "secret") }
+        #expect(lock.method == .code4)
+
+        storage.saveError = nil
+        let restarted = makeLock()
+        #expect(restarted.isLocked)
+        #expect(restarted.method == .code4)
+        #expect(restarted.unlock(with: "1234"))
     }
 
     @Test func unlocksOnceTheKeychainShowsThereIsNoLock() {

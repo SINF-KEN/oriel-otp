@@ -126,20 +126,28 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         case errSecInteractionNotAllowed:
             throw AppLockUnavailableError()
         default:
-            throw SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
+            throw Self.error(status)
         }
     }
 
+    /// Updates the lock in place, so a change that fails leaves the old lock rather than none.
     func save(_ configuration: AppLockConfiguration?) throws {
-        SecItemDelete(query as CFDictionary)
-        guard let configuration else { return }
-        var query = query
-        query[String(kSecValueData)] = try JSONEncoder().encode(configuration)
-        query[String(kSecAttrAccessible)] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else {
-            throw SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
+        guard let configuration else {
+            let status = SecItemDelete(query as CFDictionary)
+            guard status == errSecSuccess || status == errSecItemNotFound else { throw Self.error(status) }
+            return
         }
+        let attributes: [String: Any] = [String(kSecValueData): try JSONEncoder().encode(configuration),
+                                         String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
+        var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
+        if status == errSecItemNotFound {
+            status = SecItemAdd(query.merging(attributes) { _, new in new } as CFDictionary, nil)
+        }
+        guard status == errSecSuccess else { throw Self.error(status) }
+    }
+
+    private static func error(_ status: OSStatus) -> Error {
+        SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
     }
 }
 
@@ -163,8 +171,8 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     /// The lock, nil when the app isn't locked or the lock can't be read yet.
     private(set) var configuration: AppLockConfiguration?
     private(set) var isLocked: Bool
-    /// The lock couldn't be read because the device hasn't been unlocked since it started. The app stays locked
-    /// until it can be read.
+    /// The lock couldn't be read, usually because the device hasn't been unlocked since it started, or because the
+    /// keychain failed. The app stays locked until it can be read.
     private(set) var isUnavailable = false
     /// When the code or password can be tried again after too many wrong ones.
     private(set) var retryDate: Date?
@@ -205,13 +213,15 @@ nonisolated struct AppLockKeychain: AppLockStorage {
             }
             self.configuration = configuration
             isUnavailable = false
-        } catch is AppLockUnavailableError {
-            isUnavailable = true
-        } catch {
-            // A lock that can't be read can't be unlocked, so it's forgotten rather than locking the app for good.
+        } catch is DecodingError {
+            // A lock that can't be decoded can't be unlocked, so it's forgotten rather than locking the app for good.
             try? storage.save(nil)
             configuration = nil
             isUnavailable = false
+        } catch {
+            // The device is locked, or the keychain failed. The app stays locked and reads it again when it's next
+            // active, rather than opening without the lock.
+            isUnavailable = true
         }
     }
 
@@ -289,6 +299,11 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     func setMethod(_ method: AppLockMethod, secret: String? = nil) throws {
         precondition(!method.hasSecret || secret != nil, "A code or password is needed")
         let configuration = method == .off ? nil : AppLockConfiguration(method: method, secret: secret)
+        // Set before the lock is saved, so a lock saved by this installation is never taken for an earlier one's,
+        // even if the app stops in between.
+        if configuration != nil {
+            defaults.set(true, forKey: Self.enabledKey)
+        }
         try storage.save(configuration)
         defaults.set(configuration != nil, forKey: Self.enabledKey)
         defaults.removeObject(forKey: Self.failedAttemptsKey)
