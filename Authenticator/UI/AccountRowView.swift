@@ -368,6 +368,10 @@ extension Account {
     }
 }
 
+// The pie and the bar are animated by Core Animation, outside the app. A SwiftUI animation would recompute the shape
+// in the app on every frame, which kept the app busy all the time while codes were shown. SwiftUI still fills them,
+// so the hierarchical styles follow a selected row; the layer is only the mask.
+
 struct PieProgressView<Style: ShapeStyle>: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -382,12 +386,10 @@ struct PieProgressView<Style: ShapeStyle>: View {
     }
 
     var body: some View {
-        var duration = progress >= 1.0 ? 0.0 : 1.0
         // Steps once a second with Reduce Motion, rather than turning all the time.
-        duration = animate && !reduceMotion ? duration : 0.0
-        return PieShape(progress: self.progress)
-            .foregroundStyle(color)
-            .animation(.linear(duration: duration), value: self.progress)
+        Rectangle()
+            .fill(color)
+            .mask { ProgressLayerView(kind: .pie, progress: progress, animate: animate && !reduceMotion) }
     }
 }
 
@@ -400,51 +402,135 @@ struct BarProgressView<Style: ShapeStyle>: View {
     let animate: Bool
 
     var body: some View {
-        // Like PieProgressView: refills at once, and steps once a second with Reduce Motion.
-        let duration = animate && !reduceMotion && progress < 1.0 ? 1.0 : 0.0
-        BarShape(progress: progress)
-            .foregroundStyle(color)
-            .animation(.linear(duration: duration), value: progress)
+        Rectangle()
+            .fill(color)
+            .mask { ProgressLayerView(kind: .bar, progress: progress, animate: animate && !reduceMotion) }
     }
 }
 
-nonisolated private struct BarShape: Shape {
+#if os(iOS)
+private typealias PlatformView = UIView
+private typealias PlatformViewRepresentable = UIViewRepresentable
+#else
+private typealias PlatformView = NSView
+private typealias PlatformViewRepresentable = NSViewRepresentable
+#endif
 
-    var progress: Double
+private struct ProgressLayerView: PlatformViewRepresentable {
 
-    var animatableData: Double {
-        get { progress }
-        set { progress = newValue }
-    }
+    let kind: ProgressLayerHostView.Kind
+    let progress: Double
+    let animate: Bool
 
-    func path(in rect: CGRect) -> Path {
-        Path(roundedRect: CGRect(x: rect.minX, y: rect.minY, width: rect.width * min(max(progress, 0), 1), height: rect.height),
-             cornerRadius: rect.height / 2)
-    }
+    #if os(iOS)
+    func makeUIView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
+    func updateUIView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate) }
+    #else
+    func makeNSView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
+    func updateNSView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate) }
+    #endif
 }
 
-nonisolated private struct PieShape: Shape {
+/// A pie that turns from the top, or a bar that empties from the right, in an opaque color for a mask.
+private final class ProgressLayerHostView: PlatformView {
 
-    var animatableData: Double {
-        get { self.progress }
-        set { self.progress = newValue }
+    enum Kind {
+        case pie
+        case bar
     }
-    
-    var progress: Double = 0.0
-    private let start: Double = Double.pi * 1.5
-    private var end: Double {
-        get {
-            return self.start - Double.pi * 2 * self.progress
+
+    private let kind: Kind
+    // A pie is a circle stroked as wide as its radius and cut off at `strokeEnd`; a bar is a capsule as wide as the
+    // part that's left.
+    private let shapeLayer = CAShapeLayer()
+    private var progress: Double = 0
+
+    init(kind: Kind) {
+        self.kind = kind
+        super.init(frame: .zero)
+        #if os(macOS)
+        wantsLayer = true
+        #endif
+        shapeLayer.fillColor = kind == .bar ? CGColor(gray: 0, alpha: 1) : nil
+        shapeLayer.strokeColor = kind == .pie ? CGColor(gray: 0, alpha: 1) : nil
+        shapeLayer.strokeEnd = 0
+        hostLayer.addSublayer(shapeLayer)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    private var hostLayer: CALayer {
+        #if os(iOS)
+        layer
+        #else
+        layer!
+        #endif
+    }
+
+    #if os(iOS)
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateShape()
+    }
+    #else
+    override func layout() {
+        super.layout()
+        updateShape()
+    }
+    #endif
+
+    private func updateShape() {
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        shapeLayer.frame = bounds
+        switch kind {
+        case .pie:
+            // From the top round to the left. The y axis runs down on iOS, and up on the Mac unless the view is flipped.
+            #if os(iOS)
+            let direction = -1.0
+            #else
+            let direction = isFlipped ? -1.0 : 1.0
+            #endif
+            let top = direction * .pi / 2
+            let path = CGMutablePath()
+            path.addArc(center: CGPoint(x: bounds.midX, y: bounds.midY), radius: bounds.width / 4,
+                        startAngle: top, endAngle: top + direction * 2 * .pi, clockwise: direction < 0)
+            shapeLayer.path = path
+            shapeLayer.lineWidth = bounds.width / 2
+        case .bar:
+            shapeLayer.removeAnimation(forKey: "path")
+            shapeLayer.path = barPath(progress: progress)
         }
+        CATransaction.commit()
     }
 
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center =  CGPoint(x: rect.size.width / 2, y: rect.size.width / 2)
-        let radius = rect.size.width / 2
-        path.move(to: center)
-        path.addArc(center: center, radius: radius, startAngle: Angle(radians: start), endAngle: Angle(radians: end), clockwise: true)
-        path.closeSubpath()
-        return path
+    private func barPath(progress: Double) -> CGPath {
+        let rect = CGRect(x: bounds.minX, y: bounds.minY, width: bounds.width * min(max(progress, 0), 1), height: bounds.height)
+        let cornerRadius = min(rect.width, rect.height) / 2
+        return CGPath(roundedRect: rect, cornerWidth: cornerRadius, cornerHeight: cornerRadius, transform: nil)
+    }
+
+    /// Refills at once, and otherwise runs to the new value in the second until the next one.
+    func update(progress: Double, animate: Bool) {
+        guard progress != self.progress else { return }
+        self.progress = progress
+        let keyPath = kind == .pie ? "strokeEnd" : "path"
+        let fromValue: Any? = kind == .pie ? shapeLayer.presentation()?.strokeEnd : shapeLayer.presentation()?.path
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+        shapeLayer.removeAnimation(forKey: keyPath)
+        switch kind {
+        case .pie: shapeLayer.strokeEnd = min(max(progress, 0), 1)
+        case .bar: shapeLayer.path = barPath(progress: progress)
+        }
+        CATransaction.commit()
+        guard animate, progress < 1, let fromValue else { return }
+        let animation = CABasicAnimation(keyPath: keyPath)
+        animation.fromValue = fromValue
+        animation.duration = 1
+        animation.timingFunction = CAMediaTimingFunction(name: .linear)
+        shapeLayer.add(animation, forKey: keyPath)
     }
 }
