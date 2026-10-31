@@ -39,6 +39,13 @@ struct AboutView: View {
                         .multilineTextAlignment(.center)
                     Text("\(Bundle.main.appVersion) (build \(Bundle.main.appBuildNumber))")
                         .scaledFont(.body)
+                    if let commit = Bundle.main.appCommit {
+                        Text(verbatim: commit)
+                            .scaledFont(.footnote) { $0.monospaced() }
+                            .foregroundStyle(.secondary)
+                            .textSelection(.enabled)
+                            .accessibilityIdentifier("about.commit")
+                    }
                     AboutLanguageView()
                 }
                 .frame(maxWidth: .infinity)
@@ -77,6 +84,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
                             Text("Terms of use")
+                                .foregroundStyle(.primary)
                         }
                     }
                     Button {
@@ -85,6 +93,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.secondaryLabel))
                             Text("Privacy policy")
+                                .foregroundStyle(.primary)
                         }
                     }
                     NavigationLink {
@@ -103,6 +112,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "book"), color: Color(.systemPink))
                             Text("User guide")
+                                .foregroundStyle(.primary)
                         }
                     }
                     Button {
@@ -111,6 +121,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)
                             Text("Contact support")
+                                .foregroundStyle(.primary)
                         }
                     }
                 }

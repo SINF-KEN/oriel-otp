@@ -118,6 +118,7 @@ jobs:
             -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
             -authenticationKeyID "$KEY_ID" \
             -authenticationKeyIssuerID "$ISSUER_ID" \
+            ORIEL_COMMIT="$(git rev-parse --short HEAD)" \
             2>&1 | tee "$RUNNER_TEMP/archive.log"
 
       # App Store Connect gives the upload the next free build number, so the project's number doesn't need bumping.

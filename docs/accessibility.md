@@ -103,7 +103,7 @@ where there are many of a kind:
 | Add account | `add-account.issuer`, `add-account.account-name`, `add-account.secret`, `add-account.save`, `add-account.enter-manually` |
 | Ente sync | `ente.email`, `ente.password`, `ente.sign-in`, `ente.server`, `ente.stay-signed-in`, `ente.add` |
 | App lock | `app-lock.unlock`, `app-lock.key.<digit>`, `app-lock.delete`, `app-lock.password` |
-| About | `about.tutorial`, `about.version-history`, `about.app-icon`, `tutorial.next`, `tutorial.back` |
+| About | `about.commit` (release builds only), `about.tutorial`, `about.version-history`, `about.app-icon`, `tutorial.next`, `tutorial.back` |
 
 The search field is the system's (`app.searchFields.firstMatch`), and the account list's menu is the system's More
 button (`OverflowBarButtonItem`). Its items (Sync from Ente Auth, Configuration, About) don't keep identifiers on iOS,
