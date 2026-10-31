@@ -122,9 +122,8 @@ struct EnteSyncView: View {
             }
 
             Section {
-                TextField(EnteAPIClient.defaultServer.absoluteString, text: $model.server)
-                    // The placeholder is the default server's address, which isn't a name to say.
-                    .accessibilityLabel(String(localized: "Server", comment: "Ente sign in server field"))
+                // On the Mac the title is the label on the left, so the field itself stays empty.
+                TextField(String(localized: "API provider", comment: "Ente sign in server field"), text: $model.server, prompt: serverPrompt)
                     .accessibilityIdentifier("ente.server")
                     .keyboardType(.URL)
                     .textContentType(.URL)
@@ -150,6 +149,14 @@ struct EnteSyncView: View {
             }
         }
         .onAppear { focusedField = model.email.isEmpty ? .email : .password }
+    }
+
+    private var serverPrompt: Text? {
+        #if os(macOS)
+        Text(verbatim: "")
+        #else
+        nil
+        #endif
     }
 
     @ViewBuilder private func savedSessionSection(email: String) -> some View {
