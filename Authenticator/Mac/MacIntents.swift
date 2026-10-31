@@ -97,6 +97,7 @@ struct YubiKeyAccountQuery: EntityQuery {
     enum AccessError: LocalizedError {
         case noYubiKey
         case accountNotFound
+        case locked
 
         var errorDescription: String? {
             switch self {
@@ -104,6 +105,8 @@ struct YubiKeyAccountQuery: EntityQuery {
                 String(localized: "Plug in your YubiKey and try again.", comment: "Mac Shortcuts error")
             case .accountNotFound:
                 String(localized: "The account isn't on the plugged-in YubiKey.", comment: "Mac Shortcuts error")
+            case .locked:
+                String(localized: "Unlock Oriel OTP and try again.", comment: "Mac Shortcuts error when the app is locked")
             }
         }
     }
@@ -129,7 +132,18 @@ struct YubiKeyAccountQuery: EntityQuery {
         }
     }
 
+    /// Shortcuts don't get past the app lock. Touch ID or the Mac's password is asked for when it unlocks the app,
+    /// a code or password has to be entered in the app.
+    private static func unlockApp() async throws {
+        let lock = AppLock.shared
+        if lock.isLocked && lock.method == .device {
+            await lock.unlockWithDeviceOwner()
+        }
+        guard !lock.isLocked else { throw AccessError.locked }
+    }
+
     private static func withSession<T>(_ body: (OATHSession) async throws -> T) async throws -> T {
+        try await unlockApp()
         let manager = ConnectionManager.shared
         let wasSuspended = manager.areWiredConnectionsSuspended
         manager.resumeWiredConnections()

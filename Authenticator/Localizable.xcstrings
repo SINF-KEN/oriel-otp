@@ -12564,6 +12564,35 @@
         }
       }
     },
+    "Unlock Oriel OTP and try again." : {
+      "comment" : "Mac Shortcuts error when the app is locked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entsperren Sie Oriel OTP und versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déverrouillez Oriel OTP et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oriel OTPのロックを解除して、もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odomknite Oriel OTP a skúste to znova."
+          }
+        }
+      }
+    },
     "Unlock with %@" : {
       "comment" : "App lock screen button. The placeholder is Face ID, Touch ID or Device passcode.",
       "localizations" : {
