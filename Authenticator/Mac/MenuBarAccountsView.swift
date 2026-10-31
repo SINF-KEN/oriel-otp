@@ -113,10 +113,10 @@ private struct MenuBarAccountRow: View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(account.title)
+                    Text(account.title.leftToRightIfAddress)
                         .lineLimit(1)
                     account.subTitle.map {
-                        Text($0)
+                        Text($0.leftToRightIfAddress)
                             .scaledFont(.caption)
                             .foregroundStyle(isHovering ? .primary : .secondary)
                             .lineLimit(1)

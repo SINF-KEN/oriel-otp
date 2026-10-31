@@ -352,10 +352,10 @@ private struct EnteCodeRow: View {
                 // Explicit label colors, a button in a form would otherwise tint them with the accent color. An account
                 // that can't be added is lighter, but still readable.
                 VStack(alignment: .leading) {
-                    Text(code.title)
+                    Text(code.title.leftToRightIfAddress)
                         .foregroundStyle(Color(code.template == nil ? .secondaryLabel : .label))
                     if let subtitle = code.subtitle {
-                        Text(subtitle)
+                        Text(subtitle.leftToRightIfAddress)
                             .scaledFont(.subheadline)
                             .foregroundStyle(Color(.secondaryLabel))
                     }

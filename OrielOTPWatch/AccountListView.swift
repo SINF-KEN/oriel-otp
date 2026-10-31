@@ -59,11 +59,11 @@ private struct AccountRow: View {
             let code = OTPGenerator.code(for: account, at: date)
             let secondsLeft = OTPGenerator.secondsLeft(for: account, at: date)
             VStack(alignment: .leading, spacing: 2) {
-                Text(account.title)
+                Text(account.title.leftToRightIfAddress)
                     .font(.headline)
                     .lineLimit(2)
                 if let subtitle = account.subtitle {
-                    Text(subtitle)
+                    Text(subtitle.leftToRightIfAddress)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)

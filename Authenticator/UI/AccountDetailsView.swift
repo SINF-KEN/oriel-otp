@@ -47,12 +47,12 @@ struct AccountDetailView: View {
                 .background(account.iconColor)
                 .clipShape(Circle())
                 .accessibilityHidden(true)
-            Text(account.title)
+            Text(account.title.leftToRightIfAddress)
                 .scaledFont(.title2) { $0.weight(.medium) }
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             account.subTitle.map {
-                Text($0)
+                Text($0.leftToRightIfAddress)
                     .scaledFont(.body)
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
