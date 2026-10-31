@@ -1,8 +1,9 @@
 # Oriel OTP
 
 Oriel OTP is an authenticator for iPhone, iPad and Mac that keeps your one-time password accounts on a YubiKey instead of
-on your phone. It can also **import your accounts from [Ente Auth](https://ente.io/auth)**, so moving them onto a
-hardware key takes a few taps instead of re-scanning every QR code.
+on your phone. It also **syncs with [Ente Auth](https://ente.io/auth)**: it can move your Ente Auth accounts onto a
+hardware key in a few taps instead of re-scanning every QR code, or keep them in the app next to the YubiKey's, with
+changes synced both ways. An Apple Watch app shows the Ente Auth codes on your wrist.
 
 <p align="center">
   <img src="docs/screenshots/accounts.png" width="250" alt="The account list with codes from a YubiKey">
@@ -30,14 +31,15 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
   The secrets are stored on the YubiKey and the codes are calculated there; the app doesn't keep a copy.
 - **Ente Auth import.** Sign in to Ente Auth, pick accounts and add them to the YubiKey. Accounts already on the
   key are skipped, and accounts the key can't store are listed with the reason.
-  New accounts can be saved in Ente Auth as well when they are added to the YubiKey.
 - **Ente Auth codes without a YubiKey.** Signed in, your Ente Auth accounts are listed with the YubiKey's and their
   codes calculated by the app, also offline. Accounts added, renamed, pinned or deleted in the app are synced back
-  to Ente Auth, and changes from Ente's other apps show up here.
+  to Ente Auth, and changes from Ente's other apps show up here. New accounts can go on the YubiKey, in Ente Auth
+  or both.
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
 - **Everyday use.** Search, pin favorites, tap a code to copy it, rename and delete accounts, Steam codes, and an optional
   password for the YubiKey's OATH application.
+- **App lock.** Optionally lock the app with Face ID or Touch ID, a 4 or 6 digit code, or a password.
 - **Apple Watch.** Optionally shows the codes of your Ente Auth accounts on Apple Watch, without the iPhone nearby.
 - **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps
   and websites through iOS, in the same way as other smart cards. macOS does this itself, without the app.
@@ -83,8 +85,8 @@ the meantime, the other device's change wins.
 Everything is decrypted on the device and your Ente password never leaves it. Like Ente's own apps, the account
 stays signed in: the session and the key that decrypts your accounts are kept in the keychain behind Face ID or
 Touch ID (Touch ID or your password on the Mac), so later syncs need no password. The settings show the account
-and **Sign out**. Turn off **Stay signed in** to keep nothing once the sheet is closed. Self-hosted Ente servers are supported. [docs/ente-auth.md](docs/ente-auth.md) describes how
-the sign in and decryption work.
+and **Sign out**. Turn off **Stay signed in** to keep nothing once the sheet is closed. Self-hosted Ente servers are
+supported. [docs/ente-auth.md](docs/ente-auth.md) describes how the sign in and decryption work.
 
 ## Apple Watch
 
@@ -105,8 +107,8 @@ the app is paired. The accounts are sent to the watch right away and again each 
 accounts are skipped, as the watch couldn't keep the counter in step with Ente.
 
 Unlike the YubiKey accounts, **this keeps a copy of the Ente secrets on the watch**, in its keychain, readable only
-while the watch is unlocked and never synced to iCloud or included in backups. The watch calculates the codes itself, so it works without
-the iPhone. Turning the switch off or signing out of Ente deletes the accounts from the watch. Codes are hidden when
+while the watch is unlocked and never synced to iCloud or included in backups. The watch calculates the codes itself,
+so it works without the iPhone. Turning the switch off or signing out of Ente deletes the accounts from the watch. Codes are hidden when
 you lower your wrist or the screen is in Always On, and there is no way to copy a code on the watch.
 
 ## Security and privacy
@@ -130,7 +132,7 @@ See the [privacy policy](PRIVACY.md) for the details.
 ## Development
 
 The app is developed in Xcode. Open `OrielOTP.xcodeproj` and run the `OrielOTP` scheme. It depends on
-the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth import on
+the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth on
 [swift-sodium](https://github.com/jedisct1/swift-sodium) (libsodium) and
 [BigInt](https://github.com/attaswift/BigInt), all added with the Swift Package Manager.
 
@@ -138,7 +140,8 @@ Debug builds in the simulator connect to a simulated YubiKey with demo accounts 
 server at `https://demo.ente.test` with any email and the password `demo` (add `+mfa`, `+2fa` or `+nosrp` to the
 email's name to be asked for the code `123456`, and `+passkey` to also be asked for a passkey). None of this is
 compiled into release builds. [docs/screenshots.md](docs/screenshots.md) explains how the README screenshots are
-regenerated, and [docs/ci.md](docs/ci.md) what CI checks.
+regenerated, [docs/ci.md](docs/ci.md) what CI checks, [docs/macos.md](docs/macos.md) how the Mac version is built and
+[docs/accessibility.md](docs/accessibility.md) how accessibility is supported and tested.
 
 ## About this fork
 

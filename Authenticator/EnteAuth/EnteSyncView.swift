@@ -117,7 +117,7 @@ struct EnteSyncView: View {
                 if model.isDerivingKeys {
                     derivingKeysText
                 } else {
-                    Text(String(localized: "Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too.", comment: "Ente sign in footer"))
+                    Text(String(localized: "Your email and sign-in requests are sent to Ente, or to your own server. Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too.", comment: "Ente sign in footer"))
                 }
             }
 
