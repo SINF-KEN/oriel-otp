@@ -150,7 +150,10 @@ struct TokenRequestView: View {
                     .focused($isPINFocused)
                     .onSubmit(submitPIN)
                     .onChange(of: pin) { _, pin in
-                        if pin.count > 8 { self.pin = String(pin.prefix(8)) }
+                        // The YubiKey compares the PIN's bytes, so Arabic-Indic digits from an Arabic keyboard are
+                        // entered as the ASCII digits they stand for.
+                        let entered = String(pin.asciiDigits.prefix(8))
+                        if entered != pin { self.pin = entered }
                     }
                     .frame(minHeight: 44)
                 separator

@@ -45,7 +45,8 @@ struct SmartCardConfigurationView: View {
                         SmartCardMessageRow(message: String(localized: "No certificates on YubiKey", comment: "PIV extension no certificates message"))
                     } else {
                         ForEach(Array(certificates.enumerated()), id: \.offset) { _, certificate in
-                            let name = "\(certificate.certificate.subjectSummary ?? String(localized: "No name", comment: "PIV extension certificate with no name")) (slot \(String(format: "%02X", certificate.slot.rawValue)))"
+                            let subject = certificate.certificate.subjectSummary ?? String(localized: "No name", comment: "PIV extension certificate with no name")
+                            let name = String(localized: "\(subject.isolated) (slot \(String(format: "%02X", certificate.slot.rawValue)))", comment: "PIV extension certificate on the YubiKey. The placeholders are the certificate's name and its PIV slot in hexadecimal, e.g. 9A.")
                             if tokens.contains(certificate.certificate) {
                                 SmartCardCertificateRow(name: name, symbol: "checkmark.circle")
                             } else {

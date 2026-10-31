@@ -30,4 +30,25 @@ struct AccountNameDirectionTests {
         #expect("Server root".leftToRightIfAddress == "Server root")
         #expect("@ home".leftToRightIfAddress == "@ home")
     }
+
+    @Test func namesInASentenceAreIsolated() {
+        // First strong isolate for a name, left-to-right isolate for an address.
+        #expect("بنك".isolated == "\u{2068}بنك\u{2069}")
+        #expect("GitHub (work)".isolated == "\u{2068}GitHub (work)\u{2069}")
+        #expect("علي@example.com".isolated == "\u{2066}علي@example.com\u{2069}")
+    }
+
+    @Test func directionMarkFollowsTheLayout() {
+        #expect(String.directionMark(rightToLeft: true) == "\u{200F}")
+        #expect(String.directionMark(rightToLeft: false) == "\u{200E}")
+    }
+
+    @Test func otherDigitsBecomeASCII() {
+        #expect("١٢٣٤٥٦".asciiDigits == "123456") // Arabic-Indic
+        #expect("۰۹".asciiDigits == "09") // Persian
+        #expect("१२".asciiDigits == "12") // Devanagari
+        #expect("12 ab-٣".asciiDigits == "12 ab-3")
+        // Not decimal digits, so left alone.
+        #expect("½²".asciiDigits == "½²")
+    }
 }

@@ -34,7 +34,8 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
     public var errorDescription: String? {
         switch self {
         case .credentialAlreadyPresent(let issuer, let accountName):
-            let name = issuer.isEmpty ? accountName : "\(issuer), \(accountName)"
+            // Each name kept in its own direction, so an Arabic or Hebrew name doesn't take the sentence with it.
+            let name = issuer.isEmpty ? accountName.isolated : "\(issuer.isolated), \(accountName.isolated)"
             return String(localized: "There's already an account named \(name) on this YubiKey.", comment: "OATH add account duplicate error. The placeholder is the issuer and account name.")
         case .credentialNotFound:
             return String(localized: "The account could not be found on the YubiKey.", comment: "OATH error when an account is missing after renaming it")
@@ -51,7 +52,7 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
         case .fipsKeyWithoutPassword:
             return String(localized: "To add an account to a FIPS key, you must first set a password for the OATH application.", comment: "Error message when trying to add and OATH account to a FIPS key without a password.")
         case .storageFull(let notAdded):
-            let names = notAdded.formatted(.list(type: .and))
+            let names = notAdded.map(\.isolated).formatted(.list(type: .and))
             return String(localized: "The YubiKey is full. These accounts weren't added: \(names).", comment: "Import error. The placeholder is a list of account names.")
         }
     }

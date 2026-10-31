@@ -32,7 +32,7 @@ struct EnteAccountSection: View {
     var body: some View {
         Section {
             if let account {
-                LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: account.email)
+                LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: account.email.leftToRightIfAddress)
                 LabeledContent(String(localized: "Server", comment: "Ente saved account server label"),
                                value: account.server.host ?? account.server.absoluteString)
                 Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) {

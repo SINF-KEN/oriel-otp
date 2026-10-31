@@ -82,6 +82,25 @@ buttons in the YubiKey settings appear without sliding. Fades, which Apple recom
 Nothing animates on its own or loops; the countdown only follows the time. The watch's ring steps once a second
 already.
 
+## Right to left
+
+The app isn't translated into Arabic or Hebrew yet, but account names often are in those scripts, and the layout is
+ready for a translation:
+
+- Names keep their own direction. A name on its own is shown as it is, except an email address, which stays left to
+  right (`leftToRightIfAddress`). A name or address inside a sentence or next to another name is isolated
+  (`isolated`), and the issuer · name line starts with a mark in the app's direction, so the issuer comes first in
+  English and in Arabic, whatever script the names are in.
+- Search takes any keyboard, and ignores case, accents and vowel marks (`localizedStandardContains`).
+- Codes and PINs that are compared byte for byte (the app lock, the Ente verification code, the PIV PIN) turn
+  Arabic-Indic and other digits into ASCII ones (`asciiDigits`), and the Ente code field uses the ASCII number pad.
+- The layout mirrors, with these exceptions, like the system's: the app lock's number pad stays 1 2 3, and the
+  countdown pie and the watch's ring turn clockwise. Directional symbols use the `forward` and `backward` names,
+  which mirror. The Ente sync drawing mirrors; the others show objects or digits and don't.
+- Sentences are whole strings, never pieced together, and counts have plural variations, so translators can word
+  and order them as Arabic's six plural forms need. VoiceOver labels join their parts with a translatable separator
+  (`String.accessibilitySeparator`, "،" in Arabic).
+
 ## Captions and Audio Descriptions
 
 The app has no video or audio: the tutorial is still drawings, and help links open in the browser. These features
@@ -108,7 +127,7 @@ where there are many of a kind:
 | About | `about.commit` (release builds only), `about.tutorial`, `about.version-history`, `about.app-icon`, `tutorial.next`, `tutorial.back` |
 
 The search field is the system's (`app.searchFields.firstMatch`), and the account list's menu is the system's More
-button (`OverflowBarButtonItem`). Its items (Sync from Ente Auth, Configuration, About) don't keep identifiers on iOS,
+button (`OverflowBarButtonItem`, `TopOverflowBarButtonItem` from iOS 27.2). Its items (Sync from Ente Auth, Configuration, About) don't keep identifiers on iOS,
 so they're found by their title. Name new identifiers the same way and add them here.
 
 App Intents cover the tasks that make sense from outside the app: Scan NFC YubiKey and Add Account on iOS (Siri,
@@ -128,9 +147,12 @@ the add account form. It runs with the screenshots (`tools/screenshots.sh`, and 
 - After the screenshots, `tools/screenshots.sh` switches the simulator to dark mode with `simctl` and runs
   `testDarkAppearance`, the same check in dark mode, then turns on Increase Contrast and runs `testIncreasedContrast`
   in light and dark mode, where nothing has to nearly pass. The tests skip themselves in a normal run.
+- `testRightToLeft` launches with the right-to-left pseudolanguage (`-AppleTextDirection YES
+  -NSForceRightToLeftWritingDirection YES`), English text in a mirrored layout, at the largest text size, and fails for clipped text.
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
 
 To check by hand, use Accessibility Inspector (Xcode > Open Developer Tool) and the Simulator's Environment Overrides
-(text size, appearance, increase contrast, reduce motion, differentiate without color).
+(text size, appearance, increase contrast, reduce motion, differentiate without color). For right to left, set the
+scheme's App Language to Right-to-Left Pseudolanguage.

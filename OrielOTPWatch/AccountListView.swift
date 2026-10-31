@@ -91,7 +91,7 @@ private struct AccountRow: View {
             .accessibilityValue(
                 isLuminanceReduced
                     ? Text(verbatim: "")
-                    : Text(verbatim: code).speechSpellsOutCharacters() + Text(verbatim: ", ")
+                    : Text(verbatim: code).speechSpellsOutCharacters() + Text(verbatim: String.accessibilitySeparator)
                         + Text("\(secondsLeft) seconds left", comment: "VoiceOver, time until the code changes"))
         }
     }
@@ -103,7 +103,7 @@ private struct AccountRow: View {
 
     private var accessibilityLabel: Text {
         if let subtitle = account.subtitle {
-            return Text(verbatim: "\(account.title), \(subtitle)")
+            return Text(verbatim: account.title + String.accessibilitySeparator + subtitle)
         }
         return Text(verbatim: account.title)
     }
@@ -133,6 +133,8 @@ private struct CountdownRing: View {
                 )
                 .rotationEffect(.degrees(-90))
         }
+        // Empties clockwise in Arabic and Hebrew too, like a clock, which isn't mirrored.
+        .environment(\.layoutDirection, .leftToRight)
         .frame(width: size, height: size)
         .accessibilityHidden(true)
     }

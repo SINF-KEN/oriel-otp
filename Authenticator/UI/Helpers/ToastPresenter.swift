@@ -28,6 +28,7 @@ import SwiftUI
     @ObservationIgnored private var requestedMessage: String?
 
     /// Shows the message, and hides it after `duration`, or only when `dismiss(message:)` is called if `duration` is nil.
+    /// A longer message stays longer than `duration`, long enough to read it at a slow pace.
     func toast(message: String, duration: Duration? = .seconds(4)) {
         presentTask?.cancel()
         dismissTask?.cancel()
@@ -57,7 +58,9 @@ import SwiftUI
         self.message = message
         isPresenting = true
         AccessibilityNotification.Announcement(message).post()
-        guard let duration else { return }
+        guard var duration else { return }
+        // About ten characters a second, so "Moved to the YubiKey. Ente Auth keeps it in the trash." stays 6 seconds.
+        duration = max(duration, .milliseconds(message.count * 100))
         dismissTask = Task { [weak self] in
             try await Task.sleep(for: duration)
             self?.isPresenting = false
