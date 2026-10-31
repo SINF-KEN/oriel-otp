@@ -1095,6 +1095,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -1113,6 +1114,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
@@ -1268,6 +1270,7 @@
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Authenticator/Authenticator-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 207;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = XW69FY82W3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Authenticator/Info.plist;
@@ -1315,6 +1318,7 @@
 				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "Authenticator/Authenticator-macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 207;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = XW69FY82W3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Authenticator/Info.plist;
@@ -1356,6 +1360,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				INFOPLIST_FILE = AuthenticatorTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1387,6 +1392,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				INFOPLIST_FILE = AuthenticatorTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
