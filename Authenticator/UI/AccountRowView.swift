@@ -119,7 +119,7 @@ struct AccountRowView<Accessory: View>: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading) {
                     HStack(spacing: 4) {
-                        Text(account.title)
+                        Text(account.title.leftToRightIfAddress)
                             .scaledFont(titleStyle) { $0.weight(.medium) }
                             .lineLimit(1)
                             .minimumScaleFactor(0.9)
@@ -131,7 +131,7 @@ struct AccountRowView<Accessory: View>: View {
                         }
                     }
                     account.subTitle.map {
-                        Text($0)
+                        Text($0.leftToRightIfAddress)
                             .scaledFont(subtitleStyle)
                             .lineLimit(1)
                             .minimumScaleFactor(0.9)
@@ -201,9 +201,9 @@ struct AccountRowView<Accessory: View>: View {
 
     /// The issuer in bold, then the account name, e.g. "GitHub · alice@example.com".
     private var nameLine: Text {
-        let title = Text(account.title).fontWeight(.semibold).foregroundStyle(.primary)
+        let title = Text(account.title.leftToRightIfAddress).fontWeight(.semibold).foregroundStyle(.primary)
         guard let subTitle = account.subTitle else { return title }
-        return Text("\(title) · \(Text(subTitle).foregroundStyle(secondaryStyle))", comment: "An account's issuer and name on one line, in the account list with larger text")
+        return Text("\(title) · \(Text(subTitle.leftToRightIfAddress).foregroundStyle(secondaryStyle))", comment: "An account's issuer and name on one line, in the account list with larger text")
     }
 
     private var headlineCode: some View {
