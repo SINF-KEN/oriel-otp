@@ -249,11 +249,12 @@ struct MainView: View {
             .searchFocusedIfAvailable($isSearchFocused)
             // Return copies the selected account's code, Delete deletes the selected accounts.
             .onKeyPress(.return) {
-                guard let selectedAccount else { return .ignored }
+                guard !AppLock.shared.isLocked, let selectedAccount else { return .ignored }
                 toastPresenter.copyCode(of: selectedAccount)
                 return .handled
             }
             .onDeleteCommand {
+                guard !AppLock.shared.isLocked else { return }
                 accountsToDelete = selectedAccounts
             }
             #else
@@ -394,11 +395,19 @@ struct MainView: View {
         // The Mac has no app switcher snapshots, and codes are read from the window while another app is in front.
         .redacted(reason: scenePhase == .active ? [] : .privacy)
         #else
-        .focusedSceneValue(\.mainWindowMenuState, menuState)
+        // The lock screen only covers the window, the menu bar's commands would still copy codes and delete accounts.
+        .focusedSceneValue(\.mainWindowMenuState, AppLock.shared.isLocked ? nil : menuState)
         .onChange(of: commands.pending) { _, command in
             guard let command else { return }
             commands.pending = nil
+            guard !AppLock.shared.isLocked else { return }
             perform(command)
+        }
+        // The delete alert is shown above the lock screen, so it's closed when the app locks.
+        .onChange(of: AppLock.shared.isLocked) { _, isLocked in
+            if isLocked {
+                accountsToDelete = []
+            }
         }
         .textScaledFrame(minWidth: 640, minHeight: 420)
         #endif
