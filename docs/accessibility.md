@@ -25,8 +25,10 @@ placeholder.
 ## Larger Text
 
 All text uses text styles. Icons and images that sit next to text use `@ScaledMetric`, capped where growing further
-would crowd out the text. Screens that can get taller than the display scroll (`scrollsWhenTooTall()`), and the
-account row puts the code below the name at the accessibility sizes. The app lock's number keys stop growing at a
+would crowd out the text. Screens that can get taller than the display scroll (`scrollsWhenTooTall()`), and on the
+iPhone and iPad the account row puts the issuer and name on one line with the code in large type below it whenever
+the name would get narrower than about 150 points beside the code: from one size up on most iPhones, and at every
+size on an iPhone mini. The app lock's number keys stop growing at a
 size where three still fit across the smallest iPhone; held, they show the Large Content Viewer, like the navigation
 bar's buttons.
 

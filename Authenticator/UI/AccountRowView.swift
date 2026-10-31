@@ -49,6 +49,11 @@ struct AccountRowView<Accessory: View>: View {
     private let titleStyle = Font.TextStyle.subheadline
     private let subtitleStyle = Font.TextStyle.footnote
     private let codeStyle = Font.TextStyle.body
+    /// The narrowest the name gets beside the code. With less room, e.g. with larger text or on a small iPhone, the
+    /// code goes on its own line below the name instead.
+    @ScaledSize(relativeTo: .subheadline) private var minimumNameWidth: CGFloat = 150
+    @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3
+    private let headlineCodeStyle = Font.TextStyle.title
     #endif
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
@@ -62,56 +67,17 @@ struct AccountRowView<Accessory: View>: View {
         self.isDimmed = account.state == .expired || account.otp == nil
     }
 
-    // At accessibility sizes the code goes below the name, so neither has to shrink or truncate to share one line.
-    private var isStacked: Bool { dynamicTypeSize.isAccessibilitySize }
-
     var body: some View {
-        let layout = isStacked ? AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout())
-        layout {
-            HStack {
-                Text(String(account.title.first ?? "?"))
-                    .scaledFont(.body)
-                    // Grows with the text, but not so much that it crowds the name out.
-                    .frame(width: min(iconSize, 64), height: min(iconSize, 64))
-                    .background(account.iconColor)
-                    .clipShape(.circle)
-                    .padding(.trailing, 5)
-                    .accessibilityHidden(true)
-                VStack(alignment: .leading) {
-                    HStack(spacing: 4) {
-                        Text(account.title)
-                            .scaledFont(titleStyle) { $0.weight(.medium) }
-                            .lineLimit(isStacked ? 3 : 1)
-                            .minimumScaleFactor(0.9)
-                            .truncationMode(.tail)
-                        if showsLocation {
-                            AccountLocationIcon(account: account)
-                                .scaledFont(subtitleStyle)
-                                .foregroundStyle(secondaryStyle)
-                        }
-                    }
-                    account.subTitle.map {
-                        Text($0)
-                            .scaledFont(subtitleStyle)
-                            .lineLimit(isStacked ? 3 : 1)
-                            .minimumScaleFactor(0.9)
-                            .truncationMode(.tail)
-                            .foregroundStyle(secondaryStyle)
-                    }
-                }
+        Group {
+            #if os(macOS)
+            inlineRow
+            #else
+            // The first that fits: the code beside the name, or below it when the name would get too narrow.
+            ViewThatFits(in: .horizontal) {
+                inlineRow
+                headlineRow
             }
-            if !isStacked {
-                Spacer()
-            }
-            accessory
-            if let copyCode {
-                // Borderless so the list gives the tap to the code instead of opening the account.
-                Button(action: copyCode) { codePill }
-                    .buttonStyle(.borderless)
-                    .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
-            } else {
-                codePill
-            }
+            #endif
         }
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
@@ -138,6 +104,129 @@ struct AccountRowView<Accessory: View>: View {
             animate = false
         }
     }
+
+    /// The name and the code side by side.
+    private var inlineRow: some View {
+        HStack {
+            HStack {
+                Text(String(account.title.first ?? "?"))
+                    .scaledFont(.body)
+                    // Grows with the text, but not so much that it crowds the name out.
+                    .frame(width: min(iconSize, 64), height: min(iconSize, 64))
+                    .background(account.iconColor)
+                    .clipShape(.circle)
+                    .padding(.trailing, 5)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading) {
+                    HStack(spacing: 4) {
+                        Text(account.title)
+                            .scaledFont(titleStyle) { $0.weight(.medium) }
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                            .truncationMode(.tail)
+                        if showsLocation {
+                            AccountLocationIcon(account: account)
+                                .scaledFont(subtitleStyle)
+                                .foregroundStyle(secondaryStyle)
+                        }
+                    }
+                    account.subTitle.map {
+                        Text($0)
+                            .scaledFont(subtitleStyle)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.9)
+                            .truncationMode(.tail)
+                            .foregroundStyle(secondaryStyle)
+                    }
+                }
+                #if !os(macOS)
+                // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether
+                // the row fits on one line doesn't depend on how long the name is.
+                .frame(minWidth: 0, idealWidth: minimumNameWidth, maxWidth: .infinity, alignment: .leading)
+                #endif
+            }
+            #if os(macOS)
+            Spacer()
+            #endif
+            accessory
+            if let copyCode {
+                // Borderless so the list gives the tap to the code instead of opening the account.
+                Button(action: copyCode) { codePill }
+                    .buttonStyle(.borderless)
+                    .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+            } else {
+                codePill
+            }
+        }
+    }
+
+    #if !os(macOS)
+    /// The issuer and name on one line, then the code in large type with a bar for the time left.
+    private var headlineRow: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                nameLine
+                    .scaledFont(titleStyle)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? 4 : 2)
+                if showsLocation {
+                    AccountLocationIcon(account: account)
+                        .scaledFont(subtitleStyle)
+                        .foregroundStyle(secondaryStyle)
+                }
+            }
+            HStack {
+                accessory
+                if let copyCode {
+                    // Borderless so the list gives the tap to the code instead of opening the account.
+                    Button(action: copyCode) { headlineCode }
+                        .buttonStyle(.borderless)
+                        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+                } else {
+                    headlineCode
+                }
+                Spacer(minLength: 0)
+            }
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(.quaternary)
+                BarProgressView(progress: remaining, color: pillColor, animate: animate)
+            }
+            .frame(height: barHeight)
+            // In the tint, like the code in its button above.
+            .foregroundStyle(.tint)
+            .opacity(isDimmed ? dimmedOpacity : 1)
+            .accessibilityHidden(true)
+        }
+    }
+
+    /// The issuer in bold, then the account name, e.g. "GitHub · alice@example.com".
+    private var nameLine: Text {
+        let title = Text(account.title).fontWeight(.semibold).foregroundStyle(.primary)
+        guard let subTitle = account.subTitle else { return title }
+        return Text("\(title) · \(Text(subTitle).foregroundStyle(secondaryStyle))", comment: "An account's issuer and name on one line, in the account list with larger text")
+    }
+
+    private var headlineCode: some View {
+        HStack(spacing: 6) {
+            // The bar is empty while there's no code, so the symbol says what's needed to get one.
+            if case .countingdown = account.state {} else {
+                Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
+                    .imageScale(.small)
+                    .accessibilityHidden(true)
+            }
+            codeText
+        }
+        .scaledFont(headlineCodeStyle) { $0.monospacedDigit().bold() }
+        .foregroundStyle(HierarchicalShapeStyle.primary)
+        .contentShape(Rectangle())
+        .opacity(isDimmed ? dimmedOpacity : 1)
+    }
+
+    /// The part of the code's validity that's left, or none while there's no code.
+    private var remaining: Double {
+        if case .countingdown(let remaining) = account.state { remaining } else { 0 }
+    }
+    #endif
 
     // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
     // Increase Contrast the way the system's label colors do, so the primary one is used then.
@@ -169,26 +258,9 @@ struct AccountRowView<Accessory: View>: View {
                     .accessibilityHidden(true)
             }
             // The code in the full color, the ring and outline lighter. The dimmed code still has a contrast of 4.5:1.
-            ZStack {
-                if let otp = account.formattedCode {
-                    Text(otp)
-                        .privacySensitive()
-                        // Crossed out as well as dimmed, as a shade is easy to miss.
-                        .strikethrough(differentiateWithoutColor && account.state == .expired)
-                        .padding(.trailing, 4)
-                } else {
-                    Text("*** *** ")
-                        .padding(.trailing, 4)
-                        .padding(.top, 3.5)
-                        .padding(.bottom, -3.5)
-                }
-                Text("888 888") // reserves the code width so the pill doesn't resize
-                    .foregroundStyle(.clear)
-                    .padding(.trailing, 4)
-                    .accessibilityHidden(true)
-            }
-            .scaledFont(codeStyle) { $0.monospacedDigit().bold() }
-            .foregroundStyle(HierarchicalShapeStyle.primary)
+            codeText
+                .scaledFont(codeStyle) { $0.monospacedDigit().bold() }
+                .foregroundStyle(HierarchicalShapeStyle.primary)
         }
         .padding(.all, 4)
         .fixedSize() // keep the code on one line in a narrow sidebar; the title truncates instead
@@ -202,6 +274,27 @@ struct AccountRowView<Accessory: View>: View {
         .accessibilityElement()
         .accessibilityLabel(account.spokenCode)
         .opacity(isDimmed ? dimmedOpacity : 1)
+    }
+
+    private var codeText: some View {
+        ZStack {
+            if let otp = account.formattedCode {
+                Text(otp)
+                    .privacySensitive()
+                    // Crossed out as well as dimmed, as a shade is easy to miss.
+                    .strikethrough(differentiateWithoutColor && account.state == .expired)
+                    .padding(.trailing, 4)
+            } else {
+                Text("*** *** ")
+                    .padding(.trailing, 4)
+                    .padding(.top, 3.5)
+                    .padding(.bottom, -3.5)
+            }
+            Text("888 888") // reserves the code width so the pill doesn't resize
+                .foregroundStyle(.clear)
+                .padding(.trailing, 4)
+                .accessibilityHidden(true)
+        }
     }
 
     // Not dimmed at all with Increase Contrast; the symbol before the code still says it's expired.
@@ -295,6 +388,38 @@ struct PieProgressView<Style: ShapeStyle>: View {
         return PieShape(progress: self.progress)
             .foregroundStyle(color)
             .animation(.linear(duration: duration), value: self.progress)
+    }
+}
+
+/// The time left as a bar that empties from the right, for the account list with larger text.
+struct BarProgressView<Style: ShapeStyle>: View {
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let progress: Double
+    let color: Style
+    let animate: Bool
+
+    var body: some View {
+        // Like PieProgressView: refills at once, and steps once a second with Reduce Motion.
+        let duration = animate && !reduceMotion && progress < 1.0 ? 1.0 : 0.0
+        BarShape(progress: progress)
+            .foregroundStyle(color)
+            .animation(.linear(duration: duration), value: progress)
+    }
+}
+
+nonisolated private struct BarShape: Shape {
+
+    var progress: Double
+
+    var animatableData: Double {
+        get { progress }
+        set { progress = newValue }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        Path(roundedRect: CGRect(x: rect.minX, y: rect.minY, width: rect.width * min(max(progress, 0), 1), height: rect.height),
+             cornerRadius: rect.height / 2)
     }
 }
 

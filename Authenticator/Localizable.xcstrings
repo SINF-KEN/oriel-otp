@@ -103,6 +103,18 @@
         }
       }
     },
+    "%@ · %@" : {
+      "comment" : "An account's issuer and name on one line, in the account list with larger text",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
     "%lld accounts in Ente Auth" : {
       "comment" : "Ente sync accounts header. The placeholder is the number of accounts.",
       "localizations" : {
