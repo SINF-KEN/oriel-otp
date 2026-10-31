@@ -53,16 +53,23 @@ extension String {
     /// The digits of other scripts, like the Arabic-Indic ٠١٢٣ that an Arabic keyboard types, as ASCII digits. Codes
     /// and PINs are compared byte for byte, so "١٢٣٤" has to become "1234". Other characters are left as they are.
     nonisolated var asciiDigits: String {
-        String(String.UnicodeScalarView(unicodeScalars.map { scalar in
-            guard !scalar.isASCII, scalar.properties.numericType == .decimal,
-                  let value = scalar.properties.numericValue else { return scalar }
-            return Unicode.Scalar(UInt8(48 + Int(value)))
-        }))
+        String(
+            String.UnicodeScalarView(
+                unicodeScalars.map { scalar in
+                    guard !scalar.isASCII, scalar.properties.numericType == .decimal,
+                        let value = scalar.properties.numericValue
+                    else { return scalar }
+                    return Unicode.Scalar(UInt8(48 + Int(value)))
+                }))
     }
 
     /// The separator between the parts of a VoiceOver label, e.g. the issuer, the account name and the code. A comma
     /// in English, "،" in Arabic.
     nonisolated static var accessibilitySeparator: String {
-        String(localized: ", ", comment: "Separator between the parts of a VoiceOver label, e.g. the issuer, the account name and the code. Keep the space after it if your language uses one.")
+        String(
+            localized: ", ",
+            comment:
+                "Separator between the parts of a VoiceOver label, e.g. the issuer, the account name and the code. Keep the space after it if your language uses one."
+        )
     }
 }
