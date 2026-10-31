@@ -173,7 +173,8 @@ import YubiKit
 
     func submitCode() {
         guard let flow, !code.isEmpty else { return }
-        let code = code
+        // Ente only takes ASCII digits; a pasted or hardware keyboard code can be in Arabic-Indic digits.
+        let code = code.asciiDigits
         run {
             defer { self.code = "" }
             try await self.handle { try await flow.submitCode(code) }

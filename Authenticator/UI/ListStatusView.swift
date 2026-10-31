@@ -69,14 +69,19 @@ struct ListStatusView<Actions: View>: View {
 
 struct WhatsNewView: View {
     
+    /// One sentence, so translators can put the link's words where their language needs them. The words between the
+    /// asterisks are shown in the label color, the rest in the secondary color.
     var text: AttributedString {
-        var see = AttributedString(localized: "See ", comment: "Substring in \"See what's new in this version\"")
-        see.foregroundColor = .secondaryLabel
-        var whatsNew = AttributedString(localized: "what's new", comment: "Substring in \"See what's new in this version\"")
-        whatsNew.foregroundColor = .label
-        var inThisVersion = AttributedString(localized: " in this version", comment: "Substring in \"See what's new in this version\"")
-        inThisVersion.foregroundColor = .secondaryLabel
-        return see + whatsNew + inThisVersion
+        var text = AttributedString(localized: "See **what's new** in this version", comment: "Button below the account list. Keep the asterisks around the words that open the version history; they're shown brighter, not bold.")
+        for run in text.runs {
+            if run.inlinePresentationIntent?.contains(.stronglyEmphasized) == true {
+                text[run.range].foregroundColor = .label
+            } else {
+                text[run.range].foregroundColor = .secondaryLabel
+            }
+            text[run.range].inlinePresentationIntent = nil
+        }
+        return text
     }
     
     @Binding var showWhatsNew: Bool

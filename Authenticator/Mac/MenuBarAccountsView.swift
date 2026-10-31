@@ -113,10 +113,10 @@ private struct MenuBarAccountRow: View {
         Button(action: action) {
             HStack {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(account.title)
+                    Text(account.title.leftToRightIfAddress)
                         .lineLimit(1)
                     account.subTitle.map {
-                        Text($0)
+                        Text($0.leftToRightIfAddress)
                             .scaledFont(.caption)
                             .foregroundStyle(isHovering ? .primary : .secondary)
                             .lineLimit(1)
@@ -143,7 +143,7 @@ private struct MenuBarAccountRow: View {
         }
         .buttonStyle(.plain)
         .onHover { isHovering = $0 }
-        .accessibilityLabel(([account.title] + [account.subTitle].compactMap { $0 }).joined(separator: ", "))
+        .accessibilityLabel(([account.title] + [account.subTitle].compactMap { $0 }).joined(separator: String.accessibilitySeparator))
         .accessibilityValue(isCopied ? String(localized: "Copied", comment: "Mac menu bar")
                             : account.requiresTouch && account.otp == nil ? String(localized: "Requires touch", comment: "Mac menu bar help")
                             : account.spokenCode)

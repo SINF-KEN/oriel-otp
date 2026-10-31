@@ -44,7 +44,7 @@ enum TouchPrompt {
                   generation == Self.generation else { return }
             let content = UNMutableNotificationContent()
             content.title = String(localized: "Touch your YubiKey", comment: "Mac notification title")
-            content.body = String(localized: "Touch the button on the YubiKey to get the code for \(accountTitle).", comment: "Mac notification. The placeholder is the account name.")
+            content.body = String(localized: "Touch the button on the YubiKey to get the code for \(accountTitle.isolated).", comment: "Mac notification. The placeholder is the account name.")
             content.interruptionLevel = .timeSensitive
             try? await center.add(UNNotificationRequest(identifier: identifier, content: content, trigger: nil))
             // Hidden while it was being added.

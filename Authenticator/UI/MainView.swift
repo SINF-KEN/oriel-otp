@@ -60,11 +60,7 @@ struct MainView: View {
     
     // Computed so it follows VoiceOver being turned on or off while the app runs.
     var insertYubiKeyMessage: String {
-        if DeviceCapabilities.supportsNFC {
-            String(localized: "Insert YubiKey") + " " + "\(!isVoiceOverEnabled ? String(localized: "or pull down to activate NFC") : String(localized: "or scan a NFC YubiKey"))"
-        } else {
-            String(localized: "Insert YubiKey")
-        }
+        .insertYubiKey(isVoiceOverEnabled: isVoiceOverEnabled)
     }
     
     /// Whether a YubiKey can be reached, over NFC or because one is plugged in.
@@ -261,7 +257,6 @@ struct MainView: View {
             .searchable(text: $searchText, prompt: String(localized: "Search"))
             #endif
             .autocorrectionDisabled(true)
-            .keyboardType(.asciiCapable)
             .listStyle(.inset)
             .refreshable(enabled: DeviceCapabilities.supportsNFC || model.cloud.isEnabled) {
                 otp = nil
@@ -760,10 +755,10 @@ struct MainView: View {
                     model.sessionError = error
                 }
             }
-            var message = String(localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts.")
-            if !result.alreadyPresent.isEmpty {
-                message += " " + String(localized: "\(result.alreadyPresent.count) were already on the YubiKey.", comment: "Import result. The placeholder is the number of accounts.")
-            }
+            // One sentence each, so translators can word and order them as their language needs.
+            let message = result.alreadyPresent.isEmpty
+                ? String(localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts.")
+                : String(localized: "Added \(result.added.count) accounts. \(result.alreadyPresent.count) were already on the YubiKey.", comment: "Import result. The placeholders are the number of accounts added and the number that were already on the YubiKey.")
             toastPresenter.toast(message: message)
         }
     }
@@ -792,8 +787,9 @@ struct MainView: View {
         if searchText.isEmpty {
             return [Account]()
         } else {
-            return model.accounts.filter { $0.title.lowercased().contains(searchText.lowercased()) ||
-                $0.subTitle?.lowercased().contains(searchText.lowercased()) == true }
+            // Ignores case, accents and Arabic and Hebrew vowel marks, so "gerard" finds "Gérard".
+            return model.accounts.filter { $0.title.localizedStandardContains(searchText) ||
+                $0.subTitle?.localizedStandardContains(searchText) == true }
         }
     }
 }
@@ -840,6 +836,17 @@ private struct AlertOrConfirmationDialog<A: View>: ViewModifier {
                 isPresented.wrappedValue = newValue
             }
         )
+    }
+}
+
+extension String {
+    /// What to do to see the YubiKey's accounts, as one sentence so it can be translated as a whole.
+    static func insertYubiKey(isVoiceOverEnabled: Bool) -> String {
+        guard DeviceCapabilities.supportsNFC else { return String(localized: "Insert YubiKey") }
+        // Pulling down to refresh is hard to find with VoiceOver, which has the Scan NFC YubiKey button instead.
+        return isVoiceOverEnabled
+            ? String(localized: "Insert YubiKey or scan a NFC YubiKey", comment: "Account list and Configuration without a YubiKey, with VoiceOver on")
+            : String(localized: "Insert YubiKey or pull down to activate NFC", comment: "Account list and Configuration without a YubiKey")
     }
 }
 

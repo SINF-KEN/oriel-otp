@@ -190,7 +190,7 @@ struct EnteSyncView: View {
             if model.isDerivingKeys {
                 derivingKeysText
             } else {
-                Text(String(localized: "Enter the verification code Ente sent to \(model.email).", comment: "Ente email code footer. The placeholder is the email address."))
+                Text(String(localized: "Enter the verification code Ente sent to \(model.email.isolated).", comment: "Ente email code footer. The placeholder is the email address."))
             }
         }
     }
@@ -236,7 +236,8 @@ struct EnteSyncView: View {
     private var codeField: some View {
         TextField(String(localized: "Code", comment: "Ente verification code field"), text: $model.code)
             .textContentType(.oneTimeCode)
-            .keyboardType(.numberPad)
+            // The number pad types Arabic-Indic digits where those are the region's, the ASCII one always 0 to 9.
+            .keyboardType(.asciiCapableNumberPad)
             .focused($focusedField, equals: .code)
             .onAppear { focusedField = .code }
     }
@@ -352,10 +353,10 @@ private struct EnteCodeRow: View {
                 // Explicit label colors, a button in a form would otherwise tint them with the accent color. An account
                 // that can't be added is lighter, but still readable.
                 VStack(alignment: .leading) {
-                    Text(code.title)
+                    Text(code.title.leftToRightIfAddress)
                         .foregroundStyle(Color(code.template == nil ? .secondaryLabel : .label))
                     if let subtitle = code.subtitle {
-                        Text(subtitle)
+                        Text(subtitle.leftToRightIfAddress)
                             .scaledFont(.subheadline)
                             .foregroundStyle(Color(.secondaryLabel))
                     }

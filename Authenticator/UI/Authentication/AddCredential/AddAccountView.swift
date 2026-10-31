@@ -128,7 +128,9 @@ struct AddAccountView: View {
                 #endif
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Add account field")) {
-                        TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer)
+                        // Wraps rather than cutting off a long name at the larger text sizes.
+                        TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer, axis: .vertical)
+                            .submitsOnReturn($issuer, submit: focusNextField)
                             // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
                             .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
                             .accessibilityIdentifier("add-account.issuer")
@@ -136,7 +138,8 @@ struct AddAccountView: View {
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
-                        TextField(String("john@doe.com"), text: $accountName)
+                        TextField(String("john@doe.com"), text: $accountName, axis: .vertical)
+                            .submitsOnReturn($accountName, submit: focusNextField)
                             .accessibilityLabel(String(localized: "Account name", comment: "Add account field"))
                             .accessibilityIdentifier("add-account.account-name")
                             .textContentType(.username)
@@ -162,13 +165,7 @@ struct AddAccountView: View {
                     Text(String(localized: "Account details", comment: "Add account section header"))
                 }
                 .multilineTextAlignment(.trailing)
-                .onSubmit {
-                    switch focusedField {
-                    case .issuer: focusedField = .accountName
-                    case .accountName where mode == .manual: focusedField = .secret
-                    default: focusedField = nil
-                    }
-                }
+                .onSubmit(focusNextField)
 
                 destinationSection
 
@@ -251,6 +248,15 @@ struct AddAccountView: View {
         }
     }
 
+    /// Return goes from the issuer to the account name to the secret, then puts the keyboard away.
+    private func focusNextField() {
+        switch focusedField {
+        case .issuer: focusedField = .accountName
+        case .accountName where mode == .manual: focusedField = .secret
+        default: focusedField = nil
+        }
+    }
+
     private var title: String {
         availableDestinations == .ente ? String(localized: "Add to Ente Auth", comment: "Add account navigation title when adding to Ente Auth only")
             : String(localized: "Add account", comment: "Add account navigation title")
@@ -286,9 +292,9 @@ struct AddAccountView: View {
             } footer: {
                 switch destinations {
                 case .ente:
-                    Text(String(localized: "The account is saved in Ente Auth for \(enteEmail) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
+                    Text(String(localized: "The account is saved in Ente Auth for \(enteEmail.isolated) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
                 case .both:
-                    Text(String(localized: "Saves the account in Ente Auth for \(enteEmail) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.", comment: "Add account Ente Auth footer. The placeholder is an email address."))
+                    Text(String(localized: "Saves the account in Ente Auth for \(enteEmail.isolated) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.", comment: "Add account Ente Auth footer. The placeholder is an email address."))
                 default:
                     if isHOTP {
                         Text(String(localized: "A HOTP account is saved in one place only, as each copy would count its codes on its own.", comment: "Add account footer for a HOTP account"))
@@ -301,7 +307,7 @@ struct AddAccountView: View {
             Section {
                 Label(String(localized: "Stored in Ente Auth", comment: "Where an account is stored"), systemImage: "cloud")
             } footer: {
-                Text(String(localized: "The account is saved in Ente Auth for \(enteEmail) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
+                Text(String(localized: "The account is saved in Ente Auth for \(enteEmail.isolated) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
             }
         } else if enteEmail == nil {
             Section {
@@ -436,6 +442,18 @@ private struct ScanAccountRepresentable: UIViewRepresentable {
     }
 }
 #endif
+
+extension View {
+    /// For a text field that wraps (`axis: .vertical`), where Return adds a line break instead of submitting: takes
+    /// the line break out and submits, like Return in a one-line field. Pasted line breaks are taken out too.
+    func submitsOnReturn(_ text: Binding<String>, submit: @escaping () -> Void) -> some View {
+        onChange(of: text.wrappedValue) { _, newValue in
+            guard newValue.contains(where: \.isNewline) else { return }
+            text.wrappedValue = newValue.filter { !$0.isNewline }
+            submit()
+        }
+    }
+}
 
 extension YubiKitOATHSession.HashAlgorithm {
 

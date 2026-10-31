@@ -47,12 +47,12 @@ struct AccountDetailView: View {
                 .background(account.iconColor)
                 .clipShape(Circle())
                 .accessibilityHidden(true)
-            Text(account.title)
+            Text(account.title.leftToRightIfAddress)
                 .scaledFont(.title2) { $0.weight(.medium) }
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             account.subTitle.map {
-                Text($0)
+                Text($0.leftToRightIfAddress)
                     .scaledFont(.body)
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
@@ -218,7 +218,7 @@ struct CopyToYubiKeyButtons: View {
             }
             if model.canCopyToYubiKey(account, moving: true) {
                 Button(action: { Self.copy(account, moving: true, model: model, toastPresenter: toastPresenter) }) {
-                    Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.right.square")
+                    Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.forward.square")
                 }
                 .help(String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help"))
                 .disabled(!canReachYubiKey)

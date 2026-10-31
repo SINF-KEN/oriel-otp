@@ -142,6 +142,7 @@ private struct AppLockCodePad: View {
             .accessibilityElement()
             .accessibilityLabel(String(localized: "\(code.count) of \(length) digits entered", comment: "App lock code dots for VoiceOver"))
 
+            // Left to right in Arabic and Hebrew too, like the system's passcode keys: 1 2 3 rather than 3 2 1.
             Grid(horizontalSpacing: 24, verticalSpacing: 16) {
                 ForEach(rows, id: \.self) { row in
                     GridRow {
@@ -168,6 +169,7 @@ private struct AppLockCodePad: View {
                     .disabled(code.isEmpty)
                 }
             }
+            .environment(\.layoutDirection, .leftToRight)
         }
         .focusable()
         .focusEffectDisabled()
@@ -203,7 +205,8 @@ private struct AppLockCodePad: View {
 
     private func add(_ digits: String) {
         guard code.count < length else { return }
-        code += digits.filter(\.isASCII).filter(\.isNumber).prefix(length - code.count)
+        // Digits typed on an Arabic keyboard, ١٢٣, count as the 1 2 3 they stand for.
+        code += digits.asciiDigits.filter(\.isASCII).filter(\.isNumber).prefix(length - code.count)
         guard code.count == length else { return }
         let entered = code
         // Shown full for a moment, so the last dot doesn't go straight back to empty.
