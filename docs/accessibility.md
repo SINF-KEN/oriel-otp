@@ -12,6 +12,9 @@ search, pin, rename, delete, sync with Ente Auth, the YubiKey settings, and the 
 - An account row is one element: issuer, account name and the code read digit by digit ("1 2 3, 4 5 6"), with the
   seconds left and, when Ente Auth accounts are listed, where it's stored as its value. Its actions are the swipe
   actions plus Copy and Move to YubiKey and Rename; on the Mac also Copy, Pin and Delete.
+- The code in a row is a button that copies it, but the row is one element, so VoiceOver copies with the row's Copy
+  action instead. On iOS the row's hint says so ("Swipe up or down to copy the code"). After copying, the toast is
+  announced, and the row shows a checkmark for a moment.
 - Toasts (copied, synced, touch the YubiKey) are announced. So are a wrong app lock code and a scanned QR code.
 - The app lock screen takes the focus and keeps it from the app behind it. Every sheet with Cancel or Close closes
   with the escape gesture (a two-finger Z).
@@ -21,6 +24,9 @@ search, pin, rename, delete, sync with Ente Auth, the YubiKey settings, and the 
 Icon buttons answer to their title and to shorter names, e.g. "Tap Plus" or "Tap Add" for Add account, "Tap Scan"
 for Scan NFC YubiKey. A row answers to its issuer ("Tap GitHub"). Text fields are named after their row, not their
 placeholder.
+
+The code in a row isn't an element of its own, so "Show numbers" doesn't number it. To copy by voice, "Long press
+GitHub" opens the row's menu, then "Tap Copy"; or "Tap GitHub" opens the account, then "Tap Copy".
 
 ## Larger Text
 
@@ -152,6 +158,10 @@ the add account form. It runs with the screenshots (`tools/screenshots.sh`, and 
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
+
+`AuthenticatorUITests/TapToCopyTests.swift` taps the code in a row, beside the name and below it at a larger text size,
+and checks that it's copied without opening the account; also 24 points above the code, for the 44 point target. Tapping
+the name opens the account without copying.
 
 To check by hand, use Accessibility Inspector (Xcode > Open Developer Tool) and the Simulator's Environment Overrides
 (text size, appearance, increase contrast, reduce motion, differentiate without color). For right to left, set the

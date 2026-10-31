@@ -29,6 +29,8 @@ struct AccountRowView<Accessory: View>: View {
     private let accessory: Accessory
     /// Called when the code is tapped. Without it the code isn't tappable and a tap opens the row.
     private let copyCode: (() -> Void)?
+    /// The code has just been copied: a checkmark shows instead of the time left.
+    private let isCopied: Bool
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
@@ -60,10 +62,11 @@ struct AccountRowView<Accessory: View>: View {
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
     
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, @ViewBuilder accessory: () -> Accessory) {
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, @ViewBuilder accessory: () -> Accessory) {
         self.account = account
         self.showsLocation = showsLocation
         self.copyCode = copyCode
+        self.isCopied = isCopied
         self.accessory = accessory()
         self.isDimmed = account.state == .expired || account.otp == nil
     }
@@ -86,6 +89,10 @@ struct AccountRowView<Accessory: View>: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(account.accessibilityLabel)
         .accessibilityValue(accessibilityValue)
+        #if os(iOS)
+        // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
+        .accessibilityHint(copyCode == nil ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
+        #endif
         // Said to Voice Control without the code, e.g. "Tap GitHub".
         .accessibilityInputLabels([account.title] + [account.subTitle.map { "\(account.title) \($0)" }].compactMap { $0 })
         // Stable for UI tests and agents, e.g. "account-row.GitHub:alice@example.com", see docs/accessibility.md.
@@ -150,14 +157,20 @@ struct AccountRowView<Accessory: View>: View {
             Spacer()
             #endif
             accessory
-            if let copyCode {
-                // Borderless so the list gives the tap to the code instead of opening the account.
-                Button(action: copyCode) { codePill }
-                    .buttonStyle(.borderless)
-                    .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
-            } else {
-                codePill
-            }
+            copyButton { codePill }
+        }
+    }
+
+    /// The code as a button that copies it, if the row has `copyCode`.
+    @ViewBuilder private func copyButton(@ViewBuilder code: () -> some View) -> some View {
+        if let copyCode {
+            // Borderless so the list gives the tap to the code instead of opening the account.
+            // The list makes it taller to tap than it looks, at least the 44 points Apple asks for (TapToCopyTests).
+            Button(action: copyCode) { code() }
+                .buttonStyle(.borderless)
+                .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        } else {
+            code()
         }
     }
 
@@ -177,14 +190,7 @@ struct AccountRowView<Accessory: View>: View {
             }
             HStack {
                 accessory
-                if let copyCode {
-                    // Borderless so the list gives the tap to the code instead of opening the account.
-                    Button(action: copyCode) { headlineCode }
-                        .buttonStyle(.borderless)
-                        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
-                } else {
-                    headlineCode
-                }
+                copyButton { headlineCode }
                 Spacer(minLength: 0)
             }
             ZStack(alignment: .leading) {
@@ -215,7 +221,10 @@ struct AccountRowView<Accessory: View>: View {
     private var headlineCode: some View {
         HStack(spacing: 6) {
             // The bar is empty while there's no code, so the symbol says what's needed to get one.
-            if case .countingdown = account.state {} else {
+            if isCopied {
+                copiedSymbol
+                    .imageScale(.small)
+            } else if case .countingdown = account.state {} else {
                 Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
                     .imageScale(.small)
                     .accessibilityHidden(true)
@@ -246,22 +255,32 @@ struct AccountRowView<Accessory: View>: View {
 
     private var codePill: some View {
         HStack {
-            switch(account.state) {
-            case .requiresCalculation, .expired:
-                Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
-                    .font(.system(size: account.requiresTouch ? statusSize * 18 / 22 : statusSize))
-                    // In the code's color, as the pill is dimmed while it shows.
-                    .foregroundStyle(HierarchicalShapeStyle.primary)
-                    .frame(width: statusSize, height: statusSize)
-                    .padding(1)
-                    .accessibilityHidden(true)
-            case .countingdown(let remaining):
-                PieProgressView(progress: remaining,
-                                color: pillColor,
-                                animate: animate)
-                    .frame(width: statusSize, height: statusSize)
-                    .padding(1)
-                    .accessibilityHidden(true)
+            Group {
+                switch(account.state) {
+                case .requiresCalculation, .expired:
+                    Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
+                        .font(.system(size: account.requiresTouch ? statusSize * 18 / 22 : statusSize))
+                        // In the code's color, as the pill is dimmed while it shows.
+                        .foregroundStyle(HierarchicalShapeStyle.primary)
+                        .frame(width: statusSize, height: statusSize)
+                        .padding(1)
+                        .accessibilityHidden(true)
+                case .countingdown(let remaining):
+                    PieProgressView(progress: remaining,
+                                    color: pillColor,
+                                    animate: animate)
+                        .frame(width: statusSize, height: statusSize)
+                        .padding(1)
+                        .accessibilityHidden(true)
+                }
+            }
+            // Over the time left rather than instead of it, so the pie carries on where it was.
+            .opacity(isCopied ? 0 : 1)
+            .overlay {
+                if isCopied {
+                    copiedSymbol
+                        .font(.system(size: statusSize))
+                }
             }
             // The code in the full color, the ring and outline lighter. The dimmed code still has a contrast of 4.5:1.
             codeText
@@ -303,6 +322,14 @@ struct AccountRowView<Accessory: View>: View {
         }
     }
 
+    /// Shown for a moment after the code is copied, as well as the toast. A symbol, so it doesn't depend on color, and
+    /// swapped in without an animation, so there's no motion to reduce.
+    private var copiedSymbol: some View {
+        Image(systemName: "checkmark.circle.fill")
+            .foregroundStyle(HierarchicalShapeStyle.primary)
+            .accessibilityHidden(true)
+    }
+
     // Not dimmed at all with Increase Contrast; the symbol before the code still says it's expired.
     private var dimmedOpacity: Double {
         colorSchemeContrast == .increased ? 1 : 0.7
@@ -310,8 +337,8 @@ struct AccountRowView<Accessory: View>: View {
 }
 
 extension AccountRowView where Accessory == EmptyView {
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil) {
-        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode) { EmptyView() }
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false) {
+        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied) { EmptyView() }
     }
 }
 

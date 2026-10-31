@@ -7,6 +7,7 @@ Oriel OTP does not run analytics or advertising and does not collect personal da
 - OATH credentials are stored on your YubiKey. The app reads them when you use the key and writes credentials to the key when you add them. The app does not keep a server copy.
 - QR scanning starts only when you choose to scan. The app reads the QR code on the device to prepare a credential for your YubiKey; it does not save or send the camera image.
 - On the Mac, Scan QR Code on Screen takes one picture of each display, with the app's own windows left out, only when you click it and after you allow screen recording in System Settings. The app looks for a QR code in it on the Mac and does not save or send the picture. Pasted, dropped and imported pictures are handled the same way.
+- On iPhone and iPad, a copied code stays on the device: it isn't shared with your other devices through Universal Clipboard, and is removed from the clipboard after a minute.
 - On the Mac, a copied code is marked so that clipboard managers don't keep it, and is removed from the clipboard after a minute unless you have copied something else since.
 - A YubiKey password is saved in the device keychain only if you choose to save it. You can remove saved OATH passwords in the app under the YubiKey settings.
 - App settings and favorites are stored locally on the device.

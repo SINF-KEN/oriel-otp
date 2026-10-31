@@ -11001,6 +11001,35 @@
         }
       }
     },
+    "Swipe up or down to copy the code" : {
+      "comment" : "VoiceOver hint for an account in the list, whose Copy action is one of its actions",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach oben oder unten streichen, um den Code zu kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Balayez vers le haut ou le bas pour copier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上下にスワイプしてコードをコピーします"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Potiahnutím nahor alebo nadol skopírujete kód"
+          }
+        }
+      }
+    },
     "Sync" : {
       "comment" : "Voice Control name for the Sync from Ente Auth button",
       "localizations" : {

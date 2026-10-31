@@ -21,11 +21,14 @@ import SwiftUI
 @Observable class ToastPresenter {
     var isPresenting = false
     var message = "No message"
-    
+    /// The account whose code was just copied, for a moment.
+    private(set) var copiedAccountID: String?
+
     @ObservationIgnored private var presentTask: Task<Void, any Error>?
     @ObservationIgnored private var dismissTask: Task<Void, any Error>?
     // The latest message asked for, which may still be waiting for the previous toast to go away.
     @ObservationIgnored private var requestedMessage: String?
+    @ObservationIgnored private var copiedTask: Task<Void, any Error>?
 
     /// Shows the message, and hides it after `duration`, or only when `dismiss(message:)` is called if `duration` is nil.
     /// A longer message stays longer than `duration`, long enough to read it at a slow pace.
@@ -81,11 +84,22 @@ extension ToastPresenter {
     /// Copies the account's code, calculating a new one first if there's none or it has expired.
     func copyCode(of account: Account) {
         if account.state != .expired, let otp = account.otp?.code {
-            copyToClipboard(otp)
+            copyCode(otp, of: account)
         } else {
             account.calculate { [weak self] otp in
-                self?.copyToClipboard(otp.code)
+                self?.copyCode(otp.code, of: account)
             }
+        }
+    }
+
+    private func copyCode(_ code: String, of account: Account) {
+        copyToClipboard(code)
+        // The row shows a checkmark for a moment, next to the toast.
+        copiedAccountID = account.accountId
+        copiedTask?.cancel()
+        copiedTask = Task { [weak self] in
+            try await Task.sleep(for: .seconds(1.5))
+            self?.copiedAccountID = nil
         }
     }
 }
