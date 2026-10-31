@@ -84,6 +84,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
                             Text("Terms of use")
+                                .foregroundStyle(.primary)
                         }
                     }
                     Button {
@@ -92,6 +93,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.secondaryLabel))
                             Text("Privacy policy")
+                                .foregroundStyle(.primary)
                         }
                     }
                     NavigationLink {
@@ -110,6 +112,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "book"), color: Color(.systemPink))
                             Text("User guide")
+                                .foregroundStyle(.primary)
                         }
                     }
                     Button {
@@ -118,6 +121,7 @@ struct AboutView: View {
                         HStack {
                             ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)
                             Text("Contact support")
+                                .foregroundStyle(.primary)
                         }
                     }
                 }
