@@ -71,6 +71,8 @@ struct AppLockSecretEntry: View {
     let method: AppLockMethod
     let prompt: String
     var checksRetryDate = true
+    /// The shortest password that can be submitted. A shorter one isn't wrong, so it doesn't shake.
+    var minimumPasswordLength = 1
     let submit: (String) -> Bool
 
     private var lock: AppLock { .shared }
@@ -101,7 +103,7 @@ struct AppLockSecretEntry: View {
             } else if let length = method.codeLength {
                 AppLockCodePad(length: length, submit: submit)
             } else {
-                AppLockPasswordField(submit: submit)
+                AppLockPasswordField(minimumLength: minimumPasswordLength, submit: submit)
             }
         }
         .frame(maxWidth: 360)
@@ -224,6 +226,7 @@ private struct AppLockCodePad: View {
 
 private struct AppLockPasswordField: View {
 
+    let minimumLength: Int
     let submit: (String) -> Bool
 
     @State private var password = ""
@@ -242,13 +245,13 @@ private struct AppLockPasswordField: View {
                 .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             Button(String(localized: "Continue", comment: "App lock password button"), action: enter)
                 .buttonStyle(.borderedProminent)
-                .disabled(password.isEmpty)
+                .disabled(password.count < max(1, minimumLength))
         }
         .onAppear { isFocused = true }
     }
 
     private func enter() {
-        guard !password.isEmpty else { return }
+        guard password.count >= max(1, minimumLength) else { return }
         if !submit(password) {
             Platform.notify(.error)
             AccessibilityNotification.Announcement(AppLockSecretEntry.wrongPasswordMessage).post()

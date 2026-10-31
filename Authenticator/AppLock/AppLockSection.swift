@@ -107,6 +107,8 @@ private struct AppLockChangeView: View {
 
     @State private var step: Step
 
+    private static let minimumPasswordLength = 4
+
     private var lock: AppLock { .shared }
 
     init(change: AppLockChange, done: @escaping (Result<Void, Error>?) -> Void) {
@@ -127,8 +129,9 @@ private struct AppLockChangeView: View {
                         return true
                     }
                 case .new, .mismatch:
-                    AppLockSecretEntry(method: change.to, prompt: step == .mismatch ? mismatchPrompt : newPrompt, checksRetryDate: false) { secret in
-                        guard change.to != .password || secret.count >= 4 else { return false }
+                    AppLockSecretEntry(method: change.to, prompt: step == .mismatch ? mismatchPrompt : newPrompt, checksRetryDate: false,
+                                       minimumPasswordLength: Self.minimumPasswordLength) { secret in
+                        guard change.to != .password || secret.count >= Self.minimumPasswordLength else { return false }
                         step = .confirm(secret)
                         return true
                     }
