@@ -498,7 +498,10 @@ struct MainView: View {
         #endif
 
         #if os(macOS)
-        ToolbarItem(placement: .primaryAction) {
+        // With Refresh and Add account, not on its own: a secondary action floats in the middle of the Mac sidebar's toolbar.
+        ToolbarItemGroup(placement: .primaryAction) {
+            enteSyncButton
+                .help(String(localized: "Sync from Ente Auth", comment: "Main view menu item"))
             Button(action: { model.refresh() }) {
                 Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
             }
@@ -526,11 +529,11 @@ struct MainView: View {
             addAccountToolbarItem
         }
 
+        #if os(iOS)
         // Secondary actions collapse into the system overflow menu.
         ToolbarItemGroup(placement: .secondaryAction) {
             enteSyncButton
                 .help(String(localized: "Sync from Ente Auth", comment: "Main view menu item"))
-            #if os(iOS)
             // In the Settings window and the app menu on the Mac.
             Button(action: { showConfiguration.toggle() }) {
                 Label("Configuration", systemImage: "switch.2")
@@ -538,7 +541,6 @@ struct MainView: View {
             .accessibilityInputLabels(VoiceControlNames.configuration)
             .accessibilityIdentifier("accounts.configuration")
             .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
-            #endif
             // In the Debug menu on the Mac, so it isn't in the screenshots.
             #if DEBUG && targetEnvironment(simulator)
             if SimulatedYubiKey.isEnabled {
@@ -546,14 +548,13 @@ struct MainView: View {
                 SimulatedYubicoOTPButton()
             }
             #endif
-            #if os(iOS)
             Button(action: { showAbout.toggle() }) {
                 Label("About", systemImage: "questionmark.circle")
             }
             .accessibilityInputLabels(VoiceControlNames.about)
             .accessibilityIdentifier("accounts.about")
-            #endif
         }
+        #endif
     }
 
     private func performPendingQuickAction() {

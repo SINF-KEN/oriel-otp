@@ -41,14 +41,19 @@ private struct AppTextSizeModifier: ViewModifier {
     @AppStorage(TextSize.key) private var scale = 1.0
     let bodyFont: Bool
 
-    func body(content: Content) -> some View {
-        content
+    @ViewBuilder func body(content: Content) -> some View {
+        let content = content
             .font(bodyFont && scale != 1 ? .scaled(.body, by: scale) : nil)
             // Layouts that switch at the accessibility sizes on iOS, like the account row, don't on the Mac: its
             // windows and the sidebar grow with the text instead.
             .environment(\.textScale, scale)
-            // Switches, checkboxes and buttons grow a little with the text.
-            .controlSize(scale >= 1.5 ? .large : .regular)
+        // Switches, checkboxes and buttons grow a little with the text. Left alone below that: setting the regular
+        // size squeezes the toolbar's buttons into narrow pills with small icons.
+        if scale >= 1.5 {
+            content.controlSize(.large)
+        } else {
+            content
+        }
     }
 }
 
