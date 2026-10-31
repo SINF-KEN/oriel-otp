@@ -17,6 +17,7 @@
 import SwiftUI
 #if canImport(UIKit)
 import UIKit
+import UniformTypeIdentifiers
 #else
 import AppKit
 #endif
@@ -64,18 +65,19 @@ enum Platform {
         #endif
     }
 
-    #if os(macOS)
-    // How long a copied code stays on the Mac's pasteboard. The code has usually expired by then.
+    // How long a copied code stays on the pasteboard. The code has usually expired by then.
     private static let pasteboardLifetime: Duration = .seconds(60)
-    #endif
 
     /// Copies a code to the pasteboard.
     ///
-    /// On the Mac it's marked as concealed (https://nspasteboard.org) so clipboard managers don't keep it, and it's
-    /// removed after a while unless something else has been copied since.
+    /// On iOS it stays on the device rather than going to the other devices through Universal Clipboard. On the Mac
+    /// it's marked as concealed (https://nspasteboard.org) so clipboard managers don't keep it. On both it's removed
+    /// after a while, on the Mac unless something else has been copied since.
     static func copy(_ string: String) {
         #if os(iOS)
-        UIPasteboard.general.string = string
+        UIPasteboard.general.setItems([[UTType.utf8PlainText.identifier: string]],
+                                      options: [.localOnly: true,
+                                                .expirationDate: Date.now.addingTimeInterval(TimeInterval(pasteboardLifetime.components.seconds))])
         #else
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
