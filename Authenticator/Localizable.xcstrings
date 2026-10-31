@@ -2020,6 +2020,35 @@
         }
       }
     },
+    "API provider" : {
+      "comment" : "Ente sign in server field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API-Anbieter"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fournisseur d’API"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APIプロバイダ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poskytovateľ API"
+          }
+        }
+      }
+    },
     "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nWith Stay signed in, your Ente Auth accounts are listed here too, and changes you make are saved in Ente Auth. Your Ente Auth data is decrypted on this Mac." : {
       "comment" : "Mac tutorial",
       "localizations" : {
