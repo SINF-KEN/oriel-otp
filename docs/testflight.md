@@ -7,7 +7,9 @@ requests, plus `.github/`) aren't uploaded. To upload another branch, run the wo
 
 Uploads queue instead of cancelling each other. App Store Connect gives each upload the next free build number
 (`manageAppVersionAndBuildNumber`), so `CURRENT_PROJECT_VERSION` doesn't need bumping; the version shown in TestFlight
-is still `MARKETING_VERSION`. The archive step sets `ORIEL_COMMIT` to the commit's short SHA, which **About** shows under
+is still `MARKETING_VERSION`. A build that's still processing isn't counted yet, so a run right after another can be
+handed the same number; the upload then waits three minutes and tries again, up to three more times. The archive is
+also retried, up to twice, when Apple's API fails while Xcode fetches the provisioning profiles. The archive step sets `ORIEL_COMMIT` to the commit's short SHA, which **About** shows under
 the version; builds without it, such as Xcode's Run, don't show one. Once App Store Connect has processed a build,
 it's available to internal testers; add it to an external group by hand.
 
