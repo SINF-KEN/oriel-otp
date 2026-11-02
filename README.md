@@ -41,6 +41,8 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
   password for the YubiKey's OATH application.
 - **App lock.** Optionally lock the app with Face ID or Touch ID, a 4 or 6 digit code, or a password.
 - **Apple Watch.** Optionally shows the codes of your Ente Auth accounts on Apple Watch, without the iPhone nearby.
+- **AutoFill.** On iOS 18 and macOS 15 or later, fills in the codes of your Ente Auth accounts in Safari and other
+  apps, suggested on each account's websites, and opens setup links and QR codes from **Set Up Codes In**.
 - **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps
   and websites through iOS, in the same way as other smart cards. macOS does this itself, without the app.
 - **On the Mac.** Menu bar commands and keyboard shortcuts, a Settings window, codes in the menu bar, QR codes read

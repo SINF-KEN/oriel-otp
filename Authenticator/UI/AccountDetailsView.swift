@@ -31,6 +31,7 @@ struct AccountDetailView: View {
     @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
+    @State private var showAutoFillWebsites = false
 
     private let codeColor = Color(.secondaryLabel)
     @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
@@ -66,6 +67,19 @@ struct AccountDetailView: View {
                 }
                 .scaledFont(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
+            }
+            if let id = autoFillID {
+                let websites = AutoFillAccountSync.shared.websites(for: id, issuer: account.credential.issuer)
+                Label {
+                    Text(websites.isEmpty ? String(localized: "No AutoFill websites", comment: "Account details without AutoFill websites")
+                         : websites.joined(separator: ", "))
+                } icon: {
+                    Image(systemName: "key.fill")
+                        .accessibilityHidden(true)
+                }
+                .scaledFont(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
+                .accessibilityLabel(String(localized: "AutoFill websites: \(websites.joined(separator: ", "))", comment: "Account details AutoFill websites, for VoiceOver. The placeholder is a list of websites."))
             }
             if !account.isInEnte && model.cloud.isEnabled {
                 Text(String(localized: "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.", comment: "Account details of a YubiKey account while signed in to Ente Auth"))
@@ -137,6 +151,13 @@ struct AccountDetailView: View {
             }
             ToolbarItemGroup(placement: .secondaryAction) {
                 CopyToYubiKeyButtons(account: account)
+                if autoFillID != nil {
+                    Button(action: { showAutoFillWebsites = true }) {
+                        Label(String(localized: "AutoFill websites", comment: "Menu"), systemImage: "globe")
+                    }
+                    .help(String(localized: "Choose the websites AutoFill suggests the code on", comment: "Toolbar help"))
+                    .accessibilityIdentifier("account-details.autofill-websites")
+                }
                 if account.canRename {
                     Button(action: { showEditing.toggle() }) {
                         Label(String(localized: "Rename", comment: "Menu"), systemImage: "square.and.pencil")
@@ -155,6 +176,11 @@ struct AccountDetailView: View {
         .sheet(isPresented: $showEditing) {
             EditView(account: account, viewModel: model, showEditing: $showEditing)
         }
+        .sheet(isPresented: $showAutoFillWebsites) {
+            if let id = autoFillID {
+                AutoFillWebsitesView(id: id, issuer: account.credential.issuer, isPresented: $showAutoFillWebsites)
+            }
+        }
         .alert("Delete account?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Delete", role: .destructive) {
@@ -169,6 +195,12 @@ struct AccountDetailView: View {
                 Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
             }
         }
+    }
+
+    /// The id AutoFill knows a time-based Ente Auth account by, nil for the accounts it can't fill in.
+    private var autoFillID: String? {
+        guard AutoFillAccountSync.isSupported, case .ente(let id) = account.location, account.credential.type == .totp else { return nil }
+        return id
     }
 
     private var copyToolbarItem: some ToolbarContent {

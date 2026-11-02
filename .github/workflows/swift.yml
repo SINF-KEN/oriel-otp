@@ -266,9 +266,10 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-watch.log"
 
-      # CI has no provisioning profile, so the Mac build is signed ad hoc without the keychain access group, which
-      # needs one. The keychain tests skip themselves without it. The build is optimized like the simulator's. The
-      # optimized app has no debug dylib, so the hardened runtime is off: it won't load the ad hoc test bundle.
+      # CI has no provisioning profile, so the Mac build is signed ad hoc without the keychain access group, the app
+      # group and AutoFill, which need one. The keychain tests skip themselves without it. The build is optimized like
+      # the simulator's. The optimized app has no debug dylib, so the hardened runtime is off: it won't load the ad hoc
+      # test bundle.
       - name: Test on macOS
         timeout-minutes: 20
         run: |
@@ -276,6 +277,8 @@ jobs:
           ENTITLEMENTS="$RUNNER_TEMP/OrielOTP-macOS-CI.entitlements"
           cp Authenticator/Authenticator-macOS.entitlements "$ENTITLEMENTS"
           /usr/libexec/PlistBuddy -c 'Delete :keychain-access-groups' "$ENTITLEMENTS"
+          /usr/libexec/PlistBuddy -c 'Delete :com.apple.security.application-groups' "$ENTITLEMENTS"
+          /usr/libexec/PlistBuddy -c 'Delete :com.apple.developer.authentication-services.autofill-credential-provider' "$ENTITLEMENTS"
           xcodebuild test \
             -project OrielOTP.xcodeproj \
             -scheme OrielOTP \

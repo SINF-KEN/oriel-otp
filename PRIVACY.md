@@ -33,7 +33,7 @@ While you stay signed in, the copy of your Ente Auth accounts, including their s
 
 ## App lock
 
-If you turn on **App lock**, the app keeps the lock method you chose in the device keychain, only on this device. For a code or password it keeps a salted PBKDF2-SHA256 hash, never the code or password itself. Face ID, Touch ID and the device passcode are checked by the system; the app only learns whether it succeeded. The number of wrong attempts and the time of the last one are kept in local app preferences to make you wait after too many. Nothing about the lock leaves the device. The lock covers this app only: the Apple Watch app keeps showing codes while the watch is unlocked.
+If you turn on **App lock**, the app keeps the lock method you chose in the device keychain, only on this device. For a code or password it keeps a salted PBKDF2-SHA256 hash, never the code or password itself. Face ID, Touch ID and the device passcode are checked by the system; the app only learns whether it succeeded. The number of wrong attempts and the time of the last one are kept in preferences the app shares with its AutoFill extension, on this device, to make you wait after too many. Nothing about the lock leaves the device. The lock covers this app only: the Apple Watch app keeps showing codes while the watch is unlocked.
 
 ## Optional Apple Watch app
 
@@ -51,11 +51,28 @@ The watch app makes no network connections and doesn't store anything else.
 Turning the switch off, or signing out of Ente, sends an empty list that replaces the previous one and makes the
 watch delete its copy. If the watch can't be reached at that moment, the iPhone sends it the next time it can.
 
+## AutoFill
+
+On iOS and iPadOS 18 and macOS 15 or later, the app's AutoFill extension can fill in the codes of your time-based Ente
+Auth accounts in Safari and other apps, once you turn on **Oriel OTP** in the system's AutoFill settings. The extension
+can't read the app's own storage, so while you stay signed in to Ente, the app keeps a second copy of these accounts,
+including their secrets, in storage it shares only with its extension. It is protected like the app's copy: encrypted
+with a random key kept in the device keychain, which never leaves the device and can only be read while the device is
+unlocked, and excluded from backups. Counter-based (HOTP) accounts and the accounts on your YubiKey are not included.
+
+So that the system can suggest a code above the keyboard, the app gives it the website domains you chose for each
+account, or ones guessed from its issuer, with the account's name. The system keeps them on the device and only uses
+them while AutoFill from Oriel OTP is on; secrets and codes are never given to it until you choose a code. The websites
+you choose are kept in local app preferences. If App lock is on, the extension asks for it before filling in a code.
+
 ## Retention, deletion, and revoking access
 
 - To remove a saved Ente session from this device and sign out, choose **Sign out** under **Sync from Ente Auth** or in the Ente Auth section of the settings. This clears the locally saved token, key, email, server and the copy of your Ente Auth accounts right away, including changes not yet uploaded to Ente, then asks Ente to end the server session. If the server cannot be reached, the local session has already been removed; you may also revoke the session from your Ente account.
 - To remove the Ente Auth accounts from your Apple Watch, turn off **Show Ente Auth accounts on Apple Watch** or sign
   out of Ente. Deleting the watch app also removes them.
+- Signing out of Ente also deletes the AutoFill copy of your accounts and the websites chosen for them, and removes
+  them from the system's AutoFill suggestions. Turning off AutoFill from Oriel OTP in the system settings removes the
+  suggestions too.
 - To remove a saved YubiKey password from this device, use **Clear saved passwords** in the YubiKey settings.
 - To remove a smart card certificate from this device, tap the minus button next to it under **Smart card extension**.
 - OATH credentials copied to a YubiKey remain on that physical key until you remove them using the app or another compatible tool. Removing a credential from a YubiKey does not delete its source from Ente Auth. Deleting an Ente Auth account in the app moves it to the trash in Ente Auth on all your devices; to delete it for good, empty it from the trash in Ente's apps.
