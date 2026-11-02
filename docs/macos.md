@@ -6,7 +6,7 @@ The Mac version is being built in steps, following the checklist in
 ## Approach: a native macOS destination
 
 The `OrielOTP` target builds for macOS as well as iOS (`SUPPORTED_PLATFORMS = "iphoneos iphonesimulator
-macosx"`), with macOS 14 as the minimum. It's the same SwiftUI app, compiled against AppKit instead of UIKit.
+macosx"`), with macOS 15 as the minimum. It's the same SwiftUI app, compiled against AppKit instead of UIKit.
 
 The alternatives were Mac Catalyst and running the iPad app on Apple silicon ("Designed for iPad"). The native
 destination was chosen because:
@@ -19,8 +19,9 @@ destination was chosen because:
 - `MenuBarExtra` and the `Settings` scene aren't available to Catalyst or iPad apps.
 - "Designed for iPad" runs the iPad app unchanged, so nothing can be adapted for the Mac.
 
-macOS 14 is the minimum for the newer SwiftUI APIs (`@Observable`, which the app uses throughout, and the Settings
-and menu bar scenes).
+macOS 15 is the minimum, like iOS 18 on iPhone and iPad: it's the first that can fill in verification codes from
+another app with AutoFill, and it has the newer SwiftUI APIs the app uses (`@Observable`, the Settings and menu bar
+scenes, and focusing the search field).
 
 ## How the code is shared
 
@@ -48,7 +49,7 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
   right. Closing the window keeps the app running for the menu bar; the Dock icon or the menu bar opens it again.
 - **Menu bar commands** (`Authenticator/Mac/MainCommands.swift`): File > Add Account… (⌘N) and Sync from Ente
   Auth… (⇧⌘E); Edit > Copy (⌘C copies the selected account's code, or text while editing it) and Search Accounts
-  (⌘F, macOS 15 and later); an Account menu with Copy Code, Pin (⇧⌘P), Rename…, Delete… (⌘⌫) and Refresh (⌘R);
+  (⌘F); an Account menu with Copy Code, Pin (⇧⌘P), Rename…, Delete… (⌘⌫) and Refresh (⌘R);
   About in the app menu; help, the tutorial, support and the privacy policy in the Help menu; and File > Import From
   Device for Continuity Camera. The main view publishes only a small `Equatable` state for the menus, and the
   commands reach it through `MainWindowCommands`; publishing closures made SwiftUI rebuild the menus constantly.

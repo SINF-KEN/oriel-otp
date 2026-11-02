@@ -1716,6 +1716,35 @@
         }
       }
     },
+    "Add website" : {
+      "comment" : "AutoFill websites button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter un site web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webサイトを追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridať webovú stránku"
+          }
+        }
+      }
+    },
     "Added %lld accounts." : {
       "comment" : "Import result. The placeholder is the number of accounts.",
       "localizations" : {
@@ -2280,6 +2309,151 @@
         }
       }
     },
+    "AutoFill" : {
+      "comment" : "AutoFill settings section header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisch ausfüllen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplissage automatique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatické vypĺňanie"
+          }
+        }
+      }
+    },
+    "AutoFill codes" : {
+      "comment" : "AutoFill setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codes automatisch ausfüllen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplir les codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードを自動入力"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automaticky vypĺňať kódy"
+          }
+        }
+      }
+    },
+    "AutoFill suggests this account's code on these websites and their subdomains. Without a website, choose the code from the list of codes instead." : {
+      "comment" : "AutoFill websites footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das automatische Ausfüllen schlägt den Code dieses Kontos auf diesen Websites und ihren Subdomains vor. Ohne Website wähle den Code stattdessen in der Liste der Codes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le remplissage automatique propose le code de ce compte sur ces sites web et leurs sous-domaines. Sans site web, choisissez plutôt le code dans la liste des codes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力は、これらのWebサイトとそのサブドメインでこのアカウントのコードを提案します。Webサイトがない場合は、コードの一覧からコードを選んでください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatické vypĺňanie navrhne kód tohto účtu na týchto webových stránkach a ich subdoménach. Bez webovej stránky vyberte kód zo zoznamu kódov."
+          }
+        }
+      }
+    },
+    "AutoFill websites" : {
+      "comment" : "Menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites für automatisches Ausfüllen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites pour le remplissage automatique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力のWebサイト"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webové stránky na automatické vypĺňanie"
+          }
+        }
+      }
+    },
+    "AutoFill websites: %@" : {
+      "comment" : "Account details AutoFill websites, for VoiceOver. The placeholder is a list of websites.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites für automatisches Ausfüllen: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sites pour le remplissage automatique : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力のWebサイト：%@"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webové stránky na automatické vypĺňanie: %@"
+          }
+        }
+      }
+    },
     "Back" : {
       "comment" : "Mac tutorial button",
       "localizations" : {
@@ -2838,6 +3012,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zvoľte heslo s aspoň 4 znakmi"
+          }
+        }
+      }
+    },
+    "Choose the websites AutoFill suggests the code on" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Websites wählen, auf denen der Code automatisch vorgeschlagen wird"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir les sites web où le code est proposé automatiquement"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コードを自動入力で提案するWebサイトを選択"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vybrať webové stránky, na ktorých sa kód navrhne automaticky"
           }
         }
       }
@@ -4498,6 +4701,35 @@
         }
       }
     },
+    "Enter a domain such as example.com instead of “%@”." : {
+      "comment" : "AutoFill websites alert. The placeholder is what was typed.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib statt „%@“ eine Domain wie example.com ein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez un domaine tel que example.com au lieu de « %@ »."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」ではなく、example.comのようなドメインを入力してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Namiesto „%@“ zadajte doménu, napríklad example.com."
+          }
+        }
+      }
+    },
     "Enter a server URL that starts with https://." : {
       "comment" : "Ente sign in error",
       "localizations" : {
@@ -5128,6 +5360,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ikonu aplikácie sa nepodarilo zmeniť"
+          }
+        }
+      }
+    },
+    "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first." : {
+      "comment" : "Mac AutoFill settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setze die Codes Deiner zeitbasierten Ente-Auth-Konten in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplissez les codes de vos comptes Ente Auth basés sur le temps dans Safari et d’autres apps. Chaque compte est proposé sur les sites web indiqués dans ses détails. Les codes des comptes de votre YubiKey ne peuvent pas être remplis. Si vous verrouillez l’app, elle est d’abord déverrouillée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safariやほかのアプリで、時間ベースのEnte Authアカウントのコードを入力できます。各アカウントは、詳細にあるWebサイトで提案されます。YubiKeyのアカウントのコードは入力できません。アプリをロックしている場合は、先にロックを解除します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypĺňajte kódy časových účtov Ente Auth v Safari a iných aplikáciách. Každý účet sa navrhne na webových stránkach uvedených v jeho podrobnostiach. Kódy účtov na kľúči YubiKey nemožno vyplniť. Ak aplikáciu uzamknete, najprv sa odomkne."
+          }
+        }
+      }
+    },
+    "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes." : {
+      "comment" : "AutoFill settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Setze die Codes Deiner zeitbasierten Ente-Auth-Konten in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt. Wähle in den Einstellungen Oriel OTP für „Codes einrichten in“, um Konten über Einrichtungslinks und QR-Codes hinzuzufügen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remplissez les codes de vos comptes Ente Auth basés sur le temps dans Safari et d’autres apps. Chaque compte est proposé sur les sites web indiqués dans ses détails. Les codes des comptes de votre YubiKey ne peuvent pas être remplis. Si vous verrouillez l’app, elle est d’abord déverrouillée. Dans Réglages, choisissez Oriel OTP pour « Configurer les codes dans » afin d’ajouter des comptes depuis les liens et codes QR de configuration."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safariやほかのアプリで、時間ベースのEnte Authアカウントのコードを入力できます。各アカウントは、詳細にあるWebサイトで提案されます。YubiKeyのアカウントのコードは入力できません。アプリをロックしている場合は、先にロックを解除します。設定の「コードの設定に使用」でOriel OTPを選ぶと、設定用のリンクやQRコードからアカウントを追加できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vypĺňajte kódy časových účtov Ente Auth v Safari a iných aplikáciách. Každý účet sa navrhne na webových stránkach uvedených v jeho podrobnostiach. Kódy účtov na kľúči YubiKey nemožno vyplniť. Ak aplikáciu uzamknete, najprv sa odomkne. Ak chcete pridávať účty z odkazov a QR kódov na nastavenie, v Nastaveniach vyberte Oriel OTP pre „Nastaviť kódy v“."
           }
         }
       }
@@ -6714,6 +7004,35 @@
         }
       }
     },
+    "No AutoFill websites" : {
+      "comment" : "Account details without AutoFill websites",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Websites für automatisches Ausfüllen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun site pour le remplissage automatique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力のWebサイトなし"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Žiadne webové stránky na automatické vypĺňanie"
+          }
+        }
+      }
+    },
     "No QR code for an account was found. Make sure the whole QR code can be seen." : {
       "comment" : "Mac QR scan error",
       "localizations" : {
@@ -7027,6 +7346,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nie je zapnuté"
+          }
+        }
+      }
+    },
+    "Not a website" : {
+      "comment" : "AutoFill websites alert",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Website"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce n’est pas un site web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webサイトではありません"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie je to webová stránka"
           }
         }
       }
@@ -7347,6 +7695,35 @@
         }
       }
     },
+    "On" : {
+      "comment" : "AutoFill setting value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オン"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapnuté"
+          }
+        }
+      }
+    },
     "One-Time Password" : {
       "comment" : "OTP settings title and toggle",
       "localizations" : {
@@ -7372,6 +7749,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jednorazové heslo"
+          }
+        }
+      }
+    },
+    "Open AutoFill settings" : {
+      "comment" : "AutoFill setting button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen für automatisches Ausfüllen öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir les réglages de remplissage automatique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力の設定を開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otvoriť nastavenia automatického vypĺňania"
           }
         }
       }
@@ -12896,6 +13302,35 @@
         }
       }
     },
+    "Turn on AutoFill" : {
+      "comment" : "AutoFill setting button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisches Ausfüllen aktivieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer le remplissage automatique"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動入力をオンにする"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapnúť automatické vypĺňanie"
+          }
+        }
+      }
+    },
     "Two-factor authentication" : {
       "comment" : "Ente two factor header",
       "localizations" : {
@@ -13296,6 +13731,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Použiť iný účet"
+          }
+        }
+      }
+    },
+    "Use suggested websites" : {
+      "comment" : "AutoFill websites button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorgeschlagene Websites verwenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser les sites suggérés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提案されたWebサイトを使用"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Použiť navrhované webové stránky"
           }
         }
       }
@@ -14385,6 +14849,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "zadajte heslo"
+          }
+        }
+      }
+    },
+    "example.com" : {
+      "comment" : "AutoFill website field placeholder",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "example.com"
           }
         }
       }

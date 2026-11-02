@@ -242,7 +242,7 @@ struct MainView: View {
             // Here rather than for the whole window, so the search field keeps the system's size.
             .scaledBodyFont()
             .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
-            .searchFocusedIfAvailable($isSearchFocused)
+            .searchFocusedBinding($isSearchFocused)
             // Return copies the selected account's code, Delete deletes the selected accounts.
             .onKeyPress(.return) {
                 guard !AppLock.shared.isLocked, let selectedAccount else { return .ignored }
@@ -691,7 +691,7 @@ struct MainView: View {
         let selection = selectedAccounts
         return MainWindowMenuState(canAddAccount: model.isKeyPluggedIn || model.cloud.isEnabled,
                                    canRefresh: model.canRefresh,
-                                   canSearch: canFocusSearch,
+                                   canSearch: true,
                                    selectionCount: selection.count,
                                    isSelectionPinned: !selection.isEmpty && selection.allSatisfy(\.isPinned),
                                    canRename: selection.count == 1 && selection[0].canRename,
@@ -726,10 +726,6 @@ struct MainView: View {
         case .delete:
             accountsToDelete = selection
         }
-    }
-
-    private var canFocusSearch: Bool {
-        if #available(macOS 15.0, *) { true } else { false }
     }
     #endif
 
