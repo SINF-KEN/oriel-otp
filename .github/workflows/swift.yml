@@ -129,6 +129,13 @@ jobs:
           echo "Selected $SIMULATOR_NAME simulator ($DEVICE_ID)"
           echo "id=$DEVICE_ID" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
+
+      # The first boot on a fresh runner takes most of the machine for a few minutes. Started before the packages,
+      # it slowed restoring their 17 MB cache from seconds to minutes; started here, it overlaps the build instead.
       - name: Start selected simulator
         run: |
           set -euo pipefail
@@ -140,7 +147,7 @@ jobs:
               ;;
             Shutdown)
               xcrun simctl boot "$DEVICE_ID"
-              echo "Simulator boot started before package resolution and the build"
+              echo "Simulator boot started before the build"
               ;;
             *)
               echo "::error::Unexpected state '$DEVICE_STATE' for simulator $DEVICE_ID"
@@ -148,11 +155,6 @@ jobs:
               exit 1
               ;;
           esac
-
-      - name: Resolve Swift packages
-        id: packages
-        timeout-minutes: 15
-        uses: ./.github/actions/swift-packages
 
       # This builds the app and extension with warnings as errors. There's no separate analyze build: the sources
       # are all Swift, which the Clang static analyzer doesn't check. The Debug build is optimized: the Ente sign in
