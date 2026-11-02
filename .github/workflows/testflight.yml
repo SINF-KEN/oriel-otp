@@ -97,6 +97,9 @@ jobs:
           security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
           printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8"
 
+      # Fetching the provisioning profiles sometimes fails on Apple's side ("The network connection was lost", "The
+      # data couldn't be read because it isn't in the correct format"), which Xcode then reports as "No profiles for
+      # ... were found". Only that failure is retried.
       - name: Archive
         timeout-minutes: 30
         env:
@@ -104,26 +107,39 @@ jobs:
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           set -euo pipefail
-          xcodebuild archive \
-            -project OrielOTP.xcodeproj \
-            -scheme OrielOTP \
-            -configuration Release \
-            -destination "generic/platform=${{ matrix.platform }}" \
-            -archivePath "$RUNNER_TEMP/OrielOTP.xcarchive" \
-            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
-            -disableAutomaticPackageResolution \
-            -onlyUsePackageVersionsFromResolvedFile \
-            -skipPackageUpdates \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
-            -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER_ID" \
-            ORIEL_COMMIT="$(git rev-parse --short HEAD)" \
-            2>&1 | tee "$RUNNER_TEMP/archive.log"
+          for attempt in 1 2 3; do
+            rm -rf "$RUNNER_TEMP/OrielOTP.xcarchive"
+            xcodebuild archive \
+              -project OrielOTP.xcodeproj \
+              -scheme OrielOTP \
+              -configuration Release \
+              -destination "generic/platform=${{ matrix.platform }}" \
+              -archivePath "$RUNNER_TEMP/OrielOTP.xcarchive" \
+              -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
+              -disableAutomaticPackageResolution \
+              -onlyUsePackageVersionsFromResolvedFile \
+              -skipPackageUpdates \
+              -allowProvisioningUpdates \
+              -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+              -authenticationKeyID "$KEY_ID" \
+              -authenticationKeyIssuerID "$ISSUER_ID" \
+              ORIEL_COMMIT="$(git rev-parse --short HEAD)" \
+              2>&1 | tee "$RUNNER_TEMP/attempt.log" && status=0 || status=$?
+            cat "$RUNNER_TEMP/attempt.log" >> "$RUNNER_TEMP/archive.log"
+            [[ $status -eq 0 ]] && exit 0
+            if (( attempt == 3 )) || ! grep -q "No profiles for" "$RUNNER_TEMP/attempt.log"; then
+              exit "$status"
+            fi
+            echo "::warning::Couldn't fetch the provisioning profiles (attempt $attempt); retrying in a minute."
+            sleep 60
+          done
 
       # App Store Connect gives the upload the next free build number, so the project's number doesn't need bumping.
+      # A build uploaded moments earlier, still processing, isn't counted yet, so a run that follows another closely
+      # can be handed the same number and rejected as a "Redundant Binary Upload". That's retried once App Store
+      # Connect has caught up.
       - name: Upload to App Store Connect
-        timeout-minutes: 20
+        timeout-minutes: 45
         env:
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -144,15 +160,25 @@ jobs:
           </dict>
           </plist>
           EOF
-          xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/OrielOTP.xcarchive" \
-            -exportPath "$RUNNER_TEMP/export" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
-            -authenticationKeyID "$KEY_ID" \
-            -authenticationKeyIssuerID "$ISSUER_ID" \
-            2>&1 | tee "$RUNNER_TEMP/upload.log"
+          for attempt in 1 2 3 4; do
+            rm -rf "$RUNNER_TEMP/export"
+            xcodebuild -exportArchive \
+              -archivePath "$RUNNER_TEMP/OrielOTP.xcarchive" \
+              -exportPath "$RUNNER_TEMP/export" \
+              -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+              -allowProvisioningUpdates \
+              -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" \
+              -authenticationKeyID "$KEY_ID" \
+              -authenticationKeyIssuerID "$ISSUER_ID" \
+              2>&1 | tee "$RUNNER_TEMP/attempt.log" && status=0 || status=$?
+            cat "$RUNNER_TEMP/attempt.log" >> "$RUNNER_TEMP/upload.log"
+            [[ $status -eq 0 ]] && break
+            if (( attempt == 4 )) || ! grep -q "Redundant Binary Upload" "$RUNNER_TEMP/attempt.log"; then
+              exit "$status"
+            fi
+            echo "::warning::App Store Connect reused a build number (attempt $attempt); retrying in three minutes."
+            sleep 180
+          done
           echo "Uploaded the ${{ matrix.platform }} build of ${SHA::7} to App Store Connect." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload logs
