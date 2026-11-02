@@ -29,17 +29,12 @@ struct HoverReader<Content: View>: View {
 }
 
 extension View {
-    /// Lets the Search Accounts command move the focus to the search field, which needs macOS 15.
-    @ViewBuilder func searchFocusedIfAvailable(_ isFocused: Binding<Bool>) -> some View {
-        if #available(macOS 15.0, *) {
-            modifier(SearchFocusModifier(isFocused: isFocused))
-        } else {
-            self
-        }
+    /// Lets the Search Accounts command move the focus to the search field.
+    func searchFocusedBinding(_ isFocused: Binding<Bool>) -> some View {
+        modifier(SearchFocusModifier(isFocused: isFocused))
     }
 }
 
-@available(macOS 15.0, *)
 private struct SearchFocusModifier: ViewModifier {
     @Binding var isFocused: Bool
     @FocusState private var focus: Bool

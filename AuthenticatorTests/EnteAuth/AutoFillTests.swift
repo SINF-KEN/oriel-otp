@@ -79,7 +79,6 @@ struct AutoFillWebsitesTests {
         #expect(others.map(\.id) == ["2", "1"])
     }
 
-    @available(iOS 18.0, macOS 15.0, *)
     @Test func suggestsEachWebsiteWithTheAccountsName() {
         let identities = AutoFillIdentities.identities(for: [Self.account("1", issuer: "Example", websites: ["example.com", "example.org"])])
         #expect(identities.map(\.serviceIdentifier.identifier) == ["example.com", "example.org"])

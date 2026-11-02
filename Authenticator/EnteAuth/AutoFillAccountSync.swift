@@ -31,8 +31,7 @@ import Foundation
 
     private static let websitesKey = "AutoFill.Websites"
 
-    /// Whether AutoFill from Oriel OTP is turned on in Settings. Nil until it's known, and before iOS 18 and
-    /// macOS 15, which can't fill in codes from other apps.
+    /// Whether AutoFill from Oriel OTP is turned on in Settings. Nil until it's known.
     private(set) var isEnabled: Bool?
     /// The websites chosen in the app, by account id. The other accounts use the guessed ones.
     private var chosenWebsites: [String: [String]] {
@@ -52,11 +51,6 @@ import Foundation
         self.defaults = defaults
         self.updatesSystem = updatesSystem
         chosenWebsites = defaults.dictionary(forKey: Self.websitesKey) as? [String: [String]] ?? [:]
-    }
-
-    /// Whether this system can fill in codes from other apps.
-    static var isSupported: Bool {
-        if #available(iOS 18.0, macOS 15.0, *) { true } else { false }
     }
 
     // MARK: - Websites
@@ -115,7 +109,7 @@ import Foundation
 
     /// Reads whether AutoFill from Oriel OTP is on, e.g. when the app comes back from Settings.
     func refresh() {
-        guard updatesSystem, #available(iOS 18.0, macOS 15.0, *) else { return }
+        guard updatesSystem else { return }
         Task {
             isEnabled = await ASCredentialIdentityStore.shared.state().isEnabled
         }
@@ -123,7 +117,6 @@ import Foundation
 
     /// Asks to turn on AutoFill from Oriel OTP, or opens the settings where it's turned on.
     func turnOn() {
-        guard #available(iOS 18.0, macOS 15.0, *) else { return }
         Task {
             let isEnabled = await ASSettingsHelper.requestToTurnOnCredentialProviderExtension()
             self.isEnabled = isEnabled
@@ -134,12 +127,11 @@ import Foundation
     }
 
     func openSettings() {
-        guard #available(iOS 18.0, macOS 15.0, *) else { return }
         ASSettingsHelper.openVerificationCodeAppSettings(completionHandler: nil)
     }
 
     private func updateSuggestions(_ accounts: [AutoFillAccount]) {
-        guard updatesSystem, #available(iOS 18.0, macOS 15.0, *) else { return }
+        guard updatesSystem else { return }
         Task {
             isEnabled = await AutoFillIdentities.replace(with: accounts)
         }

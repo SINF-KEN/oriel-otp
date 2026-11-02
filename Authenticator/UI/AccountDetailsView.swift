@@ -199,7 +199,7 @@ struct AccountDetailView: View {
 
     /// The id AutoFill knows a time-based Ente Auth account by, nil for the accounts it can't fill in.
     private var autoFillID: String? {
-        guard AutoFillAccountSync.isSupported, case .ente(let id) = account.location, account.credential.type == .totp else { return nil }
+        guard case .ente(let id) = account.location, account.credential.type == .totp else { return nil }
         return id
     }
 

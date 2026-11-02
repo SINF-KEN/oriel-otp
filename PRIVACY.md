@@ -53,7 +53,7 @@ watch delete its copy. If the watch can't be reached at that moment, the iPhone 
 
 ## AutoFill
 
-On iOS and iPadOS 18 and macOS 15 or later, the app's AutoFill extension can fill in the codes of your time-based Ente
+The app's AutoFill extension can fill in the codes of your time-based Ente
 Auth accounts in Safari and other apps, once you turn on **Oriel OTP** in the system's AutoFill settings. The extension
 can't read the app's own storage, so while you stay signed in to Ente, the app keeps a second copy of these accounts,
 including their secrets, in storage it shares only with its extension. It is protected like the app's copy: encrypted

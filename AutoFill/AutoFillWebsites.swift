@@ -120,7 +120,6 @@ nonisolated enum AutoFillWebsites {
 }
 
 /// The accounts' websites in the system's list of AutoFill suggestions.
-@available(iOS 18.0, macOS 15.0, *)
 nonisolated enum AutoFillIdentities {
 
     static func identities(for accounts: [AutoFillAccount]) -> [ASOneTimeCodeCredentialIdentity] {

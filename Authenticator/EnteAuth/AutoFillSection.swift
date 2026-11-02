@@ -16,35 +16,33 @@
 
 import SwiftUI
 
-/// AutoFill of verification codes in settings, on iOS 18 and macOS 15 or later.
+/// AutoFill of verification codes in settings.
 struct AutoFillSection: View {
 
     @Environment(\.scenePhase) private var scenePhase
     private var autoFill: AutoFillAccountSync { .shared }
 
     var body: some View {
-        if AutoFillAccountSync.isSupported {
-            Section {
-                if autoFill.isEnabled == true {
-                    LabeledContent(String(localized: "AutoFill codes", comment: "AutoFill setting"),
-                                   value: String(localized: "On", comment: "AutoFill setting value"))
-                    Button(String(localized: "Open AutoFill settings", comment: "AutoFill setting button")) { autoFill.openSettings() }
-                } else {
-                    Button(String(localized: "Turn on AutoFill", comment: "AutoFill setting button")) { autoFill.turnOn() }
-                }
-            } header: {
-                Text(String(localized: "AutoFill", comment: "AutoFill settings section header"))
-            } footer: {
-                #if os(macOS)
-                Text(String(localized: "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first.", comment: "Mac AutoFill settings footer"))
-                #else
-                Text(String(localized: "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes.", comment: "AutoFill settings footer"))
-                #endif
+        Section {
+            if autoFill.isEnabled == true {
+                LabeledContent(String(localized: "AutoFill codes", comment: "AutoFill setting"),
+                               value: String(localized: "On", comment: "AutoFill setting value"))
+                Button(String(localized: "Open AutoFill settings", comment: "AutoFill setting button")) { autoFill.openSettings() }
+            } else {
+                Button(String(localized: "Turn on AutoFill", comment: "AutoFill setting button")) { autoFill.turnOn() }
             }
-            .task { autoFill.refresh() }
-            .onChange(of: scenePhase) { _, phase in
-                if phase == .active { autoFill.refresh() }
-            }
+        } header: {
+            Text(String(localized: "AutoFill", comment: "AutoFill settings section header"))
+        } footer: {
+            #if os(macOS)
+            Text(String(localized: "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first.", comment: "Mac AutoFill settings footer"))
+            #else
+            Text(String(localized: "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes.", comment: "AutoFill settings footer"))
+            #endif
+        }
+        .task { autoFill.refresh() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { autoFill.refresh() }
         }
     }
 }
