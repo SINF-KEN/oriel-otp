@@ -98,13 +98,17 @@ jobs:
             AuthenticatorTests/Info.plist \
             TokenExtension/Info.plist \
             TokenExtension/TokenExtension.entitlements \
+            AutoFillExtension/Info.plist \
+            AutoFillExtension/AutoFillExtension.entitlements \
+            AutoFillExtension/AutoFillExtension-macOS.entitlements \
+            AutoFillExtension/PrivacyInfo.xcprivacy \
             OrielOTPWatch/PrivacyInfo.xcprivacy
           xmllint --noout OrielOTP.xcodeproj/xcshareddata/xcschemes/OrielOTP.xcscheme
           xmllint --noout OrielOTP.xcodeproj/xcshareddata/xcschemes/OrielOTPWatch.xcscheme
           jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version == null or (.state.version | length > 0)) and (.state.revision | length == 40))' \
             OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
-          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 8
-          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 8
+          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 10
+          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 10
 
       - name: Select simulator
         id: simulator
