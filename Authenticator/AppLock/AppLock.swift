@@ -161,7 +161,11 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 /// hour. There's no way around a forgotten code or password other than deleting the app, which forgets the lock: the
 /// accounts are on the YubiKey and in Ente Auth, not only in the app.
 @MainActor @Observable final class AppLock {
-    static let shared = AppLock()
+    static let shared = Bundle.main.bundleURL.pathExtension == "appex"
+        // The AutoFill extension can't tell which installation of the app saved the lock, the app forgets an earlier
+        // one's when it starts.
+        ? AppLock(defaults: AppGroup.defaults, keepsSavedLock: true)
+        : AppLock(attempts: AppGroup.defaults)
 
     private static let enabledKey = "AppLock.Enabled"
     private static let failedAttemptsKey = "AppLock.FailedAttempts"
@@ -181,6 +185,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 
     @ObservationIgnored private let storage: AppLockStorage
     @ObservationIgnored private let defaults: UserDefaults
+    /// Where the wrong attempts are counted, shared with the AutoFill extension so they count in both.
+    @ObservationIgnored private let attempts: UserDefaults
+    @ObservationIgnored private let keepsSavedLock: Bool
     @ObservationIgnored private let now: () -> Date
     @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> Bool
     @ObservationIgnored private var pendingActions: [@MainActor () -> Void] = []
@@ -188,12 +195,18 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 
     var method: AppLockMethod { configuration?.method ?? .off }
 
+    /// `attempts` defaults to `defaults`. With `keepsSavedLock`, a lock in the keychain is used even if this
+    /// installation didn't save it.
     init(storage: AppLockStorage = AppLockKeychain(),
          defaults: UserDefaults = .standard,
+         attempts: UserDefaults? = nil,
+         keepsSavedLock: Bool = false,
          now: @escaping () -> Date = Date.init,
          authenticateDeviceOwner: @escaping @MainActor (String) async -> Bool = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
         self.storage = storage
         self.defaults = defaults
+        self.attempts = attempts ?? defaults
+        self.keepsSavedLock = keepsSavedLock
         self.now = now
         self.authenticateDeviceOwner = authenticateDeviceOwner
         isLocked = true
@@ -207,7 +220,7 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     private func reload() {
         do {
             var configuration = try storage.load()
-            if configuration != nil, !defaults.bool(forKey: Self.enabledKey) {
+            if configuration != nil, !keepsSavedLock, !defaults.bool(forKey: Self.enabledKey) {
                 try? storage.save(nil)
                 configuration = nil
             }
@@ -280,12 +293,12 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         updateRetryDate()
         guard retryDate == nil else { return false }
         if configuration.matches(secret) {
-            defaults.removeObject(forKey: Self.failedAttemptsKey)
-            defaults.removeObject(forKey: Self.lastFailureKey)
+            attempts.removeObject(forKey: Self.failedAttemptsKey)
+            attempts.removeObject(forKey: Self.lastFailureKey)
             return true
         }
-        defaults.set(defaults.integer(forKey: Self.failedAttemptsKey) + 1, forKey: Self.failedAttemptsKey)
-        defaults.set(now().timeIntervalSinceReferenceDate, forKey: Self.lastFailureKey)
+        attempts.set(attempts.integer(forKey: Self.failedAttemptsKey) + 1, forKey: Self.failedAttemptsKey)
+        attempts.set(now().timeIntervalSinceReferenceDate, forKey: Self.lastFailureKey)
         updateRetryDate()
         return false
     }
@@ -306,8 +319,8 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         }
         try storage.save(configuration)
         defaults.set(configuration != nil, forKey: Self.enabledKey)
-        defaults.removeObject(forKey: Self.failedAttemptsKey)
-        defaults.removeObject(forKey: Self.lastFailureKey)
+        attempts.removeObject(forKey: Self.failedAttemptsKey)
+        attempts.removeObject(forKey: Self.lastFailureKey)
         self.configuration = configuration
         isUnavailable = false
         retryDate = nil
@@ -316,13 +329,13 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 
     /// Clears `retryDate` once it has passed, for the views counting down to it.
     func updateRetryDate() {
-        let failures = defaults.integer(forKey: Self.failedAttemptsKey)
+        let failures = attempts.integer(forKey: Self.failedAttemptsKey)
         guard failures >= Self.freeAttempts else {
             retryDate = nil
             return
         }
         let delay = min(30 * pow(2, Double(failures - Self.freeAttempts)), 3600)
-        let lastFailure = Date(timeIntervalSinceReferenceDate: defaults.double(forKey: Self.lastFailureKey))
+        let lastFailure = Date(timeIntervalSinceReferenceDate: attempts.double(forKey: Self.lastFailureKey))
         let retryDate = lastFailure.addingTimeInterval(delay)
         self.retryDate = retryDate > now() ? retryDate : nil
     }

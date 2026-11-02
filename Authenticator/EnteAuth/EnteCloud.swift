@@ -30,7 +30,7 @@ import YubiKit
 /// list is pulled down, after each change made here and when the network comes back with changes waiting.
 @Observable final class EnteCloud {
 
-    static let shared = EnteCloud()
+    static let shared = EnteCloud(autoFill: .shared)
 
     enum AddResult: Equatable {
         case added
@@ -57,6 +57,8 @@ import YubiKit
     @ObservationIgnored private let storage: EnteVaultStorage
     @ObservationIgnored private let urlSession: URLSession
     @ObservationIgnored private let watch: WatchAccountSync
+    /// Nil in the tests, which mustn't change the accounts AutoFill uses.
+    @ObservationIgnored private let autoFill: AutoFillAccountSync?
     @ObservationIgnored private var session: EnteSavedSession?
     @ObservationIgnored private var didAskToUnlock = false
     @ObservationIgnored private var unlockTask: Task<EnteSavedSession?, Never>?
@@ -69,12 +71,16 @@ import YubiKit
     @ObservationIgnored private var isVaultLocked = false
 
     init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .shared,
-         watch: WatchAccountSync = .shared) {
+         watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil) {
         self.store = store
         self.storage = storage
         self.urlSession = session
         self.watch = watch
+        self.autoFill = autoFill
         loadVault()
+        if !isVaultLocked {
+            updateAutoFill()
+        }
     }
 
     /// Reads the vault of the saved account. If the device is locked, e.g. when the app was launched in the
@@ -161,6 +167,7 @@ import YubiKit
         isVaultLocked = false
         guard vault != nil else {
             storage.remove()
+            autoFill?.remove()
             return
         }
         replaceVault(with: nil)
@@ -328,9 +335,19 @@ import YubiKit
 
     private func changed() {
         onChange?()
+        updateAutoFill()
         // The watch shows what is in the vault. It's only sent while the session is unlocked, i.e. it is still valid.
         if session != nil {
             watch.send(codes)
+        }
+    }
+
+    /// AutoFill uses what is in the vault, also while the session is locked: the codes are calculated on the device.
+    private func updateAutoFill() {
+        if vault != nil {
+            autoFill?.update(codes)
+        } else {
+            autoFill?.remove()
         }
     }
 
