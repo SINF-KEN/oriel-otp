@@ -80,6 +80,9 @@ struct AuthenticatorApp: App {
         }
         .defaultSize(width: 900, height: 600)
         .commands {
+            // Show Sidebar, and Show Toolbar and Customize Toolbar, in the View menu.
+            SidebarCommands()
+            ToolbarCommands()
             MainCommands()
             TextSizeCommands()
         }

@@ -266,10 +266,12 @@ struct MainView: View {
                     model.updateAccountsOverNFC()
                 }
             }
-            .toolbar { mainToolbar }
             #if os(macOS)
+            // Customizable from the View menu or by Control-clicking the toolbar.
+            .toolbar(id: "accounts") { macToolbar }
             .navigationTitle(Text(verbatim: "Oriel OTP"))
             #else
+            .toolbar { mainToolbar }
             .navigationTitle(model.hasAccounts ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
             #endif
             .navigationSplitViewColumnWidth(min: 320 * textScale, ideal: 360 * textScale)
@@ -480,8 +482,50 @@ struct MainView: View {
     }
     }
 
+    #if os(macOS)
+    @ToolbarContentBuilder private var macToolbar: some CustomizableToolbarContent {
+        // Together, not on their own: a secondary action floats in the middle of the Mac sidebar's toolbar.
+        ToolbarItem(id: "sync-from-ente", placement: .primaryAction) {
+            enteSyncButton
+                .help(String(localized: "Sync from Ente Auth", comment: "Main view menu item"))
+        }
+        ToolbarItem(id: "refresh", placement: .primaryAction) {
+            Button(action: { model.refresh() }) {
+                Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
+            }
+            .accessibilityInputLabels(VoiceControlNames.refresh)
+            .accessibilityIdentifier("accounts.refresh")
+            .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
+            .disabled(!model.canRefresh)
+        }
+        // Not in the toolbar until added from Customize Toolbar, for people who'd rather click than use the menus.
+        ToolbarItem(id: "copy-code", placement: .primaryAction) {
+            Button(action: { perform(.copyCode) }) {
+                Label(String(localized: "Copy Code", comment: "Mac Account menu"), systemImage: "doc.on.doc")
+            }
+            .help(String(localized: "Copy the code", comment: "Mac row button help"))
+            .disabled(selectedAccount == nil)
+        }
+        .defaultCustomization(.hidden)
+        ToolbarItem(id: "pin", placement: .primaryAction) {
+            let unpins = !selectedAccounts.isEmpty && selectedAccounts.allSatisfy(\.isPinned)
+            Button(action: { perform(.togglePin) }) {
+                Label(unpins ? String(localized: "Unpin", comment: "Mac Account menu") : String(localized: "Pin", comment: "Mac Account menu"),
+                      systemImage: unpins ? "pin.slash" : "pin")
+            }
+            .help(unpins ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
+            .disabled(selectedAccounts.isEmpty)
+        }
+        .defaultCustomization(.hidden)
+        if #available(macOS 27.0, *) {
+            addAccountToolbarItem
+                .visibilityPriority(.high)
+        } else {
+            addAccountToolbarItem
+        }
+    }
+    #else
     @ToolbarContentBuilder private var mainToolbar: some ToolbarContent {
-        #if os(iOS)
         // Always there, so scanning doesn't depend on discovering pull to refresh.
         if DeviceCapabilities.supportsNFC {
             ToolbarItem(placement: .topBarLeading) {
@@ -495,22 +539,7 @@ struct MainView: View {
                 .accessibilityIdentifier("accounts.scan-nfc")
             }
         }
-        #endif
 
-        #if os(macOS)
-        // With Refresh and Add account, not on its own: a secondary action floats in the middle of the Mac sidebar's toolbar.
-        ToolbarItemGroup(placement: .primaryAction) {
-            enteSyncButton
-                .help(String(localized: "Sync from Ente Auth", comment: "Main view menu item"))
-            Button(action: { model.refresh() }) {
-                Label(String(localized: "Refresh", comment: "Mac toolbar"), systemImage: "arrow.clockwise")
-            }
-            .accessibilityInputLabels(VoiceControlNames.refresh)
-            .accessibilityIdentifier("accounts.refresh")
-            .help(String(localized: "Read the codes from the YubiKey again", comment: "Mac toolbar help"))
-            .disabled(!model.canRefresh)
-        }
-        #else
         if !model.hasAccounts {
             ToolbarItem(placement: .principal) {
                 // Shrinks rather than crowding out the bar items when the bar is narrow or laid out vertically.
@@ -520,16 +549,14 @@ struct MainView: View {
                     .accessibilityHidden(true)
             }
         }
-        #endif
 
-        if #available(iOS 27.0, macOS 27.0, *) {
+        if #available(iOS 27.0, *) {
             addAccountToolbarItem
                 .visibilityPriority(.high)
         } else {
             addAccountToolbarItem
         }
 
-        #if os(iOS)
         // Secondary actions collapse into the system overflow menu.
         ToolbarItemGroup(placement: .secondaryAction) {
             enteSyncButton
@@ -554,8 +581,8 @@ struct MainView: View {
             .accessibilityInputLabels(VoiceControlNames.about)
             .accessibilityIdentifier("accounts.about")
         }
-        #endif
     }
+    #endif
 
     private func performPendingQuickAction() {
         guard scenePhase == .active, !AppLock.shared.isLocked, let action = quickActions.pending else { return }
@@ -730,8 +757,8 @@ struct MainView: View {
     }
     #endif
 
-    private var addAccountToolbarItem: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
+    private var addAccountToolbarItem: some CustomizableToolbarContent {
+        ToolbarItem(id: "add-account", placement: .primaryAction) {
             // Without a YubiKey to reach, accounts can still be added to Ente Auth.
             Button(action: { addAccount() }) {
                 Label("Add account", systemImage: "plus")
