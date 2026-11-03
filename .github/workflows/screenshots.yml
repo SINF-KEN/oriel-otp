@@ -26,9 +26,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # The iPhone and Mac screenshots are taken on two runners at the same time.
+  # The iPhone and Mac screenshots are taken on two runners at the same time. The iPhone accessibility audits and tap
+  # tests are in the Accessibility workflow, which is run by hand.
   screenshots:
-    name: screenshots
+    name: iPhone screenshots
     runs-on: xcode-27
     timeout-minutes: 45
     steps:
