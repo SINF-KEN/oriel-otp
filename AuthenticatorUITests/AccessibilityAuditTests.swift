@@ -62,20 +62,20 @@ final class AccessibilityAuditTests: XCTestCase {
     /// The same in dark mode. Clipped text is checked at the largest text size, where it would show.
     ///
     /// Only the simulator's settings can switch to dark mode and turn on Increase Contrast for the whole app, sheets
-    /// included, so `tools/screenshots.sh` does after the screenshots, and runs this test and the next one again.
+    /// included, so `tools/screenshots.sh audits` does, and runs this test and the next one.
     @MainActor func testDarkAppearance() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["APPEARANCE"] == "dark",
-                          "Runs in dark mode, from tools/screenshots.sh")
+                          "Runs in dark mode, from tools/screenshots.sh audits")
         app.launchArguments = ["-DemoDate", Self.demoDate]
         app.launch()
         try auditMainScreens(for: .contrast, allowsNearlyPassingContrast: true)
     }
 
     /// With Increase Contrast every text and icon has to have the contrast it needs, 4.5:1 for text and 3:1 for large
-    /// text. `tools/screenshots.sh` runs it in light and in dark mode.
+    /// text. `tools/screenshots.sh audits` runs it in light and in dark mode.
     @MainActor func testIncreasedContrast() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["INCREASE_CONTRAST"] == "enabled",
-                          "Runs with Increase Contrast on, from tools/screenshots.sh")
+                          "Runs with Increase Contrast on, from tools/screenshots.sh audits")
         app.launchArguments = ["-DemoDate", Self.demoDate]
         app.launch()
         try auditMainScreens(for: .contrast)
