@@ -46,7 +46,7 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 - **CryptoTokenKit.** Certificates in the YubiKey's PIV (smart card) application can be used to sign in to apps
   and websites through iOS, in the same way as other smart cards. macOS does this itself, without the app.
 - **On the Mac.** Menu bar commands and keyboard shortcuts, a Settings window, codes in the menu bar, QR codes read
-  from the screen, a pasted or dropped image or your iPhone's camera, a Copy Code action for Shortcuts, and a
+  from a window on the screen, a pasted or dropped image or your iPhone's camera, a Copy Code action for Shortcuts, and a
   notification when the YubiKey needs a touch.
 
 ## Compatibility

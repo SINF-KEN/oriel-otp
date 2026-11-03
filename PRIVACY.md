@@ -5,8 +5,8 @@ Oriel OTP does not run analytics or advertising and does not collect personal da
 ## Data on your device and YubiKey
 
 - OATH credentials are stored on your YubiKey. The app reads them when you use the key and writes credentials to the key when you add them. The app does not keep a server copy.
-- QR scanning starts only when you choose to scan. The app reads the QR code on the device to prepare a credential for your YubiKey; it does not save or send the camera image.
-- On the Mac, Scan QR Code on Screen takes one picture of each display, with the app's own windows left out, only when you click it and after you allow screen recording in System Settings. The app looks for a QR code in it on the Mac and does not save or send the picture. Pasted, dropped and imported pictures are handled the same way.
+- QR scanning starts only when you choose to scan. The app reads the QR code on the device to prepare the account you are adding; it does not save or send the camera image.
+- On the Mac, Scan QR Code on Screen opens the system's window picker when you click it. The app gets one picture of the window you pick, and nothing else on the screen, and does not need the screen recording permission. It looks for a QR code in the picture on the Mac and does not save or send it. Pasted, dropped and imported pictures are handled the same way.
 - On iPhone and iPad, a copied code stays on the device: it isn't shared with your other devices through Universal Clipboard, and is removed from the clipboard after a minute.
 - On the Mac, a copied code is marked so that clipboard managers don't keep it, and is removed from the clipboard after a minute unless you have copied something else since.
 - A YubiKey password is saved in the device keychain only if you choose to save it. You can remove saved OATH passwords in the app under the YubiKey settings.
@@ -78,4 +78,4 @@ you choose are kept in local app preferences. If App lock is on, the extension a
 - OATH credentials copied to a YubiKey remain on that physical key until you remove them using the app or another compatible tool. Removing a credential from a YubiKey does not delete its source from Ente Auth. Deleting an Ente Auth account in the app moves it to the trash in Ente Auth on all your devices; to delete it for good, empty it from the trash in Ente's apps.
 - Oriel OTP does not retain a copy of these credentials on a developer-operated server. Uninstalling the app deletes its settings, favorites, saved server address and the copy of your Ente Auth accounts, but does not remove credentials from a YubiKey or from your Ente account. iOS may keep keychain items after an app is deleted, so clear saved passwords, remove smart card certificates and sign out of Ente before uninstalling if you also want to remove the app's keychain data.
 
-To contact the developer, visit the [Oriel OTP issue tracker](https://github.com/SINF-KEN/oriel-otp/issues).
+To contact the developer, email [opensource@net01.io](mailto:opensource@net01.io) or visit the [Oriel OTP issue tracker](https://github.com/SINF-KEN/oriel-otp/issues).
