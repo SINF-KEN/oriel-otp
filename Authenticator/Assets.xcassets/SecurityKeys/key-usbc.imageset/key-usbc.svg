@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
-<g transform="translate(250 73)">
-<rect x="-42" y="244" width="84" height="110" rx="22" fill="#C7C7CC"/>
-<rect x="-24" y="274" width="48" height="62" rx="12" fill="#8E8E93"/>
-<rect x="-85" y="0" width="170" height="250" rx="36" fill="#B2001F"/>
-<rect x="-42" y="98" width="84" height="84" rx="25.2" fill="#F7C6CE"/>
-<rect x="-25.2" y="114.8" width="50.4" height="50.4" rx="15.12" fill="#B2001F"/>
-<rect x="-18.48" y="121.52" width="36.96" height="36.96" rx="10.08" fill="#F7C6CE"/>
+<g transform="translate(250 86)">
+<rect x="-38" y="244" width="76" height="84" rx="14" fill="#C7C7CC"/>
+<rect x="-48" y="244" width="96" height="20" rx="6" fill="#8E8E93"/>
+<path fill-rule="evenodd" fill="#B2001F" d="M-49 0H49A36 36 0 0 1 85 36V214A36 36 0 0 1 49 250H-49A36 36 0 0 1 -85 214V36A36 36 0 0 1 -49 0ZM-15 42a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z"/>
+<rect x="-46" y="106" width="92" height="92" rx="29.44" fill="#F7C6CE"/>
+<rect x="-36.8" y="115.2" width="73.6" height="73.6" rx="23" fill="#B2001F"/>
+<rect x="-29.44" y="122.56" width="58.88" height="58.88" rx="17.48" fill="#F7C6CE"/>
 </g>
 </svg>

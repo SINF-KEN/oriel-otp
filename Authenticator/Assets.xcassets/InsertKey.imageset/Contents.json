@@ -3,6 +3,16 @@
     {
       "filename": "InsertKey.svg",
       "idiom": "universal"
+    },
+    {
+      "appearances": [
+        {
+          "appearance": "luminosity",
+          "value": "dark"
+        }
+      ],
+      "filename": "InsertKey-dark.svg",
+      "idiom": "universal"
     }
   ],
   "info": {

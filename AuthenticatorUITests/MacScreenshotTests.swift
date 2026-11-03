@@ -129,6 +129,29 @@ final class MacScreenshotTests: XCTestCase {
         try attach("check-reopen", app.windows["Oriel OTP"])
     }
 
+    /// The YubiKey tab's pages leave the Settings window's toolbar alone: its title stays the tab's, and no back button
+    /// joins the tabs.
+    @MainActor func testYubiKeySettingsPages() throws {
+        let window = app.windows["Oriel OTP"]
+        XCTAssertTrue(window.waitForExistence(timeout: 20))
+        XCTAssertTrue(window.descendants(matching: .any)["account-row.GitHub:alice@example.com"].firstMatch.waitForExistence(timeout: 20))
+
+        try openSettings(tab: "YubiKey")
+        let settings = app.windows.matching(identifier: "com_apple_SwiftUI_Settings_window").firstMatch
+        XCTAssertTrue(settings.staticTexts["Serial number"].waitForExistence(timeout: 10))
+        let toolbarButtons = settings.toolbars.buttons.count
+        for page in ["Toggle One-Time Password", "Manage password", "Clear saved passwords", "Reset OATH application"] {
+            settings.buttons[page].firstMatch.click()
+            Thread.sleep(forTimeInterval: 1)
+            try attach("check-settings-\(page)", settings)
+            XCTAssertEqual(settings.title, "YubiKey", page)
+            XCTAssertEqual(settings.toolbars.buttons.count, toolbarButtons, page)
+            app.typeKey(.escape, modifierFlags: [])
+            XCTAssertTrue(settings.sheets.firstMatch.waitForNonExistence(timeout: 5), page)
+            XCTAssertTrue(settings.staticTexts["Serial number"].waitForExistence(timeout: 10), page)
+        }
+    }
+
     /// Opens the Settings window on a tab. It opens on the tab that was shown last.
     @MainActor private func openSettings(tab: String) throws {
         app.typeKey(",", modifierFlags: .command)

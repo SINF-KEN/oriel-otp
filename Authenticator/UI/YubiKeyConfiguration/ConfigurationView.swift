@@ -34,11 +34,10 @@ struct ConfigurationView: View {
             SettingsList {
                 if model.deviceInfo == nil {
                     VStack(alignment: .center) {
-                        Image("securitykey")
+                        Image("InsertKey")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 100, height: 100)
-                            .foregroundStyle(Color(.symbol))
                             .padding(15)
                             .accessibilityHidden(true)
                         Text(insertYubiKeyMessage)
@@ -89,7 +88,7 @@ struct ConfigurationView: View {
                     }
                 }
                 Section("General") {
-                    NavigationLink {
+                    ConfigurationLink {
                         OTPConfigurationView()
                             .navigationBarTitleDisplayMode(.inline)
                             .navigationTitle("Toggle One-Time Password")
@@ -101,7 +100,7 @@ struct ConfigurationView: View {
                         Text("Toggle One-Time Password")
                     }
                     if DeviceCapabilities.supportsNFCScanning {
-                        NavigationLink {
+                        ConfigurationLink {
                             NFCSettingsView()
                                 .navigationBarTitleDisplayMode(.inline)
                                 .navigationTitle("NFC settings")
@@ -115,7 +114,7 @@ struct ConfigurationView: View {
                     }
                 }
                 Section("OATH") {
-                    NavigationLink {
+                    ConfigurationLink {
                         OATHPasswordView()
                             .onDisappear {
                                 model.start()
@@ -124,13 +123,13 @@ struct ConfigurationView: View {
                         ListIconView(image: Image(systemName: "lock.shield"), color: Color(.systemPurple))
                         Text("Manage password")
                     }
-                    NavigationLink {
+                    ConfigurationLink {
                         OATHSavedPasswordsView()
                     } label: {
                         ListIconView(image: Image(systemName: "xmark.circle"), color: Color(.systemPink), padding: 5)
                         Text("Clear saved passwords")
                     }
-                    NavigationLink {
+                    ConfigurationLink {
                         OATHResetView()
                             .onDisappear {
                                 model.start()
@@ -142,7 +141,7 @@ struct ConfigurationView: View {
                 }
                 if DeviceCapabilities.supportsNFC {
                     Section("FIDO") {
-                        NavigationLink {
+                        ConfigurationLink {
                             FIDOPINView()
                                 .onDisappear {
                                     model.start()
@@ -151,7 +150,7 @@ struct ConfigurationView: View {
                             ListIconView(image: Image(systemName: "lock.shield"), color: Color(.systemPurple))
                             Text("Manage PIN")
                         }
-                        NavigationLink {
+                        ConfigurationLink {
                             FIDOResetView {
                                 Task {
                                     model.start()
@@ -166,7 +165,7 @@ struct ConfigurationView: View {
                 #if os(iOS)
                 // The Mac reads the PIV certificates with its own smart card driver.
                 Section("PIV") {
-                    NavigationLink {
+                    ConfigurationLink {
                         SmartCardConfigurationView()
                             .onDisappear {
                                 model.start()
@@ -222,6 +221,51 @@ struct ConfigurationView: View {
         .refreshable(enabled: DeviceCapabilities.supportsNFC) {
             model.scanNFC()
         }
+    }
+}
+
+/// A row that opens a page of the configuration. iOS pushes the page. On the Mac it's a sheet: the configuration is a tab
+/// of the Settings window, where a pushed page takes over the window's toolbar, with its back button among the tabs and
+/// its title in place of the tab's.
+private struct ConfigurationLink<Destination: View, Label: View>: View {
+    @ViewBuilder let destination: () -> Destination
+    @ViewBuilder let label: () -> Label
+    #if os(macOS)
+    @State private var isPresented = false
+    #endif
+
+    var body: some View {
+        #if os(macOS)
+        Button {
+            isPresented = true
+        } label: {
+            HStack {
+                label()
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.tertiary)
+                    .accessibilityHidden(true)
+            }
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .sheet(isPresented: $isPresented) {
+            NavigationStack {
+                destination()
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            CloseButton { isPresented = false }
+                                .keyboardShortcut(.cancelAction)
+                        }
+                    }
+            }
+            .textScaledFrame(width: 480, height: 360)
+            .scaledBodyFont()
+            .appLockCover()
+        }
+        #else
+        NavigationLink(destination: destination, label: label)
+        #endif
     }
 }
 

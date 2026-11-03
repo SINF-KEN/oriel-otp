@@ -36,10 +36,13 @@ struct MenuBarAccountsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if !model.hasAccounts {
-                Label(model.isKeyPluggedIn ? String(localized: "Reading YubiKey…", comment: "Mac menu bar") : String(localized: "Insert YubiKey"),
-                      image: "securitykey")
-                    .foregroundStyle(.secondary)
-                    .padding(8)
+                Label {
+                    Text(model.isKeyPluggedIn ? String(localized: "Reading YubiKey…", comment: "Mac menu bar") : String(localized: "Insert YubiKey"))
+                } icon: {
+                    InsertKeyIcon()
+                }
+                .foregroundStyle(.secondary)
+                .padding(8)
             } else if accounts.isEmpty {
                 Text("No accounts on YubiKey")
                     .foregroundStyle(.secondary)
@@ -64,11 +67,7 @@ struct MenuBarAccountsView: View {
                 NSApp.activate()
             }
             SettingsLink {
-                Text(String(localized: "Settings…", comment: "Mac menu bar"))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .contentShape(Rectangle())
+                MenuBarRowLabel(title: String(localized: "Settings…", comment: "Mac menu bar"))
             }
             .buttonStyle(.plain)
             MenuBarButton(String(localized: "Quit Oriel OTP", comment: "Mac menu bar")) {
@@ -160,7 +159,6 @@ private extension Color {
 private struct MenuBarButton: View {
     let title: String
     let action: () -> Void
-    @State private var isHovering = false
 
     init(_ title: String, action: @escaping () -> Void) {
         self.title = title
@@ -169,16 +167,26 @@ private struct MenuBarButton: View {
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
-                .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
-                .contentShape(Rectangle())
+            MenuBarRowLabel(title: title)
         }
         .buttonStyle(.plain)
-        .onHover { isHovering = $0 }
+    }
+}
+
+/// A row below the accounts, highlighted under the pointer like a menu item.
+private struct MenuBarRowLabel: View {
+    let title: String
+    @State private var isHovering = false
+
+    var body: some View {
+        Text(title)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
+            .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
+            .contentShape(Rectangle())
+            .onHover { isHovering = $0 }
     }
 }
 

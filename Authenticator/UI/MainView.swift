@@ -424,7 +424,7 @@ struct MainView: View {
                 }
             }
             if !model.hasAccounts {
-                ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
+                ListStatusView(image: Image("InsertKey"), message: insertYubiKeyMessage, height: reader.size.height, isArtwork: true) {
                     enteSyncButton
                 }
             } else if !searchText.isEmpty {
@@ -473,10 +473,14 @@ struct MainView: View {
             }
             if !model.accountsLoaded && !model.cloudAccounts.isEmpty && searchText.isEmpty {
                 // The Ente Auth accounts are listed, the YubiKey's join them once it has been read.
-                Label(insertYubiKeyMessage, image: "securitykey")
-                    .scaledFont(.footnote)
-                    .foregroundStyle(.secondary)
-                    .listRowSeparator(.hidden)
+                Label {
+                    Text(insertYubiKeyMessage)
+                } icon: {
+                    InsertKeyIcon()
+                }
+                .scaledFont(.footnote)
+                .foregroundStyle(.secondary)
+                .listRowSeparator(.hidden)
             }
         }
     }
