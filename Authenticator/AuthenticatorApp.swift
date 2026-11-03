@@ -117,7 +117,7 @@ struct AuthenticatorApp: App {
                 .withAppEnvironment(self)
                 .appTextSize()
         } label: {
-            Image("securitykey")
+            Image("shieldlock")
                 .accessibilityLabel(Text(verbatim: "Oriel OTP"))
         }
         .menuBarExtraStyle(.window)
