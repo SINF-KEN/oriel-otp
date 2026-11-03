@@ -289,7 +289,9 @@ private struct AppLockCover: ViewModifier {
             .accessibilityHidden(isLocked)
             .overlay {
                 if isLocked {
+                    // Its own, as the main window sets the body font and control size below its toolbar.
                     AppLockView()
+                        .scaledBodyFont()
                 }
             }
     }
