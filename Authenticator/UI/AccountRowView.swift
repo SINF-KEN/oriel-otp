@@ -33,8 +33,7 @@ struct AccountRowView<Accessory: View>: View {
     private let isCopied: Bool
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
-    /// An expired or not yet calculated code is dimmed, but not so much that it can't be read.
+    /// The placeholder for an expired or not yet calculated code is dimmed, but not so much that it can't be read.
     @State private var isDimmed: Bool
 
     @State private var animate: Bool = true
@@ -306,8 +305,6 @@ struct AccountRowView<Accessory: View>: View {
             if let otp = account.formattedCode {
                 Text(otp)
                     .privacySensitive()
-                    // Crossed out as well as dimmed, as a shade is easy to miss.
-                    .strikethrough(differentiateWithoutColor && account.state == .expired)
                     .padding(.trailing, 4)
             } else {
                 Text("*** *** ")
