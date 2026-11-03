@@ -62,8 +62,8 @@ is always dark.
 ## Differentiate Without Color Alone
 
 Color is never the only sign of a state. Errors and warnings in red or orange have a symbol (the app lock's wait, a
-blocked FIDO PIN, an Ente Auth account that can't be added, too many accounts selected). An expired code has the
-refresh symbol in place of the countdown, and with Differentiate Without Color it's crossed out too. The watch's ring
+blocked FIDO PIN, an Ente Auth account that can't be added, too many accounts selected). An expired code is replaced by
+asterisks, with the refresh symbol in place of the countdown. The watch's ring
 turns orange in the last five seconds, and dashed with that setting. Account icons show the account's first letter,
 their color only tells them apart. Swipe actions have a symbol and a title.
 
@@ -73,8 +73,8 @@ Text has at least 4.5:1 against its background, large text and icons 3:1, with I
 criterion is "by default, or when Increase Contrast is on"). By default the system's secondary labels are a little
 short of that in places, as in Apple's own apps; everything the app draws itself passes by default too:
 
-- The code is drawn in the full accent color (7.2:1 in light mode, 13.6:1 in dark mode). An expired or not yet
-  calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
+- The code is drawn in the full accent color (7.2:1 in light mode, 13.6:1 in dark mode). The placeholder for an
+  expired or not yet calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
 - Swipe actions have white labels on Favorite, DeleteAction and CopyAction, which are darker than the system yellow,
   red and blue for at least 4.5:1 in both appearances.
 - Every asset color has a high contrast variant, for light and dark mode.

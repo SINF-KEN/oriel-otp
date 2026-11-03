@@ -129,7 +129,7 @@ private struct MenuBarAccountRow: View {
                     Image(systemName: "hand.tap")
                         .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
                 } else {
-                    Text(account.state == .expired ? "*** ***" : account.formattedCode ?? "*** ***")
+                    Text(account.formattedCode ?? "*** ***")
                         .scaledFont(.body) { $0.monospacedDigit().bold() }
                         .privacySensitive()
                 }
