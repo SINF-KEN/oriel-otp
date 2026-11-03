@@ -34,7 +34,9 @@ final class MacScreenshotTests: XCTestCase {
         app.launchArguments = ["-SimulatedYubiKey", "YES", "-DemoDate", Self.demoDate,
                                // A fresh window at its default size, in light mode, every run.
                                "-ApplePersistenceIgnoreState", "YES", "-NSQuitAlwaysKeepsWindows", "NO",
-                               "-DemoAppearance", "light", "-DemoWindowSize", "1280x800", "-Mac.ShowInMenuBar", "YES"]
+                               "-DemoAppearance", "light", "-DemoWindowSize", "1280x800", "-Mac.ShowInMenuBar", "YES",
+                               // The fake Ente server, even if this Mac's app has signed in to another one.
+                               "-EnteAuth.ServerURL", "https://demo.ente.test"]
         app.launch()
         app.activate()
     }
