@@ -26,10 +26,14 @@ import YubiKit
     
     enum ResetState: Equatable {
         case ready, success, error(Error)
+        // Over USB the YubiKey only accepts a reset just after it's plugged in, and then waits for a touch.
+        case removeKey, insertKey, touchKey
         
         static func == (lhs: FIDOResetViewModel.ResetState, rhs: FIDOResetViewModel.ResetState) -> Bool {
             switch (lhs, rhs) {
             case (.ready, .ready):
+                return true
+            case (.removeKey, .removeKey), (.insertKey, .insertKey), (.touchKey, .touchKey):
                 return true
             case (.success, .success):
                 return true
@@ -58,7 +62,11 @@ import YubiKit
                 let connection = try await ConnectionManager.shared.anyConnection()
                 switch connection {
                 case is USBSmartCardConnection:
+                    #if os(macOS)
+                    await resetUSB(deviceInfo: await connection.deviceInfo())
+                    #else
                     state = .error(FidoViewModelError.usbNotSupported)
+                    #endif
                 #if os(iOS)
                 case let connection as NFCSmartCardConnection:
                     await resetNFC(connection: connection)
@@ -106,3 +114,36 @@ extension FIDOResetViewModel {
 }
 #endif
 
+#if os(macOS)
+extension FIDOResetViewModel {
+    private func resetUSB(deviceInfo: DeviceInfo?) async {
+        do {
+            let current = try await ConnectionManager.shared.fidoConnection(matching: deviceInfo)
+            let locationID = current.device.locationID
+            await current.close(error: nil)
+            state = .removeKey
+            try await ConnectionManager.shared.waitForFIDORemoval(locationID: locationID)
+            let otherLocationIDs = try await ConnectionManager.shared.fidoLocationIDs()
+            state = .insertKey
+            let connection = try await ConnectionManager.shared.waitForFIDOInsertion(excluding: otherLocationIDs)
+            do {
+                let session = try await CTAP2.Session.makeSession(connection: connection)
+                for try await status in await session.reset() {
+                    if case .waitingForUser = status {
+                        state = .touchKey
+                    }
+                }
+                await connection.close(error: nil)
+            } catch {
+                await connection.close(error: nil)
+                throw error
+            }
+            state = .success
+        } catch is CancellationError {
+            // The user left the reset view.
+        } catch {
+            state = .error(LocalizedErrorWrapper(error: error))
+        }
+    }
+}
+#endif

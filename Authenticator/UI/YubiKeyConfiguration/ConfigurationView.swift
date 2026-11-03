@@ -140,7 +140,7 @@ struct ConfigurationView: View {
                         Text("Reset OATH application")
                     }
                 }
-                if DeviceCapabilities.supportsNFC {
+                if DeviceCapabilities.supportsFIDO {
                     Section("FIDO") {
                         NavigationLink {
                             FIDOPINView()
