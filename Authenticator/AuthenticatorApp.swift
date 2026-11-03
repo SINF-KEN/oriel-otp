@@ -76,7 +76,7 @@ struct AuthenticatorApp: App {
                 }
                 .appLockCover()
                 .withAppEnvironment(self)
-                .appTextSize(bodyFont: false)
+                .appTextSize(scalesContent: false)
         }
         .defaultSize(width: 900, height: 600)
         .commands {
