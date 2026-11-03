@@ -76,10 +76,13 @@ struct AuthenticatorApp: App {
                 }
                 .appLockCover()
                 .withAppEnvironment(self)
-                .appTextSize(bodyFont: false)
+                .appTextSize(scalesContent: false)
         }
         .defaultSize(width: 900, height: 600)
         .commands {
+            // Show Sidebar, and Show Toolbar and Customize Toolbar, in the View menu.
+            SidebarCommands()
+            ToolbarCommands()
             MainCommands()
             TextSizeCommands()
         }
@@ -117,7 +120,7 @@ struct AuthenticatorApp: App {
                 .withAppEnvironment(self)
                 .appTextSize()
         } label: {
-            Image("securitykey")
+            Image("MenuBarIcon")
                 .accessibilityLabel(Text(verbatim: "Oriel OTP"))
         }
         .menuBarExtraStyle(.window)
