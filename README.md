@@ -33,7 +33,7 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
   key are skipped, and accounts the key can't store are listed with the reason.
 - **Ente Auth codes without a YubiKey.** Signed in, your Ente Auth accounts are listed with the YubiKey's and their
   codes calculated by the app, also offline. Accounts added, renamed, pinned or deleted in the app are synced back
-  to Ente Auth, and changes from Ente's other apps show up here. New accounts can go on the YubiKey, in Ente Auth
+  to Ente Auth, and changes from Ente's apps show up here. New accounts can go on the YubiKey, in Ente Auth
   or both.
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
@@ -74,13 +74,13 @@ The other way, choose **YubiKey and Ente Auth** under **Save to** when adding an
 This needs a saved session (**Stay signed in**). A YubiKey never gives its secrets back, so this works only while an
 account is added; accounts already on the key can't be copied to Ente.
 
-With a saved session the app is also an Ente Auth client of its own. Your Ente Auth accounts are kept on the device,
+With a saved session the app is also an independent Ente Auth client. Your Ente Auth accounts are kept on the device,
 encrypted, and listed with the YubiKey's, with a cloud next to each one, so their codes work without a YubiKey and
 offline. When adding an account, choose under **Save to** whether it goes on the YubiKey, in Ente Auth or both; the
 choice is remembered. Without a YubiKey to reach, the add button saves to Ente Auth. **Copy to YubiKey** and **Move to
 YubiKey** on an Ente Auth account put it on the YubiKey; moving puts it in Ente's trash once it is on the key.
 Renaming, pinning or deleting an Ente Auth account changes it in Ente Auth too (deleting moves it to Ente's trash),
-and changes made in Ente's other apps show up after the next sync. The app syncs when it opens, when you pull down
+and changes made in Ente's apps show up after the next sync. The app syncs when it opens, when you pull down
 the list (or choose Refresh on the Mac) and after each change. If the same account was changed on another device in
 the meantime, the other device's change wins.
 
