@@ -34,11 +34,10 @@ struct ConfigurationView: View {
             SettingsList {
                 if model.deviceInfo == nil {
                     VStack(alignment: .center) {
-                        Image("securitykey")
+                        Image("InsertKey")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 100, height: 100)
-                            .foregroundStyle(Color(.symbol))
                             .padding(15)
                             .accessibilityHidden(true)
                         Text(insertYubiKeyMessage)

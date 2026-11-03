@@ -364,6 +364,18 @@ private struct TextScaledFrameModifier: ViewModifier {
 
 /// A list of settings: a list on iOS, and on the Mac a grouped form, like the Settings window's General tab. A Mac
 /// list sets the system's font on the text in each row, so its rows wouldn't follow the app's text size.
+/// The colored key, the height of a line of text, in a label that asks for the key.
+struct InsertKeyIcon: View {
+    @ScaledSize(relativeTo: .footnote) private var height: CGFloat = 18
+
+    var body: some View {
+        Image("InsertKey")
+            .resizable()
+            .scaledToFit()
+            .frame(height: height)
+    }
+}
+
 struct SettingsList<Content: View>: View {
     @ViewBuilder let content: Content
 

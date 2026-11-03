@@ -124,12 +124,10 @@ def key_image(kind, p):
     return svg(500, 500, group(f"translate(250 {(500 - height) / 2:g})", drawing))
 
 
-def insert_key():
-    gray = "#8E8E93"
-    # The pad is cut out of the body so the silhouette works on any background.
-    body = ('<path fill-rule="evenodd" fill="%s" d="M8,24 h24 a6,6 0 0 1 6,6 v62 a6,6 0 0 1 -6,6 h-24 '
-            'a6,6 0 0 1 -6,-6 v-62 a6,6 0 0 1 6,-6 z M20,53 a8,8 0 1 0 0.01,0 z"/>\n' % gray)
-    return svg(40, 128, rect(14, 2, 12, 26, 6, gray) + body + rect(11, 94, 18, 32, 7, gray))
+def insert_key(p):
+    """The USB-C key without the margins of key_image, for the places that ask for a key, down to the size of a text line."""
+    drawing, height = key("usbc", p)
+    return svg(170, height, group("translate(85 0)", drawing))
 
 
 # Tutorial pages
@@ -288,7 +286,8 @@ def rounded_rect_path(x, y, w, h, r, clockwise=True):
 
 
 def symbol_glyph(cx, top, scale, stroke):
-    """An outlined key with a touch pad and an open connector, sized like the medium scale at scale 1."""
+    """The colored keys' shape as an outline, with a key ring hole, a touch pad and a solid plug, sized like the medium
+    scale at scale 1."""
     s, w, n = scale, stroke, num
     bw, bh, br = 50 * s + (w - 6.655 * s), 80 * s, 12 * s
     # A short connector, with the glyph moved down by half of what it lost to stay centered where it was.
@@ -305,9 +304,9 @@ def symbol_glyph(cx, top, scale, stroke):
                f"H{n(left + pr)}{ap}{n(left)} {n(bottom - pr)}V{n(yc)}{ab}{n(x)} {n(top + bh - br)}"
                f"V{n(top + br)}{ab}{n(x + br)} {n(top)}Z")
     hollow = rounded_rect_path(x + w, top + w, bw - 2 * w, bh - 2 * w, max(br - w, 1), clockwise=False)
-    opening = f"M{n(left + w)} {n(top + bh)}V{n(bottom - w)}H{n(right - w)}V{n(top + bh)}Z"
-    pad = rounded_rect_path(cx - 10 * s, top + bh / 2 - 10 * s, 20 * s, 20 * s, 6 * s)
-    return f'<path d="{outline}{hollow}{opening}"/><path d="{pad}"/>'
+    pad = rounded_rect_path(cx - 11 * s, top + 40 * s, 22 * s, 22 * s, 6.5 * s)
+    hole = rounded_rect_path(cx - 4.5 * s, top + 17 * s, 9 * s, 9 * s, 4.5 * s)
+    return f'<path d="{outline}{hollow}"/><path d="{pad}"/><path d="{hole}"/>'
 
 
 # The positions and stroke widths of each weight and scale in Apple's symbol template (v3.0).
@@ -372,7 +371,7 @@ def main():
     write_folder("Tutorial")
     for kind in ("usba", "usbc", "usbc-lightning", "bio-usba", "bio-usbc"):
         write_imageset(f"SecurityKeys/key-{kind}.imageset", key_image(kind, LIGHT), key_image(kind, DARK))
-    write_imageset("InsertKey.imageset", insert_key())
+    write_imageset("InsertKey.imageset", insert_key(LIGHT), insert_key(DARK))
     pages = {"tutorial-accounts": tutorial_accounts, "tutorial-plug-in": tutorial_plug_in,
              "tutorial-nfc": tutorial_nfc, "tutorial-qr-code": tutorial_qr,
              "tutorial-ente-sync": tutorial_ente_sync}
