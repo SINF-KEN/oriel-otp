@@ -58,7 +58,7 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
 - **Text size**: View > Make Text Bigger (⌘+), Make Text Smaller (⌘−) and Actual Size (⌘0), from 100% to 200%, also
   in Settings > General. macOS has no text size apps can follow, see [accessibility.md](accessibility.md).
 - **Settings** (⌘,): General (menu bar, menu bar only, text size, open at login) and YubiKey, the configuration
-  screen that is a sheet on iOS.
+  screen that is a sheet on iOS. Its pages open as sheets, as a page pushed in a tab takes over the window's toolbar.
 - **Toolbar**: Refresh, Add and Sync from Ente Auth, with help tags. There is no pull to refresh; the YubiKey is
   read when it's plugged in. Copy and pin also appear on a row when the pointer is over it, in place of swipe actions,
   and clicking a code copies it.
