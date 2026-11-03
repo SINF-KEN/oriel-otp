@@ -144,15 +144,15 @@ Shortcuts, Spotlight, Apple Intelligence), Add Account and Copy Code on the Mac,
 `AuthenticatorUITests/AccessibilityAuditTests.swift` runs Xcode's accessibility audit
 (`performAccessibilityAudit`) on the main screens with the simulated YubiKey and fake Ente server: the account list
 and details, the Ente sign in and account list, Configuration, About, the tutorial, the app icons, the QR scanner and
-the add account form. It runs with the screenshots (`tools/screenshots.sh`, and the Screenshots workflow in CI), see
-[screenshots.md](screenshots.md).
+the add account form. It runs with `tools/screenshots.sh audits`, and the Accessibility workflow in CI, which is run by
+hand. See [screenshots.md](screenshots.md).
 
 - `testLightAppearance` fails for text or icons without enough contrast in light mode. Text that nearly passes, like
   the system's secondary labels in places, is left to the Increase Contrast check. Disabled controls are left out, as
   WCAG does, and so is what the keyboard covers.
-- After the screenshots, `tools/screenshots.sh` switches the simulator to dark mode with `simctl` and runs
-  `testDarkAppearance`, the same check in dark mode, then turns on Increase Contrast and runs `testIncreasedContrast`
-  in light and dark mode, where nothing has to nearly pass. The tests skip themselves in a normal run.
+- `tools/screenshots.sh audits` then switches the simulator to dark mode with `simctl` and runs `testDarkAppearance`,
+  the same check in dark mode, then turns on Increase Contrast and runs `testIncreasedContrast` in light and dark
+  mode, where nothing has to nearly pass. The tests skip themselves in a normal run.
 - `testRightToLeft` launches with the right-to-left pseudolanguage (`-AppleTextDirection YES
   -NSForceRightToLeftWritingDirection YES`), English text in a mirrored layout, at the largest text size, and fails for clipped text.
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
