@@ -68,7 +68,8 @@ def usb_a(top, p):
 
 
 def usb_c(top, p):
-    return rect(-42, top, 84, 110, 22, p["metal"]) + rect(-24, top + 30, 48, 62, 12, p["metal_dark"])
+    """A short plug coming out of a collar. The drawing's height is top + 84."""
+    return rect(-38, top, 76, 84, 14, p["metal"]) + rect(-48, top, 96, 20, 6, p["metal_dark"])
 
 
 def lightning(bottom, p):
@@ -76,10 +77,20 @@ def lightning(bottom, p):
         "".join(rect(-14, bottom - 82 + i * 22, 28, 10, 5, p["metal_dark"]) for i in range(3))
 
 
+def key_body(x, y, w, h, r, p, hole=True):
+    """The body, with a key ring hole cut out of it so the background shows through."""
+    path = rounded_rect_path(x, y, w, h, r)
+    if hole:
+        cx, cy, radius = x + w / 2, y + 42, 15
+        path += f"M{num(cx - radius)} {num(cy)}a{radius} {radius} 0 1 0 {2 * radius} 0a{radius} {radius} 0 1 0 {-2 * radius} 0Z"
+    return f'<path fill-rule="evenodd" fill="{p["body"]}" d="{path}"/>\n'
+
+
 def touch_pad(cy, size, p):
-    return rect(-size / 2, cy - size / 2, size, size, size * 0.3, p["pad"]) + \
-        rect(-size * 0.3, cy - size * 0.3, size * 0.6, size * 0.6, size * 0.18, p["body"]) + \
-        rect(-size * 0.22, cy - size * 0.22, size * 0.44, size * 0.44, size * 0.12, p["pad"])
+    """A solid pad inside a thin ring."""
+    return rect(-size / 2, cy - size / 2, size, size, size * 0.32, p["pad"]) + \
+        rect(-size * 0.4, cy - size * 0.4, size * 0.8, size * 0.8, size * 0.25, p["body"]) + \
+        rect(-size * 0.32, cy - size * 0.32, size * 0.64, size * 0.64, size * 0.19, p["pad"])
 
 
 def fingerprint_pad(cy, size, p):
@@ -95,16 +106,16 @@ def fingerprint_pad(cy, size, p):
 def key(kind, p):
     """Returns the drawing and its height."""
     if kind == "usba":
-        return usb_a(244, p) + rect(-90, 0, 180, 250, 36, p["body"]) + touch_pad(140, 84, p), 394
+        return usb_a(244, p) + key_body(-90, 0, 180, 250, 36, p) + touch_pad(152, 92, p), 394
     if kind == "usbc":
-        return usb_c(244, p) + rect(-85, 0, 170, 250, 36, p["body"]) + touch_pad(140, 84, p), 354
+        return usb_c(244, p) + key_body(-85, 0, 170, 250, 36, p) + touch_pad(152, 92, p), 328
     if kind == "usbc-lightning":
-        return lightning(106, p) + usb_c(300, p) + rect(-75, 100, 150, 206, 32, p["body"]) + \
-            touch_pad(203, 76, p), 410
+        return lightning(106, p) + usb_c(300, p) + key_body(-75, 100, 150, 206, 32, p, hole=False) + \
+            touch_pad(203, 84, p), 384
     if kind == "bio-usbc":
-        return usb_c(244, p) + rect(-115, 0, 230, 250, 44, p["body"]) + fingerprint_pad(130, 120, p), 354
+        return usb_c(244, p) + key_body(-115, 0, 230, 250, 44, p) + fingerprint_pad(152, 120, p), 328
     if kind == "bio-usba":
-        return usb_a(244, p) + rect(-115, 0, 230, 250, 44, p["body"]) + fingerprint_pad(130, 120, p), 394
+        return usb_a(244, p) + key_body(-115, 0, 230, 250, 44, p) + fingerprint_pad(152, 120, p), 394
     raise ValueError(kind)
 
 
