@@ -6,8 +6,9 @@
 # the clock frozen, light appearance and a 1280 × 800 point window, so the screenshots are 2560 × 1600 pixels on a
 # Retina display, a Mac App Store size, and only change when the UI does.
 #
-# The build is signed ad hoc, without the keychain access group that would need a provisioning profile; the
-# screenshots don't use the keychain. The first run may ask to allow UI automation.
+# The build is signed ad hoc, without the keychain access group, the app group and AutoFill, which need a provisioning
+# profile; the screenshots don't use them. The entitlements apply to every target, the UI test runner included, which
+# launchd won't start with any of them. The first run may ask to allow UI automation.
 #
 # Usage: tools/screenshots-macos.sh
 #   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
@@ -24,6 +25,8 @@ result=${RESULT_BUNDLE_PATH:-$work/Screenshots.xcresult}
 entitlements="$work/Authenticator-macOS.entitlements"
 cp Authenticator/Authenticator-macOS.entitlements "$entitlements"
 /usr/libexec/PlistBuddy -c 'Delete :keychain-access-groups' "$entitlements"
+/usr/libexec/PlistBuddy -c 'Delete :com.apple.security.application-groups' "$entitlements"
+/usr/libexec/PlistBuddy -c 'Delete :com.apple.developer.authentication-services.autofill-credential-provider' "$entitlements"
 
 packages=()
 if [[ -n "${SOURCE_PACKAGES_DIR:-}" ]]; then
