@@ -128,8 +128,9 @@ import YubiKit
         }
     }
     
+    /// The code to show, or none while there's no code or it has expired.
     var formattedCode: String? {
-        guard let otp else { return nil }
+        guard let otp, state != .expired else { return nil }
         if self.credential.isSteam {
             return otp.code
         } else {
