@@ -252,7 +252,7 @@ extension View {
 
 extension View {
     /// The body font at the Mac's text size, for text without a font of its own: list rows, form labels, buttons and
-    /// text fields. Left to the system at 100% and on iOS.
+    /// text fields, and the larger controls from 150%. Left to the system at 100% and on iOS.
     func scaledBodyFont() -> some View {
         modifier(ScaledBodyFontModifier())
     }
@@ -263,7 +263,9 @@ private struct ScaledBodyFontModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         #if os(macOS)
-        content.font(textScale == 1 ? nil : .scaled(.body, by: textScale))
+        content
+            .font(textScale == 1 ? nil : .scaled(.body, by: textScale))
+            .textScaledControlSize(textScale)
         #else
         content
         #endif

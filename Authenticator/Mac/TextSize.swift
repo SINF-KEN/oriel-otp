@@ -30,27 +30,36 @@ enum TextSize {
 
 extension View {
     /// Shows the window's text at the app's text size. Every window and the menu bar extra have it. The main window
-    /// sets the body font further in (`bodyFont: false`), below its search field, which keeps its height when its
-    /// font grows and so stays at the system's size, like the toolbar.
-    func appTextSize(bodyFont: Bool = true) -> some View {
-        modifier(AppTextSizeModifier(bodyFont: bodyFont))
+    /// sets the body font and control size further in (`scalesContent: false`), with `scaledBodyFont()` below its
+    /// toolbar and search field, which keep the system's size.
+    func appTextSize(scalesContent: Bool = true) -> some View {
+        modifier(AppTextSizeModifier(scalesContent: scalesContent))
+    }
+
+    /// Switches, checkboxes and buttons grow a little with the text, from 150%. Not set above a toolbar: any control
+    /// size there, the large one as much as the regular one, also reaches the toolbar's buttons and squeezes them from
+    /// circles into narrow pills with small icons.
+    @ViewBuilder func textScaledControlSize(_ scale: Double) -> some View {
+        if scale >= 1.5 {
+            controlSize(.large)
+        } else {
+            self
+        }
     }
 }
 
 private struct AppTextSizeModifier: ViewModifier {
     @AppStorage(TextSize.key) private var scale = 1.0
-    let bodyFont: Bool
+    let scalesContent: Bool
 
     @ViewBuilder func body(content: Content) -> some View {
         let content = content
-            .font(bodyFont && scale != 1 ? .scaled(.body, by: scale) : nil)
+            .font(scalesContent && scale != 1 ? .scaled(.body, by: scale) : nil)
             // Layouts that switch at the accessibility sizes on iOS, like the account row, don't on the Mac: its
             // windows and the sidebar grow with the text instead.
             .environment(\.textScale, scale)
-        // Switches, checkboxes and buttons grow a little with the text. Left alone below that: setting the regular
-        // size squeezes the toolbar's buttons into narrow pills with small icons.
-        if scale >= 1.5 {
-            content.controlSize(.large)
+        if scalesContent {
+            content.textScaledControlSize(scale)
         } else {
             content
         }

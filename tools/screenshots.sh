@@ -53,11 +53,14 @@ result=()
 if [[ -n "${RESULT_BUNDLE_PATH:-}" ]]; then
     result=(-resultBundlePath "$RESULT_BUNDLE_PATH")
 fi
+# A test that fails runs once more. On a busy CI runner the simulator has taken minutes to answer a UI query; a real
+# failure, like an accessibility issue, fails both times.
+retry=(-retry-tests-on-failure -test-iterations 2)
 # xcodebuild passes TEST_RUNNER_ variables to the test without the prefix. The app is optimized: signing in to the fake
 # Ente server runs 4096-bit SRP, which the unoptimized build took long enough over on CI for the test to give up.
 TEST_RUNNER_SCREENSHOT_DIR="$work/screenshots" xcodebuild test \
     -project OrielOTP.xcodeproj -scheme Screenshots -destination "id=$udid" \
-    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} ${result[@]+"${result[@]}"} \
+    -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} ${result[@]+"${result[@]}"} "${retry[@]}" \
     SWIFT_OPTIMIZATION_LEVEL=-O | "${formatter[@]}"
 
 mkdir -p "$output"
@@ -78,7 +81,7 @@ audit() {
     xcrun simctl ui "$udid" increase_contrast "$increase_contrast"
     TEST_RUNNER_APPEARANCE="$appearance" TEST_RUNNER_INCREASE_CONTRAST="$increase_contrast" xcodebuild test-without-building \
         -project OrielOTP.xcodeproj -scheme Screenshots -destination "id=$udid" \
-        -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} \
+        -derivedDataPath "$work/DerivedData" ${packages[@]+"${packages[@]}"} "${retry[@]}" \
         -only-testing:"OrielOTPUITests/AccessibilityAuditTests/$test" \
         ${RESULT_BUNDLE_PATH:+-resultBundlePath "${RESULT_BUNDLE_PATH%.xcresult}-$test-$appearance.xcresult"} \
         | "${formatter[@]}"
