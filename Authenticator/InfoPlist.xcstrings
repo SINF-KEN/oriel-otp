@@ -116,31 +116,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Scanne QR-Codes, um Deinem YubiKey Konten hinzuzufügen."
+            "value" : "Scanne QR-Codes, um Konten hinzuzufügen."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Scan QR codes to add accounts to your YubiKey."
+            "value" : "Scan QR codes to add accounts."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Scannez des codes QR pour ajouter des comptes à votre YubiKey."
+            "value" : "Scannez des codes QR pour ajouter des comptes."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "QRコードをスキャンして、YubiKeyにアカウントを追加します。"
+            "value" : "QRコードをスキャンしてアカウントを追加します。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Skenujte QR kódy a pridávajte účty do svojho YubiKey."
+            "value" : "Skenujte QR kódy a pridávajte účty."
           }
         }
       }

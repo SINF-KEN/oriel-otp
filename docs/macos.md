@@ -72,11 +72,12 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
 - **Menu bar extra** (`MenuBarAccountsView`): the pinned accounts, or all of them if none are pinned; a click copies
   the code. It connects to the YubiKey itself while the main window is closed. Settings can hide it, or show the app
   only in the menu bar (no Dock icon, `NSApplication.ActivationPolicy.accessory`).
-- **QR codes without a camera** (`QRCodeReader`): Scan QR Code on Screen captures each display with
-  ScreenCaptureKit, leaving out the app's own windows, which needs the Screen Recording permission; Paste QR Code or
-  Link reads an image or an `otpauth://` link from the pasteboard; a picture can be dropped on the sheet; and File >
-  Import From Device takes one with an iPhone or iPad. QR codes are found with Core Image. Entering the details by
-  hand still works.
+- **QR codes without a camera** (`QRCodeReader`): Scan QR Code on Screen opens the system's window picker
+  (`SCContentSharingPicker`) and takes one frame of the window picked, leaving out the app's own windows. This needs
+  no Screen Recording permission, but only with an `SCStream`: `SCScreenshotManager` is refused the picker's filter
+  without the permission. Paste QR Code or Link reads an image or an `otpauth://` link from the pasteboard; a picture
+  can be dropped on the sheet; and File > Import From Device takes one with an iPhone or iPad. QR codes are found with
+  Core Image. Entering the details by hand still works.
 - **Shortcuts and Spotlight** (`MacIntents.swift`): Copy Code, with the account picked from the plugged-in YubiKey,
   and Add Account. The Dock menu also has Add Account. Both open `orielotp://add-account`, which brings back the
   window when it was closed.
@@ -94,9 +95,11 @@ with `[sdk=macosx*]` build settings:
 | `com.apple.security.smartcard` | Talks to the YubiKey's OATH application over CCID |
 | `com.apple.security.network.client` | Ente Auth |
 | `keychain-access-groups` | The data protection keychain, for saved passwords and the Ente session |
+| `com.apple.security.application-groups` | Shares the AutoFill accounts and the app lock's preferences with the AutoFill extension |
+| `com.apple.developer.authentication-services.autofill-credential-provider` | The AutoFill extension |
 
-The app group isn't used on the Mac, since it only shares data with the iOS smart card extension, which isn't part of
-the Mac build. The NFC entitlement and the iOS-only `Info.plist` keys aren't there either. Add
+The smart card extension isn't part of the Mac build, so only the AutoFill extension uses the app group there. The NFC
+entitlement and the iOS-only `Info.plist` keys aren't there either. Add
 `com.apple.security.device.usb` if the app starts using YubiKit's HID connections (OTP or FIDO over USB).
 
 `keychain-access-groups` needs a provisioning profile, so set your team in Xcode to run the Mac app with the keychain.
@@ -110,8 +113,7 @@ CI signs the Mac build ad hoc without it, and the keychain tests skip themselves
   Settings tabs and that the Dock menu's Add Account opens a closed window (see [screenshots.md](screenshots.md)).
 - Debug builds use the simulated YubiKey and the fake Ente server when launched with `-SimulatedYubiKey YES`, with a
   Debug menu to plug and unplug it. Without that argument they use a real YubiKey.
-- A real YubiKey, Touch ID, the screen recording prompt, Continuity Camera and the notification can only be checked
-  by hand.
+- A real YubiKey, Touch ID, the window picker, Continuity Camera and the notification can only be checked by hand.
 
 ## App icon
 
