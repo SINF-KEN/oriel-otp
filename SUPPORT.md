@@ -1,20 +1,26 @@
 # Oriel OTP support
 
 Oriel OTP shows the one-time codes stored on a YubiKey and can copy accounts from
-[Ente Auth](https://ente.io/auth) onto the key. It needs iOS or iPadOS 17 or later and a YubiKey with NFC or USB-C.
-YubiKeys can't connect through a Lightning port; on an iPhone with Lightning, use NFC.
+[Ente Auth](https://ente.io/auth) onto the key. It needs iOS or iPadOS 18 or later, or macOS 15 or later, and a
+YubiKey with the OATH application, such as the YubiKey 5 Series. The optional Apple Watch app needs watchOS 10 or later.
+
+- On iPhone, the YubiKey connects over NFC or USB-C. YubiKeys can't connect through a Lightning port; on an iPhone
+  with Lightning, use NFC.
+- On iPad, it connects over USB-C. iPads don't read NFC tags.
+- On a Mac, it connects over USB, with a USB-C or USB-A YubiKey.
 
 ## Getting help
 
-Search the [issue tracker](https://github.com/SINF-KEN/oriel-otp/issues) for your problem, or
+Email [opensource@net01.io](mailto:opensource@net01.io); you don't need a GitHub account. The address is also under
+**About** in the app. Or search the [issue tracker](https://github.com/SINF-KEN/oriel-otp/issues) for your problem and
 [open a new issue](https://github.com/SINF-KEN/oriel-otp/issues/new). Please include:
 
-- the iPhone or iPad model and iOS version,
-- the YubiKey model and how it connects (NFC or USB-C),
+- the iPhone, iPad, Mac or Apple Watch model and its system version,
+- the YubiKey model and how it connects (NFC, USB-C or USB-A),
 - the Oriel OTP version, shown under **About**,
 - what you did, what you expected and what happened instead.
 
-Don't post secrets, QR codes, passwords, PINs or Ente recovery keys in an issue.
+Don't send secrets, QR codes, passwords, PINs or Ente recovery keys, in an issue or by email.
 
 ## Common questions
 
@@ -56,6 +62,11 @@ wrong attempts the app makes you wait before the next one, up to an hour.
 Under **Configuration > Smart card extension**, add the certificate to the device and allow notifications. When an
 app asks for the certificate, tap the notification and enter the YubiKey's PIN.
 
+**AutoFill doesn't suggest a code.**
+AutoFill only has your time-based Ente Auth accounts, and needs **Stay signed in**. Codes of accounts on your YubiKey
+can't be filled in. Check that AutoFill is on, under **AutoFill** in the app's settings. Each account is suggested on
+the websites in its details; choose **AutoFill websites** on the account to change them.
+
 ## Accessibility
 
 Oriel OTP is made to work with VoiceOver, Voice Control, larger text, dark mode, Increase Contrast, Differentiate
@@ -79,6 +90,35 @@ in and to sign, like any other smart card. The private keys stay on the YubiKey.
    scan the YubiKey. Then go back to the app.
 
 The certificates have to be on the YubiKey already: Oriel OTP doesn't create or import them.
+
+## AutoFill
+
+The app can fill in the codes of your time-based Ente Auth accounts in Safari and other apps, on iPhone, iPad and Mac.
+
+1. Choose **Sync from Ente Auth**, turn on **Stay signed in** and sign in.
+2. Choose **Turn on AutoFill** under **AutoFill**, in **Configuration** on iPhone and iPad or **Settings > General**
+   on the Mac, and turn on Oriel OTP in the system's AutoFill settings if asked.
+3. On a website's verification code field, choose the suggested code. If the app is locked, it's unlocked first.
+
+## Mac
+
+The Mac app reads the YubiKey over USB: plug it in and the codes appear. It doesn't use NFC.
+
+- **Adding an account.** Choose **File > Add Account**. **Scan QR Code on Screen** asks you to pick the window with
+  the QR code. You can also paste the QR code or link, drop a picture of it on the sheet, take a picture with your
+  iPhone or iPad from the File menu, or enter the details by hand.
+- **Menu bar.** The menu bar icon copies codes; **Settings > General** can hide it, or show the app only in the
+  menu bar.
+- **Touch.** When a code needs a touch of the YubiKey and the app isn't in front, a notification asks for it.
+- **Smart cards.** macOS uses the certificates on a YubiKey itself, so the Mac app has no smart card extension.
+
+## Apple Watch
+
+The watch app shows the codes of your time-based Ente Auth accounts, without the iPhone nearby. It can't reach a
+YubiKey, so accounts that are only on the key aren't shown, nor are counter-based (HOTP) accounts.
+
+To turn it on, choose **Sync from Ente Auth** on the iPhone, sign in with **Stay signed in** on, and turn on **Show
+Ente Auth accounts on Apple Watch**. Turning it off or signing out deletes the accounts from the watch.
 
 ## Privacy
 

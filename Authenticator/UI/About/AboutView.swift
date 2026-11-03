@@ -124,6 +124,15 @@ struct AboutView: View {
                                 .foregroundStyle(.primary)
                         }
                     }
+                    Button {
+                        Platform.open(URL(string: "mailto:opensource@net01.io")!)
+                    } label: {
+                        HStack {
+                            ListIconView(image: Image(systemName: "envelope"), color: Color(.systemBlue))
+                            Text("Email support")
+                                .foregroundStyle(.primary)
+                        }
+                    }
                 }
             }
             #if os(macOS)

@@ -11,7 +11,8 @@ checklist.
 | Support URL | https://github.com/SINF-KEN/oriel-otp/blob/main/SUPPORT.md |
 | Marketing URL (optional) | https://github.com/SINF-KEN/oriel-otp |
 
-The app links to the same privacy policy and support page under **About**.
+The app links to the same privacy policy and support page under **About**, which also has the support email
+(opensource@net01.io).
 
 ## Availability
 
@@ -28,9 +29,9 @@ The app links to the same privacy policy and support page under **About**.
 ## App Privacy
 
 The privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/PrivacyInfo.xcprivacy`,
-`OrielOTPWatch/PrivacyInfo.xcprivacy`) declare no tracking and no collected data types. The only required-reason API
-is `UserDefaults`: `CA92.1` for the app's own settings, and `1C8F.1` for the app group the app shares with the smart
-card extension. The watch app uses only the keychain and WatchConnectivity, so its manifest lists no APIs. The Mac
+`AutoFillExtension/PrivacyInfo.xcprivacy`, `OrielOTPWatch/PrivacyInfo.xcprivacy`) declare no tracking and no collected
+data types. The only required-reason API is `UserDefaults`: `CA92.1` for the app's own settings, and `1C8F.1` for the
+app group the app shares with the smart card and AutoFill extensions. The watch app uses only the keychain and WatchConnectivity, so its manifest lists no APIs. The Mac
 app uses the same manifest as the iOS app; it adds no other required-reason APIs (the pasteboard, ScreenCaptureKit,
 notifications and login item aren't on the list). Reading a QR code from the screen happens on the Mac and the
 picture isn't kept or sent.
@@ -85,6 +86,11 @@ Description:
 > • Pin, rename and delete accounts, and require a touch of the YubiKey per account
 > • Works with password-protected YubiKeys, and can keep the password in the Keychain
 > • Lock the app with Face ID, a 4 or 6 digit code or a password
+>
+> AUTOFILL
+> Fill in the codes of your time-based Ente Auth accounts in Safari and other apps on iPhone, iPad and Mac. Stay
+> signed in to Ente Auth and turn on Oriel OTP in the system's AutoFill settings, and each account is suggested on its
+> websites. Codes of accounts on your YubiKey can't be filled in.
 >
 > SMART CARD
 > Use the certificates in the YubiKey's smart card application with apps that support smart card sign-in on iOS.
@@ -142,8 +148,8 @@ gives.
 >
 > Without an Ente Auth account the app needs a YubiKey (NFC or USB-C) to show codes. With the demo account below and
 > **Stay signed in**, the Ente Auth codes are shown without a YubiKey. A video of the app on a device is attached,
-> showing NFC and USB-C, adding an account by QR code, Ente sync from sign-in to writing to the key, and the smart
-> card extension. We can send a YubiKey on request.
+> showing NFC and USB-C, adding an account by QR code, Ente sync from sign-in to writing to the key, the smart card
+> extension and AutoFill. We can send a YubiKey on request.
 >
 > Ente sync is optional and only signs in to the person's own Ente account, through Ente's public API, the same one
 > Ente's open-source (AGPL-3.0) apps use. The email and sign-in requests go only to Ente, or to the self-hosted server
@@ -161,10 +167,22 @@ gives.
 > the demo account, then turn on **Show Ente Auth accounts on Apple Watch** (shown when a watch with the app is
 > paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
 > watch.
+>
+> AutoFill: the app includes an AutoFill extension that fills in the codes of Ente Auth accounts in Safari and other
+> apps; it doesn't use the YubiKey. To test it, choose **Sync from Ente Auth** in the account list menu, turn on **Stay
+> signed in** and sign in with the demo account. Under Configuration > AutoFill, tap **Turn on AutoFill** and turn on
+> Oriel OTP in the system's AutoFill settings if asked. Then open a page with a verification code field in Safari, on
+> a website in the account's details (**AutoFill websites** on the account changes them), and choose the suggested
+> code above the keyboard. Codes of accounts on the YubiKey aren't offered.
 
-Fill in the demo account and attach the video before submitting. If App Review asks about guideline 5.2.2 (using
+Fill in the demo account and attach the video, including AutoFill, before submitting. If App Review asks about guideline 5.2.2 (using
 Ente's service), reply with [Ente's terms](https://ente.com/terms), which don't mention third-party clients, and
 the AGPL-3.0 license of Ente's apps and server, and attach Ente's written permission once we have it.
+
+If App Review asks why the smart card extension needs notifications: a CryptoTokenKit extension has no user interface
+and can't open the app, so a local notification is the only way to reach the person when another app asks for a
+certificate. Tapping it opens the app to enter the PIN and connect the YubiKey. The notifications are created on the
+device, and on iPhone and iPad the app only asks for them on the Smart card extension screen, for this feature.
 
 Add watch screenshots to the Apple Watch section of the listing. App Store Connect takes one size and scales it for
 the others, so make them on the largest, the Ultra (422 × 514 pixels):
@@ -180,6 +198,8 @@ Mac review notes (draft):
 > The Mac version connects to a YubiKey over USB only (USB-C or USB-A, e.g. a YubiKey 5C NFC), as a smart card. Plug
 > it in and the codes appear; touch the key when asked. Codes can also be copied from the menu bar icon, and with the
 > Copy Code action in Shortcuts. To add an account, choose File > Add Account and use Scan QR Code on Screen (this
-> asks for the Screen Recording permission, only to find the QR code) or enter it manually. Ente sync works as on
-> iOS, under File > Sync from Ente Auth. A video of the Mac app with a YubiKey is attached, and we can send a
+> opens the system's window picker, to pick the window with the QR code; the app doesn't ask for the Screen Recording
+> permission) or enter it manually. Ente sync works as on iOS, under File > Sync from Ente Auth. AutoFill works as on
+> iOS too: after signing in with **Stay signed in**, choose **Turn on AutoFill** under Settings > General, and turn on
+> Oriel OTP in the system's AutoFill settings if asked. A video of the Mac app with a YubiKey is attached, and we can send a
 > YubiKey on request.
