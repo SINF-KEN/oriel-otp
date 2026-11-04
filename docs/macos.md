@@ -47,7 +47,7 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
   window would only show the same list. It opens at 900 × 600 points with a minimum of 280 × 420, and macOS
   remembers its size and position. The account list is the sidebar of the split view and the details are on the
   right, each at least 320 points wide. In a narrower window, or as the text gets bigger, the two become one column
-  like on an iPhone, with the details opening over the list (→ opens the selected account, Back or Escape returns), and in the narrowest windows the
+  like on an iPhone, with the details opening over the list (→ opens the selected account, Back or Escape returns) and the search field above the list, and in the narrowest windows the
   codes go below the names. Closing the window keeps the app running for the menu bar; the Dock icon or the menu bar opens it again.
 - **Menu bar commands** (`Authenticator/Mac/MainCommands.swift`): File > Add Account… (⌘N) and Sync from Ente
   Auth… (⇧⌘E); Edit > Copy (⌘C copies the selected account's code, or text while editing it) and Search Accounts
