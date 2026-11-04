@@ -39,6 +39,8 @@ struct MainView: View {
     @State var isSearchFocused = false
     /// The account open over the list in the single column layout.
     @State var singleColumnPath: [String] = []
+    /// For the arrow keys, which only reach the list while it has the focus.
+    @FocusState private var isListFocused: Bool
     #else
     @State var selectedAccountID: String? = nil
     #endif
@@ -241,6 +243,8 @@ struct MainView: View {
     private static let minimumColumnWidth: CGFloat = 320
     /// The narrowest the window gets, in points at 100% text size, where the codes go below the names.
     private static let minimumWindowWidth: CGFloat = 280
+    /// Until a view that comes back to the single column can take the focus, after going back to it.
+    private static let navigationDelay = Duration.milliseconds(400)
 
     /// Two columns while both fit, otherwise one, as on an iPhone, which also happens as the text gets bigger. A split
     /// view doesn't do this itself on the Mac, and when its columns don't fit, it's centered in the window and cut off
@@ -258,7 +262,11 @@ struct MainView: View {
 
     private var singleColumnView: some View {
         NavigationStack(path: $singleColumnPath) {
-            accountColumn(searchPlacement: .toolbar)
+            accountColumn()
+                // Below the toolbar, whose search field gets wider than a narrow window and is cut off.
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    SingleColumnSearchField(text: $searchText, isFocused: $isSearchFocused)
+                }
                 .environment(\.opensAccount, OpenAccountAction(path: $singleColumnPath))
                 // The arrow keys only move the selection here, so they can get past an account.
                 .onKeyPress(.rightArrow) {
@@ -279,17 +287,39 @@ struct MainView: View {
                     }
                 }
         }
+        .onAppear(perform: focusList)
+        // Leaving the search field with Escape goes back to the list.
+        .onChange(of: isSearchFocused) { _, isFocused in
+            if !isFocused {
+                focusList()
+            }
+        }
         // The menu bar's commands work on the selection, which the two columns also show when the window gets wider.
         .onChange(of: singleColumnPath) { _, path in
             if let accountID = path.last {
                 selectedAccountID = accountID
+            } else {
+                focusList()
+            }
+        }
+    }
+
+    /// Gives the list the focus once it's on screen, unless the search field is about to take it.
+    private func focusList() {
+        Task {
+            try? await Task.sleep(for: Self.navigationDelay)
+            if !isSearchFocused {
+                isListFocused = true
             }
         }
     }
 
     private func splitView(sidebarWidth: ClosedRange<CGFloat>) -> some View {
         NavigationSplitView {
-            accountColumn(searchPlacement: .sidebar)
+            accountColumn()
+                .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
+                .searchFocusedBinding($isSearchFocused)
+                .autocorrectionDisabled(true)
                 .navigationSplitViewColumnWidth(min: sidebarWidth.lowerBound,
                                                 ideal: min(360 * textScale, sidebarWidth.upperBound),
                                                 max: sidebarWidth.upperBound)
@@ -301,6 +331,8 @@ struct MainView: View {
     private var mainLayout: some View {
         NavigationSplitView {
             accountColumn()
+                .searchable(text: $searchText, prompt: String(localized: "Search"))
+                .autocorrectionDisabled(true)
                 .navigationSplitViewColumnWidth(min: 320, ideal: 360)
         } detail: {
             detailColumn
@@ -327,16 +359,13 @@ struct MainView: View {
         .scaledBodyFont()
     }
 
-    /// The account list with its search field, toolbar and title.
-    private func accountColumn(searchPlacement: SearchFieldPlacement = .automatic) -> some View {
+    /// The account list with its toolbar and title.
+    private func accountColumn() -> some View {
         accountList
             #if os(macOS)
+            .focused($isListFocused)
             // Here rather than for the whole window, so the search field keeps the system's size.
             .scaledBodyFont()
-            #endif
-            .searchable(text: $searchText, placement: searchPlacement, prompt: String(localized: "Search"))
-            #if os(macOS)
-            .searchFocusedBinding($isSearchFocused)
             // Return copies the selected account's code, Delete deletes the selected accounts.
             .onKeyPress(.return) {
                 guard !AppLock.shared.isLocked, let selectedAccount else { return .ignored }
@@ -348,7 +377,6 @@ struct MainView: View {
                 accountsToDelete = selectedAccounts
             }
             #endif
-            .autocorrectionDisabled(true)
             .listStyle(.inset)
             .refreshable(enabled: DeviceCapabilities.supportsNFC || model.cloud.isEnabled) {
                 otp = nil
@@ -823,7 +851,15 @@ struct MainView: View {
         case .refresh:
             model.refresh()
         case .search:
-            isSearchFocused = true
+            // The search field is on the list, so an account open over it closes first. Set again each time, as the
+            // field doesn't report back when it wasn't there to take the focus.
+            let delay = singleColumnPath.isEmpty ? Duration.zero : Self.navigationDelay
+            isSearchFocused = false
+            singleColumnPath = []
+            Task {
+                try? await Task.sleep(for: delay)
+                isSearchFocused = true
+            }
         case .copyCode:
             if let selectedAccount { toastPresenter.copyCode(of: selectedAccount) }
         case .togglePin:
@@ -937,6 +973,9 @@ private struct AccountRowLink<Label: View>: View {
             label
                 .tag(accountID)
                 .onTapGesture { opensAccount(accountID) }
+                // A button to VoiceOver and Voice Control, as the link is in the split view.
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { opensAccount(accountID) }
         } else {
             link
         }
