@@ -287,7 +287,9 @@ struct MainView: View {
                     }
                 }
         }
-        .onAppear(perform: focusList)
+        // AppKit gives the search field the first focus, mostly with larger text, which would keep the arrow keys from
+        // the list. With something typed in it, it came from the two columns, so it keeps the focus.
+        .onAppear { focusList(overSearch: searchText.isEmpty) }
         // Leaving the search field with Escape goes back to the list.
         .onChange(of: isSearchFocused) { _, isFocused in
             if !isFocused {
@@ -305,10 +307,10 @@ struct MainView: View {
     }
 
     /// Gives the list the focus once it's on screen, unless the search field is about to take it.
-    private func focusList() {
+    private func focusList(overSearch: Bool = false) {
         Task {
             try? await Task.sleep(for: Self.navigationDelay)
-            if !isSearchFocused {
+            if overSearch || !isSearchFocused {
                 isListFocused = true
             }
         }
