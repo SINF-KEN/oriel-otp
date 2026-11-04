@@ -128,7 +128,7 @@ extension TutorialView {
         // A Mac connects to a YubiKey over USB only.
         [TutorialPageModel(title: String(localized: "How it works"),
                            image: Image(.tutorialAccounts),
-                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with a USB-C or USB-A connector to get started.", comment: "Mac tutorial"),
+                           text: String(localized: "Add the accounts of the services you wish to secure and get their security codes right here.\n\nThey're kept on this Mac. A YubiKey with a USB-C or USB-A connector and Ente Auth are optional.", comment: "Mac tutorial"),
                            link: nil),
 
          TutorialPageModel(title: String(localized: "Add accounts from Ente Auth", comment: "Tutorial page title"),
@@ -149,7 +149,7 @@ extension TutorialView {
         #else
         [TutorialPageModel(title: String(localized: "How it works"),
                            image: Image(.tutorialAccounts),
-                           text: String(localized: "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC or USB-C to get started."),
+                           text: String(localized: "Add the accounts of the services you wish to secure and get their security codes right here.\n\nThey're kept on this device. A YubiKey with NFC or USB-C and Ente Auth are optional.", comment: "Tutorial"),
                            link: nil),
 
          TutorialPageModel(title: String(localized: "Add accounts from Ente Auth", comment: "Tutorial page title"),
@@ -169,7 +169,7 @@ extension TutorialView {
          
          TutorialPageModel(title: String(localized: "Where to get QR codes"),
                            image: Image(.tutorialQrCode),
-                            text: String(localized: "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add your YubiKey and generate your own security codes."),
+                            text: String(localized: "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add an account and get your own security codes."),
                             link: nil)
         ]
         #endif

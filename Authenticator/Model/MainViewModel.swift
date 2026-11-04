@@ -26,8 +26,10 @@ import YubiKit
     private(set) var keyAccounts: [Account] = []
     /// The accounts in the Ente Auth vault on this device, whose codes the app calculates.
     private(set) var cloudAccounts: [Account] = []
-    /// The accounts of both, by name.
-    var accounts: [Account] { (keyAccounts + cloudAccounts).sorted() }
+    /// The accounts kept only on this device, whose codes the app calculates.
+    private(set) var deviceAccounts: [Account] = []
+    /// The accounts of all three, by name.
+    var accounts: [Account] { (keyAccounts + cloudAccounts + deviceAccounts).sorted() }
     var pinnedAccounts: [Account] { accounts.filter(\.isPinned) }
     var otherAccounts: [Account] { accounts.filter { !$0.isPinned } }
     var accountsLoaded: Bool = false
@@ -67,16 +69,32 @@ import YubiKit
     @ObservationIgnored let cloud: EnteCloud
     /// The vault code each cloud account was made from, by account id.
     @ObservationIgnored private var cloudCodes: [String: EnteCloudCode] = [:]
+    @ObservationIgnored let device: DeviceAccounts
+    /// The code each account on this device was made from, by account id.
+    @ObservationIgnored private var deviceCodes: [String: EnteCloudCode] = [:]
 
-    init(cloud: EnteCloud = .shared) {
+    private static let hasReadYubiKeyKey = "HasReadYubiKey"
+    /// Whether a YubiKey was ever read here. Until then the app doesn't ask for one next to the accounts it has.
+    private(set) var hasReadYubiKey = UserDefaults.standard.bool(forKey: MainViewModel.hasReadYubiKeyKey)
+
+    init(cloud: EnteCloud = .shared, device: DeviceAccounts = .shared) {
         self.cloud = cloud
+        self.device = device
         self.favorites = favoritesStorage.readFavorites()
         cloud.onChange = { [weak self] in self?.updateCloudAccounts() }
+        device.onChange = { [weak self] in self?.updateDeviceAccounts() }
         updateCloudAccounts()
+        updateDeviceAccounts()
     }
 
-    /// Whether there are accounts to list, from a YubiKey or Ente Auth.
-    var hasAccounts: Bool { accountsLoaded || !cloudAccounts.isEmpty }
+    /// Whether there are accounts to list, from a YubiKey, Ente Auth or this device.
+    var hasAccounts: Bool { accountsLoaded || !cloudAccounts.isEmpty || !deviceAccounts.isEmpty }
+
+    /// Whether rows show where each account is stored: with Ente Auth accounts, or when a YubiKey's are listed with
+    /// this device's. Someone who only uses this device has no need to tell them apart.
+    var showsAccountLocations: Bool {
+        !cloudAccounts.isEmpty || (!deviceAccounts.isEmpty && !keyAccounts.isEmpty)
+    }
 
     // MARK: - Ente Auth
 
@@ -104,9 +122,7 @@ import YubiKit
                                                 period: UInt(code.period))
         let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
         // Calculated like on a YubiKey that is plugged in: a new code is calculated when one expires.
-        let account = Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
-                              keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCloudCode(for: $0) },
-                              connectionType: .wired, isPinned: code.isPinned, location: .ente(id: id))
+        let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .ente(id: id))
         account.isPendingSync = isPending
         account.onPinnedChange = { [weak self] account in
             self?.cloud.setPinned(id, account.isPinned)
@@ -114,10 +130,30 @@ import YubiKit
         return account
     }
 
-    private func calculateCloudCode(for account: Account) {
-        guard case .ente(let id) = account.location, let code = cloudCodes[account.accountId] else { return }
+    private func calculatedAccount(credential: OATHSession.Credential, otp: (code: String, validity: DateInterval)?, code: EnteCloudCode,
+                                   location: Account.Location) -> Account {
+        Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
+                keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
+                connectionType: .wired, isPinned: code.isPinned, location: location)
+    }
+
+    /// Calculates the code of an account in Ente Auth or on this device.
+    private func calculateCode(for account: Account) {
+        let nextHOTPCode: () -> String?
+        let code: EnteCloudCode?
+        switch account.location {
+        case .yubiKey:
+            return
+        case .ente(let id):
+            code = cloudCodes[account.accountId]
+            nextHOTPCode = { [cloud] in cloud.nextHOTPCode(id) }
+        case .device(let id):
+            code = deviceCodes[account.accountId]
+            nextHOTPCode = { [device] in device.nextHOTPCode(id) }
+        }
+        guard let code else { return }
         if code.kind == .hotp {
-            guard let otp = cloud.nextHOTPCode(id) else { return }
+            guard let otp = nextHOTPCode() else { return }
             account.update(otp: OATHSession.OTP(code: otp, validity: DateInterval(start: AppClock.now, end: .distantFuture)))
         } else {
             // A refresh scheduled for when the code expires can fire a moment early. It still gets the next code.
@@ -130,10 +166,10 @@ import YubiKit
         }
     }
 
-    /// Calculates the codes of the time-based Ente Auth accounts again, e.g. after the app was in the background.
-    private func refreshCloudCodes() {
-        for account in cloudAccounts where account.credential.type == .totp {
-            calculateCloudCode(for: account)
+    /// Calculates the codes of the time-based accounts the app calculates again, e.g. after it was in the background.
+    private func refreshCalculatedCodes() {
+        for account in cloudAccounts + deviceAccounts where account.credential.type == .totp {
+            calculateCode(for: account)
         }
     }
 
@@ -142,30 +178,97 @@ import YubiKit
         try cloud.add(template)
     }
 
+    // MARK: - This device
+
+    /// Makes the accounts for the ones on this device, keeping the ones that didn't change so their codes stay.
+    private func updateDeviceAccounts() {
+        var codes = [String: EnteCloudCode]()
+        let previous = Dictionary(deviceAccounts.map { ($0.accountId, $0) }, uniquingKeysWith: { first, _ in first })
+        deviceAccounts = device.accounts.map { entry in
+            let accountId = "device/" + entry.id
+            codes[accountId] = entry.code
+            if let account = previous[accountId], let code = deviceCodes[accountId], code.isSameAccount(as: entry.code) {
+                if account.isPinned != entry.code.isPinned {
+                    account.isPinned = entry.code.isPinned
+                }
+                return account
+            }
+            return deviceAccount(id: entry.id, code: entry.code)
+        }
+        deviceCodes = codes
+    }
+
+    private func deviceAccount(id: String, code: EnteCloudCode) -> Account {
+        let credential = OATHSession.Credential(type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
+                                                period: UInt(code.period))
+        let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
+        let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .device(id: id))
+        account.onPinnedChange = { [weak self] account in
+            self?.device.setPinned(id, account.isPinned)
+        }
+        return account
+    }
+
+    /// Adds an account to this device.
+    func addDeviceAccount(_ template: YubiKitOATHSession.CredentialTemplate) throws -> DeviceAccounts.AddResult {
+        try device.add(template)
+    }
+
+    enum MoveToEnteResult {
+        case moved
+        /// Ente Auth has an account with the same name. Nothing was changed, also not on this device.
+        case alreadyInEnte
+    }
+
+    /// Whether the account on this device can be moved to Ente Auth, which also backs it up.
+    func canMoveToEnte(_ account: Account) -> Bool {
+        account.isOnDevice && cloud.isEnabled
+    }
+
+    /// Puts an account on this device in Ente Auth, and deletes it here once it is in the vault.
+    func moveToEnte(_ account: Account) throws -> MoveToEnteResult {
+        guard case .device(let id) = account.location, let rawData = device.rawData(of: id) else { return .alreadyInEnte }
+        guard try cloud.add(rawData: rawData) == .added else { return .alreadyInEnte }
+        try device.delete(id)
+        return .moved
+    }
+
+    // MARK: - YubiKey
+
     enum CopyToYubiKeyResult {
         case copied, moved
-        /// The YubiKey has an account with the same name. Nothing was changed, also not in Ente Auth.
+        /// The YubiKey has an account with the same name. Nothing was changed, also not where the account is now.
         case alreadyOnYubiKey
     }
 
-    /// Whether the Ente Auth account can be copied to a YubiKey. It can't if a YubiKey can't store it. A HOTP account
-    /// can only be moved, as a copy would count codes on its own and fall out of step with Ente Auth's.
-    func canCopyToYubiKey(_ account: Account, moving: Bool) -> Bool {
-        guard case .ente(let id) = account.location, moving || account.credential.type != .hotp else { return false }
-        return cloud.yubiKeyTemplate(of: id) != nil
+    /// The credential to put the account on a YubiKey with, nil if a YubiKey can't store it.
+    private func yubiKeyTemplate(of account: Account) -> YubiKitOATHSession.CredentialTemplate? {
+        switch account.location {
+        case .yubiKey: nil
+        case .ente(let id): cloud.yubiKeyTemplate(of: id)
+        case .device(let id): device.yubiKeyTemplate(of: id)
+        }
     }
 
-    /// Puts an Ente Auth account on the YubiKey. Moving it also moves it to Ente's trash, once it is on the YubiKey.
-    /// The completion isn't called when the YubiKey couldn't be reached, which `handle(error:)` reports.
+    /// Whether the account can be copied to a YubiKey. It can't if a YubiKey can't store it. A HOTP account can only
+    /// be moved, as a copy would count codes on its own and fall out of step with the original.
+    func canCopyToYubiKey(_ account: Account, moving: Bool) -> Bool {
+        guard moving || account.credential.type != .hotp else { return false }
+        return yubiKeyTemplate(of: account) != nil
+    }
+
+    /// Puts an account in Ente Auth or on this device on the YubiKey. Moving it also moves it to Ente's trash or
+    /// deletes it from this device, once it is on the YubiKey. The completion isn't called when the YubiKey couldn't
+    /// be reached, which `handle(error:)` reports.
     func copyToYubiKey(_ account: Account, moving: Bool, completion: @escaping (CopyToYubiKeyResult) -> Void) {
-        guard case .ente(let id) = account.location, let template = cloud.yubiKeyTemplate(of: id) else { return }
+        guard let template = yubiKeyTemplate(of: account) else { return }
         addAccounts([template], requiresTouch: false) { [weak self] result in
             if let error = result.error {
                 self?.sessionError = error.isOATHStorageFull ? OATHSessionError.storageFull(notAdded: [template.displayName]) : error
             } else if result.added.isEmpty {
                 completion(.alreadyOnYubiKey)
             } else if moving {
-                self?.cloud.delete(id)
+                self?.removeAfterMove(account)
                 completion(.moved)
             } else {
                 completion(.copied)
@@ -173,6 +276,19 @@ import YubiKit
         }
     }
     
+    private func removeAfterMove(_ account: Account) {
+        switch account.location {
+        case .yubiKey: break
+        case .ente(let id): cloud.delete(id)
+        case .device(let id):
+            do {
+                try device.delete(id)
+            } catch {
+                sessionError = error
+            }
+        }
+    }
+
     /// Refresh requests arriving within 100 ms of each other are coalesced. A single request refreshes
     /// only that account, several requests refresh all accounts.
     private func requestRefresh(_ account: Account) {
@@ -228,7 +344,8 @@ import YubiKit
         // start() is called again to retry after a connection error.
         tickTask?.cancel()
         sessionTask?.cancel()
-        refreshCloudCodes()
+        device.loadIfLocked()
+        refreshCalculatedCodes()
 
         tickTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -380,6 +497,10 @@ import YubiKit
             
             self.keyVersion = useSession.version
             self.accountsLoaded = true
+            if !hasReadYubiKey {
+                hasReadYubiKey = true
+                UserDefaults.standard.set(true, forKey: Self.hasReadYubiKeyKey)
+            }
             let message = SettingsConfig.showNFCSwipeHint ? String(localized: "Success!\nHint: swipe down to dismiss", comment: "iOS NFC alert success with hint") : String(localized: "Successfully read", comment: "iOS NFC alert successfully read")
             useSession.endNFC(message: message)
         } catch {
@@ -450,6 +571,15 @@ import YubiKit
             completion()
             return
         }
+        if case .device(let id) = account.location {
+            do {
+                try device.rename(id, issuer: issuer, accountName: accountName)
+                completion()
+            } catch {
+                sessionError = error
+            }
+            return
+        }
         Task {
             do {
                 let wasPinned = account.isPinned
@@ -470,11 +600,20 @@ import YubiKit
         }
     }
     
-    /// Deletes the account from the YubiKey, or moves an Ente Auth account to Ente's trash.
+    /// Deletes the account from the YubiKey or this device, or moves an Ente Auth account to Ente's trash.
     func deleteAccount(_ account: Account, completion: @escaping () -> Void) {
         if case .ente(let id) = account.location {
             cloud.delete(id)
             completion()
+            return
+        }
+        if case .device(let id) = account.location {
+            do {
+                try device.delete(id)
+                completion()
+            } catch {
+                sessionError = error
+            }
             return
         }
         Task {
