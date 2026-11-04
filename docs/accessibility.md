@@ -44,7 +44,8 @@ size, from 100% to 200%: View > Make Text Bigger (⌘+), Make Text Smaller (⌘�
 General > Text size. It scales the text styles (`scaledFont(_:)` in place of `font(_:)` with a text style), the
 default font of each window (`appTextSize()`), sizes beside text (`@ScaledSize`, which is `@ScaledMetric` on iOS),
 and the windows, sheets, sidebar and menu bar extra (`textScaledFrame`), so larger text gets more room instead of
-wrapping in a narrow column, up to the size of the screen. A few things keep the system's size, as on iOS: the toolbar,
+wrapping in a narrow column, up to the size of the screen. The main window keeps its size, and its two columns become
+one when they no longer fit at the larger text. A few things keep the system's size, as on iOS: the toolbar,
 the search field, menus and alerts.
 
 Two things that don't follow the window's font on the Mac: a list sets the system font on the text in its rows, so the
