@@ -220,13 +220,16 @@ final class MacScreenshotTests: XCTestCase {
         try attach("check-single-column-keyboard-opened", window)
     }
 
-    /// The list has the focus from the start in one column, so the arrow keys work without a click.
+    /// The list has the focus from the start in one column, so the arrow keys work without a click. With larger text
+    /// the search field usually took it, but not always, so that's tried a few times.
     @MainActor func testSingleColumnFocusAtLaunch() throws {
-        let window = try relaunch(windowSize: "420x700")
-        app.typeKey(.downArrow, modifierFlags: [])
-        Thread.sleep(forTimeInterval: 1)
-        app.typeKey(.rightArrow, modifierFlags: [])
-        XCTAssertTrue(window.descendants(matching: .any)["account-details.code"].firstMatch.waitForExistence(timeout: 5))
+        for (size, scale) in [("420x700", "1"), ("560x700", "2"), ("560x700", "2"), ("560x700", "2"), ("560x700", "2")] {
+            let window = try relaunch(windowSize: size, arguments: ["-Mac.TextSize", scale])
+            app.typeKey(.downArrow, modifierFlags: [])
+            Thread.sleep(forTimeInterval: 1)
+            app.typeKey(.rightArrow, modifierFlags: [])
+            XCTAssertTrue(window.descendants(matching: .any)["account-details.code"].firstMatch.waitForExistence(timeout: 5), "At \(scale)x")
+        }
     }
 
     /// Search Accounts works from the list, right after going back to it and with an account open, again and again.
