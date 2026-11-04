@@ -5,9 +5,9 @@ a YubiKey. Choose **Sync from Ente Auth** in the menu of the account list, or be
 YubiKey has been read yet or the YubiKey has no accounts. It can also add a new account to Ente Auth while adding it
 to the YubiKey, see [Adding to Ente Auth](#adding-to-ente-auth).
 
-When you stay signed in, the app also works as an Ente Auth client of its own: the accounts are kept on the device,
+When you stay signed in, the app also works as an independent Ente Auth client: the accounts are kept on the device,
 listed with the YubiKey's, and their codes are calculated by the app, without a YubiKey. Accounts added, renamed,
-pinned or deleted in the app are changed in Ente Auth too, and changes made in Ente's other apps show up here. See
+pinned or deleted in the app are changed in Ente Auth too, and changes made in Ente's apps show up here. See
 [Ente Auth accounts in the app](#ente-auth-accounts-in-the-app).
 
 Copying onto the YubiKey reads accounts from Ente and writes them to the YubiKey. Accounts with the same name as one
@@ -32,8 +32,9 @@ With the KEK the client decrypts the master key (XSalsa20-Poly1305 secretbox), t
 auth token, which is a sealed box to the account's public key. The public key is checked against the decrypted
 secret key.
 
-Requests send `X-Client-Package: io.ente.auth`, like Ente's CLI. Ente's server only lets tokens issued for that
-package read authenticator data.
+Requests send `X-Client-Package: io.ente.auth.orielotp`. Ente's server only lets tokens issued for a package starting
+with `io.ente.auth` read authenticator data, and the suffix tells this app apart from Ente's own, which send
+`io.ente.auth`.
 
 ## Reading accounts
 

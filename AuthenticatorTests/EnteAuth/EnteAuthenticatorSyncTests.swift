@@ -210,7 +210,7 @@ struct EnteAuthenticatorSyncTests {
         #expect(codes.map(\.title) == ["Alpha", "Zeta"])
 
         for request in EnteMockURLProtocol.requests {
-            #expect(request.value(forHTTPHeaderField: "X-Client-Package") == "io.ente.auth")
+            #expect(request.value(forHTTPHeaderField: "X-Client-Package") == "io.ente.auth.orielotp")
             #expect(request.value(forHTTPHeaderField: "X-Auth-Token") == "the-token")
         }
         let diffRequest = try #require(EnteMockURLProtocol.requests.last?.url)
