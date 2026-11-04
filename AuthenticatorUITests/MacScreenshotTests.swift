@@ -281,6 +281,42 @@ final class MacScreenshotTests: XCTestCase {
         XCTAssertLessThanOrEqual(row.frame.maxX, window.frame.maxX)
     }
 
+    /// Xcode's accessibility audit on each layout of the main window, at both ends of the text size. What the system
+    /// draws, like the toolbar's overflow menu and the title, is left out, see `isOwnIssue`.
+    @MainActor func testAccessibilityAudit() throws {
+        continueAfterFailure = true
+        let layouts: [(name: String, size: String, scale: String)] = [
+            ("two columns", "1000x700", "1"), ("one column", "420x700", "1"), ("narrowest", "280x700", "1"),
+            ("two columns 200%", "1400x800", "2"), ("one column 200%", "1000x700", "2"), ("narrowest 200%", "560x700", "2")]
+        for layout in layouts {
+            let window = try relaunch(windowSize: layout.size, arguments: ["-Mac.TextSize", layout.scale])
+            try audit()
+            accountRow(in: window).click()
+            XCTAssertTrue(window.descendants(matching: .any)["account-details.code"].firstMatch.waitForExistence(timeout: 5))
+            try audit()
+        }
+    }
+
+    @MainActor private func audit() throws {
+        try app.performAccessibilityAudit { issue in
+            !Self.isOwnIssue(issue)
+        }
+    }
+
+    /// Whether an issue is in what the app draws. The audit asks every group and list for a description, which the
+    /// Mac's don't have, and doesn't know the role of a row, which is a button there too.
+    private static func isOwnIssue(_ issue: XCUIAccessibilityAuditIssue) -> Bool {
+        // Without an element it can't be in anything of the app's. A "Parent/Child mismatch" comes and goes this way
+        // with the relaunches, at any window size.
+        guard let element = issue.element else { return false }
+        // Left to Increase Contrast, as on iOS, see docs/accessibility.md.
+        if ["Unknown role", "Contrast nearly passed"].contains(issue.compactDescription) { return false }
+        // The window's title.
+        if element.value as? String == "Oriel OTP" { return false }
+        if [.group, .outline, .popUpButton].contains(element.elementType) { return false }
+        return true
+    }
+
     /// The narrowest window has the code below the name, at any text size.
     @MainActor func testNarrowestWindow() throws {
         for (scale, width) in [("1", 280.0), ("2", 560.0)] {
