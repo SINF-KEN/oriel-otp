@@ -3128,6 +3128,9 @@
         }
       }
     },
+    "Clear search" : {
+      "comment" : "Mac button in the search field above the account list"
+    },
     "Close" : {
       "comment" : "View close button",
       "localizations" : {

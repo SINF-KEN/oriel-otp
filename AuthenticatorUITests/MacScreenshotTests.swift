@@ -152,6 +152,164 @@ final class MacScreenshotTests: XCTestCase {
         }
     }
 
+    /// A sidebar dragged wide and a window made narrow afterwards leave the columns inside the window, first as two
+    /// and then as one. The split view used to be wider than the window, cut off on both sides.
+    @MainActor func testColumnsStayInsideWindow() throws {
+        let window = try relaunch(windowSize: "1100x800")
+        let row = accountRow(in: window)
+        let splitter = window.splitters.firstMatch
+        XCTAssertTrue(splitter.waitForExistence(timeout: 5))
+        let origin = window.coordinate(withNormalizedOffset: .zero)
+        let divider = origin.withOffset(CGVector(dx: splitter.frame.midX - window.frame.minX - 1, dy: 400))
+        divider.click(forDuration: 0.3, thenDragTo: divider.withOffset(CGVector(dx: 700, dy: 0)))
+        try attach("check-wide-sidebar", window)
+        XCTAssertLessThanOrEqual(splitter.frame.maxX, window.frame.maxX - 320, "The details lost their room")
+
+        let corner = origin.withOffset(CGVector(dx: window.frame.width - 1, dy: window.frame.height - 1))
+        corner.click(forDuration: 0.3, thenDragTo: corner.withOffset(CGVector(dx: -350, dy: 0)))
+        try attach("check-narrow-two-columns", window)
+        XCTAssertTrue(splitter.exists, "Still wide enough for two columns")
+        XCTAssertGreaterThanOrEqual(row.frame.minX, window.frame.minX)
+        XCTAssertLessThanOrEqual(splitter.frame.maxX, window.frame.maxX - 320, "The details lost their room")
+
+        let smallerCorner = origin.withOffset(CGVector(dx: window.frame.width - 1, dy: window.frame.height - 1))
+        smallerCorner.click(forDuration: 0.3, thenDragTo: smallerCorner.withOffset(CGVector(dx: -200, dy: 0)))
+        try attach("check-narrow-one-column", window)
+        XCTAssertFalse(splitter.exists, "One column in a window too narrow for two")
+        XCTAssertGreaterThanOrEqual(row.frame.minX, window.frame.minX)
+        XCTAssertLessThanOrEqual(row.frame.maxX, window.frame.maxX)
+    }
+
+    /// In a narrow window the details open over the list, and Back returns to it.
+    @MainActor func testSingleColumnWindow() throws {
+        let window = try relaunch(windowSize: "420x700")
+        XCTAssertFalse(window.splitters.firstMatch.exists)
+        try attach("check-single-column-list", window)
+        XCTAssertTrue(window.buttons["account-row.GitHub:alice@example.com"].exists, "A row is a button, as in two columns")
+        let code = window.descendants(matching: .any)["account-details.code"].firstMatch
+        // Clicking the code copies it without opening the account.
+        accountRow(in: window).coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).click()
+        Thread.sleep(forTimeInterval: 1)
+        XCTAssertFalse(code.exists, "Clicking the code opened the account")
+        accountRow(in: window).click()
+        XCTAssertTrue(code.waitForExistence(timeout: 5))
+        try attach("check-single-column-details", window)
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(code.waitForNonExistence(timeout: 5))
+        XCTAssertTrue(accountRow(in: window).waitForExistence(timeout: 5))
+    }
+
+    /// The arrow keys move through the list in one column too, rather than opening each account they pass.
+    @MainActor func testSingleColumnKeyboard() throws {
+        let window = try relaunch(windowSize: "420x700")
+        accountRow(in: window).click()
+        let code = window.descendants(matching: .any)["account-details.code"].firstMatch
+        XCTAssertTrue(code.waitForExistence(timeout: 5))
+        let github = code.label
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(code.waitForNonExistence(timeout: 5))
+        Thread.sleep(forTimeInterval: 1)
+        // The list has the focus again after going back, without pressing Tab.
+        app.typeKey(.downArrow, modifierFlags: [])
+        Thread.sleep(forTimeInterval: 1)
+        try attach("check-single-column-keyboard", window)
+        XCTAssertFalse(code.exists, "The arrow key opened an account")
+        app.typeKey(.rightArrow, modifierFlags: [])
+        XCTAssertTrue(code.waitForExistence(timeout: 5))
+        XCTAssertNotEqual(code.label, github, "The arrow key didn't move to the next account")
+        try attach("check-single-column-keyboard-opened", window)
+    }
+
+    /// The list has the focus from the start in one column, so the arrow keys work without a click.
+    @MainActor func testSingleColumnFocusAtLaunch() throws {
+        let window = try relaunch(windowSize: "420x700")
+        app.typeKey(.downArrow, modifierFlags: [])
+        Thread.sleep(forTimeInterval: 1)
+        app.typeKey(.rightArrow, modifierFlags: [])
+        XCTAssertTrue(window.descendants(matching: .any)["account-details.code"].firstMatch.waitForExistence(timeout: 5))
+    }
+
+    /// Search Accounts works from the list, right after going back to it and with an account open, again and again.
+    @MainActor func testSingleColumnSearchShortcut() throws {
+        let window = try relaunch(windowSize: "420x700")
+        let code = window.descendants(matching: .any)["account-details.code"].firstMatch
+        let search = window.textFields["accounts.search"]
+        func expectSearchFocused(_ step: String) throws {
+            app.typeKey("f", modifierFlags: .command)
+            Thread.sleep(forTimeInterval: 1.5)
+            app.typeText("goo")
+            Thread.sleep(forTimeInterval: 1)
+            try attach("check-search-\(step)", window)
+            XCTAssertEqual(search.value as? String, "goo", step)
+            app.typeKey(.escape, modifierFlags: [])
+            Thread.sleep(forTimeInterval: 1)
+            XCTAssertNotEqual(search.value as? String, "goo", "Escape clears the search")
+        }
+        try expectSearchFocused("from-list")
+        accountRow(in: window).click()
+        XCTAssertTrue(code.waitForExistence(timeout: 5))
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertTrue(code.waitForNonExistence(timeout: 5))
+        try expectSearchFocused("after-back")
+        accountRow(in: window).click()
+        XCTAssertTrue(code.waitForExistence(timeout: 5))
+        try expectSearchFocused("from-details")
+        try expectSearchFocused("again")
+    }
+
+    /// The search field fits the narrowest window.
+    @MainActor func testSearchFieldFitsNarrowestWindow() throws {
+        let window = try relaunch(windowSize: "280x700")
+        app.typeKey("f", modifierFlags: .command)
+        let search = window.textFields["accounts.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        Thread.sleep(forTimeInterval: 1)
+        app.typeText("goo")
+        Thread.sleep(forTimeInterval: 1)
+        try attach("check-search-narrowest", window)
+        XCTAssertGreaterThanOrEqual(search.frame.minX, window.frame.minX)
+        XCTAssertLessThanOrEqual(search.frame.maxX, window.frame.maxX)
+    }
+
+    /// Bigger text changes to one column at a window size that fits two at 100%.
+    @MainActor func testLargestTextUsesOneColumn() throws {
+        let window = try relaunch(windowSize: "1000x700", arguments: ["-Mac.TextSize", "2"])
+        XCTAssertFalse(window.splitters.firstMatch.exists)
+        try attach("check-largest-text", window)
+        let row = accountRow(in: window)
+        XCTAssertGreaterThanOrEqual(row.frame.minX, window.frame.minX)
+        XCTAssertLessThanOrEqual(row.frame.maxX, window.frame.maxX)
+    }
+
+    /// The narrowest window has the code below the name, at any text size.
+    @MainActor func testNarrowestWindow() throws {
+        for (scale, width) in [("1", 280.0), ("2", 560.0)] {
+            let window = try relaunch(windowSize: "\(Int(width))x700", arguments: ["-Mac.TextSize", scale])
+            XCTAssertEqual(window.frame.width, width)
+            try attach("check-narrowest-\(scale)", window)
+            let row = accountRow(in: window)
+            XCTAssertGreaterThanOrEqual(row.frame.minX, window.frame.minX)
+            XCTAssertLessThanOrEqual(row.frame.maxX, window.frame.maxX)
+        }
+    }
+
+    @MainActor private func relaunch(windowSize: String, arguments: [String] = []) throws -> XCUIElement {
+        app.terminate()
+        app.launchArguments += ["-DemoWindowSize", windowSize] + arguments
+        app.launch()
+        app.activate()
+        let window = app.windows["Oriel OTP"]
+        XCTAssertTrue(window.waitForExistence(timeout: 20))
+        XCTAssertTrue(accountRow(in: window).waitForExistence(timeout: 20))
+        // The window gets its size just after it opens.
+        Thread.sleep(forTimeInterval: 1)
+        return window
+    }
+
+    @MainActor private func accountRow(in window: XCUIElement) -> XCUIElement {
+        window.descendants(matching: .any)["account-row.GitHub:alice@example.com"].firstMatch
+    }
+
     /// Opens the Settings window on a tab. It opens on the tab that was shown last.
     @MainActor private func openSettings(tab: String) throws {
         app.typeKey(",", modifierFlags: .command)

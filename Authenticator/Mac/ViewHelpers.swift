@@ -35,6 +35,46 @@ extension View {
     }
 }
 
+/// The search field above the list in the main window's single column. Escape clears it and leaves it, as in the
+/// system's search field, and it grows with the text, which the system's doesn't.
+struct SingleColumnSearchField: View {
+    @Binding var text: String
+    @Binding var isFocused: Bool
+    @FocusState private var focus: Bool
+
+    var body: some View {
+        HStack(spacing: 6) {
+            TextField(String(localized: "Search"), text: $text)
+                .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled(true)
+                .focused($focus)
+                .accessibilityLabel(String(localized: "Search"))
+                .accessibilityIdentifier("accounts.search")
+                .onExitCommand {
+                    text = ""
+                    focus = false
+                }
+            if !text.isEmpty {
+                Button(action: { text = "" }) {
+                    Label(String(localized: "Clear search", comment: "Mac button in the search field above the account list"), systemImage: "xmark.circle.fill")
+                }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.borderless)
+            }
+        }
+        .scaledBodyFont()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(.bar)
+        .onChange(of: isFocused) { _, isFocused in
+            if isFocused { focus = true }
+        }
+        .onChange(of: focus) { _, focus in
+            isFocused = focus
+        }
+    }
+}
+
 private struct SearchFocusModifier: ViewModifier {
     @Binding var isFocused: Bool
     @FocusState private var focus: Bool
