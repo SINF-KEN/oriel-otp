@@ -64,6 +64,22 @@ final class TapToCopyTests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Copied to clipboard"].exists, "Opening the account copied its code")
     }
 
+    /// With a hardware keyboard on an iPad, which has no menu bar to find these in.
+    @MainActor func testHardwareKeyboardShortcuts() throws {
+        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "For a hardware keyboard on an iPad")
+        app.launchArguments = ["-DemoDate", Self.demoDate]
+        app.launch()
+        let row = try bankRow()
+        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
+        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 10))
+        app.typeKey("c", modifierFlags: .command)
+        XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "⌘C didn't copy the code")
+        app.typeKey("f", modifierFlags: .command)
+        Thread.sleep(forTimeInterval: 1)
+        app.typeText("goo")
+        XCTAssertEqual(app.searchFields.firstMatch.value as? String, "goo", "⌘F didn't go to the search field")
+    }
+
     @MainActor private func assertTapCopies(codeAt offset: CGVector, offsetBy points: CGVector = .zero) throws {
         let row = try bankRow()
         let changeCount = UIPasteboard.general.changeCount

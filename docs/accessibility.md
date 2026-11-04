@@ -16,6 +16,8 @@ search, pin, rename, delete, sync with Ente Auth, the YubiKey settings, and the 
   action instead. On iOS the row's hint says so ("Swipe up or down to copy the code"). After copying, the toast is
   announced, and the row shows a checkmark for a moment.
 - Toasts (copied, synced, touch the YubiKey) are announced. So are a wrong app lock code and a scanned QR code.
+- On the Mac, rows in the main window's single column are buttons too, with an action that opens the account, and the
+  list takes the keyboard focus at launch and after going back.
 - The app lock screen takes the focus and keeps it from the app behind it. Every sheet with Cancel or Close closes
   with the escape gesture (a two-finger Z).
 
@@ -80,6 +82,17 @@ short of that in places, as in Apple's own apps; everything the app draws itself
   red and blue for at least 4.5:1 in both appearances.
 - Every asset color has a high contrast variant, for light and dark mode.
 
+A selected row is highlighted in the accent color, so everything on it changes with it: the code and the account name
+are white, whatever the code's button would otherwise be drawn in, and the letter on the account icon keeps its color,
+as the icon stays light.
+
+With Button Shapes on, the code below the name gets the outline the code beside the name always has.
+
+## Reduced Transparency
+
+The app has no transparency of its own to reduce. The only material is the system's, behind the Mac's toast, and the
+system's materials become opaque with this setting.
+
 ## Reduced Motion
 
 With Reduce Motion on, toasts fade instead of growing and springing, the tutorial's Next and Back swap pages at once,
@@ -88,6 +101,14 @@ so), the QR scanner's checkmark only fades in, the countdown pie steps once a se
 buttons in the YubiKey settings appear without sliding. Fades, which Apple recommends in place of motion, are kept.
 Nothing animates on its own or loops; the countdown only follows the time. The watch's ring steps once a second
 already.
+
+## Keyboard and pointer
+
+On the Mac every action is in the menu bar, see [macos.md](macos.md). In the main window's single column the arrow keys
+move through the list, → opens the selected account, and Back or Escape returns.
+
+On an iPad with a hardware keyboard, ⌘N adds an account, ⌘F goes to the search field, and in the details ⌘C copies the
+code and ⌘R calculates a new one. A pointer highlights the codes, which can be clicked to copy them.
 
 ## Right to left
 
@@ -159,6 +180,9 @@ hand. See [screenshots.md](screenshots.md).
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
+
+The same audits run on an iPad, whose details are beside the list. On the Mac, `testAccessibilityAudit` in
+`AuthenticatorUITests/MacScreenshotTests.swift` audits each layout of the main window at 100% and 200%.
 
 `AuthenticatorUITests/TapToCopyTests.swift` taps the code in a row, beside the name and below it at a larger text size,
 and checks that it's copied without opening the account; also 24 points above the code, for the 44 point target. Tapping

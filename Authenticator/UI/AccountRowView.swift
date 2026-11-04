@@ -31,8 +31,11 @@ struct AccountRowView<Accessory: View>: View {
     private let copyCode: (() -> Void)?
     /// The code has just been copied: a checkmark shows instead of the time left.
     private let isCopied: Bool
+    /// The list highlights the row in the accent color, which the code's button would otherwise be drawn in.
+    private let isSelected: Bool
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    @Environment(\.accessibilityShowButtonShapes) private var showButtonShapes
     /// The placeholder for an expired or not yet calculated code is dimmed, but not so much that it can't be read.
     @State private var isDimmed: Bool
 
@@ -60,11 +63,12 @@ struct AccountRowView<Accessory: View>: View {
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
     
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, @ViewBuilder accessory: () -> Accessory) {
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false, @ViewBuilder accessory: () -> Accessory) {
         self.account = account
         self.showsLocation = showsLocation
         self.copyCode = copyCode
         self.isCopied = isCopied
+        self.isSelected = isSelected
         self.accessory = accessory()
         self.isDimmed = account.state == .expired || account.otp == nil
     }
@@ -112,6 +116,8 @@ struct AccountRowView<Accessory: View>: View {
             HStack {
                 Text(String(account.title.first ?? "?"))
                     .scaledFont(.body)
+                    // Not the row's, which turns white on a selected row, on an icon that stays light.
+                    .foregroundStyle(Color(.label))
                     // Grows with the text, but not so much that it crowds the name out.
                     .frame(width: min(iconSize, 64), height: min(iconSize, 64))
                     .background(account.iconColor)
@@ -156,6 +162,11 @@ struct AccountRowView<Accessory: View>: View {
             // The list makes it taller to tap than it looks, at least the 44 points Apple asks for (TapToCopyTests).
             Button(action: copyCode) { code() }
                 .buttonStyle(.borderless)
+                .tint(isSelected ? Color.white : nil)
+                #if os(iOS)
+                // For a pointer on an iPad.
+                .hoverEffect(.highlight)
+                #endif
                 .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
         } else {
             code()
@@ -221,6 +232,14 @@ struct AccountRowView<Accessory: View>: View {
         .scaledFont(headlineCodeStyle) { $0.monospacedDigit().bold() }
         .foregroundStyle(HierarchicalShapeStyle.primary)
         .contentShape(Rectangle())
+        // The code in the pill has its outline. Here it's only text, which doesn't look like a button.
+        .padding(.horizontal, showButtonShapes ? 8 : 0)
+        .overlay {
+            if showButtonShapes {
+                Capsule()
+                    .stroke(pillColor, lineWidth: 1)
+            }
+        }
         .opacity(isDimmed ? dimmedOpacity : 1)
     }
 
@@ -232,7 +251,8 @@ struct AccountRowView<Accessory: View>: View {
     // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
     // Increase Contrast the way the system's label colors do, so the primary one is used then.
     private var secondaryStyle: HierarchicalShapeStyle {
-        colorSchemeContrast == .increased ? .primary : .secondary
+        // The same with the selected row's highlight, which is too dark for the secondary style.
+        colorSchemeContrast == .increased || isSelected ? .primary : .secondary
     }
 
     private var accessibilityValue: String {
@@ -321,8 +341,8 @@ struct AccountRowView<Accessory: View>: View {
 }
 
 extension AccountRowView where Accessory == EmptyView {
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false) {
-        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied) { EmptyView() }
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false) {
+        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied, isSelected: isSelected) { EmptyView() }
     }
 }
 

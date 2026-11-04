@@ -58,6 +58,7 @@ struct ToastView: View {
 struct ToastModifier: ViewModifier {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var isPresenting: Bool
     var message: String
     
@@ -76,7 +77,8 @@ struct ToastModifier: ViewModifier {
         #if os(macOS)
         let alignment = Alignment.bottom
         #else
-        let alignment = Alignment.top
+        // At the bottom in regular width too, where the top of the screen has the sidebar's toolbar buttons.
+        let alignment = horizontalSizeClass == .regular ? Alignment.bottom : Alignment.top
         #endif
         content
             .overlay(alignment: alignment) {
