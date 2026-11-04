@@ -56,8 +56,10 @@ struct AuthenticatorApp: App {
             .fullScreenCover(isPresented: $notificationsViewModel.showPIVTokenView) {
                 TokenRequestView(userInfo: notificationsViewModel.userInfo)
             }
-            .transaction { transaction in
-                transaction.disablesAnimations = notificationsViewModel.showPIVTokenView
+            // Read here rather than in the closure, which SwiftUI can call off the main actor, and which would crash
+            // if it was isolated to it, as it is by default in `body`.
+            .transaction { @Sendable [disablesAnimations = notificationsViewModel.showPIVTokenView] transaction in
+                transaction.disablesAnimations = disablesAnimations
             }
             .navigationViewStyle(.stack)
             .environment(toastPresenter)
