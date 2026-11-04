@@ -10342,6 +10342,9 @@
         }
       }
     },
+    "Select an account to see its code and details" : {
+      "comment" : "Details column before an account is selected"
+    },
     "Select none" : {
       "comment" : "Ente sync deselect all",
       "localizations" : {

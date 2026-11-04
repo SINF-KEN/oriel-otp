@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# Regenerates the README screenshots in docs/screenshots, or runs the iPhone UI tests and accessibility audits.
+# Regenerates the README screenshots in docs/screenshots, or runs the UI tests and accessibility audits on an iPhone or
+# iPad.
 #
 # Runs the Screenshots scheme's UI tests on a new, empty simulator that is deleted afterwards. The app uses its
 # debug-only simulated YubiKey and fake Ente server, with the clock frozen, so the screenshots only change when
@@ -11,7 +12,7 @@
 #                left, in dark mode and with Increase Contrast. They take about 13 minutes.
 #
 # Usage: tools/screenshots.sh [screenshots] [audits]   (default: screenshots)
-#   DEVICE_TYPE  simulator device type, e.g. "iPhone 17 Pro" (default: the newest iPhone Pro)
+#   DEVICE_TYPE  simulator device type, e.g. "iPad Air 11-inch (M4)" (default: the newest iPhone Pro)
 #   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
 #   RESULT_BUNDLE_PATH  where to keep the tests' result bundles, e.g. to look at a failure (default: not kept). Each
 #                       run of the tests adds its name: Screenshots.xcresult becomes Screenshots-<name>.xcresult.

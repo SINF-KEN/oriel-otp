@@ -96,7 +96,10 @@ final class AccessibilityAuditTests: XCTestCase {
         bank.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
         XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try audit("account details", types)
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        // On an iPad the details are beside the list, without a back button.
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+        }
 
         openMenuItem("Sync from Ente Auth")
         XCTAssertTrue(app.textFields["ente.email"].waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
@@ -207,11 +210,14 @@ final class AccessibilityAuditTests: XCTestCase {
         // out the bar above the keys (Passwords, predictions), so that's added.
         let keyboard = app.keyboards.firstMatch
         let keyboardFrame = keyboard.exists ? keyboard.frame.inset(by: UIEdgeInsets(top: -60, left: 0, bottom: 0, right: 0)) : .null
+        // A sheet on an iPad ends above the bottom of the screen. What it cuts off is measured against what's behind it.
+        let list = app.sheets.count > 0 || UIDevice.current.userInterfaceIdiom == .pad ? app.collectionViews.firstMatch : nil
+        let visibleBottom = list?.exists == true ? list!.frame.maxY : CGFloat.infinity
         var failed = false
         try app.performAccessibilityAudit(for: types) { issue in
             if issue.auditType == .contrast {
                 // Disabled controls are dimmed on purpose and don't need the contrast (WCAG 1.4.3).
-                if let element = issue.element, !element.isEnabled || element.frame.intersects(keyboardFrame) {
+                if let element = issue.element, !element.isEnabled || element.frame.intersects(keyboardFrame) || element.frame.maxY > visibleBottom {
                     return true
                 }
                 if allowsNearlyPassingContrast && issue.compactDescription.localizedCaseInsensitiveContains("nearly passed") {
