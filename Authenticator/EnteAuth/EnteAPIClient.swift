@@ -89,9 +89,9 @@ nonisolated struct EnteAPIClient: Sendable {
 
     static let defaultServer = URL(string: "https://api.ente.io")!
 
-    /// Ente's server tells its apps apart by this header and only lets tokens issued for "io.ente.auth*" use the
-    /// authenticator endpoints. Ente's own CLI sends the same value.
-    static let clientPackage = "io.ente.auth"
+    /// Ente's server sorts clients by the prefix of this header and only lets tokens issued for "io.ente.auth*" use
+    /// the authenticator endpoints. The suffix tells this app apart from Ente's own, which send "io.ente.auth".
+    static let clientPackage = "io.ente.auth.orielotp"
 
     let server: URL
     let session: URLSession

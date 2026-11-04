@@ -151,8 +151,9 @@ gives.
 > showing NFC and USB-C, adding an account by QR code, Ente sync from sign-in to writing to the key, the smart card
 > extension and AutoFill. We can send a YubiKey on request.
 >
-> Ente sync is optional and only signs in to the person's own Ente account, through Ente's public API, the same one
-> Ente's open-source (AGPL-3.0) apps use. The email and sign-in requests go only to Ente, or to the self-hosted server
+> Ente sync is optional and only signs in to the person's own Ente account, through the same API Ente's open-source
+> (AGPL-3.0) apps use. The app is an independent client and identifies itself to Ente's server as
+> `io.ente.auth.orielotp`; the server requires the `io.ente.auth` prefix for the authenticator endpoints. The email and sign-in requests go only to Ente, or to the self-hosted server
 > the person enters, as the sign-in screen says; the password is checked with SRP and never leaves the device. We
 > run no server and receive none of this data, so the App Privacy answer is Data Not Collected. Oriel OTP is not
 > affiliated with Ente.
@@ -175,9 +176,18 @@ gives.
 > a website in the account's details (**AutoFill websites** on the account changes them), and choose the suggested
 > code above the keyboard. Codes of accounts on the YubiKey aren't offered.
 
-Fill in the demo account and attach the video, including AutoFill, before submitting. If App Review asks about guideline 5.2.2 (using
-Ente's service), reply with [Ente's terms](https://ente.com/terms), which don't mention third-party clients, and
-the AGPL-3.0 license of Ente's apps and server, and attach Ente's written permission once we have it.
+Fill in the demo account and attach the video, including AutoFill, before submitting.
+
+If App Review asks about guideline 5.2.2 (using Ente's service), reply with the text below. We don't have Ente's
+permission, so never claim or imply that we do.
+
+> Oriel OTP is an independent client, and we don't have written permission from Ente. People sign in to their own Ente
+> accounts with their own credentials, and Ente's apps and server are open source under AGPL-3.0. The app identifies
+> itself to Ente's server as `io.ente.auth.orielotp`. [Ente's terms](https://ente.com/terms) (updated May 5, 2026)
+> don't mention third-party clients. Section 11(a)(xiii) says not to access Ente's websites or apps "by any means other
+> than through the interface provided by Ente", and the terms count Ente's API as part of its Services, while
+> 11(a)(iv), (v) and (viii) make exceptions for what open-source licenses permit. They don't say whether a client
+> like this one is allowed.
 
 If App Review asks why the smart card extension needs notifications: a CryptoTokenKit extension has no user interface
 and can't open the app, so a local notification is the only way to reach the person when another app asks for a
