@@ -80,6 +80,9 @@ struct AccountRowView<Accessory: View>: View {
             inlineRow
             headlineRow
         }
+        #if os(iOS)
+        .foregroundStyle(isSelected ? selectedColor : Color.primary)
+        #endif
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
         // code is copied with the row's Copy action.
@@ -116,7 +119,7 @@ struct AccountRowView<Accessory: View>: View {
             HStack {
                 Text(String(account.title.first ?? "?"))
                     .scaledFont(.body)
-                    // Not the row's, which turns white on a selected row, on an icon that stays light.
+                    // Not the row's, which changes on a selected row, on an icon that doesn't.
                     .foregroundStyle(Color(.label))
                     // Grows with the text, but not so much that it crowds the name out.
                     .frame(width: min(iconSize, 64), height: min(iconSize, 64))
@@ -162,7 +165,7 @@ struct AccountRowView<Accessory: View>: View {
             // The list makes it taller to tap than it looks, at least the 44 points Apple asks for (TapToCopyTests).
             Button(action: copyCode) { code() }
                 .buttonStyle(.borderless)
-                .tint(isSelected ? Color.white : nil)
+                .tint(isSelected ? selectedColor : nil)
                 #if os(iOS)
                 // For a pointer on an iPad.
                 .hoverEffect(.highlight)
@@ -243,6 +246,16 @@ struct AccountRowView<Accessory: View>: View {
         .opacity(isDimmed ? dimmedOpacity : 1)
     }
 
+    /// What's drawn on a selected row. On iOS the highlight is the accent color, so the background color, like all text on
+    /// it: white would be unreadable on the light pink of dark mode.
+    private var selectedColor: Color {
+        #if os(iOS)
+        Color(.systemBackground)
+        #else
+        Color.white
+        #endif
+    }
+
     /// The part of the code's validity that's left, or none while there's no code.
     private var remaining: Double {
         if case .countingdown(let remaining) = account.state { remaining } else { 0 }
@@ -319,10 +332,11 @@ struct AccountRowView<Accessory: View>: View {
                     .padding(.top, 3.5)
                     .padding(.bottom, -3.5)
             }
-            Text("888 888") // reserves the code width so the pill doesn't resize
-                .foregroundStyle(.clear)
+            // Reserves the code's width so the pill doesn't resize. Hidden rather than clear, which the accessibility
+            // audit would measure as text without contrast.
+            Text("888 888")
                 .padding(.trailing, 4)
-                .accessibilityHidden(true)
+                .hidden()
         }
     }
 

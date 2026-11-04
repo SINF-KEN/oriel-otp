@@ -216,6 +216,9 @@ final class AccessibilityAuditTests: XCTestCase {
         // A sheet on an iPad ends above the bottom of the screen. What it cuts off is measured against what's behind it.
         let list = app.sheets.count > 0 || UIDevice.current.userInterfaceIdiom == .pad ? app.collectionViews.firstMatch : nil
         let visibleBottom = list?.exists == true ? list!.frame.maxY : CGFloat.infinity
+        let isSidebarInDarkMode = UIDevice.current.userInterfaceIdiom == .pad && ["account list", "account details"].contains(screen)
+            && ProcessInfo.processInfo.environment["APPEARANCE"] == "dark"
+        let screenshot = XCUIScreen.main.screenshot().image
         var failed = false
         try app.performAccessibilityAudit(for: types) { issue in
             if issue.auditType == .contrast {
@@ -231,6 +234,14 @@ final class AccessibilityAuditTests: XCTestCase {
                 // system's, on glass too.
                 if let element = issue.element,
                    element.elementType == .button && navigationBarButtons[element.label].exists || element.elementType == .searchField {
+                    return true
+                }
+                // The iPad's sidebar in dark mode is glass, with the details behind it, and the audit fails text level
+                // with what's there, like one Steam code of many or one of two rows in the same color. So what's on
+                // screen decides: the code measures 16.6:1, and white on a light pink selected row 1.6:1. The audit
+                // calls text just short of the contrast it needs nearly passing, 3.1:1 for the secondary labels here.
+                if isSidebarInDarkMode, let element = issue.element, element.elementType == .staticText,
+                   Self.contrast(in: element.frame, of: screenshot) >= (allowsNearlyPassingContrast ? 3 : 4.5) {
                     return true
                 }
             }
@@ -252,6 +263,26 @@ final class AccessibilityAuditTests: XCTestCase {
             attachment.lifetime = .keepAlways
             add(attachment)
         }
+    }
+
+    /// The WCAG contrast between the lightest and darkest pixels in a frame of a screenshot.
+    private static func contrast(in frame: CGRect, of screenshot: UIImage) -> Double {
+        let scale = screenshot.scale
+        let pixels = CGRect(x: frame.minX * scale, y: frame.minY * scale, width: frame.width * scale, height: frame.height * scale)
+        guard let image = screenshot.cgImage?.cropping(to: pixels), let colorSpace = CGColorSpace(name: CGColorSpace.sRGB) else { return 0 }
+        var bytes = [UInt8](repeating: 0, count: image.width * image.height * 4)
+        guard let context = CGContext(data: &bytes, width: image.width, height: image.height, bitsPerComponent: 8, bytesPerRow: image.width * 4,
+                                      space: colorSpace, bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return 0 }
+        context.draw(image, in: CGRect(x: 0, y: 0, width: image.width, height: image.height))
+        func linear(_ byte: UInt8) -> Double {
+            let value = Double(byte) / 255
+            return value <= 0.03928 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4)
+        }
+        let luminances = stride(from: 0, to: bytes.count, by: 4).map {
+            0.2126 * linear(bytes[$0]) + 0.7152 * linear(bytes[$0 + 1]) + 0.0722 * linear(bytes[$0 + 2])
+        }
+        guard let lightest = luminances.max(), let darkest = luminances.min() else { return 0 }
+        return (lightest + 0.05) / (darkest + 0.05)
     }
 }
 
