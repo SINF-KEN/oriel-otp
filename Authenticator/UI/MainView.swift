@@ -37,6 +37,8 @@ struct MainView: View {
     }
     @State var commands = MainWindowCommands.shared
     @State var isSearchFocused = false
+    /// The account open over the list in the single column layout.
+    @State var singleColumnPath: [String] = []
     #else
     @State var selectedAccountID: String? = nil
     #endif
@@ -234,14 +236,106 @@ struct MainView: View {
         }
     }
     
-    private var splitView: some View {
-        @Bindable var model = model
-        return NavigationSplitView {
-            accountList
+    #if os(macOS)
+    /// The narrowest the list and the details get beside each other, in points at 100% text size.
+    private static let minimumColumnWidth: CGFloat = 320
+    /// The narrowest the window gets, in points at 100% text size, where the codes go below the names.
+    private static let minimumWindowWidth: CGFloat = 280
+
+    /// Two columns while both fit, otherwise one, as on an iPhone, which also happens as the text gets bigger. A split
+    /// view doesn't do this itself on the Mac, and when its columns don't fit, it's centered in the window and cut off
+    /// on both sides.
+    private var mainLayout: some View {
+        GeometryReader { reader in
+            let minimumWidth = Self.minimumColumnWidth * textScale
+            if reader.size.width < 2 * minimumWidth {
+                singleColumnView
+            } else {
+                splitView(sidebarWidth: minimumWidth...(reader.size.width - minimumWidth))
+            }
+        }
+    }
+
+    private var singleColumnView: some View {
+        NavigationStack(path: $singleColumnPath) {
+            accountColumn(searchPlacement: .toolbar)
+                .environment(\.opensAccount, OpenAccountAction(path: $singleColumnPath))
+                // The arrow keys only move the selection here, so they can get past an account.
+                .onKeyPress(.rightArrow) {
+                    guard let selectedAccountID else { return .ignored }
+                    singleColumnPath = [selectedAccountID]
+                    return .handled
+                }
+                .navigationDestination(for: String.self) { accountID in
+                    if let account = model.accounts.first(where: { $0.accountId == accountID }) {
+                        accountDetail(account)
+                            // Back to the list with Escape, wherever the focus is.
+                            .background {
+                                Button(action: { singleColumnPath = [] }) { EmptyView() }
+                                    .keyboardShortcut(.cancelAction)
+                                    .opacity(0)
+                                    .accessibilityHidden(true)
+                            }
+                    }
+                }
+        }
+        // The menu bar's commands work on the selection, which the two columns also show when the window gets wider.
+        .onChange(of: singleColumnPath) { _, path in
+            if let accountID = path.last {
+                selectedAccountID = accountID
+            }
+        }
+    }
+
+    private func splitView(sidebarWidth: ClosedRange<CGFloat>) -> some View {
+        NavigationSplitView {
+            accountColumn(searchPlacement: .sidebar)
+                .navigationSplitViewColumnWidth(min: sidebarWidth.lowerBound,
+                                                ideal: min(360 * textScale, sidebarWidth.upperBound),
+                                                max: sidebarWidth.upperBound)
+        } detail: {
+            detailColumn
+        }
+    }
+    #else
+    private var mainLayout: some View {
+        NavigationSplitView {
+            accountColumn()
+                .navigationSplitViewColumnWidth(min: 320, ideal: 360)
+        } detail: {
+            detailColumn
+        }
+    }
+    #endif
+
+    @ViewBuilder private var detailColumn: some View {
+        if let selectedAccount {
+            accountDetail(selectedAccount)
+        } else {
+            Image(systemName: "person.crop.circle")
+                .font(.system(size: placeholderSize))
+                .foregroundStyle(Color(.tertiaryLabel))
+                .accessibilityHidden(true)
+        }
+    }
+
+    private func accountDetail(_ account: Account) -> some View {
+        AccountDetailView(account: account) {
+            selectedAccountID = nil
+        }
+        .id(account.accountId)
+        .scaledBodyFont()
+    }
+
+    /// The account list with its search field, toolbar and title.
+    private func accountColumn(searchPlacement: SearchFieldPlacement = .automatic) -> some View {
+        accountList
             #if os(macOS)
             // Here rather than for the whole window, so the search field keeps the system's size.
             .scaledBodyFont()
-            .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
+            #endif
+            .searchable(text: $searchText, placement: searchPlacement, prompt: String(localized: "Search"))
+            #if os(macOS)
             .searchFocusedBinding($isSearchFocused)
             // Return copies the selected account's code, Delete deletes the selected accounts.
             .onKeyPress(.return) {
@@ -253,8 +347,6 @@ struct MainView: View {
                 guard !AppLock.shared.isLocked else { return }
                 accountsToDelete = selectedAccounts
             }
-            #else
-            .searchable(text: $searchText, prompt: String(localized: "Search"))
             #endif
             .autocorrectionDisabled(true)
             .listStyle(.inset)
@@ -274,30 +366,16 @@ struct MainView: View {
             .toolbar { mainToolbar }
             .navigationTitle(model.hasAccounts ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
             #endif
-            .navigationSplitViewColumnWidth(min: 320 * textScale, ideal: 360 * textScale)
-        } detail: {
-            if let selectedAccount {
-                AccountDetailView(account: selectedAccount) {
-                    selectedAccountID = nil
-                }
-                .id(selectedAccount.accountId)
-                .scaledBodyFont()
-            } else {
-                Image(systemName: "person.crop.circle")
-                    .font(.system(size: placeholderSize))
-                    .foregroundStyle(Color(.tertiaryLabel))
-                    .accessibilityHidden(true)
-            }
-        }
     }
 
     private var presentations: some View {
         @Bindable var model = model
-        return splitView
+        return mainLayout
         .onChange(of: model.accounts.map(\.accountId)) { _, accountIDs in
             // Drop the selection when the account goes away, e.g. the YubiKey was removed or the account deleted.
             #if os(macOS)
             selectedAccountIDs.formIntersection(accountIDs)
+            singleColumnPath.removeAll { !accountIDs.contains($0) }
             #else
             if let selectedAccountID, !accountIDs.contains(selectedAccountID) {
                 self.selectedAccountID = nil
@@ -406,7 +484,7 @@ struct MainView: View {
                 accountsToDelete = []
             }
         }
-        .textScaledFrame(minWidth: 640, minHeight: 420)
+        .textScaledFrame(minWidth: Self.minimumWindowWidth, minHeight: 420)
         #endif
     }
 
@@ -619,7 +697,7 @@ struct MainView: View {
     }
 
     private func accountRow(_ account: Account) -> some View {
-        NavigationLink(value: account.accountId) {
+        AccountRowLink(accountID: account.accountId) {
             #if os(macOS)
             // Copy and pin appear when the pointer is over the row, as there are no swipe actions on the Mac.
             HoverReader { isHovering in
@@ -634,6 +712,8 @@ struct MainView: View {
                         }
                         .labelStyle(.iconOnly)
                         .buttonStyle(.borderless)
+                        // Asks for no room, so the pointer being over a row doesn't change how it's laid out.
+                        .frame(minWidth: 0, idealWidth: 0)
                     }
                 }
             }
@@ -821,6 +901,52 @@ struct MainView: View {
             return model.accounts.filter { $0.title.localizedStandardContains(searchText) ||
                 $0.subTitle?.localizedStandardContains(searchText) == true }
         }
+    }
+}
+
+#if os(macOS)
+/// Opens an account over the list, in the main window's single column.
+struct OpenAccountAction: Equatable {
+    @Binding var path: [String]
+
+    func callAsFunction(_ accountID: String) {
+        path = [accountID]
+    }
+
+    // There's only the one path, so a new action doesn't need to update the rows.
+    static func == (lhs: Self, rhs: Self) -> Bool { true }
+}
+
+extension EnvironmentValues {
+    @Entry var opensAccount: OpenAccountAction?
+}
+#endif
+
+/// A row that opens its account. A link shows it in the split view's details, but in a stack a link also opens whatever
+/// the arrow keys select, so there a click opens it instead.
+private struct AccountRowLink<Label: View>: View {
+    #if os(macOS)
+    @Environment(\.opensAccount) private var opensAccount
+    #endif
+    let accountID: String
+    @ViewBuilder let label: Label
+
+    var body: some View {
+        #if os(macOS)
+        if let opensAccount {
+            label
+                .tag(accountID)
+                .onTapGesture { opensAccount(accountID) }
+        } else {
+            link
+        }
+        #else
+        link
+        #endif
+    }
+
+    private var link: some View {
+        NavigationLink(value: accountID) { label }
     }
 }
 

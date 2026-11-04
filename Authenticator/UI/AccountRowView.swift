@@ -45,18 +45,17 @@ struct AccountRowView<Accessory: View>: View {
     private let titleStyle = Font.TextStyle.body
     private let subtitleStyle = Font.TextStyle.subheadline
     private let codeStyle = Font.TextStyle.title3
+    @ScaledSize(relativeTo: .body) private var minimumNameWidth: CGFloat = 115
     #else
     @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 40
     @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 22
     private let titleStyle = Font.TextStyle.subheadline
     private let subtitleStyle = Font.TextStyle.footnote
     private let codeStyle = Font.TextStyle.body
-    /// The narrowest the name gets beside the code. With less room, e.g. with larger text or on a small iPhone, the
-    /// code goes on its own line below the name instead.
     @ScaledSize(relativeTo: .subheadline) private var minimumNameWidth: CGFloat = 150
+    #endif
     @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3
     private let headlineCodeStyle = Font.TextStyle.title
-    #endif
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
@@ -71,16 +70,11 @@ struct AccountRowView<Accessory: View>: View {
     }
 
     var body: some View {
-        Group {
-            #if os(macOS)
+        // The first that fits: the code beside the name, or below it when the name would get too narrow, e.g. with
+        // larger text, on a small iPhone or in a narrow Mac window.
+        ViewThatFits(in: .horizontal) {
             inlineRow
-            #else
-            // The first that fits: the code beside the name, or below it when the name would get too narrow.
-            ViewThatFits(in: .horizontal) {
-                inlineRow
-                headlineRow
-            }
-            #endif
+            headlineRow
         }
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
@@ -146,15 +140,10 @@ struct AccountRowView<Accessory: View>: View {
                             .foregroundStyle(secondaryStyle)
                     }
                 }
-                #if !os(macOS)
                 // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether
                 // the row fits on one line doesn't depend on how long the name is.
                 .frame(minWidth: 0, idealWidth: minimumNameWidth, maxWidth: .infinity, alignment: .leading)
-                #endif
             }
-            #if os(macOS)
-            Spacer()
-            #endif
             accessory
             copyButton { codePill }
         }
@@ -173,7 +162,6 @@ struct AccountRowView<Accessory: View>: View {
         }
     }
 
-    #if !os(macOS)
     /// The issuer and name on one line, then the code in large type with a bar for the time left.
     private var headlineRow: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -188,9 +176,9 @@ struct AccountRowView<Accessory: View>: View {
                 }
             }
             HStack {
-                accessory
                 copyButton { headlineCode }
                 Spacer(minLength: 0)
+                accessory
             }
             ZStack(alignment: .leading) {
                 Capsule()
@@ -240,7 +228,6 @@ struct AccountRowView<Accessory: View>: View {
     private var remaining: Double {
         if case .countingdown(let remaining) = account.state { remaining } else { 0 }
     }
-    #endif
 
     // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
     // Increase Contrast the way the system's label colors do, so the primary one is used then.
