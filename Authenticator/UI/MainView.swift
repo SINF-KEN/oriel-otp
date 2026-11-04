@@ -36,7 +36,6 @@ struct MainView: View {
         nonmutating set { selectedAccountIDs = newValue.map { [$0] } ?? [] }
     }
     @State var commands = MainWindowCommands.shared
-    @State var isSearchFocused = false
     /// The account open over the list in the single column layout.
     @State var singleColumnPath: [String] = []
     /// For the arrow keys, which only reach the list while it has the focus.
@@ -54,6 +53,7 @@ struct MainView: View {
     @State var showEnteSync: Bool = false
     @State var password: String = ""
     @State var searchText: String = ""
+    @State var isSearchFocused = false
     @State var didEnterBackground = true
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
@@ -332,8 +332,18 @@ struct MainView: View {
         NavigationSplitView {
             accountColumn()
                 .searchable(text: $searchText, prompt: String(localized: "Search"))
+                .searchFocusedBinding($isSearchFocused)
                 .autocorrectionDisabled(true)
-                .navigationSplitViewColumnWidth(min: 320, ideal: 360)
+                // Wide enough on an iPad for a 6 digit code beside the name at the default text size.
+                .navigationSplitViewColumnWidth(min: 320, ideal: 420)
+                // ⌘F with a hardware keyboard. Search Accounts in the menu bar on the Mac.
+                .background {
+                    // Without a label, which the accessibility audit would still see at this opacity.
+                    Button(action: focusSearch) { EmptyView() }
+                        .keyboardShortcut("f")
+                        .opacity(0)
+                        .accessibilityHidden(true)
+                }
         } detail: {
             detailColumn
         }
@@ -344,10 +354,19 @@ struct MainView: View {
         if let selectedAccount {
             accountDetail(selectedAccount)
         } else {
-            Image(systemName: "person.crop.circle")
-                .font(.system(size: placeholderSize))
-                .foregroundStyle(Color(.tertiaryLabel))
-                .accessibilityHidden(true)
+            VStack(spacing: 12) {
+                Image(systemName: "person.crop.circle")
+                    .font(.system(size: placeholderSize))
+                    .foregroundStyle(Color(.tertiaryLabel))
+                    .accessibilityHidden(true)
+                if model.hasAccounts {
+                    Text(String(localized: "Select an account to see its code and details", comment: "Details column before an account is selected"))
+                        .scaledFont(.body)
+                        .foregroundStyle(Color(.secondaryLabel))
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .padding()
         }
     }
 
@@ -730,7 +749,8 @@ struct MainView: View {
             // Copy and pin appear when the pointer is over the row, as there are no swipe actions on the Mac.
             HoverReader { isHovering in
                 AccountRowView(account: account, showsLocation: showsLocation, copyCode: { toastPresenter.copyCode(of: account) },
-                               isCopied: toastPresenter.copiedAccountID == account.accountId) {
+                               isCopied: toastPresenter.copiedAccountID == account.accountId,
+                               isSelected: selectedAccountIDs.contains(account.accountId)) {
                     if isHovering {
                         HStack(spacing: 2) {
                             copyButton(account)
@@ -747,7 +767,8 @@ struct MainView: View {
             }
             #else
             AccountRowView(account: account, showsLocation: showsLocation, copyCode: { toastPresenter.copyCode(of: account) },
-                           isCopied: toastPresenter.copiedAccountID == account.accountId)
+                           isCopied: toastPresenter.copiedAccountID == account.accountId,
+                           isSelected: selectedAccountID == account.accountId)
             #endif
         }
         .listRowSeparator(.hidden)
@@ -854,12 +875,8 @@ struct MainView: View {
             // The search field is on the list, so an account open over it closes first. Set again each time, as the
             // field doesn't report back when it wasn't there to take the focus.
             let delay = singleColumnPath.isEmpty ? Duration.zero : Self.navigationDelay
-            isSearchFocused = false
             singleColumnPath = []
-            Task {
-                try? await Task.sleep(for: delay)
-                isSearchFocused = true
-            }
+            focusSearch(after: delay)
         case .copyCode:
             if let selectedAccount { toastPresenter.copyCode(of: selectedAccount) }
         case .togglePin:
@@ -877,6 +894,18 @@ struct MainView: View {
     }
     #endif
 
+    private func focusSearch() {
+        focusSearch(after: .zero)
+    }
+
+    private func focusSearch(after delay: Duration) {
+        isSearchFocused = false
+        Task {
+            try? await Task.sleep(for: delay)
+            isSearchFocused = true
+        }
+    }
+
     private var addAccountToolbarItem: some CustomizableToolbarContent {
         ToolbarItem(id: "add-account", placement: .primaryAction) {
             // Without a YubiKey to reach, accounts can still be added to Ente Auth.
@@ -885,6 +914,10 @@ struct MainView: View {
             }
             .accessibilityInputLabels(VoiceControlNames.addAccount)
             .accessibilityIdentifier("accounts.add-account")
+            #if os(iOS)
+            // With a hardware keyboard. In the menu bar on the Mac.
+            .keyboardShortcut("n")
+            #endif
             .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
                   : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
             .disabled(!canAddToYubiKey && !model.cloud.isEnabled)
