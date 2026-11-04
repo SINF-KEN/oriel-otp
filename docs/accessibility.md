@@ -36,7 +36,7 @@ All text uses text styles. Icons and images that sit next to text use `@ScaledMe
 would crowd out the text. Screens that can get taller than the display scroll (`scrollsWhenTooTall()`), and on the
 iPhone and iPad the account row puts the issuer and name on one line with the code in large type below it whenever
 the name would get narrower than about 150 points beside the code: from one size up on most iPhones, and at every
-size on an iPhone mini. The app lock's number keys stop growing at a
+size on an iPhone mini. In an iPad's sidebar that's about 110 points, so that a code of 8 digits fits too. The app lock's number keys stop growing at a
 size where three still fit across the smallest iPhone; held, they show the Large Content Viewer, like the navigation
 bar's buttons.
 
