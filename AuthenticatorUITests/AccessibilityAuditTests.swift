@@ -156,7 +156,10 @@ final class AccessibilityAuditTests: XCTestCase {
             }
             XCTAssertEqual(staySignedIn.value as? String, "0", "Stay signed in is still on")
         }
-        for _ in 0..<6 where !email.isHittable {
+        // At the largest text sizes a swipe can stop with the field under the navigation bar. It's still hittable then,
+        // but the tap lands on the bar, and the field doesn't get the focus.
+        let navigationBar = app.navigationBars["Ente Auth"]
+        for _ in 0..<6 where !email.isHittable || email.frame.minY < navigationBar.frame.maxY {
             app.swipeDown()
         }
         email.tap()

@@ -181,6 +181,10 @@ hand. See [screenshots.md](screenshots.md).
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
 
+The Dynamic Type audit steps the app through the text sizes, and rows are recycled as they grow and shrink. Right after
+scrolling a list it reports clipped text and text that doesn't scale with no element, on both an iPhone and an iPad, for
+rows that are fine; a second audit reports nothing. So the tests audit a screen before scrolling it.
+
 The same audits run on an iPad, whose details are beside the list. On the Mac, `testAccessibilityAudit` in
 `AuthenticatorUITests/MacScreenshotTests.swift` audits each layout of the main window at 100% and 200%.
 

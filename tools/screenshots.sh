@@ -9,7 +9,8 @@
 #
 #   screenshots  only the screenshots, in about half a minute after the build
 #   audits       the tap to copy tests and the accessibility audits: in light mode, at the largest text size, right to
-#                left, in dark mode and with Increase Contrast. They take about 13 minutes.
+#                left, in dark mode and with Increase Contrast. They take about 13 minutes. All of them run even when
+#                one fails, and the script then lists what failed and exits with an error.
 #
 # Usage: tools/screenshots.sh [screenshots] [audits]   (default: screenshots)
 #   DEVICE_TYPE  simulator device type, e.g. "iPad Air 11-inch (M4)" (default: the newest iPhone Pro)
@@ -83,8 +84,9 @@ run() {
     for test in "$@"; do
         only+=(-only-testing:"OrielOTPUITests/$test")
     done
-    xcrun simctl ui "$udid" appearance "$appearance"
-    xcrun simctl ui "$udid" increase_contrast "$increase_contrast"
+    # With `|| return`, as set -e doesn't apply when run_audit calls this. A test in the wrong mode would pass anyway.
+    xcrun simctl ui "$udid" appearance "$appearance" || return
+    xcrun simctl ui "$udid" increase_contrast "$increase_contrast" || return
     # xcodebuild passes TEST_RUNNER_ variables to the test without the prefix. A test that fails runs once more: on a
     # busy CI runner the simulator has taken minutes to answer a UI query; a real failure, like an accessibility issue,
     # fails both times.
@@ -95,6 +97,14 @@ run() {
         -retry-tests-on-failure -test-iterations 2 \
         ${RESULT_BUNDLE_PATH:+-resultBundlePath "${RESULT_BUNDLE_PATH%.xcresult}-$name.xcresult"} \
         | "${formatter[@]}"
+}
+
+# Keeps going after a failure, so one failing mode doesn't hide what the others find.
+failed_audits=()
+run_audit() {
+    if ! run "$@"; then
+        failed_audits+=("$1")
+    fi
 }
 
 for group in "${groups[@]}"; do
@@ -113,10 +123,15 @@ for group in "${groups[@]}"; do
             ;;
         audits)
             # The dark mode and Increase Contrast audits skip themselves here.
-            run audits light disabled TapToCopyTests AccessibilityAuditTests
-            run dark dark disabled AccessibilityAuditTests/testDarkAppearance
-            run increased-contrast-light light enabled AccessibilityAuditTests/testIncreasedContrast
-            run increased-contrast-dark dark enabled AccessibilityAuditTests/testIncreasedContrast
+            run_audit audits light disabled TapToCopyTests AccessibilityAuditTests
+            run_audit dark dark disabled AccessibilityAuditTests/testDarkAppearance
+            run_audit increased-contrast-light light enabled AccessibilityAuditTests/testIncreasedContrast
+            run_audit increased-contrast-dark dark enabled AccessibilityAuditTests/testIncreasedContrast
             ;;
     esac
 done
+
+if [[ ${#failed_audits[@]} -gt 0 ]]; then
+    echo "Failed on $DEVICE_TYPE: ${failed_audits[*]}" >&2
+    exit 1
+fi
