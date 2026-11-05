@@ -33,7 +33,7 @@
       "location" : "https://github.com/Yubico/yubikit-swift",
       "state" : {
         "branch" : "release/1.5.0",
-        "revision" : "7b68fdfd960214097eb129724dd9b77a249ad31c"
+        "revision" : "99e4d21c7c9b0692b64f7d988252c5285f557b5f"
       }
     }
   ],

@@ -61,12 +61,14 @@ struct ConfigurationView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        LabeledContent {
-                            Text(deviceInfo.deviceName)
-                        } label: {
-                            HStack {
-                                ListIconView(image: Image("securitykey"), color: Color(.systemGray))
-                                Text("Device type")
+                        if let deviceName = model.deviceName {
+                            LabeledContent {
+                                Text(deviceName)
+                            } label: {
+                                HStack {
+                                    ListIconView(image: Image("securitykey"), color: Color(.systemGray))
+                                    Text("Device type")
+                                }
                             }
                         }
                         LabeledContent {
@@ -293,36 +295,6 @@ struct ListIconView: View {
 }
 
 extension DeviceInfo {
-    var deviceName: String {
-
-        let deviceName: String
-        switch formFactor {
-        case .usbAKeychain:
-            let name: String
-            if version.major == 5 { name = "5" } else
-            if version.major < 4 { name = "NEO" }
-            else { name = "" }
-            deviceName = "YubiKey \(name) NFC"
-            break
-        case .usbCKeychain:
-            deviceName = "YubiKey 5C NFC"
-        case .usbCLightning:
-            deviceName = "YubiKey 5Ci"
-        case .usbCBio, .usbABio:
-            deviceName = "YubiKey Bio"
-        case .usbCNano:
-            deviceName = "YubiKey Nano"
-        default:
-            return "Unknown key"
-        }
-
-        if (fipsCapabilityFlags != 0) || isFIPS {
-            return deviceName + " FIPS"
-        } else {
-            return deviceName
-        }
-    }
-    
     var deviceImage: Image? {
         switch formFactor {
         case .usbAKeychain:

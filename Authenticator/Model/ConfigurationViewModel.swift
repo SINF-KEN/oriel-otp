@@ -27,6 +27,8 @@ import YubiKit
             resetDeviceInfoTask = nil
         }
     }
+    /// The YubiKey's product name, nil if it couldn't be read.
+    private(set) var deviceName: String?
 
     @ObservationIgnored var resetDeviceInfoTask: Task<Void, Never>?
     @ObservationIgnored private var wiredConnectionsTask: Task<Void, Never>?
@@ -47,7 +49,7 @@ import YubiKit
                 }
                 Logger.connection.debug("ConfigurationViewModel: got wired connection")
                 do {
-                    self.deviceInfo = try await connection.managementSession().getDeviceInfo()
+                    try await self.readDevice(connection)
                 } catch {
                     Logger.connection.error("ConfigurationviewModel: got error: \(error)")
                 }
@@ -68,7 +70,7 @@ import YubiKit
         Task {
             do {
                 let connection = try await ConnectionManager.shared.anyConnection()
-                self.deviceInfo = try await connection.managementSession().getDeviceInfo()
+                try await readDevice(connection)
                 ConnectionManager.shared.closeNFC(message: String(localized: "Configuration read", comment: "NFC connection stopped message."))
             } catch where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
@@ -77,6 +79,14 @@ import YubiKit
                 ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)
             }
         }
+    }
+
+    private func readDevice(_ connection: SmartCardConnection) async throws {
+        // Reading the name selects applications on the connection, so it comes before the session.
+        let deviceName = try? await connection.deviceName
+        let deviceInfo = try await connection.managementSession().getDeviceInfo()
+        self.deviceName = deviceName
+        self.deviceInfo = deviceInfo
     }
 
     deinit {
