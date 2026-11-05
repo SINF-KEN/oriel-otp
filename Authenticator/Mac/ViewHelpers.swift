@@ -28,6 +28,36 @@ struct HoverReader<Content: View>: View {
     }
 }
 
+/// Tells when the window around it starts and stops being resized by the user or an animation.
+struct LiveResizeObserver: NSViewRepresentable {
+    let onChange: (_ isResizing: Bool) -> Void
+
+    func makeNSView(context: Context) -> ObserverView {
+        ObserverView()
+    }
+
+    func updateNSView(_ view: ObserverView, context: Context) {
+        view.onChange = onChange
+    }
+
+    final class ObserverView: NSView {
+        var onChange: ((Bool) -> Void)?
+
+        override func viewWillStartLiveResize() {
+            super.viewWillStartLiveResize()
+            onChange?(true)
+        }
+
+        override func viewDidEndLiveResize() {
+            super.viewDidEndLiveResize()
+            // After the other views, which end their resize in the same pass.
+            DispatchQueue.main.async { [weak self] in
+                self?.onChange?(false)
+            }
+        }
+    }
+}
+
 /// The search field above the list in the main window's single column. Escape clears it and leaves it, as in the
 /// system's search field, and it grows with the text, which the system's doesn't.
 struct SingleColumnSearchField: View {
