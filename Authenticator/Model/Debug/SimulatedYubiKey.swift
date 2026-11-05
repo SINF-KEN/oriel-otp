@@ -168,6 +168,10 @@ nonisolated final class SimulatedYubiKeyStorage: @unchecked Sendable {
             let secret = Data(SHA256.hash(data: Data(name.utf8)).prefix(10))
             return Credential(name: Data(name.utf8), typeAndAlgorithm: type | algorithm, digits: digits, secret: secret, requiresTouch: touch, counter: 0)
         }
+        // More accounts than fit in the window, for the UI tests: -DemoExtraAccounts 30.
+        let extraAccounts = (0..<UserDefaults.standard.integer(forKey: "DemoExtraAccounts")).map {
+            credential("Service \($0):alice@example.com")
+        }
         return State(
             salt: Data([0x0d, 0xe0, 0x0d, 0xe0, 0x0d, 0xe0, 0x0d, 0xe0]),
             accessKey: nil,
@@ -180,7 +184,7 @@ nonisolated final class SimulatedYubiKeyStorage: @unchecked Sendable {
                 credential("Steam:alice"),
                 credential("Example HOTP:alice", type: 0x10),
                 credential("Server root"),
-            ],
+            ] + extraAccounts,
             serialNumber: 31_415_926,
             usbEnabled: 0x023b,
             nfcEnabled: 0x023b
