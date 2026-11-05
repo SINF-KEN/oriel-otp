@@ -80,6 +80,8 @@ short of that in places, as in Apple's own apps; everything the app draws itself
   expired or not yet calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
 - Swipe actions have white labels on Favorite, DeleteAction and CopyAction, which are darker than the system yellow,
   red and blue for at least 4.5:1 in both appearances.
+- The app lock's buttons have white labels on UnlockButton, the accent in light mode and a darker pink in dark mode,
+  for at least 4.5:1. The accent itself stays light in dark mode, as the codes are drawn in it.
 - Every asset color has a high contrast variant, for light and dark mode.
 
 A selected row is highlighted in the accent color, so everything on it changes with it: the code and the account name
