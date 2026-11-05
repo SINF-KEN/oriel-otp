@@ -47,11 +47,13 @@ struct EditView: View {
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Rename account field")) {
                         TextField(String(localized: "Issuer", comment: "Rename account field"), text: $issuer)
+                            .formRowTextBox()
                             .submitLabel(.next)
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Rename account field")) {
                         TextField(String(localized: "Account name", comment: "Rename account field"), text: $accountName)
+                            .formRowTextBox()
                             .textInputAutocapitalization(.never)
                             .submitLabel(.done)
                             .focused($focusedField, equals: .accountName)
