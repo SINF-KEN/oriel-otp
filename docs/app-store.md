@@ -190,6 +190,18 @@ permission, so never claim or imply that we do.
 > 11(a)(iv), (v) and (viii) make exceptions for what open-source licenses permit. They don't say whether a client
 > like this one is allowed.
 
+We don't ship hardware to App Review. To answer the Guideline 2.1 request for a demo video and hardware, reply with the
+text below in App Store Connect, once the video link is filled in.
+
+> Thank you for your message. Oriel OTP no longer needs a YubiKey: every account feature can be tested without one by
+> saving an account to **This device**, as the Review Notes explain. The YubiKey is an optional extra, so we aren't
+> sending hardware. The features that do need a key (NFC and USB-C, writing accounts to the key, the smart card
+> extension) are shown in this video, recorded on a real device: `…`.
+
+If Apple still requires hardware, order a YubiKey from a seller in the US and have it delivered straight to the address
+in Apple's message. Nothing is then imported, and Apple only asks for FCC Form 740 on shipments from outside the US.
+The form is the importer's declaration for one shipment, so Yubico doesn't provide it and it means nothing on its own.
+
 If App Review asks why the smart card extension needs notifications: a CryptoTokenKit extension has no user interface
 and can't open the app, so a local notification is the only way to reach the person when another app asks for a
 certificate. Tapping it opens the app to enter the PIN and connect the YubiKey. The notifications are created on the
