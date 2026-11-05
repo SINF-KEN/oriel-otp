@@ -58,6 +58,68 @@ struct LiveResizeObserver: NSViewRepresentable {
     }
 }
 
+/// Starts the scroller of the list it's behind below the section header, which stays at the top of the list while the
+/// rows go under it. `contentMargins` for the scroll indicators does nothing for a list on the Mac.
+struct ListScrollerInset: NSViewRepresentable {
+    /// Whether the list's first row is a section's header.
+    let hasSectionHeader: Bool
+
+    func makeNSView(context: Context) -> InsetView {
+        InsetView()
+    }
+
+    func updateNSView(_ view: InsetView, context: Context) {
+        view.hasSectionHeader = hasSectionHeader
+        // After SwiftUI has updated the list's rows.
+        DispatchQueue.main.async {
+            view.updateInset()
+        }
+    }
+
+    final class InsetView: NSView {
+        var hasSectionHeader = false
+        private weak var table: NSTableView?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            DispatchQueue.main.async { [weak self] in
+                self?.updateInset()
+            }
+        }
+
+        /// The table's frame changes with its rows, whose heights change with the text size.
+        @objc func updateInset() {
+            guard let table = table ?? findTable(), let scrollView = table.enclosingScrollView else { return }
+            let inset = hasSectionHeader && table.numberOfRows > 0 ? table.rect(ofRow: 0).height : 0
+            if scrollView.scrollerInsets.top != inset {
+                scrollView.scrollerInsets.top = inset
+            }
+        }
+
+        /// The nearest table, which is the list's as this view is behind it.
+        private func findTable() -> NSTableView? {
+            var ancestor = superview
+            while let view = ancestor {
+                if let table = Self.table(in: view) {
+                    self.table = table
+                    NotificationCenter.default.addObserver(self, selector: #selector(updateInset),
+                                                           name: NSView.frameDidChangeNotification, object: table)
+                    return table
+                }
+                ancestor = view.superview
+            }
+            return nil
+        }
+
+        private static func table(in view: NSView) -> NSTableView? {
+            if let table = view as? NSTableView {
+                return table
+            }
+            return view.subviews.lazy.compactMap(table(in:)).first
+        }
+    }
+}
+
 /// The search field above the list in the main window's single column. Escape clears it and leaves it, as in the
 /// system's search field, and it grows with the text, which the system's doesn't.
 struct SingleColumnSearchField: View {
