@@ -22,6 +22,8 @@ struct ListStatusView<Actions: View>: View {
     let image: Image
     let message: String
     let height: CGFloat
+    /// The image is a colored drawing rather than a symbol, which is sized by the font.
+    var isArtwork = false
     /// Buttons for what to do next, shown below the message.
     @ViewBuilder let actions: Actions
     @State var showWhatsNew = false
@@ -32,11 +34,20 @@ struct ListStatusView<Actions: View>: View {
             Spacer()
             VStack(spacing: 20) {
                 Spacer()
-                image
-                    // Grows a little with the text, leaving the room to the message at the largest sizes.
-                    .font(.system(size: min(imageSize, 140)))
-                    .foregroundStyle(Color(.symbol))
-                    .accessibilityHidden(true)
+                // Grows a little with the text, leaving the room to the message at the largest sizes.
+                Group {
+                    if isArtwork {
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: min(imageSize, 140))
+                    } else {
+                        image
+                            .font(.system(size: min(imageSize, 140)))
+                            .foregroundStyle(Color(.symbol))
+                    }
+                }
+                .accessibilityHidden(true)
                 Text(message)
                     .scaledFont(.title3)
                     .multilineTextAlignment(.center)
