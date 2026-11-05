@@ -27,14 +27,10 @@ struct AccountDetailView: View {
     let account: Account
     let onDelete: () -> Void
 
-    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
     @State private var showAutoFillWebsites = false
 
-    private let codeColor = Color(.secondaryLabel)
-    @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
-    @ScaledSize(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
     @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
 
     var body: some View {
@@ -87,41 +83,8 @@ struct AccountDetailView: View {
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: 360)
             }
-            Button(action: copyCode) {
-                HStack(spacing: 10) {
-                    statusIcon
-                        .frame(width: statusSize, height: statusSize)
-                        .accessibilityHidden(true)
-                    // Scales with Dynamic Type, and shrinks rather than truncating or wrapping in a narrow column such as
-                    // Slide Over or half of a folded iPhone Duo.
-                    Text(account.formattedCode ?? "*** ***")
-                        .privacySensitive()
-                        .font(.system(size: codeFontSize, weight: .bold))
-                        .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.4)
-                        // Not dimmed with Increase Contrast; the symbol before it still says it's expired.
-                        .opacity(account.state == .expired && colorSchemeContrast != .increased ? 0.4 : 1.0)
-                }
-                .foregroundStyle(codeColor)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 24)
-                .background(Color(.secondarySystemBackground), in: Capsule())
-            }
-            .buttonStyle(.plain)
-            .padding(.top, 12)
-            .accessibilityLabel(account.spokenCode)
-            .accessibilityValue(account.accessibilityCodeState)
-            .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
-            .accessibilityIdentifier("account-details.code")
-            #if os(iOS)
-            // With a hardware keyboard, which the Mac has in its menu bar. Also for a pointer on an iPad.
-            .keyboardShortcut("c")
-            .hoverEffect(.highlight)
-            #endif
-            // The label is the code itself, which can't be said to Voice Control.
-            .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
-                                       String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
+            AccountCodeButton(account: account)
+                .padding(.top, 12)
             Spacer()
             Spacer()
         }
@@ -226,8 +189,62 @@ struct AccountDetailView: View {
             .accessibilityInputLabels(VoiceControlNames.copy)
             .accessibilityIdentifier("account-details.copy")
             .help(String(localized: "Copy the code", comment: "Mac row button help"))
-            .disabled(account.state == .expired || account.otp == nil)
+            .disabled(!account.canCopyCode)
         }
+    }
+
+    private func copyCode() {
+        toastPresenter.copyCode(of: account)
+    }
+}
+
+/// The code with its countdown. A view of its own so the countdown only redraws this: redrawing the details would
+/// rebuild their toolbar every second, and on the Mac that makes the tooltip of the button under the pointer blink.
+private struct AccountCodeButton: View {
+
+    @Environment(ToastPresenter.self) private var toastPresenter
+    @Environment(\.colorSchemeContrast) private var colorSchemeContrast
+    let account: Account
+
+    private let codeColor = Color(.secondaryLabel)
+    @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
+    @ScaledSize(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
+
+    var body: some View {
+        Button(action: { toastPresenter.copyCode(of: account) }) {
+            HStack(spacing: 10) {
+                statusIcon
+                    .frame(width: statusSize, height: statusSize)
+                    .accessibilityHidden(true)
+                // Scales with Dynamic Type, and shrinks rather than truncating or wrapping in a narrow column such as
+                // Slide Over or half of a folded iPhone Duo.
+                Text(account.formattedCode ?? "*** ***")
+                    .privacySensitive()
+                    .font(.system(size: codeFontSize, weight: .bold))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
+                    // Not dimmed with Increase Contrast; the symbol before it still says it's expired.
+                    .opacity(account.state == .expired && colorSchemeContrast != .increased ? 0.4 : 1.0)
+            }
+            .foregroundStyle(codeColor)
+            .padding(.vertical, 12)
+            .padding(.horizontal, 24)
+            .background(Color(.secondarySystemBackground), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(account.spokenCode)
+        .accessibilityValue(account.accessibilityCodeState)
+        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        .accessibilityIdentifier("account-details.code")
+        #if os(iOS)
+        // With a hardware keyboard, which the Mac has in its menu bar. Also for a pointer on an iPad.
+        .keyboardShortcut("c")
+        .hoverEffect(.highlight)
+        #endif
+        // The label is the code itself, which can't be said to Voice Control.
+        .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
+                                   String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
     }
 
     @ViewBuilder private var statusIcon: some View {
@@ -238,10 +255,6 @@ struct AccountDetailView: View {
         case .countingdown(let remaining):
             PieProgressView(progress: remaining, color: codeColor)
         }
-    }
-
-    private func copyCode() {
-        toastPresenter.copyCode(of: account)
     }
 }
 
