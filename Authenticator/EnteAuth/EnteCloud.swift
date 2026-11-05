@@ -374,7 +374,21 @@ import YubiKit
         let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
                                                 period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
         guard !codes.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
-        let rawData = String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self)
+        return insert(rawData: String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self))
+    }
+
+    /// Adds an account kept on this device and uploads it, with its pin and HOTP counter, unless the vault has one
+    /// with the same name.
+    func add(rawData: String) throws -> AddResult {
+        guard vault != nil else { throw EnteAuthenticatorSyncError.signedOut }
+        if let credentialId = EnteCodeParser.parse(id: "", rawData: rawData)?.credentialId,
+           codes.contains(where: { $0.credentialId == credentialId }) {
+            return .alreadyPresent
+        }
+        return insert(rawData: rawData)
+    }
+
+    private func insert(rawData: String) -> AddResult {
         update { _ = $0.add(rawData: rawData) }
         syncChanges()
         return .added

@@ -36,13 +36,19 @@ struct MenuBarAccountsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if !model.hasAccounts {
-                Label {
-                    Text(model.isKeyPluggedIn ? String(localized: "Reading YubiKey…", comment: "Mac menu bar") : String(localized: "Insert YubiKey"))
-                } icon: {
-                    InsertKeyIcon()
+                if model.isKeyPluggedIn {
+                    Label {
+                        Text(String(localized: "Reading YubiKey…", comment: "Mac menu bar"))
+                    } icon: {
+                        InsertKeyIcon()
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+                } else {
+                    Text(String(localized: "No accounts yet", comment: "Account list without accounts"))
+                        .foregroundStyle(.secondary)
+                        .padding(8)
                 }
-                .foregroundStyle(.secondary)
-                .padding(8)
             } else if accounts.isEmpty {
                 Text("No accounts on YubiKey")
                     .foregroundStyle(.secondary)

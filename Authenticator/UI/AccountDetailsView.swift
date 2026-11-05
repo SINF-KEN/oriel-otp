@@ -57,7 +57,7 @@ struct AccountDetailView: View {
                     .foregroundStyle(Color(.secondaryLabel))
                     .multilineTextAlignment(.center)
             }
-            if account.isInEnte || !model.cloudAccounts.isEmpty {
+            if !account.isOnYubiKey || model.showsAccountLocations {
                 Label {
                     Text(account.locationDescription)
                 } icon: {
@@ -80,7 +80,7 @@ struct AccountDetailView: View {
                 .foregroundStyle(Color(.secondaryLabel))
                 .accessibilityLabel(String(localized: "AutoFill websites: \(websites.joined(separator: ", "))", comment: "Account details AutoFill websites, for VoiceOver. The placeholder is a list of websites."))
             }
-            if !account.isInEnte && model.cloud.isEnabled {
+            if account.isOnYubiKey && model.cloud.isEnabled {
                 Text(String(localized: "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.", comment: "Account details of a YubiKey account while signed in to Ente Auth"))
                     .scaledFont(.footnote)
                     .foregroundStyle(Color(.secondaryLabel))
@@ -174,8 +174,7 @@ struct AccountDetailView: View {
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
-                .help(account.isInEnte ? String(localized: "Move the account to the trash in Ente Auth", comment: "Toolbar help")
-                      : String(localized: "Delete the account from the YubiKey", comment: "Toolbar help"))
+                .help(deleteHelp)
                 .accessibilityIdentifier("account-details.delete")
             }
         }
@@ -195,11 +194,21 @@ struct AccountDetailView: View {
                 }
             }
         } message: {
-            if account.isInEnte {
+            if account.isOnDevice {
+                Text(String(localized: "This deletes the account for good, as there is no other copy. You won’t be able to generate codes for it anymore.", comment: "Delete account alert for an account on this device"))
+            } else if account.isInEnte {
                 Text(String(localized: "This moves the account to the trash in Ente Auth on all your devices. You can restore it in the Ente Auth app.", comment: "Delete account alert for an account in Ente Auth"))
             } else {
                 Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
             }
+        }
+    }
+
+    private var deleteHelp: String {
+        switch account.location {
+        case .yubiKey: String(localized: "Delete the account from the YubiKey", comment: "Toolbar help")
+        case .ente: String(localized: "Move the account to the trash in Ente Auth", comment: "Toolbar help")
+        case .device: String(localized: "Delete the account from this device", comment: "Toolbar help")
         }
     }
 
@@ -236,8 +245,9 @@ struct AccountDetailView: View {
     }
 }
 
-/// Copy to YubiKey and Move to YubiKey, for an account in Ente Auth. Moving puts it in Ente's trash once it is on
-/// the YubiKey, so it can still be restored in Ente Auth.
+/// Copy to YubiKey and Move to YubiKey, for an account in Ente Auth or on this device, and Move to Ente Auth for one on
+/// this device. Moving puts an Ente Auth account in Ente's trash once it is on the YubiKey, so it can still be restored
+/// in Ente Auth, and deletes an account on this device once it is in its new place.
 struct CopyToYubiKeyButtons: View {
 
     @Environment(MainViewModel.self) private var model
@@ -245,32 +255,55 @@ struct CopyToYubiKeyButtons: View {
     let account: Account
 
     var body: some View {
-        if account.isInEnte {
+        if !account.isOnYubiKey {
             let canReachYubiKey = DeviceCapabilities.supportsNFC || model.isKeyPluggedIn
             if model.canCopyToYubiKey(account, moving: false) {
                 Button(action: { Self.copy(account, moving: false, model: model, toastPresenter: toastPresenter) }) {
                     Label(String(localized: "Copy to YubiKey", comment: "Menu"), systemImage: "plus.square.on.square")
                 }
-                .help(String(localized: "Put the account on the YubiKey and keep it in Ente Auth", comment: "Toolbar help"))
+                .help(account.isOnDevice ? String(localized: "Put the account on the YubiKey and keep it on this device", comment: "Toolbar help")
+                      : String(localized: "Put the account on the YubiKey and keep it in Ente Auth", comment: "Toolbar help"))
                 .disabled(!canReachYubiKey)
             }
             if model.canCopyToYubiKey(account, moving: true) {
                 Button(action: { Self.copy(account, moving: true, model: model, toastPresenter: toastPresenter) }) {
                     Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.forward.square")
                 }
-                .help(String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help"))
+                .help(account.isOnDevice ? String(localized: "Put the account on the YubiKey and delete it from this device", comment: "Toolbar help")
+                      : String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help"))
                 .disabled(!canReachYubiKey)
+            }
+            if model.canMoveToEnte(account) {
+                Button(action: { Self.moveToEnte(account, model: model, toastPresenter: toastPresenter) }) {
+                    Label(String(localized: "Move to Ente Auth", comment: "Menu"), systemImage: "cloud")
+                }
+                .help(String(localized: "Save the account in Ente Auth and delete it from this device", comment: "Toolbar help"))
             }
         }
     }
 
+    static func moveToEnte(_ account: Account, model: MainViewModel, toastPresenter: ToastPresenter) {
+        do {
+            switch try model.moveToEnte(account) {
+            case .moved:
+                toastPresenter.toast(message: String(localized: "Moved to Ente Auth", comment: "Toast after moving an account from this device to Ente Auth"))
+            case .alreadyInEnte:
+                toastPresenter.toast(message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
+            }
+        } catch {
+            model.sessionError = EnteSyncError(error)
+        }
+    }
+
     static func copy(_ account: Account, moving: Bool, model: MainViewModel, toastPresenter: ToastPresenter) {
+        let wasOnDevice = account.isOnDevice
         model.copyToYubiKey(account, moving: moving) { result in
             switch result {
             case .copied:
                 toastPresenter.toast(message: String(localized: "Copied to the YubiKey", comment: "Toast after copying an Ente Auth account to the YubiKey"))
             case .moved:
-                toastPresenter.toast(message: String(localized: "Moved to the YubiKey. Ente Auth keeps it in the trash.", comment: "Toast after moving an Ente Auth account to the YubiKey"))
+                toastPresenter.toast(message: wasOnDevice ? String(localized: "Moved to the YubiKey", comment: "Toast after moving an account from this device to the YubiKey")
+                                     : String(localized: "Moved to the YubiKey. Ente Auth keeps it in the trash.", comment: "Toast after moving an Ente Auth account to the YubiKey"))
             case .alreadyOnYubiKey:
                 toastPresenter.toast(message: String(localized: "The YubiKey already has an account with this name. Nothing was changed.", comment: "Toast when copying an Ente Auth account to a YubiKey that has one with the same name"))
             }
