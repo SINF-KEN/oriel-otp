@@ -4,7 +4,7 @@ Oriel OTP does not run analytics or advertising and does not collect personal da
 
 ## Data on your device and YubiKey
 
-- OATH credentials are stored on your YubiKey. The app reads them when you use the key and writes credentials to the key when you add them. The app does not keep a server copy.
+- OATH credentials you save to a YubiKey are stored on the key. The app reads them when you use the key and writes credentials to the key when you add them. The app does not keep a server copy.
 - QR scanning starts only when you choose to scan. The app reads the QR code on the device to prepare the account you are adding; it does not save or send the camera image.
 - On the Mac, Scan QR Code on Screen opens the system's window picker when you click it. The app gets one picture of the window you pick, and nothing else on the screen, and does not need the screen recording permission. It looks for a QR code in the picture on the Mac and does not save or send it. Pasted, dropped and imported pictures are handled the same way.
 - On iPhone and iPad, a copied code stays on the device: it isn't shared with your other devices through Universal Clipboard, and is removed from the clipboard after a minute.
@@ -30,6 +30,10 @@ When you stay signed in (see below), the app works as an independent Ente Auth c
 Staying signed in is on by default when the device can protect the session, and you can turn it off before signing in. When on, the app stores an Ente session token and your Ente authenticator key, which decrypts your Ente Auth accounts, in the device keychain. If your Ente account has never used Ente Auth and so has no authenticator key yet, the app creates one on your device, like Ente Auth does, and uploads it to Ente encrypted with your master key. The token and key stay on this device and can only be read after Face ID or Touch ID with the current enrollment on iPhone and iPad, or Touch ID or your Mac's password on the Mac. The app also stores the account email and server address in local app preferences so the saved account can be shown in the settings without unlocking. If Ente's server rejects the session, the token and key are deleted and the email and server are kept so you can enter your password again. If you enter a self-hosted server address, it is saved in local app preferences and remains after sign-out. The app never stores your Ente password or your Ente master key.
 
 While you stay signed in, the copy of your Ente Auth accounts, including their secrets, and any changes not yet uploaded, are kept in a file in the app's storage on the device. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked, without Face ID or Touch ID, so the codes are shown at once and work offline. The file is excluded from backups. If Ente's server rejects the session, the copy is kept so the codes keep working until you sign in again or sign out.
+
+## Accounts on this device
+
+Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device. Deleting an account removes it for good. AutoFill and the Apple Watch app don't use these accounts.
 
 ## App lock
 

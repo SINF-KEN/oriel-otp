@@ -31,6 +31,8 @@ import YubiKit
         case yubiKey
         /// In the Ente Auth vault on this device, with the id of the vault item. Its codes are calculated by the app.
         case ente(id: String)
+        /// Only on this device, with the id of the item in `DeviceAccounts`. Its codes are calculated by the app.
+        case device(id: String)
     }
 
     var otp: OATHSession.OTP?
@@ -51,6 +53,7 @@ import YubiKit
         switch location {
         case .yubiKey: credential.id
         case .ente(let id): "ente/" + id
+        case .device(let id): "device/" + id
         }
     }
     var credential: OATHSession.Credential
@@ -92,10 +95,20 @@ import YubiKit
         requestRefresh(self)
     }
     
-    var isInEnte: Bool { location != .yubiKey }
+    var isOnYubiKey: Bool { location == .yubiKey }
+
+    var isInEnte: Bool {
+        if case .ente = location { return true }
+        return false
+    }
+
+    var isOnDevice: Bool {
+        if case .device = location { return true }
+        return false
+    }
 
     /// Renaming on a YubiKey needs firmware 5.3 or later.
-    var canRename: Bool { isInEnte || keyVersion >= Version("5.3.0")! }
+    var canRename: Bool { !isOnYubiKey || keyVersion >= Version("5.3.0")! }
 
     func updateTitles() {
         title = credential.title
@@ -200,8 +213,8 @@ extension Account: Comparable {
 
     /// By name, the YubiKey's account first when the same name is in Ente Auth too.
     static func < (lhs: Account, rhs: Account) -> Bool {
-        return (lhs.credential.id.lowercased(), lhs.isInEnte ? 1 : 0, lhs.accountId.lowercased())
-            < (rhs.credential.id.lowercased(), rhs.isInEnte ? 1 : 0, rhs.accountId.lowercased())
+        return (lhs.credential.id.lowercased(), lhs.isOnYubiKey ? 0 : 1, lhs.accountId.lowercased())
+            < (rhs.credential.id.lowercased(), rhs.isOnYubiKey ? 0 : 1, rhs.accountId.lowercased())
     }
 }
 
