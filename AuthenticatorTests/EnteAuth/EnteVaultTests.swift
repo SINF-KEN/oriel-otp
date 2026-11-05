@@ -350,7 +350,7 @@ struct EnteVaultTests {
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=\(rfcSecret)",
                                      "otpauth://hotp/VPN:alice?secret=\(rfcSecret)&counter=0",
                                      "otpauth://totp/Old:alice?secret=\(rfcSecret)&codeDisplay=%7B%22trashed%22%3Atrue%7D"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(model.cloudAccounts.map(\.title) == ["GitHub", "VPN"])
         #expect(model.accounts.allSatisfy { $0.isInEnte })
         #expect(model.hasAccounts)
@@ -374,7 +374,7 @@ struct EnteVaultTests {
 
     @Test func changesGoToTheVault() throws {
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         let github = try #require(model.cloudAccounts.first { $0.title == "GitHub" })
 
         github.isPinned = true
@@ -414,7 +414,7 @@ struct EnteVaultTests {
 
         // Launched in the background while the device is locked.
         let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(!cloud.isEnabled)
         #expect(model.cloudAccounts.isEmpty)
 
@@ -430,7 +430,7 @@ struct EnteVaultTests {
                                      "otpauth://hotp/VPN:alice?secret=JBSWY3DPEHPK3PXP&counter=5",
                                      "otpauth://steam/Steam:alice?secret=JBSWY3DPEHPK3PXP",
                                      "otpauth://totp/Long:alice?secret=JBSWY3DPEHPK3PXP&digits=10"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         func account(_ title: String) throws -> Account { try #require(model.cloudAccounts.first { $0.title == title }) }
 
         let github = try account("GitHub")
@@ -456,7 +456,7 @@ struct EnteVaultTests {
 
     @Test func sortsTheAccountsByName() throws {
         let cloud = try cloud(with: ["otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(model.accounts.map(\.title) == ["A", "B"])
     }
 }

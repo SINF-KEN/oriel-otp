@@ -1,8 +1,12 @@
 # Oriel OTP support
 
-Oriel OTP shows the one-time codes stored on a YubiKey and can copy accounts from
-[Ente Auth](https://ente.io/auth) onto the key. It needs iOS or iPadOS 18 or later, or macOS 15 or later, and a
-YubiKey with the OATH application, such as the YubiKey 5 Series. The optional Apple Watch app needs watchOS 10 or later.
+Oriel OTP shows one-time codes for accounts kept on your device, in [Ente Auth](https://ente.io/auth) or on a YubiKey,
+and can copy Ente Auth accounts onto a key. It needs iOS or iPadOS 18 or later, or macOS 15 or later. A YubiKey is
+optional, and needs the OATH application, such as the YubiKey 5 Series. The optional Apple Watch app needs watchOS 10 or
+later.
+
+Accounts saved on **This device** aren't in backups or iCloud, so they're lost with the device. Keep each service's
+recovery codes, or use **Move to Ente Auth** or **Move to YubiKey** in the account's menu.
 
 - On iPhone, the YubiKey connects over NFC or USB-C. YubiKeys can't connect through a Lightning port; on an iPhone
   with Lightning, use NFC.

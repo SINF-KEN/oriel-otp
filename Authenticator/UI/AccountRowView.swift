@@ -352,14 +352,16 @@ extension AccountRowView where Accessory == EmptyView {
     }
 }
 
-/// A key for an account on the YubiKey, a cloud for one in Ente Auth, and a clock while a change to an Ente Auth
-/// account waits to be uploaded.
+/// A key for an account on the YubiKey, a drive for one on this device, a cloud for one in Ente Auth, and a clock while
+/// a change to an Ente Auth account waits to be uploaded.
 struct AccountLocationIcon: View {
     let account: Account
 
     var body: some View {
         Group {
-            if account.isInEnte {
+            if account.isOnDevice {
+                Image(systemName: "internaldrive")
+            } else if account.isInEnte {
                 Image(systemName: account.isPendingSync ? "clock.arrow.circlepath" : "cloud")
             } else {
                 Image("securitykey")
@@ -401,8 +403,10 @@ extension Account {
     }
 
     var locationDescription: String {
-        if !isInEnte {
+        if isOnYubiKey {
             String(localized: "Stored on YubiKey", comment: "Where an account is stored")
+        } else if isOnDevice {
+            String(localized: "Stored on this device", comment: "Where an account is stored")
         } else if isPendingSync {
             String(localized: "Stored in Ente Auth, not synced yet", comment: "Where an account is stored, for an Ente Auth account with changes that haven't been uploaded")
         } else {

@@ -62,10 +62,15 @@ adding stops and an alert names the accounts that weren't added.
 
 ## Adding to Ente Auth
 
-The *Add account* sheet has a **Save to** choice: **YubiKey**, **Ente Auth** or **YubiKey and Ente Auth**
-(`AccountDestinations`). It is offered when a YubiKey can be reached (NFC, or one plugged in) and you have signed in
-with **Stay signed in**. The last choice is remembered (`AddAccount.Destinations`; the earlier *Also add to Ente Auth*
-switch is carried over). Without a YubiKey to reach, the add button saves to Ente Auth; signed out, to the YubiKey.
+The *Add account* sheet has a **Save to** choice: **This device**, **YubiKey**, **Ente Auth** or **YubiKey and Ente
+Auth** (`AccountDestinations`). **This device** is always there; the others are offered when a YubiKey can be reached
+(NFC, or one plugged in) or you have signed in with **Stay signed in**. The last choice is remembered
+(`AddAccount.Destinations`; the earlier *Also add to Ente Auth* switch is carried over). With neither a YubiKey nor an
+Ente account, the account is saved on this device.
+
+Accounts on this device (`DeviceAccounts`) have their own encrypted file, apart from the vault, which is replaced when
+another Ente account signs in. They stay when signing out of Ente, and **Move to Ente Auth** uploads one with its pin
+and counter.
 
 A YubiKey never gives its OATH secrets back, so an account that is already on a key can't be copied to Ente. The app
 only has the secret while an account is being added, and the sheet says so when only the YubiKey is chosen. The
