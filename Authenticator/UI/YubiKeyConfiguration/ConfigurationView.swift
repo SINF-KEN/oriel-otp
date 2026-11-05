@@ -80,7 +80,7 @@ struct ConfigurationView: View {
                             }
                         }
                         LabeledContent {
-                            Text(deviceInfo.version.description)
+                            Text(deviceInfo.firmwareDescription)
                         } label: {
                             HStack {
                                 ListIconView(image: Image(systemName: "cpu"), color: Color(.systemGray), padding: 5)
@@ -295,6 +295,22 @@ struct ListIconView: View {
 }
 
 extension DeviceInfo {
+    /// The firmware version, with the release stage and build of prerelease firmware.
+    var firmwareDescription: String {
+        Self.firmwareDescription(version: version, releaseType: versionQualifier.releaseType, iteration: versionQualifier.iteration)
+    }
+
+    static func firmwareDescription(version: Version, releaseType: VersionQualifier.ReleaseType, iteration: UInt32) -> String {
+        switch releaseType {
+        case .alpha:
+            return "\(version)-alpha.\(iteration)"
+        case .beta:
+            return "\(version)-beta.\(iteration)"
+        case .final:
+            return version.description
+        }
+    }
+
     var deviceImage: Image? {
         switch formFactor {
         case .usbAKeychain:

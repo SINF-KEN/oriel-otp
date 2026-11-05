@@ -33,6 +33,17 @@ struct YubiKitExtensionsTests {
         #expect(newer > older)
     }
 
+    @Test(arguments: [
+        (DeviceInfo.VersionQualifier.ReleaseType.alpha, UInt32(1), "5.8.0-alpha.1"),
+        (.beta, 2, "5.8.0-beta.2"),
+        (.final, 0, "5.8.0"),
+        (.final, 3, "5.8.0"),
+    ])
+    func firmwareDescription(releaseType: DeviceInfo.VersionQualifier.ReleaseType, iteration: UInt32, expected: String) throws {
+        let version = try #require(Version("5.8.0"))
+        #expect(DeviceInfo.firmwareDescription(version: version, releaseType: releaseType, iteration: iteration) == expected)
+    }
+
     @Test func versionEquality() throws {
         let version = try #require(Version("3.1.4"))
         #expect(version == Version("3.1.4"))

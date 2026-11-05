@@ -285,9 +285,14 @@ extension ConnectionManager {
         for device in devices {
             do {
                 let connection = try await HIDFIDOConnection(device: device)
-                if try await Management.Session.makeSession(connection: connection).getDeviceInfo().serialNumber == serialNumber {
-                    Logger.connection.debug("ConnectionManager: FIDO interface at USB location \(device.locationID)")
-                    return connection
+                do {
+                    if try await Management.Session.makeSession(connection: connection).getDeviceInfo().serialNumber == serialNumber {
+                        Logger.connection.debug("ConnectionManager: FIDO interface at USB location \(device.locationID)")
+                        return connection
+                    }
+                } catch {
+                    await connection.close(error: nil)
+                    throw error
                 }
                 await connection.close(error: nil)
             } catch {
