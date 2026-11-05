@@ -43,7 +43,7 @@
 	<key>NFCReaderUsageDescription</key>
 	<string>Hold your YubiKey to your device to get codes and add accounts over NFC.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Scan QR codes to add accounts to your YubiKey.</string>
+	<string>Scan QR codes to add accounts.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to unlock the app if you lock it, the YubiKey passwords and the optional Ente Auth session saved on this device.</string>
 	<key>UILaunchStoryboardName</key>

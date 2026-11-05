@@ -1933,35 +1933,6 @@
         }
       }
     },
-    "Allow Oriel OTP to record the screen in System Settings, under Privacy & Security > Screen & System Audio Recording. It only looks for a QR code and doesn't keep the picture." : {
-      "comment" : "Mac QR scan error",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Erlauben Sie Oriel OTP die Bildschirmaufnahme in den Systemeinstellungen unter „Datenschutz & Sicherheit“ > „Bildschirm- & Systemaudioaufnahme“. Es sucht nur nach einem QR-Code und behält das Bild nicht."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autorisez Oriel OTP à enregistrer l’écran dans Réglages Système, sous Confidentialité et sécurité > Enregistrement de l’écran et de l’audio du système. L’app cherche seulement un code QR et ne conserve pas l’image."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "システム設定の「プライバシーとセキュリティ」>「画面とシステムオーディオの録音」で、Oriel OTPに画面の収録を許可してください。QRコードを探すだけで、画像は保存しません。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "V Systémových nastaveniach v časti Súkromie a bezpečnosť > Nahrávanie obrazovky a systémového zvuku povoľte aplikácii Oriel OTP nahrávať obrazovku. Hľadá iba QR kód a obrázok si neuchováva."
-          }
-        }
-      }
-    },
     "Allow notifications" : {
       "comment" : "PIV extension notifications explanation title",
       "localizations" : {
@@ -3156,6 +3127,9 @@
           }
         }
       }
+    },
+    "Clear search" : {
+      "comment" : "Mac button in the search field above the account list"
     },
     "Close" : {
       "comment" : "View close button",
@@ -4609,6 +4583,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "E-mail"
+          }
+        }
+      }
+    },
+    "Email support" : {
+      "comment" : "About: button that opens an email to the developer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Support per E-Mail"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Contacter par e-mail"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "メールでサポートに問い合わせる"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Napísať podpore e-mail"
           }
         }
       }
@@ -7896,35 +7899,6 @@
         }
       }
     },
-    "Open System Settings" : {
-      "comment" : "Mac add account QR code error",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Systemeinstellungen öffnen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouvrir Réglages Système"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "システム設定を開く"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Otvoriť Systémové nastavenia"
-          }
-        }
-      }
-    },
     "Open at login" : {
       "comment" : "Mac setting",
       "localizations" : {
@@ -10482,6 +10456,9 @@
         }
       }
     },
+    "Select an account to see its code and details" : {
+      "comment" : "Details column before an account is selected"
+    },
     "Select none" : {
       "comment" : "Ente sync deselect all",
       "localizations" : {
@@ -11747,6 +11724,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Časový interval tohto účtu YubiKey nepodporuje."
+          }
+        }
+      }
+    },
+    "That window couldn't be read. Copy the QR code or drop a picture of it here instead." : {
+      "comment" : "Mac QR scan error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses Fenster konnte nicht gelesen werden. Kopieren Sie stattdessen den QR-Code oder ziehen Sie ein Bild davon hierher."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cette fenêtre n’a pas pu être lue. Copiez plutôt le code QR ou déposez-en une image ici."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "そのウインドウを読み取れませんでした。代わりにQRコードをコピーするか、その画像をここにドロップしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Toto okno sa nepodarilo prečítať. Namiesto toho skopírujte QR kód alebo sem presuňte jeho obrázok."
           }
         }
       }

@@ -31,10 +31,12 @@ struct AccountRowView<Accessory: View>: View {
     private let copyCode: (() -> Void)?
     /// The code has just been copied: a checkmark shows instead of the time left.
     private let isCopied: Bool
+    /// The list highlights the row in the accent color, which the code's button would otherwise be drawn in.
+    private let isSelected: Bool
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
-    /// An expired or not yet calculated code is dimmed, but not so much that it can't be read.
+    @Environment(\.accessibilityShowButtonShapes) private var showButtonShapes
+    /// The placeholder for an expired or not yet calculated code is dimmed, but not so much that it can't be read.
     @State private var isDimmed: Bool
 
     @State private var animate: Bool = true
@@ -46,42 +48,43 @@ struct AccountRowView<Accessory: View>: View {
     private let titleStyle = Font.TextStyle.body
     private let subtitleStyle = Font.TextStyle.subheadline
     private let codeStyle = Font.TextStyle.title3
+    @ScaledSize(relativeTo: .body) private var minimumNameWidth: CGFloat = 115
     #else
     @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 40
     @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 22
     private let titleStyle = Font.TextStyle.subheadline
     private let subtitleStyle = Font.TextStyle.footnote
     private let codeStyle = Font.TextStyle.body
-    /// The narrowest the name gets beside the code. With less room, e.g. with larger text or on a small iPhone, the
-    /// code goes on its own line below the name instead.
-    @ScaledSize(relativeTo: .subheadline) private var minimumNameWidth: CGFloat = 150
+    @ScaledSize(relativeTo: .subheadline) private var phoneMinimumNameWidth: CGFloat = 150
+    @ScaledSize(relativeTo: .subheadline) private var sidebarMinimumNameWidth: CGFloat = 110
+    /// Less in an iPad's sidebar, whose width the system limits, so an 8 digit code fits beside the name like the others.
+    /// By the device, as a sidebar's size class is compact.
+    private var minimumNameWidth: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .pad ? sidebarMinimumNameWidth : phoneMinimumNameWidth
+    }
+    #endif
     @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3
     private let headlineCodeStyle = Font.TextStyle.title
-    #endif
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
     
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, @ViewBuilder accessory: () -> Accessory) {
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false, @ViewBuilder accessory: () -> Accessory) {
         self.account = account
         self.showsLocation = showsLocation
         self.copyCode = copyCode
         self.isCopied = isCopied
+        self.isSelected = isSelected
         self.accessory = accessory()
         self.isDimmed = account.state == .expired || account.otp == nil
     }
 
     var body: some View {
-        Group {
-            #if os(macOS)
+        // The first that fits: the code beside the name, or below it when the name would get too narrow, e.g. with
+        // larger text, on a small iPhone or in a narrow Mac window.
+        ViewThatFits(in: .horizontal) {
             inlineRow
-            #else
-            // The first that fits: the code beside the name, or below it when the name would get too narrow.
-            ViewThatFits(in: .horizontal) {
-                inlineRow
-                headlineRow
-            }
-            #endif
+            headlineRow
         }
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
@@ -119,6 +122,8 @@ struct AccountRowView<Accessory: View>: View {
             HStack {
                 Text(String(account.title.first ?? "?"))
                     .scaledFont(.body)
+                    // Not the row's, which turns white on a selected row, on an icon that stays light.
+                    .foregroundStyle(Color(.label))
                     // Grows with the text, but not so much that it crowds the name out.
                     .frame(width: min(iconSize, 64), height: min(iconSize, 64))
                     .background(account.iconColor)
@@ -147,15 +152,10 @@ struct AccountRowView<Accessory: View>: View {
                             .foregroundStyle(secondaryStyle)
                     }
                 }
-                #if !os(macOS)
                 // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether
                 // the row fits on one line doesn't depend on how long the name is.
                 .frame(minWidth: 0, idealWidth: minimumNameWidth, maxWidth: .infinity, alignment: .leading)
-                #endif
             }
-            #if os(macOS)
-            Spacer()
-            #endif
             accessory
             copyButton { codePill }
         }
@@ -168,13 +168,17 @@ struct AccountRowView<Accessory: View>: View {
             // The list makes it taller to tap than it looks, at least the 44 points Apple asks for (TapToCopyTests).
             Button(action: copyCode) { code() }
                 .buttonStyle(.borderless)
+                .tint(isSelected ? Color.white : nil)
+                #if os(iOS)
+                // For a pointer on an iPad.
+                .hoverEffect(.highlight)
+                #endif
                 .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
         } else {
             code()
         }
     }
 
-    #if !os(macOS)
     /// The issuer and name on one line, then the code in large type with a bar for the time left.
     private var headlineRow: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -189,9 +193,9 @@ struct AccountRowView<Accessory: View>: View {
                 }
             }
             HStack {
-                accessory
                 copyButton { headlineCode }
                 Spacer(minLength: 0)
+                accessory
             }
             ZStack(alignment: .leading) {
                 Capsule()
@@ -234,6 +238,14 @@ struct AccountRowView<Accessory: View>: View {
         .scaledFont(headlineCodeStyle) { $0.monospacedDigit().bold() }
         .foregroundStyle(HierarchicalShapeStyle.primary)
         .contentShape(Rectangle())
+        // The code in the pill has its outline. Here it's only text, which doesn't look like a button.
+        .padding(.horizontal, showButtonShapes ? 8 : 0)
+        .overlay {
+            if showButtonShapes {
+                Capsule()
+                    .stroke(pillColor, lineWidth: 1)
+            }
+        }
         .opacity(isDimmed ? dimmedOpacity : 1)
     }
 
@@ -241,12 +253,12 @@ struct AccountRowView<Accessory: View>: View {
     private var remaining: Double {
         if case .countingdown(let remaining) = account.state { remaining } else { 0 }
     }
-    #endif
 
     // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
     // Increase Contrast the way the system's label colors do, so the primary one is used then.
     private var secondaryStyle: HierarchicalShapeStyle {
-        colorSchemeContrast == .increased ? .primary : .secondary
+        // The same with the selected row's highlight, which is too dark for the secondary style.
+        colorSchemeContrast == .increased || isSelected ? .primary : .secondary
     }
 
     private var accessibilityValue: String {
@@ -306,8 +318,6 @@ struct AccountRowView<Accessory: View>: View {
             if let otp = account.formattedCode {
                 Text(otp)
                     .privacySensitive()
-                    // Crossed out as well as dimmed, as a shade is easy to miss.
-                    .strikethrough(differentiateWithoutColor && account.state == .expired)
                     .padding(.trailing, 4)
             } else {
                 Text("*** *** ")
@@ -337,8 +347,8 @@ struct AccountRowView<Accessory: View>: View {
 }
 
 extension AccountRowView where Accessory == EmptyView {
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false) {
-        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied) { EmptyView() }
+    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false) {
+        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied, isSelected: isSelected) { EmptyView() }
     }
 }
 

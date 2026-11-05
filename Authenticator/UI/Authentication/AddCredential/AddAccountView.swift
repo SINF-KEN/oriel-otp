@@ -234,12 +234,7 @@ struct AddAccountView: View {
             }
             #if os(macOS)
             .alert(String(localized: "Couldn't read a QR code", comment: "Mac add account QR code error title"),
-                   isPresented: Binding(get: { qrCodeError != nil }, set: { if !$0 { qrCodeError = nil } }), presenting: qrCodeError) { error in
-                if case .noScreenRecordingPermission = error {
-                    Button(String(localized: "Open System Settings", comment: "Mac add account QR code error")) {
-                        Platform.open(QRCodeReader.screenRecordingSettings)
-                    }
-                }
+                   isPresented: Binding(get: { qrCodeError != nil }, set: { if !$0 { qrCodeError = nil } }), presenting: qrCodeError) { _ in
                 Button("OK", role: .cancel) { }
             } message: { error in
                 Text(error.localizedDescription)
@@ -355,7 +350,7 @@ struct AddAccountView: View {
     private var qrCodeSection: some View {
         Section {
             Button {
-                readQRCode { try await QRCodeReader.scanScreen() }
+                readQRCode { try await QRCodeReader.scanWindow() }
             } label: {
                 Label(String(localized: "Scan QR Code on Screen", comment: "Mac add account button"), systemImage: "qrcode.viewfinder")
             }
@@ -382,6 +377,8 @@ struct AddAccountView: View {
                 mode = .prefilled
             } catch let error as QRCodeReader.ReadError {
                 qrCodeError = error
+            } catch is CancellationError {
+                // The window picker was cancelled.
             } catch {
                 errorMessage = error.localizedDescription
             }

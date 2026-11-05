@@ -1,0 +1,49 @@
+name: Accessibility
+
+# Runs the accessibility audits and tap to copy tests on an iPhone and an iPad: in light mode, at the largest text size,
+# right to left, in dark mode and with Increase Contrast. It takes two macOS runners for about 20 minutes each, so it
+# only runs by hand: before a release, or after changing a screen's layout or colors. See docs/accessibility.md.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audits:
+    name: ${{ matrix.name }} audits
+    runs-on: xcode-27
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The script picks the newest iPhone Pro.
+          - name: iPhone
+            device: ""
+          # The details are beside the list, and sheets don't fill the screen, so an iPad has its own layout.
+          - name: iPad
+            device: iPad Air 11-inch (M4)
+    steps:
+      - uses: actions/checkout@v7
+      - name: Resolve Swift packages
+        id: packages
+        timeout-minutes: 15
+        uses: ./.github/actions/swift-packages
+      - name: Run the audits
+        env:
+          DEVICE_TYPE: ${{ matrix.device }}
+          SOURCE_PACKAGES_DIR: ${{ steps.packages.outputs.path }}
+          RESULT_BUNDLE_PATH: ${{ runner.temp }}/results/Audits.xcresult
+        run: tools/screenshots.sh audits
+      # The result bundles have the failing test's log and a screenshot of where it stopped.
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: audit-test-results-${{ matrix.name }}
+          path: ${{ runner.temp }}/results

@@ -220,6 +220,29 @@ extension View {
     }
 }
 
+extension View {
+    /// Lets Search Accounts (⌘F) move the focus to the search field.
+    func searchFocusedBinding(_ isFocused: Binding<Bool>) -> some View {
+        modifier(SearchFocusModifier(isFocused: isFocused))
+    }
+}
+
+private struct SearchFocusModifier: ViewModifier {
+    @Binding var isFocused: Bool
+    @FocusState private var focus: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .searchFocused($focus)
+            .onChange(of: isFocused) { _, isFocused in
+                if isFocused { focus = true }
+            }
+            .onChange(of: focus) { _, focus in
+                isFocused = focus
+            }
+    }
+}
+
 // Larger Text on the Mac. macOS doesn't let apps follow a system text size, and SwiftUI's text styles and
 // @ScaledMetric don't change with dynamicTypeSize there, so the Mac app has its own text size (View > Make Text
 // Bigger) and scales its fonts and sizes by it. On iOS these are the system's text styles and @ScaledMetric.
@@ -364,6 +387,18 @@ private struct TextScaledFrameModifier: ViewModifier {
 
 /// A list of settings: a list on iOS, and on the Mac a grouped form, like the Settings window's General tab. A Mac
 /// list sets the system's font on the text in each row, so its rows wouldn't follow the app's text size.
+/// The colored key, the height of a line of text, in a label that asks for the key.
+struct InsertKeyIcon: View {
+    @ScaledSize(relativeTo: .footnote) private var height: CGFloat = 18
+
+    var body: some View {
+        Image("InsertKey")
+            .resizable()
+            .scaledToFit()
+            .frame(height: height)
+    }
+}
+
 struct SettingsList<Content: View>: View {
     @ViewBuilder let content: Content
 

@@ -62,20 +62,20 @@ final class AccessibilityAuditTests: XCTestCase {
     /// The same in dark mode. Clipped text is checked at the largest text size, where it would show.
     ///
     /// Only the simulator's settings can switch to dark mode and turn on Increase Contrast for the whole app, sheets
-    /// included, so `tools/screenshots.sh` does after the screenshots, and runs this test and the next one again.
+    /// included, so `tools/screenshots.sh audits` does, and runs this test and the next one.
     @MainActor func testDarkAppearance() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["APPEARANCE"] == "dark",
-                          "Runs in dark mode, from tools/screenshots.sh")
+                          "Runs in dark mode, from tools/screenshots.sh audits")
         app.launchArguments = ["-DemoDate", Self.demoDate]
         app.launch()
         try auditMainScreens(for: .contrast, allowsNearlyPassingContrast: true)
     }
 
     /// With Increase Contrast every text and icon has to have the contrast it needs, 4.5:1 for text and 3:1 for large
-    /// text. `tools/screenshots.sh` runs it in light and in dark mode.
+    /// text. `tools/screenshots.sh audits` runs it in light and in dark mode.
     @MainActor func testIncreasedContrast() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["INCREASE_CONTRAST"] == "enabled",
-                          "Runs with Increase Contrast on, from tools/screenshots.sh")
+                          "Runs with Increase Contrast on, from tools/screenshots.sh audits")
         app.launchArguments = ["-DemoDate", Self.demoDate]
         app.launch()
         try auditMainScreens(for: .contrast)
@@ -96,7 +96,10 @@ final class AccessibilityAuditTests: XCTestCase {
         bank.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
         XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try audit("account details", types)
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        // On an iPad the details are beside the list, without a back button.
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+        }
 
         openMenuItem("Sync from Ente Auth")
         XCTAssertTrue(app.textFields["ente.email"].waitForExistence(timeout: 20), "The Ente sign in screen didn't show")
@@ -207,11 +210,14 @@ final class AccessibilityAuditTests: XCTestCase {
         // out the bar above the keys (Passwords, predictions), so that's added.
         let keyboard = app.keyboards.firstMatch
         let keyboardFrame = keyboard.exists ? keyboard.frame.inset(by: UIEdgeInsets(top: -60, left: 0, bottom: 0, right: 0)) : .null
+        // A sheet on an iPad ends above the bottom of the screen. What it cuts off is measured against what's behind it.
+        let list = app.sheets.count > 0 || UIDevice.current.userInterfaceIdiom == .pad ? app.collectionViews.firstMatch : nil
+        let visibleBottom = list?.exists == true ? list!.frame.maxY : CGFloat.infinity
         var failed = false
         try app.performAccessibilityAudit(for: types) { issue in
             if issue.auditType == .contrast {
                 // Disabled controls are dimmed on purpose and don't need the contrast (WCAG 1.4.3).
-                if let element = issue.element, !element.isEnabled || element.frame.intersects(keyboardFrame) {
+                if let element = issue.element, !element.isEnabled || element.frame.intersects(keyboardFrame) || element.frame.maxY > visibleBottom {
                     return true
                 }
                 if allowsNearlyPassingContrast && issue.compactDescription.localizedCaseInsensitiveContains("nearly passed") {

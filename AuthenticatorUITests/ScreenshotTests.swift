@@ -46,7 +46,10 @@ final class ScreenshotTests: XCTestCase {
         github.tap()
         XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account details didn't show")
         try save("account-details")
-        app.navigationBars.buttons.element(boundBy: 0).tap()
+        // On an iPad the details are beside the list, without a back button.
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            app.navigationBars.buttons.element(boundBy: 0).tap()
+        }
 
         // Named TopOverflowBarButtonItem from iOS 27.2.
         app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch.tap()

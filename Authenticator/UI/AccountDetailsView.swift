@@ -28,7 +28,6 @@ struct AccountDetailView: View {
     let onDelete: () -> Void
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
-    @Environment(\.accessibilityDifferentiateWithoutColor) private var differentiateWithoutColor
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
     @State private var showAutoFillWebsites = false
@@ -97,7 +96,6 @@ struct AccountDetailView: View {
                     // Slide Over or half of a folded iPhone Duo.
                     Text(account.formattedCode ?? "*** ***")
                         .privacySensitive()
-                        .strikethrough(differentiateWithoutColor && account.state == .expired)
                         .font(.system(size: codeFontSize, weight: .bold))
                         .monospacedDigit()
                         .lineLimit(1)
@@ -116,6 +114,11 @@ struct AccountDetailView: View {
             .accessibilityValue(account.accessibilityCodeState)
             .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
             .accessibilityIdentifier("account-details.code")
+            #if os(iOS)
+            // With a hardware keyboard, which the Mac has in its menu bar. Also for a pointer on an iPad.
+            .keyboardShortcut("c")
+            .hoverEffect(.highlight)
+            #endif
             // The label is the code itself, which can't be said to Voice Control.
             .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
                                        String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
@@ -140,6 +143,9 @@ struct AccountDetailView: View {
                 }
                 .accessibilityInputLabels(VoiceControlNames.calculate)
                 .accessibilityIdentifier("account-details.calculate")
+                #if os(iOS)
+                .keyboardShortcut("r")
+                #endif
                 .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
                 .disabled(!account.enableRefresh)
                 Button(action: { account.isPinned.toggle() }) {

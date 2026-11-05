@@ -28,16 +28,23 @@ tools/screenshots.sh
 ```
 
 This needs Xcode and `jq`. The script creates a simulator for the newest iPhone Pro (set `DEVICE_TYPE`, e.g.
-`DEVICE_TYPE="iPhone 17 Pro"`, to pick another one), runs `OrielOTPUITests` with the `Screenshots` scheme and
+`DEVICE_TYPE="iPhone 17 Pro"`, to pick another one), builds the `Screenshots` scheme once, runs `OrielOTPUITests` and
 deletes the simulator again. Screenshots whose bytes changed are copied to `docs/screenshots/`; the others are left
 alone.
 
 The test is `AuthenticatorUITests/ScreenshotTests.swift`. To add a screenshot, navigate to the screen there and
 call `save("name")`, then add `docs/screenshots/name.png` to the README.
 
-The same run has `AuthenticatorUITests/AccessibilityAuditTests.swift`, which goes through the main screens and runs
-Xcode's accessibility audit on each. It fails for every issue it finds, so a screen that breaks at a large text size
-fails the screenshots job. See [accessibility.md](accessibility.md).
+The same script runs the accessibility audits in `AuthenticatorUITests/AccessibilityAuditTests.swift` and the tap
+to copy tests, which take about 13 minutes more, when asked to:
+
+```bash
+tools/screenshots.sh audits
+DEVICE_TYPE="iPad Air 11-inch (M4)" tools/screenshots.sh audits
+```
+
+In CI they're the Accessibility workflow, on an iPhone and an iPad, which is run by hand, e.g. before a release or after changing a screen's
+layout or colors. See [accessibility.md](accessibility.md).
 
 ## The Mac screenshots
 

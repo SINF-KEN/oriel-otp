@@ -16,6 +16,8 @@ search, pin, rename, delete, sync with Ente Auth, the YubiKey settings, and the 
   action instead. On iOS the row's hint says so ("Swipe up or down to copy the code"). After copying, the toast is
   announced, and the row shows a checkmark for a moment.
 - Toasts (copied, synced, touch the YubiKey) are announced. So are a wrong app lock code and a scanned QR code.
+- On the Mac, rows in the main window's single column are buttons too, with an action that opens the account, and the
+  list takes the keyboard focus at launch and after going back.
 - The app lock screen takes the focus and keeps it from the app behind it. Every sheet with Cancel or Close closes
   with the escape gesture (a two-finger Z).
 
@@ -34,7 +36,7 @@ All text uses text styles. Icons and images that sit next to text use `@ScaledMe
 would crowd out the text. Screens that can get taller than the display scroll (`scrollsWhenTooTall()`), and on the
 iPhone and iPad the account row puts the issuer and name on one line with the code in large type below it whenever
 the name would get narrower than about 150 points beside the code: from one size up on most iPhones, and at every
-size on an iPhone mini. The app lock's number keys stop growing at a
+size on an iPhone mini. In an iPad's sidebar that's about 110 points, so that a code of 8 digits fits too. The app lock's number keys stop growing at a
 size where three still fit across the smallest iPhone; held, they show the Large Content Viewer, like the navigation
 bar's buttons.
 
@@ -44,7 +46,8 @@ size, from 100% to 200%: View > Make Text Bigger (⌘+), Make Text Smaller (⌘�
 General > Text size. It scales the text styles (`scaledFont(_:)` in place of `font(_:)` with a text style), the
 default font of each window (`appTextSize()`), sizes beside text (`@ScaledSize`, which is `@ScaledMetric` on iOS),
 and the windows, sheets, sidebar and menu bar extra (`textScaledFrame`), so larger text gets more room instead of
-wrapping in a narrow column, up to the size of the screen. A few things keep the system's size, as on iOS: the toolbar,
+wrapping in a narrow column, up to the size of the screen. The main window keeps its size, and its two columns become
+one when they no longer fit at the larger text. A few things keep the system's size, as on iOS: the toolbar,
 the search field, menus and alerts.
 
 Two things that don't follow the window's font on the Mac: a list sets the system font on the text in its rows, so the
@@ -62,8 +65,8 @@ is always dark.
 ## Differentiate Without Color Alone
 
 Color is never the only sign of a state. Errors and warnings in red or orange have a symbol (the app lock's wait, a
-blocked FIDO PIN, an Ente Auth account that can't be added, too many accounts selected). An expired code has the
-refresh symbol in place of the countdown, and with Differentiate Without Color it's crossed out too. The watch's ring
+blocked FIDO PIN, an Ente Auth account that can't be added, too many accounts selected). An expired code is replaced by
+asterisks, with the refresh symbol in place of the countdown. The watch's ring
 turns orange in the last five seconds, and dashed with that setting. Account icons show the account's first letter,
 their color only tells them apart. Swipe actions have a symbol and a title.
 
@@ -73,11 +76,22 @@ Text has at least 4.5:1 against its background, large text and icons 3:1, with I
 criterion is "by default, or when Increase Contrast is on"). By default the system's secondary labels are a little
 short of that in places, as in Apple's own apps; everything the app draws itself passes by default too:
 
-- The code is drawn in the full accent color (7.2:1 in light mode, 13.6:1 in dark mode). An expired or not yet
-  calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
+- The code is drawn in the full accent color (7.2:1 in light mode, 13.6:1 in dark mode). The placeholder for an
+  expired or not yet calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
 - Swipe actions have white labels on Favorite, DeleteAction and CopyAction, which are darker than the system yellow,
   red and blue for at least 4.5:1 in both appearances.
 - Every asset color has a high contrast variant, for light and dark mode.
+
+A selected row is highlighted in the accent color, so everything on it changes with it: the code and the account name
+are white, whatever the code's button would otherwise be drawn in, and the letter on the account icon keeps its color,
+as the icon stays light.
+
+With Button Shapes on, the code below the name gets the outline the code beside the name always has.
+
+## Reduced Transparency
+
+The app has no transparency of its own to reduce. The only material is the system's, behind the Mac's toast, and the
+system's materials become opaque with this setting.
 
 ## Reduced Motion
 
@@ -87,6 +101,14 @@ so), the QR scanner's checkmark only fades in, the countdown pie steps once a se
 buttons in the YubiKey settings appear without sliding. Fades, which Apple recommends in place of motion, are kept.
 Nothing animates on its own or loops; the countdown only follows the time. The watch's ring steps once a second
 already.
+
+## Keyboard and pointer
+
+On the Mac every action is in the menu bar, see [macos.md](macos.md). In the main window's single column the arrow keys
+move through the list, → opens the selected account, and Back or Escape returns.
+
+On an iPad with a hardware keyboard, ⌘N adds an account, ⌘F goes to the search field, and in the details ⌘C copies the
+code and ⌘R calculates a new one. A pointer highlights the codes, which can be clicked to copy them.
 
 ## Right to left
 
@@ -144,20 +166,23 @@ Shortcuts, Spotlight, Apple Intelligence), Add Account and Copy Code on the Mac,
 `AuthenticatorUITests/AccessibilityAuditTests.swift` runs Xcode's accessibility audit
 (`performAccessibilityAudit`) on the main screens with the simulated YubiKey and fake Ente server: the account list
 and details, the Ente sign in and account list, Configuration, About, the tutorial, the app icons, the QR scanner and
-the add account form. It runs with the screenshots (`tools/screenshots.sh`, and the Screenshots workflow in CI), see
-[screenshots.md](screenshots.md).
+the add account form. It runs with `tools/screenshots.sh audits`, and the Accessibility workflow in CI, which is run by
+hand. See [screenshots.md](screenshots.md).
 
 - `testLightAppearance` fails for text or icons without enough contrast in light mode. Text that nearly passes, like
   the system's secondary labels in places, is left to the Increase Contrast check. Disabled controls are left out, as
   WCAG does, and so is what the keyboard covers.
-- After the screenshots, `tools/screenshots.sh` switches the simulator to dark mode with `simctl` and runs
-  `testDarkAppearance`, the same check in dark mode, then turns on Increase Contrast and runs `testIncreasedContrast`
-  in light and dark mode, where nothing has to nearly pass. The tests skip themselves in a normal run.
+- `tools/screenshots.sh audits` then switches the simulator to dark mode with `simctl` and runs `testDarkAppearance`,
+  the same check in dark mode, then turns on Increase Contrast and runs `testIncreasedContrast` in light and dark
+  mode, where nothing has to nearly pass. The tests skip themselves in a normal run.
 - `testRightToLeft` launches with the right-to-left pseudolanguage (`-AppleTextDirection YES
   -NSForceRightToLeftWritingDirection YES`), English text in a mirrored layout, at the largest text size, and fails for clipped text.
 - `testLargestTextSize` launches at the largest accessibility text size (AX5) and fails for clipped text and text
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
+
+The same audits run on an iPad, whose details are beside the list. On the Mac, `testAccessibilityAudit` in
+`AuthenticatorUITests/MacScreenshotTests.swift` audits each layout of the main window at 100% and 200%.
 
 `AuthenticatorUITests/TapToCopyTests.swift` taps the code in a row, beside the name and below it at a larger text size,
 and checks that it's copied without opening the account; also 24 points above the code, for the 44 point target. Tapping

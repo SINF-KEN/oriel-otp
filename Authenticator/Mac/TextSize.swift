@@ -55,8 +55,8 @@ private struct AppTextSizeModifier: ViewModifier {
     @ViewBuilder func body(content: Content) -> some View {
         let content = content
             .font(scalesContent && scale != 1 ? .scaled(.body, by: scale) : nil)
-            // Layouts that switch at the accessibility sizes on iOS, like the account row, don't on the Mac: its
-            // windows and the sidebar grow with the text instead.
+            // On the Mac, layouts follow the room there is at this size rather than the accessibility sizes: windows
+            // and the sidebar grow with the text, and the main window's columns become one when they no longer fit.
             .environment(\.textScale, scale)
         if scalesContent {
             content.textScaledControlSize(scale)

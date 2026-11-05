@@ -36,7 +36,12 @@ struct MainView: View {
         nonmutating set { selectedAccountIDs = newValue.map { [$0] } ?? [] }
     }
     @State var commands = MainWindowCommands.shared
-    @State var isSearchFocused = false
+    /// The account open over the list in the single column layout.
+    @State var singleColumnPath: [String] = []
+    /// The layout kept while the window is being resized, true for the single column. See `mainLayout`.
+    @State private var layoutDuringResize: Bool?
+    /// For the arrow keys, which only reach the list while it has the focus.
+    @FocusState private var isListFocused: Bool
     #else
     @State var selectedAccountID: String? = nil
     #endif
@@ -50,6 +55,7 @@ struct MainView: View {
     @State var showEnteSync: Bool = false
     @State var password: String = ""
     @State var searchText: String = ""
+    @State var isSearchFocused = false
     @State var didEnterBackground = true
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
@@ -234,15 +240,166 @@ struct MainView: View {
         }
     }
     
-    private var splitView: some View {
-        @Bindable var model = model
-        return NavigationSplitView {
-            accountList
+    #if os(macOS)
+    /// The narrowest the list and the details get beside each other, in points at 100% text size.
+    private static let minimumColumnWidth: CGFloat = 320
+    /// The narrowest the window gets, in points at 100% text size, where the codes go below the names.
+    private static let minimumWindowWidth: CGFloat = 280
+    /// Until a view that comes back to the single column can take the focus, after going back to it.
+    private static let navigationDelay = Duration.milliseconds(400)
+
+    /// Two columns while both fit, otherwise one, as on an iPhone, which also happens as the text gets bigger. A split
+    /// view doesn't do this itself on the Mac, and when its columns don't fit, it's centered in the window and cut off
+    /// on both sides.
+    ///
+    /// The layout only changes once a resize ends. Replacing the list during one crashes the app: AppKit ends the
+    /// table's live resize as it's removed, which adds rows to a table SwiftUI is already destroying.
+    private var mainLayout: some View {
+        GeometryReader { reader in
+            let minimumWidth = Self.minimumColumnWidth * textScale
+            let isSingleColumn = layoutDuringResize ?? (reader.size.width < 2 * minimumWidth)
+            ZStack {
+                LiveResizeObserver { isResizing in
+                    layoutDuringResize = isResizing ? isSingleColumn : nil
+                }
+                if isSingleColumn {
+                    singleColumnView
+                } else {
+                    // The window can be too narrow for two columns during a resize. They share it until it ends.
+                    let sidebarMinimum = min(minimumWidth, reader.size.width / 2)
+                    splitView(sidebarWidth: sidebarMinimum...(reader.size.width - sidebarMinimum))
+                }
+            }
+        }
+    }
+
+    private var singleColumnView: some View {
+        NavigationStack(path: $singleColumnPath) {
+            accountColumn()
+                // Below the toolbar, whose search field gets wider than a narrow window and is cut off.
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    SingleColumnSearchField(text: $searchText, isFocused: $isSearchFocused)
+                }
+                .environment(\.opensAccount, OpenAccountAction(path: $singleColumnPath))
+                // The arrow keys only move the selection here, so they can get past an account.
+                .onKeyPress(.rightArrow) {
+                    guard let selectedAccountID else { return .ignored }
+                    singleColumnPath = [selectedAccountID]
+                    return .handled
+                }
+                .navigationDestination(for: String.self) { accountID in
+                    if let account = model.accounts.first(where: { $0.accountId == accountID }) {
+                        accountDetail(account)
+                            // Back to the list with Escape, wherever the focus is.
+                            .background {
+                                Button(action: { singleColumnPath = [] }) { EmptyView() }
+                                    .keyboardShortcut(.cancelAction)
+                                    .opacity(0)
+                                    .accessibilityHidden(true)
+                            }
+                    }
+                }
+        }
+        // AppKit gives the search field the first focus, mostly with larger text, which would keep the arrow keys from
+        // the list. With something typed in it, it came from the two columns, so it keeps the focus.
+        .onAppear { focusList(overSearch: searchText.isEmpty) }
+        // Leaving the search field with Escape goes back to the list.
+        .onChange(of: isSearchFocused) { _, isFocused in
+            if !isFocused {
+                focusList()
+            }
+        }
+        // The menu bar's commands work on the selection, which the two columns also show when the window gets wider.
+        .onChange(of: singleColumnPath) { _, path in
+            if let accountID = path.last {
+                selectedAccountID = accountID
+            } else {
+                focusList()
+            }
+        }
+    }
+
+    /// Gives the list the focus once it's on screen, unless the search field is about to take it.
+    private func focusList(overSearch: Bool = false) {
+        Task {
+            try? await Task.sleep(for: Self.navigationDelay)
+            if overSearch || !isSearchFocused {
+                isListFocused = true
+            }
+        }
+    }
+
+    private func splitView(sidebarWidth: ClosedRange<CGFloat>) -> some View {
+        NavigationSplitView {
+            accountColumn()
+                .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
+                .searchFocusedBinding($isSearchFocused)
+                .autocorrectionDisabled(true)
+                .navigationSplitViewColumnWidth(min: sidebarWidth.lowerBound,
+                                                ideal: min(360 * textScale, sidebarWidth.upperBound),
+                                                max: sidebarWidth.upperBound)
+        } detail: {
+            detailColumn
+        }
+    }
+    #else
+    private var mainLayout: some View {
+        NavigationSplitView {
+            accountColumn()
+                .searchable(text: $searchText, prompt: String(localized: "Search"))
+                .searchFocusedBinding($isSearchFocused)
+                .autocorrectionDisabled(true)
+                // Wide enough on an iPad for a 6 digit code beside the name at the default text size.
+                .navigationSplitViewColumnWidth(min: 320, ideal: 420)
+                // ⌘F with a hardware keyboard. Search Accounts in the menu bar on the Mac.
+                .background {
+                    // Without a label, which the accessibility audit would still see at this opacity.
+                    Button(action: focusSearch) { EmptyView() }
+                        .keyboardShortcut("f")
+                        .opacity(0)
+                        .accessibilityHidden(true)
+                }
+        } detail: {
+            detailColumn
+        }
+    }
+    #endif
+
+    @ViewBuilder private var detailColumn: some View {
+        if let selectedAccount {
+            accountDetail(selectedAccount)
+        } else {
+            VStack(spacing: 12) {
+                Image(systemName: "person.crop.circle")
+                    .font(.system(size: placeholderSize))
+                    .foregroundStyle(Color(.tertiaryLabel))
+                    .accessibilityHidden(true)
+                if model.hasAccounts {
+                    Text(String(localized: "Select an account to see its code and details", comment: "Details column before an account is selected"))
+                        .scaledFont(.body)
+                        .foregroundStyle(Color(.secondaryLabel))
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .padding()
+        }
+    }
+
+    private func accountDetail(_ account: Account) -> some View {
+        AccountDetailView(account: account) {
+            selectedAccountID = nil
+        }
+        .id(account.accountId)
+        .scaledBodyFont()
+    }
+
+    /// The account list with its toolbar and title.
+    private func accountColumn() -> some View {
+        accountList
             #if os(macOS)
+            .focused($isListFocused)
             // Here rather than for the whole window, so the search field keeps the system's size.
             .scaledBodyFont()
-            .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
-            .searchFocusedBinding($isSearchFocused)
             // Return copies the selected account's code, Delete deletes the selected accounts.
             .onKeyPress(.return) {
                 guard !AppLock.shared.isLocked, let selectedAccount else { return .ignored }
@@ -253,10 +410,7 @@ struct MainView: View {
                 guard !AppLock.shared.isLocked else { return }
                 accountsToDelete = selectedAccounts
             }
-            #else
-            .searchable(text: $searchText, prompt: String(localized: "Search"))
             #endif
-            .autocorrectionDisabled(true)
             .listStyle(.inset)
             .refreshable(enabled: DeviceCapabilities.supportsNFC || model.cloud.isEnabled) {
                 otp = nil
@@ -274,30 +428,16 @@ struct MainView: View {
             .toolbar { mainToolbar }
             .navigationTitle(model.hasAccounts ? String(localized: "Accounts", comment: "Navigation title in main view.") : "")
             #endif
-            .navigationSplitViewColumnWidth(min: 320 * textScale, ideal: 360 * textScale)
-        } detail: {
-            if let selectedAccount {
-                AccountDetailView(account: selectedAccount) {
-                    selectedAccountID = nil
-                }
-                .id(selectedAccount.accountId)
-                .scaledBodyFont()
-            } else {
-                Image(systemName: "person.crop.circle")
-                    .font(.system(size: placeholderSize))
-                    .foregroundStyle(Color(.tertiaryLabel))
-                    .accessibilityHidden(true)
-            }
-        }
     }
 
     private var presentations: some View {
         @Bindable var model = model
-        return splitView
+        return mainLayout
         .onChange(of: model.accounts.map(\.accountId)) { _, accountIDs in
             // Drop the selection when the account goes away, e.g. the YubiKey was removed or the account deleted.
             #if os(macOS)
             selectedAccountIDs.formIntersection(accountIDs)
+            singleColumnPath.removeAll { !accountIDs.contains($0) }
             #else
             if let selectedAccountID, !accountIDs.contains(selectedAccountID) {
                 self.selectedAccountID = nil
@@ -406,7 +546,7 @@ struct MainView: View {
                 accountsToDelete = []
             }
         }
-        .textScaledFrame(minWidth: 640, minHeight: 420)
+        .textScaledFrame(minWidth: Self.minimumWindowWidth, minHeight: 420)
         #endif
     }
 
@@ -424,7 +564,7 @@ struct MainView: View {
                 }
             }
             if !model.hasAccounts {
-                ListStatusView(image: Image("securitykey"), message: insertYubiKeyMessage, height: reader.size.height) {
+                ListStatusView(image: Image("InsertKey"), message: insertYubiKeyMessage, height: reader.size.height, isArtwork: true) {
                     enteSyncButton
                 }
             } else if !searchText.isEmpty {
@@ -473,10 +613,14 @@ struct MainView: View {
             }
             if !model.accountsLoaded && !model.cloudAccounts.isEmpty && searchText.isEmpty {
                 // The Ente Auth accounts are listed, the YubiKey's join them once it has been read.
-                Label(insertYubiKeyMessage, image: "securitykey")
-                    .scaledFont(.footnote)
-                    .foregroundStyle(.secondary)
-                    .listRowSeparator(.hidden)
+                Label {
+                    Text(insertYubiKeyMessage)
+                } icon: {
+                    InsertKeyIcon()
+                }
+                .scaledFont(.footnote)
+                .foregroundStyle(.secondary)
+                .listRowSeparator(.hidden)
             }
         }
     }
@@ -615,12 +759,13 @@ struct MainView: View {
     }
 
     private func accountRow(_ account: Account) -> some View {
-        NavigationLink(value: account.accountId) {
+        AccountRowLink(accountID: account.accountId) {
             #if os(macOS)
             // Copy and pin appear when the pointer is over the row, as there are no swipe actions on the Mac.
             HoverReader { isHovering in
                 AccountRowView(account: account, showsLocation: showsLocation, copyCode: { toastPresenter.copyCode(of: account) },
-                               isCopied: toastPresenter.copiedAccountID == account.accountId) {
+                               isCopied: toastPresenter.copiedAccountID == account.accountId,
+                               isSelected: selectedAccountIDs.contains(account.accountId)) {
                     if isHovering {
                         HStack(spacing: 2) {
                             copyButton(account)
@@ -630,12 +775,15 @@ struct MainView: View {
                         }
                         .labelStyle(.iconOnly)
                         .buttonStyle(.borderless)
+                        // Asks for no room, so the pointer being over a row doesn't change how it's laid out.
+                        .frame(minWidth: 0, idealWidth: 0)
                     }
                 }
             }
             #else
             AccountRowView(account: account, showsLocation: showsLocation, copyCode: { toastPresenter.copyCode(of: account) },
-                           isCopied: toastPresenter.copiedAccountID == account.accountId)
+                           isCopied: toastPresenter.copiedAccountID == account.accountId,
+                           isSelected: selectedAccountID == account.accountId)
             #endif
         }
         .listRowSeparator(.hidden)
@@ -739,7 +887,11 @@ struct MainView: View {
         case .refresh:
             model.refresh()
         case .search:
-            isSearchFocused = true
+            // The search field is on the list, so an account open over it closes first. Set again each time, as the
+            // field doesn't report back when it wasn't there to take the focus.
+            let delay = singleColumnPath.isEmpty ? Duration.zero : Self.navigationDelay
+            singleColumnPath = []
+            focusSearch(after: delay)
         case .copyCode:
             if let selectedAccount { toastPresenter.copyCode(of: selectedAccount) }
         case .togglePin:
@@ -757,6 +909,18 @@ struct MainView: View {
     }
     #endif
 
+    private func focusSearch() {
+        focusSearch(after: .zero)
+    }
+
+    private func focusSearch(after delay: Duration) {
+        isSearchFocused = false
+        Task {
+            try? await Task.sleep(for: delay)
+            isSearchFocused = true
+        }
+    }
+
     private var addAccountToolbarItem: some CustomizableToolbarContent {
         ToolbarItem(id: "add-account", placement: .primaryAction) {
             // Without a YubiKey to reach, accounts can still be added to Ente Auth.
@@ -765,6 +929,10 @@ struct MainView: View {
             }
             .accessibilityInputLabels(VoiceControlNames.addAccount)
             .accessibilityIdentifier("accounts.add-account")
+            #if os(iOS)
+            // With a hardware keyboard. In the menu bar on the Mac.
+            .keyboardShortcut("n")
+            #endif
             .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
                   : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
             .disabled(!canAddToYubiKey && !model.cloud.isEnabled)
@@ -817,6 +985,55 @@ struct MainView: View {
             return model.accounts.filter { $0.title.localizedStandardContains(searchText) ||
                 $0.subTitle?.localizedStandardContains(searchText) == true }
         }
+    }
+}
+
+#if os(macOS)
+/// Opens an account over the list, in the main window's single column.
+struct OpenAccountAction: Equatable {
+    @Binding var path: [String]
+
+    func callAsFunction(_ accountID: String) {
+        path = [accountID]
+    }
+
+    // There's only the one path, so a new action doesn't need to update the rows.
+    static func == (lhs: Self, rhs: Self) -> Bool { true }
+}
+
+extension EnvironmentValues {
+    @Entry var opensAccount: OpenAccountAction?
+}
+#endif
+
+/// A row that opens its account. A link shows it in the split view's details, but in a stack a link also opens whatever
+/// the arrow keys select, so there a click opens it instead.
+private struct AccountRowLink<Label: View>: View {
+    #if os(macOS)
+    @Environment(\.opensAccount) private var opensAccount
+    #endif
+    let accountID: String
+    @ViewBuilder let label: Label
+
+    var body: some View {
+        #if os(macOS)
+        if let opensAccount {
+            label
+                .tag(accountID)
+                .onTapGesture { opensAccount(accountID) }
+                // A button to VoiceOver and Voice Control, as the link is in the split view.
+                .accessibilityAddTraits(.isButton)
+                .accessibilityAction { opensAccount(accountID) }
+        } else {
+            link
+        }
+        #else
+        link
+        #endif
+    }
+
+    private var link: some View {
+        NavigationLink(value: accountID) { label }
     }
 }
 
