@@ -45,6 +45,7 @@ struct AppLockView: View {
                         .padding(.horizontal, 8)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(Color(.unlockButton))
                 .controlSize(.large)
                 .disabled(lock.isAuthenticating)
                 .accessibilityIdentifier("app-lock.unlock")
@@ -248,6 +249,7 @@ private struct AppLockPasswordField: View {
                 .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             Button(String(localized: "Continue", comment: "App lock password button"), action: enter)
                 .buttonStyle(.borderedProminent)
+                .tint(Color(.unlockButton))
                 .disabled(password.count < max(1, minimumLength))
         }
         .onAppear { isFocused = true }

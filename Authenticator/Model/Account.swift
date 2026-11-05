@@ -35,10 +35,17 @@ import YubiKit
         case device(id: String)
     }
 
-    var otp: OATHSession.OTP?
+    var otp: OATHSession.OTP? {
+        didSet { updateCanCopyCode() }
+    }
     var title: String
     var subTitle: String?
-    var state: AccountState
+    /// Changes every second while counting down, so only views that show the countdown should read it.
+    var state: AccountState {
+        didSet { updateCanCopyCode() }
+    }
+    /// Whether there's a code to copy. Unlike `state` it doesn't change with the countdown, so the toolbar can use it.
+    private(set) var canCopyCode = false
     var isPinned: Bool {
         didSet { onPinnedChange?(self) }
     }
@@ -62,7 +69,7 @@ import YubiKit
     var isPendingSync = false
     var keyVersion: Version
     var color: Color = .red
-    var enableRefresh: Bool = true
+    private(set) var enableRefresh: Bool = true
     @ObservationIgnored private var timeLeft: Double?
     @ObservationIgnored private var requestRefresh: (Account) -> Void
     @ObservationIgnored private var connectionType: OATHSession.ConnectionType
@@ -90,6 +97,13 @@ import YubiKit
         self.update(otp: code)
     }
     
+    private func updateCanCopyCode() {
+        let canCopyCode = otp != nil && state != .expired
+        if self.canCopyCode != canCopyCode {
+            self.canCopyCode = canCopyCode
+        }
+    }
+
     func calculate(completion: ((OATHSession.OTP) -> ())? = nil) {
         calculateCompletion = completion
         requestRefresh(self)
@@ -181,7 +195,7 @@ import YubiKit
 
     func updateState() {
         guard credential.type == .totp else {
-            self.enableRefresh = true
+            setEnableRefresh(true)
             self.state = .requiresCalculation
             return
         }
@@ -191,14 +205,21 @@ import YubiKit
             self.timeLeft = timeLeft
             if timeLeft > 0 {
                 self.state = .countingdown(timeLeft / validInterval.duration)
-                self.enableRefresh = false
+                setEnableRefresh(false)
             } else if timeLeft < 0 {
                 self.state = .expired
-                self.enableRefresh = true
+                setEnableRefresh(true)
             } else if connectionType == .nfc {
                 self.state = .expired
-                self.enableRefresh = true
+                setEnableRefresh(true)
             }
+        }
+    }
+
+    /// Only when it changes, as `updateState()` runs every second and the toolbar reads this.
+    private func setEnableRefresh(_ enableRefresh: Bool) {
+        if self.enableRefresh != enableRefresh {
+            self.enableRefresh = enableRefresh
         }
     }
 }
