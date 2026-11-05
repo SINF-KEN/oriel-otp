@@ -52,7 +52,9 @@ final class NoYubiKeyTests: XCTestCase {
         secret.tap()
         secret.typeText("JBSWY3DPEHPK3PXP")
         attachScreenshot("add-account")
-        app.buttons["add-account.save"].firstMatch.tap()
+        let save = app.buttons["add-account.save"].firstMatch
+        XCTAssertTrue(save.waitForExistence(timeout: 20), "The add account form has no Save button")
+        save.tap()
 
         let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'account-row.device/'")).firstMatch
         XCTAssertTrue(row.waitForExistence(timeout: 20), "The account isn't in the list")
@@ -73,6 +75,14 @@ final class NoYubiKeyTests: XCTestCase {
         attachScreenshot("delete-alert")
         alert.buttons["Delete"].tap()
         XCTAssertTrue(app.buttons["accounts.empty-add-account"].firstMatch.waitForExistence(timeout: 20), "The account wasn't deleted")
+    }
+
+    /// The codes shown when the YubiKey is unplugged still expire, which mustn't go looking for a YubiKey.
+    @MainActor func testUnpluggingDoesntAskForAYubiKeyLater() throws {
+        unplugSimulatedYubiKey()
+        XCTAssertTrue(app.buttons["accounts.empty-add-account"].firstMatch.waitForExistence(timeout: 20))
+        // Longer than the 30 seconds a code lasts.
+        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 35), "An alert showed after the YubiKey was unplugged")
     }
 
     @MainActor private func unplugSimulatedYubiKey() {

@@ -300,6 +300,8 @@ import YubiKit
             let requestCount = self.refreshRequestCount
             self.refreshRequestCount = 0
             guard self.sessionTask != nil else { return }
+            // The timer of a code outlives its YubiKey being unplugged, and looking for the key would then ask for NFC.
+            guard self.keyAccounts.contains(where: { $0 === account }) else { return }
             // Run the refresh outside the debounce task so a later request doesn't cancel it.
             if requestCount == 1 {
                 Task { [weak self] in
