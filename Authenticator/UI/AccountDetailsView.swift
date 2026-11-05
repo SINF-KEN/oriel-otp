@@ -101,16 +101,22 @@ struct AccountDetailView: View {
                 copyToolbarItem
             }
             ToolbarItemGroup(placement: .primaryAction) {
-                Button(action: { account.calculate() }) {
-                    Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
+                // The app calculates these accounts' codes by itself, so Calculate would only ever be dimmed.
+                if autoFillID != nil {
+                    autoFillWebsitesButton
+                        .accessibilityIdentifier("account-details.toolbar-autofill-websites")
+                } else {
+                    Button(action: { account.calculate() }) {
+                        Label(String(localized: "Calculate", comment: "Menu"), systemImage: "arrow.clockwise")
+                    }
+                    .accessibilityInputLabels(VoiceControlNames.calculate)
+                    .accessibilityIdentifier("account-details.calculate")
+                    #if os(iOS)
+                    .keyboardShortcut("r")
+                    #endif
+                    .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
+                    .disabled(!account.enableRefresh)
                 }
-                .accessibilityInputLabels(VoiceControlNames.calculate)
-                .accessibilityIdentifier("account-details.calculate")
-                #if os(iOS)
-                .keyboardShortcut("r")
-                #endif
-                .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
-                .disabled(!account.enableRefresh)
                 Button(action: { account.isPinned.toggle() }) {
                     Label(account.isPinned ? String(localized: "Unpin", comment: "Menu") : String(localized: "Pin", comment: "Menu"),
                           systemImage: account.isPinned ? "pin.slash" : "pin")
@@ -119,13 +125,9 @@ struct AccountDetailView: View {
                 .accessibilityIdentifier("account-details.pin")
             }
             ToolbarItemGroup(placement: .secondaryAction) {
-                CopyToYubiKeyButtons(account: account)
                 if autoFillID != nil {
-                    Button(action: { showAutoFillWebsites = true }) {
-                        Label(String(localized: "AutoFill websites", comment: "Menu"), systemImage: "globe")
-                    }
-                    .help(String(localized: "Choose the websites AutoFill suggests the code on", comment: "Toolbar help"))
-                    .accessibilityIdentifier("account-details.autofill-websites")
+                    autoFillWebsitesButton
+                        .accessibilityIdentifier("account-details.autofill-websites")
                 }
                 if account.canRename {
                     Button(action: { showEditing.toggle() }) {
@@ -134,6 +136,7 @@ struct AccountDetailView: View {
                     .help(String(localized: "Rename the account", comment: "Toolbar help"))
                     .accessibilityIdentifier("account-details.rename")
                 }
+                CopyToYubiKeyButtons(account: account)
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
@@ -179,6 +182,13 @@ struct AccountDetailView: View {
     private var autoFillID: String? {
         guard case .ente(let id) = account.location, account.credential.type == .totp else { return nil }
         return id
+    }
+
+    private var autoFillWebsitesButton: some View {
+        Button(action: { showAutoFillWebsites = true }) {
+            Label(String(localized: "AutoFill websites", comment: "Menu"), systemImage: "globe")
+        }
+        .help(String(localized: "Choose the websites AutoFill suggests the code on", comment: "Toolbar help"))
     }
 
     private var copyToolbarItem: some ToolbarContent {
