@@ -180,6 +180,25 @@ final class MacScreenshotTests: XCTestCase {
         XCTAssertLessThanOrEqual(row.frame.maxX, window.frame.maxX)
     }
 
+    /// Dragging the window's corner past the width where the two columns become one, both ways, with a list longer than
+    /// the window that adds rows during the drag. Replacing the list during the drag used to crash the app.
+    @MainActor func testResizingAcrossColumnLayouts() throws {
+        let window = try relaunch(windowSize: "800x430", arguments: ["-DemoExtraAccounts", "30"])
+        let row = accountRow(in: window)
+        for _ in 0..<6 {
+            for (dx, dy) in [(-300.0, 260.0), (300.0, -260.0)] {
+                let origin = window.coordinate(withNormalizedOffset: .zero)
+                let corner = origin.withOffset(CGVector(dx: window.frame.width - 1, dy: window.frame.height - 1))
+                corner.click(forDuration: 0.2, thenDragTo: corner.withOffset(CGVector(dx: dx, dy: dy)),
+                              withVelocity: .slow, thenHoldForDuration: 0.2)
+                XCTAssertTrue(row.waitForExistence(timeout: 5), "The app quit during the drag")
+                let splitter = window.splitters.firstMatch
+                XCTAssertTrue(dx > 0 ? splitter.waitForExistence(timeout: 5) : splitter.waitForNonExistence(timeout: 5),
+                              "The layout didn't follow the window")
+            }
+        }
+    }
+
     /// In a narrow window the details open over the list, and Back returns to it.
     @MainActor func testSingleColumnWindow() throws {
         let window = try relaunch(windowSize: "420x700")

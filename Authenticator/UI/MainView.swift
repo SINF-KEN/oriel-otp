@@ -38,6 +38,8 @@ struct MainView: View {
     @State var commands = MainWindowCommands.shared
     /// The account open over the list in the single column layout.
     @State var singleColumnPath: [String] = []
+    /// The layout kept while the window is being resized, true for the single column. See `mainLayout`.
+    @State private var layoutDuringResize: Bool?
     /// For the arrow keys, which only reach the list while it has the focus.
     @FocusState private var isListFocused: Bool
     #else
@@ -249,13 +251,24 @@ struct MainView: View {
     /// Two columns while both fit, otherwise one, as on an iPhone, which also happens as the text gets bigger. A split
     /// view doesn't do this itself on the Mac, and when its columns don't fit, it's centered in the window and cut off
     /// on both sides.
+    ///
+    /// The layout only changes once a resize ends. Replacing the list during one crashes the app: AppKit ends the
+    /// table's live resize as it's removed, which adds rows to a table SwiftUI is already destroying.
     private var mainLayout: some View {
         GeometryReader { reader in
             let minimumWidth = Self.minimumColumnWidth * textScale
-            if reader.size.width < 2 * minimumWidth {
-                singleColumnView
-            } else {
-                splitView(sidebarWidth: minimumWidth...(reader.size.width - minimumWidth))
+            let isSingleColumn = layoutDuringResize ?? (reader.size.width < 2 * minimumWidth)
+            ZStack {
+                LiveResizeObserver { isResizing in
+                    layoutDuringResize = isResizing ? isSingleColumn : nil
+                }
+                if isSingleColumn {
+                    singleColumnView
+                } else {
+                    // The window can be too narrow for two columns during a resize. They share it until it ends.
+                    let sidebarMinimum = min(minimumWidth, reader.size.width / 2)
+                    splitView(sidebarWidth: sidebarMinimum...(reader.size.width - sidebarMinimum))
+                }
             }
         }
     }
