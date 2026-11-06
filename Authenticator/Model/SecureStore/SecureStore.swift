@@ -110,7 +110,12 @@ nonisolated final class SecureStore: Sendable {
     validating password with device's biometric or passcode protection.
     */
     @concurrent public func getValue(for userAccount: String) async throws -> Data {
-        guard let data = try copyValueData(for: userAccount, useAuthentication: hasValueProtected(for: userAccount)) else {
+        try await getValue(for: userAccount, authentication: nil)
+    }
+
+    /// Doesn't ask the user if `authentication` satisfies the item's access control.
+    @concurrent func getValue(for userAccount: String, authentication: KeychainAuthentication?) async throws -> Data {
+        guard let data = try copyValueData(for: userAccount, useAuthentication: hasValueProtected(for: userAccount), authentication: authentication) else {
             throw SecureStoreError.dataCastError
         }
         return data
@@ -132,8 +137,11 @@ nonisolated final class SecureStore: Sendable {
     }
     
     /// Blocks while the user authenticates if the item is protected. Returns nil if the item has no data.
-    private func copyValueData(for userAccount: String, useAuthentication: Bool) throws -> Data? {
+    private func copyValueData(for userAccount: String, useAuthentication: Bool, authentication: KeychainAuthentication? = nil) throws -> Data? {
         var query = secureStoreQueryable.setUpQuery(useAuthentication: useAuthentication)
+        if let authentication {
+            query[String(kSecUseAuthenticationContext)] = authentication.context
+        }
         query[String(kSecMatchLimit)] = kSecMatchLimitOne
         query[String(kSecReturnAttributes)] = kCFBooleanTrue
         query[String(kSecReturnData)] = kCFBooleanTrue

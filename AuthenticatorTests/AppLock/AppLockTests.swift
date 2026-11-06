@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import LocalAuthentication
 import Testing
 
 @testable import OrielOTP
@@ -74,7 +75,7 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
 
     func makeLock(now: @escaping () -> Date = { Date(timeIntervalSinceReferenceDate: 800_000_000) },
                   deviceOwner: Bool = true) -> AppLock {
-        AppLock(storage: storage, defaults: defaults, now: now, authenticateDeviceOwner: { _ in deviceOwner })
+        AppLock(storage: storage, defaults: defaults, now: now, authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil })
     }
 
     @Test func notLockedWithoutALock() {
@@ -133,7 +134,7 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
 
     @Test func waitsAfterTooManyWrongAttempts() throws {
         var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
-        let lock = AppLock(storage: storage, defaults: defaults, now: { now }, authenticateDeviceOwner: { _ in true })
+        let lock = AppLock(storage: storage, defaults: defaults, now: { now }, authenticateDeviceOwner: { _ in KeychainAuthentication(context: LAContext()) })
         try lock.setMethod(.code4, secret: "1234")
         lock.lock()
         for _ in 0..<4 {
@@ -150,7 +151,7 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(lock.retryDate == now.addingTimeInterval(60))
 
         // The wait survives the app being restarted.
-        let restarted = AppLock(storage: storage, defaults: defaults, now: { now }, authenticateDeviceOwner: { _ in true })
+        let restarted = AppLock(storage: storage, defaults: defaults, now: { now }, authenticateDeviceOwner: { _ in KeychainAuthentication(context: LAContext()) })
         #expect(restarted.retryDate == now.addingTimeInterval(60))
 
         now = now.addingTimeInterval(61)
@@ -243,6 +244,35 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(restarted.isLocked)
         #expect(restarted.method == .code4)
         #expect(restarted.unlock(with: "1234"))
+    }
+
+    @Test func waitingActionsGetTheFaceIDThatUnlockedTheApp() async throws {
+        let context = LAContext()
+        let lock = AppLock(storage: storage, defaults: defaults, authenticateDeviceOwner: { _ in KeychainAuthentication(context: context) })
+        try lock.setMethod(.device)
+        lock.lock()
+
+        var authentication: KeychainAuthentication?
+        lock.whenUnlocked { authentication = lock.unlockAuthentication }
+        await lock.unlockWithDeviceOwner()
+
+        #expect(authentication?.context === context)
+        // Nothing later can use it.
+        #expect(lock.unlockAuthentication == nil)
+    }
+
+    @Test func aCodeLeavesNoFaceIDForTheWaitingActions() throws {
+        let lock = makeLock()
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+
+        var didRun = false
+        lock.whenUnlocked {
+            didRun = true
+            #expect(lock.unlockAuthentication == nil)
+        }
+        #expect(lock.unlock(with: "1234"))
+        #expect(didRun)
     }
 
     @Test func unlocksOnceTheKeychainShowsThereIsNoLock() {
