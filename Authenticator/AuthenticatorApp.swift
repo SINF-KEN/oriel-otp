@@ -117,8 +117,7 @@ struct AuthenticatorApp: App {
         .commandsRemoved()
 
         MenuBarExtra(isInserted: $menuBar.isShown) {
-            MenuBarAccountsView()
-                .appLockCover()
+            MenuBarView()
                 .withAppEnvironment(self)
                 .appTextSize()
         } label: {
