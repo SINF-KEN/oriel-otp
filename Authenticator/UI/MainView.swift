@@ -160,7 +160,8 @@ struct MainView: View {
                 // session's Face ID would come up over it or compete with it.
                 AppLock.shared.whenUnlocked {
                     model.start() // This is called when app becomes active
-                    Task { await model.cloud.syncAutomatically() }
+                    let authentication = AppLock.shared.unlockAuthentication
+                    Task { await model.cloud.syncAutomatically(authentication: authentication) }
                     performPendingQuickAction()
                 }
             } else if phase == .active {

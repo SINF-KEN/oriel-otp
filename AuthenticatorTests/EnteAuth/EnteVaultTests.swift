@@ -16,6 +16,7 @@
 
 import CryptoKit
 import Foundation
+import LocalAuthentication
 import Testing
 import YubiKit
 
@@ -399,6 +400,22 @@ struct EnteVaultTests {
         cloud.setPinned(id, false)
         cloud.rename(id, issuer: "GitHub", accountName: "alice")
         #expect(!cloud.hasPendingChanges)
+    }
+
+    @Test func theFaceIDThatUnlockedTheAppUnlocksTheSession() async throws {
+        let defaults = makeTestDefaults()
+        let keychain = InMemoryKeychain()
+        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
+        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        let storage = InMemoryVaultStorage()
+        try storage.save(EnteVault(email: "alice@example.com", server: server))
+        let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+
+        let context = LAContext()
+        await cloud.syncAutomatically(authentication: KeychainAuthentication(context: context))
+
+        #expect(keychain.authentications.count == 1)
+        #expect(keychain.authentications.first??.context === context)
     }
 
     @Test func readsAVaultLockedAtLaunchOnceTheDeviceIsUnlocked() async throws {

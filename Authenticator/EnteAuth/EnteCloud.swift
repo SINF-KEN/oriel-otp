@@ -185,14 +185,14 @@ import YubiKit
     }
 
     /// The session in memory, or the saved one after Face ID or Touch ID if `unlock` is set. Nil if it can't be had.
-    private func unlockedSession(unlock: Bool) async -> EnteSavedSession? {
+    private func unlockedSession(unlock: Bool, authentication: KeychainAuthentication? = nil) async -> EnteSavedSession? {
         if let session { return session }
         guard unlock else { return nil }
         if let unlockTask { return await unlockTask.value }
         didAskToUnlock = true
         let task = Task { () -> EnteSavedSession? in
             do {
-                return try await store.unlock()
+                return try await store.unlock(authentication: authentication)
             } catch EnteAuthenticatorSyncError.signedOut {
                 sessionRejected()
                 return nil
@@ -224,16 +224,17 @@ import YubiKit
     // MARK: - Sync
 
     /// Syncs if the session is unlocked, or after asking to unlock it the first time since the app started. For when
-    /// the app comes to the foreground. Errors aren't shown, except for a rejected session.
-    func syncAutomatically() async {
-        await sync(unlock: !didAskToUnlock)
+    /// the app comes to the foreground. Errors aren't shown, except for a rejected session. `authentication` is the
+    /// Face ID or Touch ID that just unlocked the app, if any, so the session doesn't ask for it a second time.
+    func syncAutomatically(authentication: KeychainAuthentication? = nil) async {
+        await sync(unlock: !didAskToUnlock, authentication: authentication)
     }
 
     /// Syncs, asking to unlock the session if needed. Errors are shown if `reportsErrors` is set, e.g. when the user
     /// pulled down the list; changes made offline just wait for the next sync.
-    func sync(unlock: Bool = true, reportsErrors: Bool = false) async {
+    func sync(unlock: Bool = true, reportsErrors: Bool = false, authentication: KeychainAuthentication? = nil) async {
         loadVaultIfLocked()
-        guard vault != nil, let session = await unlockedSession(unlock: unlock) else { return }
+        guard vault != nil, let session = await unlockedSession(unlock: unlock, authentication: authentication) else { return }
         do {
             try await enqueueSync(session).value
         } catch EnteAuthenticatorSyncError.signedOut {

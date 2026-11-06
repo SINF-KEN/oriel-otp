@@ -151,6 +151,14 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     }
 }
 
+/// A Face ID, Touch ID or passcode check that already succeeded. Reading a protected item with it doesn't ask again,
+/// as long as the check satisfies the item's access control: the device passcode doesn't satisfy `biometryCurrentSet`.
+/// Keep it only as long as it's needed, as it reads protected items without the user knowing.
+nonisolated struct KeychainAuthentication: @unchecked Sendable {
+    // Only ever passed to the keychain, never changed after it was evaluated.
+    let context: LAContext
+}
+
 /// Locks the account list behind Face ID or Touch ID, a 4 or 6 digit code, or a password.
 ///
 /// The app locks when it starts and whenever it goes to the background, or on the Mac when the screen locks or the
@@ -182,6 +190,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     private(set) var retryDate: Date?
     /// Face ID or Touch ID is being asked for.
     private(set) var isAuthenticating = false
+    /// The Face ID or Touch ID that just unlocked the app, for what's waiting in `whenUnlocked` to read the keychain
+    /// without asking again. Only set while those actions run, so it can't approve anything later on.
+    @ObservationIgnored private(set) var unlockAuthentication: KeychainAuthentication?
 
     @ObservationIgnored private let storage: AppLockStorage
     @ObservationIgnored private let defaults: UserDefaults
@@ -189,7 +200,7 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     @ObservationIgnored private let attempts: UserDefaults
     @ObservationIgnored private let keepsSavedLock: Bool
     @ObservationIgnored private let now: () -> Date
-    @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> Bool
+    @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> KeychainAuthentication?
     @ObservationIgnored private var pendingActions: [@MainActor () -> Void] = []
     @ObservationIgnored private var didAskForDeviceOwner = false
 
@@ -202,7 +213,7 @@ nonisolated struct AppLockKeychain: AppLockStorage {
          attempts: UserDefaults? = nil,
          keepsSavedLock: Bool = false,
          now: @escaping () -> Date = Date.init,
-         authenticateDeviceOwner: @escaping @MainActor (String) async -> Bool = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
+         authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
         self.storage = storage
         self.defaults = defaults
         self.attempts = attempts ?? defaults
@@ -275,9 +286,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     func unlockWithDeviceOwner() async {
         guard isLocked, method == .device, !isAuthenticating else { return }
         isAuthenticating = true
-        let success = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
+        let authentication = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
         isAuthenticating = false
-        if success { unlock() }
+        if let authentication { unlock(authentication: authentication) }
     }
 
     /// Unlocks if `secret` is the code or password. Returns false when it isn't, or it's too early to try again.
@@ -305,7 +316,7 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 
     /// Asks for Face ID, Touch ID or the device passcode before the lock is changed from or to the device method.
     func verifyDeviceOwner() async -> Bool {
-        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock"))
+        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
     }
 
     /// Changes the lock. `secret` is the new code or password, for the methods that have one.
@@ -340,16 +351,19 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         self.retryDate = retryDate > now() ? retryDate : nil
     }
 
-    private func unlock() {
+    private func unlock(authentication: KeychainAuthentication? = nil) {
         isLocked = false
         let actions = pendingActions
         pendingActions = []
+        unlockAuthentication = authentication
         actions.forEach { $0() }
+        unlockAuthentication = nil
     }
 
-    nonisolated static func evaluateDeviceOwner(reason: String) async -> Bool {
+    nonisolated static func evaluateDeviceOwner(reason: String) async -> KeychainAuthentication? {
         let context = LAContext()
-        return (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) ?? false
+        guard (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) == true else { return nil }
+        return KeychainAuthentication(context: context)
     }
 
     /// Whether the device can check its owner, i.e. a passcode or password is set.
