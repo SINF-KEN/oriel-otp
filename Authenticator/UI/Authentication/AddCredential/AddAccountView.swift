@@ -132,7 +132,9 @@ struct AddAccountView: View {
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Add account field")) {
                         // Wraps rather than cutting off a long name at the larger text sizes.
-                        TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer, axis: .vertical)
+                        TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer,
+                                  prompt: Text(String(localized: "Optional", comment: "Add account issuer placeholder")), axis: .vertical)
+                            .formRowTextBox()
                             .submitsOnReturn($issuer, submit: focusNextField)
                             // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
                             .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
@@ -141,7 +143,8 @@ struct AddAccountView: View {
                             .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
-                        TextField(String("john@doe.com"), text: $accountName, axis: .vertical)
+                        TextField(String("john@doe.com"), text: $accountName, prompt: Text(verbatim: "john@doe.com"), axis: .vertical)
+                            .formRowTextBox()
                             .submitsOnReturn($accountName, submit: focusNextField)
                             .accessibilityLabel(String(localized: "Account name", comment: "Add account field"))
                             .accessibilityIdentifier("add-account.account-name")
@@ -153,7 +156,9 @@ struct AddAccountView: View {
                     }
                     if mode == .manual {
                         LabeledContent(String(localized: "Secret", comment: "Add account field")) {
-                            TextField(String(localized: "Secret", comment: "Add account field"), text: $secret)
+                            TextField(String(localized: "Secret", comment: "Add account field"), text: $secret,
+                                      prompt: Text(String(localized: "Secret", comment: "Add account field")))
+                                .formRowTextBox()
                                 .accessibilityIdentifier("add-account.secret")
                                 .textInputAutocapitalization(.characters)
                                 .autocorrectionDisabled()

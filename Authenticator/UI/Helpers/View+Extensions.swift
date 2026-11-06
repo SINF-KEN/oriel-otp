@@ -447,3 +447,18 @@ private extension Font.TextStyle {
 /// `@ScaledMetric`, which on the Mac is a size that grows with the app's own text size instead.
 typealias ScaledSize = ScaledMetric<CGFloat>
 #endif
+
+extension View {
+    /// For a text field in a `LabeledContent` row of a form. On the Mac a form shows the field's own title as a second
+    /// label and draws no box around it, so the row reads as plain text. This hides that title, which then needs a
+    /// `prompt` for its placeholder, and draws the box. On iOS the row's look already says it can be edited.
+    @ViewBuilder func formRowTextBox() -> some View {
+        #if os(macOS)
+        labelsHidden()
+            .textFieldStyle(.roundedBorder)
+            .multilineTextAlignment(.leading)
+        #else
+        self
+        #endif
+    }
+}
