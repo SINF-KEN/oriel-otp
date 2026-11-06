@@ -20,6 +20,7 @@ import Clibsodium
 enum EnteCryptoError: Error, Equatable {
     case sodiumInitFailed
     case keyDerivationFailed
+    case invalidKeyLimits
     case invalidLength
     case decryptionFailed
     case encryptionFailed
@@ -43,10 +44,23 @@ nonisolated enum EnteCrypto {
         guard isInitialized else { throw EnteCryptoError.sodiumInitFailed }
     }
 
+    /// Whether Argon2 limits sent by a server are safe to use. The limits come with the account and aren't
+    /// authenticated, so a server could otherwise have the password hashed cheaply, and then guess it from the SRP
+    /// proof, or ask for more than the device has.
+    ///
+    /// Ente's clients start from libsodium's sensitive limits, 1 GiB and 4 operations, and double the operations as
+    /// they halve the memory on devices that need it, stopping at 128 MiB today. The range is wider than that so that
+    /// older accounts keep working: at least libsodium's interactive limits, and at most its sensitive memory.
+    static func areKeyLimitsValid(opsLimit: UInt64, memLimit: UInt64) -> Bool {
+        (UInt64(crypto_pwhash_opslimit_interactive())...256).contains(opsLimit)
+            && (UInt64(crypto_pwhash_memlimit_interactive())...UInt64(crypto_pwhash_memlimit_sensitive())).contains(memLimit)
+    }
+
     /// Derives the key encryption key. This is slow and memory hungry by design, call it off the main actor.
     static func deriveKeyEncryptionKey(password: String, salt: Data, opsLimit: UInt64, memLimit: UInt64) throws -> Data {
         try ensureInitialized()
         guard salt.count == saltLength else { throw EnteCryptoError.invalidLength }
+        guard areKeyLimitsValid(opsLimit: opsLimit, memLimit: memLimit) else { throw EnteCryptoError.invalidKeyLimits }
         var key = [UInt8](repeating: 0, count: keyLength)
         let password = Array(password.utf8CString.dropLast())
         defer { sodium_memzero(&key, key.count) }

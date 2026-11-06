@@ -29,15 +29,29 @@ struct EnteCryptoTests {
 
     @Test func keyEncryptionKeyIsDeterministic() throws {
         let salt = Data(repeating: 1, count: EnteCrypto.saltLength)
-        let first = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: 2, memLimit: 8 * 1024 * 1024)
-        let second = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: 2, memLimit: 8 * 1024 * 1024)
+        let first = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: 2, memLimit: 64 * 1024 * 1024)
+        let second = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: 2, memLimit: 64 * 1024 * 1024)
         let otherSalt = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: Data(repeating: 2, count: EnteCrypto.saltLength),
-                                                              opsLimit: 2, memLimit: 8 * 1024 * 1024)
+                                                              opsLimit: 2, memLimit: 64 * 1024 * 1024)
         #expect(first.count == 32)
         #expect(first == second)
         #expect(first != otherSalt)
         #expect(throws: EnteCryptoError.invalidLength) {
-            try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: Data(count: 3), opsLimit: 2, memLimit: 8 * 1024 * 1024)
+            try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: Data(count: 3), opsLimit: 2, memLimit: 64 * 1024 * 1024)
+        }
+    }
+
+    @Test func keyLimitsFromTheServerAreChecked() throws {
+        let mebibyte: UInt64 = 1024 * 1024
+        for (opsLimit, memLimit) in [(4, 1024 * mebibyte), (16, 256 * mebibyte), (32, 128 * mebibyte), (64, 64 * mebibyte)] {
+            #expect(EnteCrypto.areKeyLimitsValid(opsLimit: UInt64(opsLimit), memLimit: memLimit))
+        }
+        let salt = Data(repeating: 1, count: EnteCrypto.saltLength)
+        for (opsLimit, memLimit) in [(UInt64(1), 64 * mebibyte), (2, 8 * 1024), (2, 63 * mebibyte), (0, 0),
+                                     (2, 2048 * mebibyte), (2, .max), (257, 64 * mebibyte), (.max, 64 * mebibyte)] {
+            #expect(throws: EnteCryptoError.invalidKeyLimits) {
+                try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: opsLimit, memLimit: memLimit)
+            }
         }
     }
 
@@ -131,7 +145,7 @@ struct FakeEnteAccount {
                                            publicKey: publicKey.base64EncodedString(),
                                            encryptedSecretKey: encryptedSecretKey.cipherText.base64EncodedString(),
                                            secretKeyDecryptionNonce: encryptedSecretKey.nonce.base64EncodedString(),
-                                           memLimit: 8 * 1024 * 1024, opsLimit: 2)
+                                           memLimit: 64 * 1024 * 1024, opsLimit: 2)
         authResponse = EnteAuthResponse(id: 42, keyAttributes: attributes,
                                         encryptedToken: try EnteCrypto.sealedBox(token, publicKey: publicKey).base64EncodedString())
     }
