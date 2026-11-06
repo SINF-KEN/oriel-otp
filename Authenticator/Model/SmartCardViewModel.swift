@@ -30,6 +30,8 @@ final class SmartCardViewModel {
 
     var certificatesCallback: ((_ result: Result<[Certificate]?, Error>) -> Void)?
     var tokensCallback: ((_ result: Result<[SecCertificate], Error>) -> Void)?
+    /// The PIV PIN attempts left on the YubiKey, nil when there's no YubiKey or they couldn't be read.
+    var pinAttemptsCallback: ((_ attempts: Int?) -> Void)?
 
     init() {
         Logger.allocation.debug("SmartCardViewModel: init")
@@ -50,6 +52,7 @@ final class SmartCardViewModel {
                     await self?.readCertificates(connection: connection)
                 } else {
                     self?.certificatesCallback?(.success(nil))
+                    self?.pinAttemptsCallback?(nil)
                 }
             }
         }
@@ -101,6 +104,8 @@ final class SmartCardViewModel {
                 }
             }
             certificatesCallback?(.success(certificates))
+            // Reading the attempts left doesn't use one up.
+            pinAttemptsCallback?(try? await session.getPinAttempts())
             ConnectionManager.shared.closeNFC(message: String(localized: "Finished reading certificates", comment: "PIV extension NFC finished reading certs"))
         } catch {
             certificatesCallback?(.failure(error))

@@ -153,6 +153,20 @@ nonisolated extension Error {
         }
     }
 
+    /// The error from the HID FIDO connection the Mac uses for FIDO.
+    private var fidoConnectionError: FIDOConnectionError? {
+        switch self {
+        case let error as FIDOConnectionError: return error
+        case let error as CTAP2.SessionError:
+            if case let .fidoConnectionError(error, _) = error { return error }
+        case let error as ManagementSessionError:
+            if case let .fidoConnectionError(error, _) = error { return error }
+        default:
+            break
+        }
+        return nil
+    }
+
     private var connectionError: SmartCardConnectionError? {
         switch self {
         case let error as SmartCardConnectionError: return error
@@ -190,8 +204,26 @@ nonisolated extension Error {
                 return String(localized: "YubiKey connection is not found.")
             }
         }
+        if let fidoConnectionError {
+            switch fidoConnectionError {
+            case .connectionLost:
+                return String(localized: "YubiKey connection lost.")
+            case .noDevicesFound:
+                return String(localized: "The YubiKey is not connected.")
+            case .busy:
+                return String(localized: "The key is busy performing another operation.")
+            case .cancelled:
+                return String(localized: "Connection cancelled by user", comment: "Internal error message not to be displayed to the user.")
+            default:
+                return String(localized: "YubiKey connection is not found.")
+            }
+        }
         if isApplicationNotSupported {
             return String(localized: "The requested functionality is missing or disabled in this YubiKey.")
+        }
+        // YubiKit rejects a TOTP period that isn't a whole number of seconds.
+        if case .illegalArgument = self as? YubiKitOATHSessionError {
+            return String(localized: "The account's time period isn't supported by the YubiKey.")
         }
         if responseStatus == .noSpace {
             return String(localized: "The YubiKey has no more storage for OATH accounts.")
