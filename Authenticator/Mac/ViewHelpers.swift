@@ -70,10 +70,7 @@ struct ListScrollerInset: NSViewRepresentable {
 
     func updateNSView(_ view: InsetView, context: Context) {
         view.hasSectionHeader = hasSectionHeader
-        // After SwiftUI has updated the list's rows.
-        DispatchQueue.main.async {
-            view.updateInset()
-        }
+        view.scheduleUpdate()
     }
 
     final class InsetView: NSView {
@@ -82,13 +79,19 @@ struct ListScrollerInset: NSViewRepresentable {
 
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
+            scheduleUpdate()
+        }
+
+        /// After the update or layout going on, as the scroller wouldn't move for an inset set during a layout. The
+        /// table's frame changes with its rows, whose heights change with the text size, and the scroller's with the
+        /// insets.
+        @objc func scheduleUpdate() {
             DispatchQueue.main.async { [weak self] in
                 self?.updateInset()
             }
         }
 
-        /// The table's frame changes with its rows, whose heights change with the text size.
-        @objc func updateInset() {
+        private func updateInset() {
             guard let table = table ?? findTable(), let scrollView = table.enclosingScrollView else { return }
             let inset = hasSectionHeader && table.numberOfRows > 0 ? table.rect(ofRow: 0).height : 0
             if scrollView.scrollerInsets.top != inset {
@@ -102,8 +105,12 @@ struct ListScrollerInset: NSViewRepresentable {
             while let view = ancestor {
                 if let table = Self.table(in: view) {
                     self.table = table
-                    NotificationCenter.default.addObserver(self, selector: #selector(updateInset),
-                                                           name: NSView.frameDidChangeNotification, object: table)
+                    // SwiftUI resets the insets when it updates the list, e.g. as the lock screen goes away, which
+                    // moves the scroller.
+                    for view in [table, table.enclosingScrollView?.verticalScroller].compactMap(\.self) as [NSView] {
+                        NotificationCenter.default.addObserver(self, selector: #selector(scheduleUpdate),
+                                                               name: NSView.frameDidChangeNotification, object: view)
+                    }
                     return table
                 }
                 ancestor = view.superview
