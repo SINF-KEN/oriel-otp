@@ -633,10 +633,18 @@ struct MainView: View {
                 .listRowSeparator(.hidden)
             }
         }
+        #if os(macOS)
+        .background { ListScrollerInset(hasSectionHeader: showsSectionHeader) }
+        #endif
     }
     }
 
     #if os(macOS)
+    /// Whether the list starts with a section's header, as search results and an unsorted list don't have any.
+    private var showsSectionHeader: Bool {
+        otp != nil || (model.hasAccounts && searchText.isEmpty && model.pinnedAccounts.count > 0)
+    }
+
     @ToolbarContentBuilder private var macToolbar: some CustomizableToolbarContent {
         // Together, not on their own: a secondary action floats in the middle of the Mac sidebar's toolbar.
         ToolbarItem(id: "sync-from-ente", placement: .primaryAction) {
