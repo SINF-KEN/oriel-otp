@@ -216,6 +216,10 @@ revoked with `POST /users/logout`.
 
 Enter the API URL of the server, e.g. `https://ente.example.com`, under Options. Only `https` URLs are accepted.
 
+A server on the local network makes the system ask for Local Network access the first time the app connects to it, using
+`NSLocalNetworkUsageDescription`. If that's declined, the connection fails until it's allowed in the system's privacy
+settings. Servers on the internet don't trigger the prompt.
+
 ## Code
 
 Everything lives in `Authenticator/EnteAuth/` and is added to the project as a synchronized folder:
