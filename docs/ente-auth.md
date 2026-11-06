@@ -147,7 +147,9 @@ is taken to be that item. Ente's server has no compare-and-swap, so two devices 
 sync of each other can still overwrite each other; the last write wins there.
 
 A sync needs the saved session. It is unlocked with Face ID or Touch ID (Touch ID or the password on the Mac) the
-first time it is needed after the app starts, and then kept in memory until the app quits. The app syncs:
+first time it is needed after the app starts, and then kept in memory until the app quits. When the app lock is
+set to Face ID or Touch ID, the check that unlocks the app also unlocks the session, so it is only asked for once.
+If the device passcode was used instead, Face ID is still asked for, as the session needs it. The app syncs:
 
 - when it comes to the foreground, asking for the unlock only once per launch,
 - when the list is pulled down (iPhone and iPad) or refreshed (Mac), which also shows errors,

@@ -30,6 +30,12 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
     private var items: [String: Data] = [:]
     private var protectedItems: Set<String> = []
     private var _writes: [Write] = []
+    private var _authentications: [KeychainAuthentication?] = []
+
+    /// The authentication of each read.
+    var authentications: [KeychainAuthentication?] {
+        lock.withLock { _authentications }
+    }
 
     var writes: [Write] {
         lock.withLock { _writes }
@@ -55,7 +61,8 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
         }
     }
 
-    func getValue(for userAccount: String) async throws -> Data {
+    func getValue(for userAccount: String, authentication: KeychainAuthentication?) async throws -> Data {
+        lock.withLock { _authentications.append(authentication) }
         guard let value = lock.withLock({ items[userAccount] }) else { throw SecureStoreError.itemNotFound }
         return value
     }
