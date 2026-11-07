@@ -1,18 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="456" height="1086" viewBox="0 0 456 1086">
-<g transform="translate(228 1052) rotate(180) scale(0.62)">
-<rect x="-38" y="244" width="76" height="84" rx="14" fill="#C7C7CC"/>
-<rect x="-48" y="244" width="96" height="20" rx="6" fill="#8E8E93"/>
-<path fill-rule="evenodd" fill="#B2001F" d="M-49 0H49A36 36 0 0 1 85 36V214A36 36 0 0 1 49 250H-49A36 36 0 0 1 -85 214V36A36 36 0 0 1 -49 0ZM-15 42a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z"/>
-<rect x="-46" y="106" width="92" height="92" rx="29.44" fill="#F7C6CE"/>
-<rect x="-36.8" y="115.2" width="73.6" height="73.6" rx="23" fill="#B2001F"/>
-<rect x="-29.44" y="122.56" width="58.88" height="58.88" rx="17.48" fill="#F7C6CE"/>
-</g>
-<rect x="8" y="8" width="440" height="880" rx="70.4" fill="#8E8E93"/>
-<rect x="22" y="22" width="412" height="852" rx="58.4" fill="#F2F2F7"/>
-<rect x="166.4" y="40" width="123.2" height="33" rx="16.5" fill="#3A3A3C"/>
-<path d="M74,958 L140,958" stroke="#8E8E93" stroke-width="6" stroke-linecap="round"/>
-<path d="M164,958 L130,940 L130,976 z" fill="#8E8E93"/>
-<path d="M382,958 L316,958" stroke="#8E8E93" stroke-width="6" stroke-linecap="round"/>
-<path d="M292,958 L326,940 L326,976 z" fill="#8E8E93"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="456" height="1086" viewBox="0 0 456 1086"><g transform="translate(228 1052)scale(-.62)"><rect width="76" height="84" x="-38" y="244" fill="#c7c7cc" rx="14"/><rect width="96" height="20" x="-48" y="244" fill="#8e8e93" rx="6"/><path fill="#b2001f" fill-rule="evenodd" d="M-49 0h98a36 36 0 0 1 36 36v178a36 36 0 0 1-36 36h-98a36 36 0 0 1-36-36V36A36 36 0 0 1-49 0m34 42a15 15 0 1 0 30 0 15 15 0 1 0-30 0"/><rect width="92" height="92" x="-46" y="106" fill="#f7c6ce" rx="29.44"/><rect width="73.6" height="73.6" x="-36.8" y="115.2" fill="#b2001f" rx="23"/><rect width="58.88" height="58.88" x="-29.44" y="122.56" fill="#f7c6ce" rx="17.48"/></g><rect width="440" height="880" x="8" y="8" fill="#8e8e93" rx="70.4"/><rect width="412" height="852" x="22" y="22" fill="#f2f2f7" rx="58.4"/><rect width="123.2" height="33" x="166.4" y="40" fill="#3a3a3c" rx="16.5"/><path stroke="#8e8e93" stroke-linecap="round" stroke-width="6" d="M74 958h66"/><path fill="#8e8e93" d="m164 958-34-18v36z"/><path stroke="#8e8e93" stroke-linecap="round" stroke-width="6" d="M382 958h-66"/><path fill="#8e8e93" d="m292 958 34-18v36z"/></svg>

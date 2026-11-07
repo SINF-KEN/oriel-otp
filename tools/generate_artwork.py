@@ -4,11 +4,15 @@
 The drawings are the app's own and use the colors of the app icon. Run from the repository root:
 
     python3 tools/generate_artwork.py
+
+The images are then optimized with SVGO, which needs Node. The symbol set is left alone, because Xcode reads the
+ids and guides of its template.
 """
 
 import json
 import math
 import random
+import subprocess
 from pathlib import Path
 
 ASSETS = Path(__file__).resolve().parent.parent / "Authenticator" / "Assets.xcassets"
@@ -366,6 +370,12 @@ def write_imageset(name, light, dark=None):
     (folder / "Contents.json").write_text(json.dumps(contents, indent=2) + "\n")
 
 
+def optimize_images():
+    images = [path for pattern in ("SecurityKeys/*/*.svg", "Tutorial/*/*.svg", "InsertKey.imageset/*.svg")
+              for path in sorted(ASSETS.glob(pattern))]
+    subprocess.run(["npx", "--yes", "svgo@4.1.0", "--multipass", "--quiet", *images], check=True)
+
+
 def main():
     write_folder("SecurityKeys")
     write_folder("Tutorial")
@@ -378,6 +388,7 @@ def main():
     for name, draw in pages.items():
         write_imageset(f"Tutorial/{name}.imageset", draw(LIGHT), draw(DARK))
     write_symbol("securitykey")
+    optimize_images()
 
 
 if __name__ == "__main__":
