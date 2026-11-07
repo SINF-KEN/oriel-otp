@@ -793,8 +793,6 @@ struct MainView: View {
                         }
                         .labelStyle(.iconOnly)
                         .buttonStyle(.borderless)
-                        // Asks for no room, so the pointer being over a row doesn't change how it's laid out.
-                        .frame(minWidth: 0, idealWidth: 0)
                     }
                 }
             }

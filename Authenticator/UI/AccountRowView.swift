@@ -130,33 +130,36 @@ struct AccountRowView<Accessory: View>: View {
                     .clipShape(.circle)
                     .padding(.trailing, 5)
                     .accessibilityHidden(true)
-                VStack(alignment: .leading) {
-                    HStack(spacing: 4) {
-                        Text(account.title.leftToRightIfAddress)
-                            .scaledFont(titleStyle) { $0.weight(.medium) }
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.9)
-                            .truncationMode(.tail)
-                        if showsLocation {
-                            AccountLocationIcon(account: account)
+                HStack {
+                    VStack(alignment: .leading) {
+                        HStack(spacing: 4) {
+                            Text(account.title.leftToRightIfAddress)
+                                .scaledFont(titleStyle) { $0.weight(.medium) }
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.9)
+                                .truncationMode(.tail)
+                            if showsLocation {
+                                AccountLocationIcon(account: account)
+                                    .scaledFont(subtitleStyle)
+                                    .foregroundStyle(secondaryStyle)
+                            }
+                        }
+                        account.subTitle.map {
+                            Text($0.leftToRightIfAddress)
                                 .scaledFont(subtitleStyle)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.9)
+                                .truncationMode(.tail)
                                 .foregroundStyle(secondaryStyle)
                         }
                     }
-                    account.subTitle.map {
-                        Text($0.leftToRightIfAddress)
-                            .scaledFont(subtitleStyle)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.9)
-                            .truncationMode(.tail)
-                            .foregroundStyle(secondaryStyle)
-                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    accessory
                 }
-                // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether
-                // the row fits on one line doesn't depend on how long the name is.
+                // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether the
+                // row fits on one line depends on neither how long the name is nor whether the accessory is showing.
                 .frame(minWidth: 0, idealWidth: minimumNameWidth, maxWidth: .infinity, alignment: .leading)
             }
-            accessory
             copyButton { codePill }
         }
     }
