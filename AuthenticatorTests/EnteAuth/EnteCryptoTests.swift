@@ -44,7 +44,7 @@ struct EnteCryptoTests {
     @Test func keyLimitsFromTheServerAreChecked() throws {
         let mebibyte: UInt64 = 1024 * 1024
         for (opsLimit, memLimit) in [(4, 1024 * mebibyte), (16, 256 * mebibyte), (32, 128 * mebibyte), (64, 64 * mebibyte)] {
-            #expect(EnteCrypto.areKeyLimitsValid(opsLimit: UInt64(opsLimit), memLimit: memLimit))
+            #expect(EnteCrypto.isAllowed(opsLimit: UInt64(opsLimit), memLimit: memLimit))
         }
         let salt = Data(repeating: 1, count: EnteCrypto.saltLength)
         for (opsLimit, memLimit) in [(UInt64(1), 64 * mebibyte), (2, 8 * 1024), (2, 63 * mebibyte), (0, 0),
@@ -53,6 +53,34 @@ struct EnteCryptoTests {
                 try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: opsLimit, memLimit: memLimit)
             }
         }
+    }
+
+    // These must fail straight away: actually running one would take the test's memory or never end.
+    private nonisolated static let mebibyte: UInt64 = 1024 * 1024
+    private nonisolated static let limitsTooHigh: [(UInt64, UInt64)] = [
+        (2, .max),
+        (2, 2048 * mebibyte),
+        (.max, 8 * mebibyte),
+        (1 << 40, 1024 * mebibyte),
+    ]
+
+    @Test(arguments: limitsTooHigh) func limitsFromTheServerThatAreTooHighFail(opsLimit: UInt64, memLimit: UInt64) {
+        #expect(throws: EnteCryptoError.invalidKeyLimits) {
+            try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: Data(repeating: 1, count: EnteCrypto.saltLength), opsLimit: opsLimit, memLimit: memLimit)
+        }
+    }
+
+    // Ente's sensitive, moderate and interactive limits, and what low memory devices fall back to.
+    private nonisolated static let realLimits: [(UInt64, UInt64)] = [
+        (4, 1024 * mebibyte),
+        (3, 256 * mebibyte),
+        (2, 64 * mebibyte),
+        (16, 256 * mebibyte),
+        (64, 64 * mebibyte),
+    ]
+
+    @Test(arguments: realLimits) func limitsAccountsReallyHaveAreAllowed(opsLimit: UInt64, memLimit: UInt64) {
+        #expect(EnteCrypto.isAllowed(opsLimit: opsLimit, memLimit: memLimit))
     }
 
     @Test func secretBoxRoundTrip() throws {

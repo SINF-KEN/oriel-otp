@@ -147,8 +147,9 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
     }
 
     @Test func waitsAfterTooManyWrongAttempts() throws {
-        var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
-        let lock = makeLock(now: { now }, uptime: { now.timeIntervalSinceReferenceDate })
+        let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+        var uptime: TimeInterval = 1000
+        let lock = makeLock(now: { now }, uptime: { uptime })
         try lock.setMethod(.code4, secret: "1234")
         lock.lock()
         for _ in 0..<4 {
@@ -160,15 +161,15 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         // The right code isn't accepted while waiting.
         #expect(!lock.unlock(with: "1234"))
 
-        now = now.addingTimeInterval(31)
+        uptime += 31
         #expect(!lock.unlock(with: "0000"))
         #expect(lock.retryDate == now.addingTimeInterval(60))
 
         // The wait survives the app being restarted.
-        let restarted = makeLock(now: { now }, uptime: { now.timeIntervalSinceReferenceDate })
+        let restarted = makeLock(now: { now }, uptime: { uptime })
         #expect(restarted.retryDate == now.addingTimeInterval(60))
 
-        now = now.addingTimeInterval(61)
+        uptime += 61
         #expect(restarted.unlock(with: "1234"))
         #expect(restarted.retryDate == nil)
         restarted.lock()
@@ -264,6 +265,48 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         lock.relock()
         #expect(lock.isLocked)
         #expect(lock.isUnavailable)
+    }
+
+    /// A lock with 5 wrong attempts made, so it waits 30 seconds.
+    private func waitingLock(now: @escaping () -> Date, uptime: @escaping () -> TimeInterval) throws -> AppLock {
+        let lock = makeLock(now: now, uptime: uptime, deviceOwner: false)
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        for _ in 0..<5 {
+            lock.unlock(with: "0000")
+        }
+        return lock
+    }
+
+    @Test func changingTheClockDoesNotEndTheWait() throws {
+        var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+        let lock = try waitingLock(now: { now }, uptime: { 1000 })
+
+        now = now.addingTimeInterval(365 * 24 * 3600)
+        #expect(!lock.unlock(with: "1234"))
+        #expect(lock.retryDate == now.addingTimeInterval(30))
+
+        // Setting it back doesn't make the wait longer either.
+        now = now.addingTimeInterval(-2 * 365 * 24 * 3600)
+        #expect(!lock.unlock(with: "1234"))
+        #expect(lock.retryDate == now.addingTimeInterval(30))
+    }
+
+    @Test func restartingTheDeviceStartsTheWaitOver() throws {
+        let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+        var uptime: TimeInterval = 100_000
+        let lock = try waitingLock(now: { now }, uptime: { uptime })
+
+        uptime = 5
+        #expect(!lock.unlock(with: "1234"))
+        #expect(lock.retryDate == now.addingTimeInterval(30))
+
+        uptime = 34
+        lock.updateRetryDate()
+        #expect(lock.retryDate == now.addingTimeInterval(1))
+
+        uptime = 36
+        #expect(lock.unlock(with: "1234"))
     }
 
     @Test func deviceOwnerUnlocks() async throws {

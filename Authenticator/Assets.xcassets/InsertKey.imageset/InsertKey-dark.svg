@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="170" height="328" viewBox="0 0 170 328">
-<g transform="translate(85 0)">
-<rect x="-38" y="244" width="76" height="84" rx="14" fill="#AEAEB2"/>
-<rect x="-48" y="244" width="96" height="20" rx="6" fill="#636366"/>
-<path fill-rule="evenodd" fill="#C8102E" d="M-49 0H49A36 36 0 0 1 85 36V214A36 36 0 0 1 49 250H-49A36 36 0 0 1 -85 214V36A36 36 0 0 1 -49 0ZM-15 42a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z"/>
-<rect x="-46" y="106" width="92" height="92" rx="29.44" fill="#FFBFCB"/>
-<rect x="-36.8" y="115.2" width="73.6" height="73.6" rx="23" fill="#C8102E"/>
-<rect x="-29.44" y="122.56" width="58.88" height="58.88" rx="17.48" fill="#FFBFCB"/>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="328" viewBox="0 0 170 328"><g transform="translate(85)"><rect width="76" height="84" x="-38" y="244" fill="#aeaeb2" rx="14"/><rect width="96" height="20" x="-48" y="244" fill="#636366" rx="6"/><path fill="#c8102e" fill-rule="evenodd" d="M-49 0h98a36 36 0 0 1 36 36v178a36 36 0 0 1-36 36h-98a36 36 0 0 1-36-36V36A36 36 0 0 1-49 0m34 42a15 15 0 1 0 30 0 15 15 0 1 0-30 0"/><rect width="92" height="92" x="-46" y="106" fill="#ffbfcb" rx="29.44"/><rect width="73.6" height="73.6" x="-36.8" y="115.2" fill="#c8102e" rx="23"/><rect width="58.88" height="58.88" x="-29.44" y="122.56" fill="#ffbfcb" rx="17.48"/></g></svg>

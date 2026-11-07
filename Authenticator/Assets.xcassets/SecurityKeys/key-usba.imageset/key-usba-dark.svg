@@ -1,12 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500">
-<g transform="translate(250 53)">
-<rect x="-60" y="244" width="120" height="150" rx="8" fill="#AEAEB2"/>
-<rect x="-36" y="314" width="24" height="20" rx="3" fill="#636366"/>
-<rect x="12" y="314" width="24" height="20" rx="3" fill="#636366"/>
-<path fill-rule="evenodd" fill="#C8102E" d="M-54 0H54A36 36 0 0 1 90 36V214A36 36 0 0 1 54 250H-54A36 36 0 0 1 -90 214V36A36 36 0 0 1 -54 0ZM-15 42a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z"/>
-<rect x="-46" y="106" width="92" height="92" rx="29.44" fill="#FFBFCB"/>
-<rect x="-36.8" y="115.2" width="73.6" height="73.6" rx="23" fill="#C8102E"/>
-<rect x="-29.44" y="122.56" width="58.88" height="58.88" rx="17.48" fill="#FFBFCB"/>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500"><g transform="translate(250 53)"><rect width="120" height="150" x="-60" y="244" fill="#aeaeb2" rx="8"/><rect width="24" height="20" x="-36" y="314" fill="#636366" rx="3"/><rect width="24" height="20" x="12" y="314" fill="#636366" rx="3"/><path fill="#c8102e" fill-rule="evenodd" d="M-54 0H54a36 36 0 0 1 36 36v178a36 36 0 0 1-36 36H-54a36 36 0 0 1-36-36V36A36 36 0 0 1-54 0m39 42a15 15 0 1 0 30 0 15 15 0 1 0-30 0"/><rect width="92" height="92" x="-46" y="106" fill="#ffbfcb" rx="29.44"/><rect width="73.6" height="73.6" x="-36.8" y="115.2" fill="#c8102e" rx="23"/><rect width="58.88" height="58.88" x="-29.44" y="122.56" fill="#ffbfcb" rx="17.48"/></g></svg>

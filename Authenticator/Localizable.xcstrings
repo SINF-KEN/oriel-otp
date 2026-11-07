@@ -14523,6 +14523,35 @@
         }
       }
     },
+    "Website" : {
+      "comment" : "AutoFill website field, for VoiceOver",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Site web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webサイト"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webová stránka"
+          }
+        }
+      }
+    },
     "What's new" : {
       "comment" : "About navigation title",
       "localizations" : {
@@ -15378,35 +15407,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "zadajte heslo"
-          }
-        }
-      }
-    },
-    "example.com" : {
-      "comment" : "AutoFill website field placeholder",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
           }
         }
       }

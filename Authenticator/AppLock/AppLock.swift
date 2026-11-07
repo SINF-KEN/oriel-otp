@@ -57,7 +57,8 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
         self.rounds = rounds
         if method.hasSecret, let secret {
             var salt = Data(count: 16)
-            _ = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            let status = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            precondition(status == errSecSuccess, "No random bytes for the salt")
             self.salt = salt
             hash = Self.derive(secret, salt: salt, rounds: rounds)
         } else {
@@ -91,7 +92,7 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
 /// The wrong codes or passwords since the last right one.
 nonisolated struct AppLockAttempts: Codable, Sendable, Equatable {
     var failures: Int
-    /// The system's uptime at the last wrong attempt, see `AppLock.systemUptime`.
+    /// The system's uptime at the last wrong attempt, see `AppLock.deviceUptime()`.
     var lastFailure: TimeInterval
 }
 
@@ -249,7 +250,7 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
          defaults: UserDefaults = .standard,
          keepsSavedLock: Bool = false,
          now: @escaping () -> Date = Date.init,
-         uptime: @escaping () -> TimeInterval = { AppLock.systemUptime },
+         uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
          deviceOwnerIsAvailable: @escaping () -> Bool = { AppLock.canUseDeviceOwner },
          authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
         self.storage = storage
@@ -438,9 +439,9 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
         return KeychainAuthentication(context: context)
     }
 
-    /// Seconds since the device started, including while it sleeps. Unlike the clock it can't be set.
-    nonisolated static var systemUptime: TimeInterval {
-        TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC)) / 1_000_000_000
+    /// The time since the device started, including while it slept. Changing the clock doesn't affect it.
+    nonisolated static func deviceUptime() -> TimeInterval {
+        TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW)) / 1_000_000_000
     }
 
     /// Whether the device can check its owner, i.e. a passcode or password is set.

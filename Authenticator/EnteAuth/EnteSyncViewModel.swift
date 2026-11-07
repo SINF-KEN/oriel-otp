@@ -63,7 +63,7 @@ import YubiKit
     @ObservationIgnored private let cloud: EnteCloud
 
     init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard,
-         session: URLSession = .shared, watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) {
+         session: URLSession = .ente, watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) {
         self.existingCredentialIds = existingCredentialIds
         self.capacity = capacity
         self.store = store
@@ -334,7 +334,7 @@ import YubiKit
             let cloud = cloud
             isBusy = true
             Task {
-                await store.signOut(watch: watch, cloud: cloud)
+                await store.signOut(watch: watch, cloud: cloud, session: session)
                 isBusy = false
             }
         } else {
