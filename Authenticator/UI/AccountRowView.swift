@@ -57,10 +57,11 @@ struct AccountRowView<Accessory: View>: View {
     private let codeStyle = Font.TextStyle.body
     @ScaledSize(relativeTo: .subheadline) private var phoneMinimumNameWidth: CGFloat = 150
     @ScaledSize(relativeTo: .subheadline) private var sidebarMinimumNameWidth: CGFloat = 110
-    /// Less in an iPad's sidebar, whose width the system limits, so an 8 digit code fits beside the name like the others.
-    /// By the device, as a sidebar's size class is compact.
+    @Environment(\.isInFoldedColumn) private var isInFoldedColumn
+    /// Less in the sidebar of an iPad or an iPhone Duo, whose width is limited, so an 8 digit code fits beside the name
+    /// like the others. By the device, as a sidebar's size class is compact.
     private var minimumNameWidth: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .pad ? sidebarMinimumNameWidth : phoneMinimumNameWidth
+        UIDevice.current.userInterfaceIdiom == .pad || isInFoldedColumn ? sidebarMinimumNameWidth : phoneMinimumNameWidth
     }
     #endif
     @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3

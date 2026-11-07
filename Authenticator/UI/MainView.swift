@@ -347,23 +347,30 @@ struct MainView: View {
     }
     #else
     private var mainLayout: some View {
-        NavigationSplitView {
-            accountColumn()
-                .searchable(text: $searchText, prompt: String(localized: "Search"))
-                .searchFocusedBinding($isSearchFocused)
-                .autocorrectionDisabled(true)
-                // Wide enough on an iPad for a 6 digit code beside the name at the default text size.
-                .navigationSplitViewColumnWidth(min: 320, ideal: 420)
-                // ⌘F with a hardware keyboard. Search Accounts in the menu bar on the Mac.
-                .background {
-                    // Without a label, which the accessibility audit would still see at this opacity.
-                    Button(action: focusSearch) { EmptyView() }
-                        .keyboardShortcut("f")
-                        .opacity(0)
-                        .accessibilityHidden(true)
-                }
-        } detail: {
-            detailColumn
+        FoldedColumnWidthReader { foldedColumnWidth in
+            NavigationSplitView {
+                accountColumn()
+                    .searchable(text: $searchText, prompt: String(localized: "Search"))
+                    .searchFocusedBinding($isSearchFocused)
+                    .autocorrectionDisabled(true)
+                    // Wide enough on an iPad for a 6 digit code beside the name at the default text size.
+                    .navigationSplitViewColumnWidth(min: 320, ideal: foldedColumnWidth ?? 420, max: foldedColumnWidth)
+                    // ⌘F with a hardware keyboard. Search Accounts in the menu bar on the Mac.
+                    .background {
+                        // Without a label, which the accessibility audit would still see at this opacity.
+                        Button(action: focusSearch) { EmptyView() }
+                            .keyboardShortcut("f")
+                            .opacity(0)
+                            .accessibilityHidden(true)
+                    }
+                    .environment(\.isInFoldedColumn, foldedColumnWidth != nil)
+                    .background {
+                        FoldedSplitViewAdapter(isOnFold: foldedColumnWidth != nil)
+                            .accessibilityHidden(true)
+                    }
+            } detail: {
+                detailColumn
+            }
         }
     }
     #endif
@@ -385,6 +392,9 @@ struct MainView: View {
                 }
             }
             .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // In one half of an iPhone Duo, rather than across the fold.
+            .avoidingReservedRegions()
         }
     }
 
