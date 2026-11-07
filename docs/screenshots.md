@@ -43,6 +43,8 @@ tools/screenshots.sh audits
 DEVICE_TYPE="iPad Air 11-inch (M4)" tools/screenshots.sh audits
 ```
 
+All the modes run even when one fails. The script then lists the modes that failed and exits with an error.
+
 In CI they're the Accessibility workflow, on an iPhone and an iPad, which is run by hand, e.g. before a release or after changing a screen's
 layout or colors. See [accessibility.md](accessibility.md).
 

@@ -184,6 +184,9 @@ struct ConfigurationView: View {
             #if os(iOS)
             // On the Mac the Settings window is titled after the tab.
             .navigationTitle(String(localized: "Configuration", comment: "Configuration navigation title"))
+            // Like most sheets. With a large title this one fails the accessibility audit on an iPad, whose sheets end
+            // above the bottom of the screen, at the largest text sizes, where the title also takes room from the rows.
+            .navigationBarTitleDisplayMode(.inline)
             .accessibilityAction(.escape) { showConfiguration.toggle() }
             #endif
             .toolbar {
