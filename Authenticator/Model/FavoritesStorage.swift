@@ -17,51 +17,55 @@
 
 import Foundation
 
-// This class is for storing a set of favorite credentials in UserDefaults by keyIdentifier.
-class FavoritesStorage: NSObject {
-    
+// This class is for storing a set of favorite credentials by keyIdentifier. The identifiers name the accounts, so they
+// are kept in an encrypted file, which unlike a keychain item goes away with the app. Earlier versions kept them in
+// UserDefaults, and they are moved from there the first time they are read.
+nonisolated class FavoritesStorage: NSObject {
+
+    private static let key = "Favorites"
+    private static let mergedKey = "Favorites.MergedPerDevice"
+
+    private let file: EncryptedFile<Set<String>>
+    private let defaults: UserDefaults
+
+    static var defaultURL: URL {
+        URL.applicationSupportDirectory.appending(components: "Favorites", "Favorites")
+    }
+
+    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey(service: "Favorites"), defaults: UserDefaults = .standard) {
+        file = EncryptedFile(url: url, keychain: keychain)
+        self.defaults = defaults
+    }
+
+    /// Adds the favorites kept per YubiKey under "Favorites-<device id>" by the first versions to the others. What was
+    /// there is only removed once it's saved, otherwise it's tried again the next time the app starts.
     func migrate() {
-        // merge and save old favorites
-        let favorites = UserDefaults.standard.dictionaryRepresentation()
-        let merged = favorites.filter { dict in
-            dict.key.starts(with: "Favorites-")
-        }.map { dict in
-            dict.value as? Data
-        }.compactMap {
-            $0
-        }.map { data in
+        guard !defaults.bool(forKey: Self.mergedKey) else { return }
+        let old = defaults.dictionaryRepresentation().filter { $0.key.starts(with: "Favorites-") }
+        let merged = old.values.compactMap { $0 as? Data }.compactMap { data in
             try? NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSSet.self, NSString.self], from: data) as? Set<String>
-        }.compactMap {
-            $0
-        }.flatMap {
-            $0
-        }
+        }.flatMap { $0 }
         if !merged.isEmpty {
-            saveFavorites(Set(merged))
-            // remove old favorites
-            let keys = favorites.filter { dict in
-                dict.key.starts(with: "Favorites-")
-            }.map { dict in
-                dict.key
-            }
-            keys.forEach { key in
-                UserDefaults.standard.removeObject(forKey: key)
-            }
+            guard saveFavorites(readFavorites().union(merged)) else { return }
         }
+        old.keys.forEach(defaults.removeObject(forKey:))
+        defaults.set(true, forKey: Self.mergedKey)
     }
-    
-    func saveFavorites(_ favorites: Set<String>) {
-        guard let encodedData = try? NSKeyedArchiver.archivedData(withRootObject: favorites, requiringSecureCoding: true) else {
-            return
-        }
-        UserDefaults.standard.setValue(encodedData, forKey: "Favorites")
+
+    @discardableResult func saveFavorites(_ favorites: Set<String>) -> Bool {
+        guard (try? file.save(favorites)) != nil else { return false }
+        defaults.removeObject(forKey: Self.key)
+        return true
     }
-    
+
+    /// Empty while the device is locked, unless the favorites weren't moved yet.
     func readFavorites() -> Set<String> {
-        guard let encodedData = UserDefaults.standard.data(forKey: "Favorites"),
+        if let favorites = try? file.load() { return favorites }
+        guard let encodedData = defaults.data(forKey: Self.key),
               let favorites = try? NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSSet.self, NSString.self], from: encodedData) as? Set<String> else {
             return Set<String>()
         }
+        saveFavorites(favorites)
         return favorites
     }
 }

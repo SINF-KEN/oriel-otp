@@ -16,6 +16,7 @@
 
 import AuthenticationServices
 import Foundation
+import CryptoKit
 import Testing
 
 @testable import OrielOTP
@@ -95,13 +96,26 @@ struct AutoFillWebsitesTests {
 nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sendable {
     private let lock = NSLock()
     private var accounts: [AutoFillAccount]?
+    private var saves = 0
+    private var fails = false
+
+    /// How many times the accounts were written.
+    var saveCount: Int { lock.withLock { saves } }
+    var failsToSave: Bool {
+        get { lock.withLock { fails } }
+        set { lock.withLock { fails = newValue } }
+    }
 
     func load() throws -> [AutoFillAccount]? {
         lock.withLock { accounts }
     }
 
     func save(_ accounts: [AutoFillAccount]) throws {
-        lock.withLock { self.accounts = accounts.isEmpty ? nil : accounts }
+        try lock.withLock {
+            if fails { throw AutoFillStoreError.unavailable }
+            saves += 1
+            self.accounts = accounts.isEmpty ? nil : accounts
+        }
     }
 
     func remove() {
@@ -109,14 +123,29 @@ nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sen
     }
 }
 
+/// Runs a value's reads and tells where they ran.
+private nonisolated final class Recorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var ranOnMain: Bool?
+    var wasOnMain: Bool? { lock.withLock { ranOnMain } }
+    func record() { lock.withLock { ranOnMain = Thread.isMainThread } }
+}
+
 @MainActor
 struct AutoFillAccountSyncTests {
 
     private let storage = InMemoryAutoFillStorage()
     private let defaults = UserDefaults(suiteName: "AutoFillAccountSyncTests-\(UUID().uuidString)")!
+    private let websitesURL = URL.temporaryDirectory.appending(components: "AutoFillAccountSyncTests-\(UUID().uuidString)", "Websites")
+    private let websitesKey = InMemoryVaultKey()
 
-    private func sync() -> AutoFillAccountSync {
-        AutoFillAccountSync(storage: storage, defaults: defaults, updatesSystem: false)
+    private func sync(keychain: EnteVaultKeychain? = nil) -> AutoFillAccountSync {
+        AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults, updatesSystem: false)
+    }
+
+    private func update(_ sync: AutoFillAccountSync, with codes: [EnteCode] = Self.codes) async {
+        sync.update { codes }
+        await sync.finishWriting()
     }
 
     private static func code(_ id: String, _ url: String) -> EnteCode {
@@ -128,44 +157,137 @@ struct AutoFillAccountSyncTests {
         code("bank", "otpauth://hotp/Bank:alice?secret=JBSWY3DPEHPK3PXP&issuer=Bank&counter=3"),
     ]
 
-    @Test func writesTheTimeBasedAccountsWithTheirGuessedWebsites() throws {
-        sync().update(Self.codes)
+    @Test func writesTheTimeBasedAccountsWithTheirGuessedWebsites() async throws {
+        await update(sync())
         let accounts = try #require(try storage.load())
         #expect(accounts.map(\.id) == ["github"])
         #expect(accounts.first?.websites == ["github.com"])
         #expect(accounts.first.map { OTPGenerator.code(for: $0.account, at: Date(timeIntervalSince1970: 59)) } == "996554")
     }
 
-    @Test func usesTheChosenWebsites() throws {
+    @Test func parsesTheAccountsOffTheMainThread() async {
         let sync = sync()
-        sync.update(Self.codes)
+        let recorder = Recorder()
+        let codes = Self.codes
+        sync.update {
+            recorder.record()
+            return codes
+        }
+        await sync.finishWriting()
+        #expect(recorder.wasOnMain == false)
+    }
+
+    @Test func usesTheChosenWebsites() async throws {
+        let sync = sync()
+        await update(sync)
         sync.setWebsites(["github.example.com"], for: "github")
+        await sync.finishWriting()
         #expect(try storage.load()?.first?.websites == ["github.example.com"])
         #expect(sync.hasChosenWebsites(for: "github"))
 
         // Kept when the app starts again.
         let relaunched = self.sync()
-        relaunched.update(Self.codes)
+        await update(relaunched)
         #expect(relaunched.websites(for: "github", issuer: "GitHub") == ["github.example.com"])
 
         relaunched.setWebsites(nil, for: "github")
+        await relaunched.finishWriting()
         #expect(try storage.load()?.first?.websites == ["github.com"])
     }
 
-    @Test func forgetsTheWebsitesOfDeletedAccounts() {
+    @Test func forgetsTheWebsitesOfDeletedAccounts() async {
         let sync = sync()
-        sync.update(Self.codes)
+        await update(sync)
         sync.setWebsites([], for: "github")
-        sync.update([Self.codes[1]])
+        await update(sync, with: [Self.codes[1]])
         #expect(!sync.hasChosenWebsites(for: "github"))
     }
 
-    @Test func deletesEverythingWhenSignedOut() throws {
+    @Test func deletesEverythingWhenSignedOut() async throws {
         let sync = sync()
-        sync.update(Self.codes)
+        await update(sync)
         sync.setWebsites([], for: "github")
+        // Not waiting first: a write that's under way mustn't bring the accounts back.
         sync.remove()
+        await sync.finishWriting()
         #expect(try storage.load() == nil)
         #expect(!sync.hasChosenWebsites(for: "github"))
+        #expect(!FileManager.default.fileExists(atPath: websitesURL.path))
     }
+
+    @Test func signingOutWhileTheAccountsAreParsedDoesNotBringThemBack() async throws {
+        let sync = sync()
+        let codes = Self.codes
+        sync.update {
+            Thread.sleep(forTimeInterval: 0.05)
+            return codes
+        }
+        sync.remove()
+        try await Task.sleep(for: .milliseconds(150))
+        await sync.finishWriting()
+        #expect(try storage.load() == nil)
+    }
+
+    @Test func theLastUpdateWinsWhenAnEarlierOneTakesLonger() async throws {
+        let sync = sync()
+        let codes = Self.codes
+        sync.update {
+            Thread.sleep(forTimeInterval: 0.05)
+            return codes
+        }
+        sync.update { [] }
+        try await Task.sleep(for: .milliseconds(150))
+        await sync.finishWriting()
+        #expect(try storage.load() == nil)
+    }
+
+    @Test func aFileWithTheSameAccountsIsLeftAsItIsWhenTheAppStarts() async throws {
+        await update(sync())
+        let saves = storage.saveCount
+        await update(sync())
+        #expect(storage.saveCount == saves)
+    }
+
+    @Test func aWriteThatFailedIsTriedAgain() async throws {
+        let sync = sync()
+        storage.failsToSave = true
+        await update(sync)
+        #expect(try storage.load() == nil)
+
+        storage.failsToSave = false
+        await update(sync)
+        #expect(try storage.load()?.map(\.id) == ["github"])
+    }
+
+    // Chosen websites used to be kept in UserDefaults, in the clear.
+    @Test func chosenWebsitesAreMovedOutOfUserDefaults() async throws {
+        defaults.set(["github": ["github.example.com"]], forKey: "AutoFill.Websites")
+        await update(sync())
+        #expect(defaults.object(forKey: "AutoFill.Websites") == nil)
+        #expect(try storage.load()?.first?.websites == ["github.example.com"])
+
+        let file = try Data(contentsOf: websitesURL)
+        #expect(file.range(of: Data("example".utf8)) == nil)
+        #expect(sync().websites(for: "github", issuer: "GitHub") == ["github.example.com"])
+    }
+
+    @Test func websitesThatCanNotBeReadYetAreNotWrittenOver() async throws {
+        let first = sync()
+        await update(first)
+        first.setWebsites(["github.example.com"], for: "github")
+        await first.finishWriting()
+        let saved = try Data(contentsOf: websitesURL)
+
+        // While the device is locked, updating with other accounts mustn't forget them.
+        await update(sync(keychain: LockedVaultKey()), with: [Self.codes[1]])
+        #expect(try Data(contentsOf: websitesURL) == saved)
+        #expect(sync().hasChosenWebsites(for: "github"))
+    }
+}
+
+/// A keychain that can't be read, like while the device is locked.
+private nonisolated struct LockedVaultKey: EnteVaultKeychain {
+    func existingKey() throws -> SymmetricKey? { throw EnteVaultError.unavailable }
+    func createKey() throws -> SymmetricKey { throw EnteVaultError.unavailable }
+    func removeKey() {}
 }

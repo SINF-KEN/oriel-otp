@@ -158,12 +158,12 @@ struct EnteSessionStore {
     /// unlocked first so the session can be ended; if that's cancelled the account is still forgotten here. Returns
     /// once nothing is left on the device, without waiting for the server, which only ever sees the old token.
     /// The copy of the accounts in the vault is deleted too, with changes that weren't uploaded yet.
-    @MainActor func signOut(watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) async {
+    @MainActor func signOut(watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared, session: URLSession = .ente) async {
         let saved = savedAccount?.hasSession == true ? try? await read() : nil
         remove()
         cloud.remove()
         watch.disable()
-        guard let saved, let api = try? EnteAPIClient(server: saved.server) else { return }
+        guard let saved, let api = try? EnteAPIClient(server: saved.server, session: session) else { return }
         Task { try? await api.logout(token: saved.token) }
     }
 }

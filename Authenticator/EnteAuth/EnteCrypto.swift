@@ -47,6 +47,7 @@ nonisolated enum EnteCrypto {
     static func deriveKeyEncryptionKey(password: String, salt: Data, opsLimit: UInt64, memLimit: UInt64) throws -> Data {
         try ensureInitialized()
         guard salt.count == saltLength else { throw EnteCryptoError.invalidLength }
+        guard isAllowed(opsLimit: opsLimit, memLimit: memLimit) else { throw EnteCryptoError.keyDerivationFailed }
         var key = [UInt8](repeating: 0, count: keyLength)
         let password = Array(password.utf8CString.dropLast())
         defer { sodium_memzero(&key, key.count) }
@@ -55,6 +56,16 @@ nonisolated enum EnteCrypto {
             throw EnteCryptoError.keyDerivationFailed
         }
         return Data(key)
+    }
+
+    /// The limits come from the server, which mustn't be able to run the app out of memory or keep it busy for good.
+    /// Ente's clients use at most libsodium's sensitive limits. Devices short of memory trade it for more passes, which
+    /// leaves memory times passes the same, so a few times that leaves room without allowing anything unreasonable.
+    static func isAllowed(opsLimit: UInt64, memLimit: UInt64) -> Bool {
+        let maxMemory = UInt64(crypto_pwhash_memlimit_sensitive())
+        let maxWork = 4 * maxMemory * UInt64(crypto_pwhash_opslimit_sensitive())
+        let (work, overflow) = memLimit.multipliedReportingOverflow(by: opsLimit)
+        return memLimit <= maxMemory && !overflow && work <= maxWork
     }
 
     /// Derives the 16 byte SRP password from the key encryption key.

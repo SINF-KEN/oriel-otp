@@ -96,7 +96,7 @@ nonisolated struct EnteAPIClient: Sendable {
     let server: URL
     let session: URLSession
 
-    init(server: URL = defaultServer, session: URLSession = .shared) throws {
+    init(server: URL = defaultServer, session: URLSession = .ente) throws {
         // Credentials and tokens must never travel unencrypted.
         guard server.scheme == "https", server.host?.isEmpty == false else { throw EnteAPIError.invalidServerURL }
         self.server = server
@@ -233,4 +233,32 @@ nonisolated struct EnteAPIClient: Sendable {
             throw EnteAPIError.invalidResponse
         }
     }
+}
+
+/// Keeps a redirect on the server it started from. A redirect keeps the request's headers, so following one elsewhere,
+/// or to plain http, would hand over the session token. A refused redirect fails as an HTTP error.
+nonisolated final class EnteRedirectGuard: NSObject, URLSessionTaskDelegate, Sendable {
+
+    static func allows(from origin: URL?, to destination: URL?) -> Bool {
+        guard let origin, let destination, origin.scheme?.lowercased() == "https", destination.scheme?.lowercased() == "https",
+              let host = origin.host()?.lowercased(), host == destination.host()?.lowercased() else { return false }
+        return (origin.port ?? 443) == (destination.port ?? 443)
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) {
+        completionHandler(Self.allows(from: task.originalRequest?.url, to: request.url) ? request : nil)
+    }
+}
+
+extension URLSession {
+    /// For talking to Ente's server: keeps nothing on disk, and redirects stay on the server.
+    nonisolated static let ente: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        #if DEBUG && (targetEnvironment(simulator) || os(macOS))
+        // URLProtocol.registerClass only reaches the shared session. It only answers for its own hosts.
+        configuration.protocolClasses = [FakeEnteServer.self] + (configuration.protocolClasses ?? [])
+        #endif
+        return URLSession(configuration: configuration, delegate: EnteRedirectGuard(), delegateQueue: nil)
+    }()
 }
