@@ -33,6 +33,10 @@ struct AuthenticatorApp: App {
     @State var mainViewModel = MainViewModel()
 
     init() {
+        // The requests to Ente have the email address in their URL and carry the vault. Nothing keeps them on disk,
+        // which also empties what earlier versions left there.
+        URLCache.shared.memoryCapacity = 0
+        URLCache.shared.diskCapacity = 0
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         if SimulatedYubiKey.isEnabled {
             FakeEnteServer.install()

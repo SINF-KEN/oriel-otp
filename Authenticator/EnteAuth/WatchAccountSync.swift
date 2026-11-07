@@ -95,7 +95,7 @@ import Foundation
     }
 
     /// The accounts for the watch, pinned in Ente Auth or marked as favorite in this app.
-    static func accounts(from codes: [EnteCode], favorites: Set<String>) -> [OTPAccount] {
+    nonisolated static func accounts(from codes: [EnteCode], favorites: Set<String>) -> [OTPAccount] {
         codes.compactMap { code in
             guard var account = code.otpAccount else { return nil }
             account.isPinned = account.isPinned || code.credentialId.map(favorites.contains) == true

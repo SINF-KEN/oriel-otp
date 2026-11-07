@@ -111,7 +111,7 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     private let kekSalt = EnteCrypto.randomBytes(16)
     // Low limits so signing in is quick. Real accounts use far more memory.
     private let opsLimit: UInt64 = 2
-    private let memLimit: UInt64 = 8 * 1024 * 1024
+    private let memLimit: UInt64 = 64 * 1024 * 1024
     private let loginKey: Data
     private let keyAttributes: [String: Any]
     private let encryptedToken: String

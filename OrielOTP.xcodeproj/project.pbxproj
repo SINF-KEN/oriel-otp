@@ -1443,7 +1443,10 @@
 				LIBRARY_SEARCH_PATHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-Wl,-no_exported_symbols",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP";
 				PRODUCT_MODULE_NAME = OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";

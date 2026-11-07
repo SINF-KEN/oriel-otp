@@ -70,7 +70,7 @@ import YubiKit
     /// The vault file couldn't be read when the app started because the device was locked.
     @ObservationIgnored private var isVaultLocked = false
 
-    init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .shared,
+    init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
          watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil) {
         self.store = store
         self.storage = storage
@@ -134,7 +134,9 @@ import YubiKit
     }
 
     /// The accounts as the sync sheet lists them, sorted, including ones that couldn't be read.
-    var codes: [EnteCode] {
+    var codes: [EnteCode] { Self.codes(in: vault) }
+
+    nonisolated private static func codes(in vault: EnteVault?) -> [EnteCode] {
         (vault?.items ?? []).compactMap { item -> EnteCode? in
             guard let rawData = item.rawData else {
                 return EnteCode(id: item.id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
@@ -338,15 +340,15 @@ import YubiKit
         onChange?()
         updateAutoFill()
         // The watch shows what is in the vault. It's only sent while the session is unlocked, i.e. it is still valid.
-        if session != nil {
+        if session != nil, watch.isEnabled {
             watch.send(codes)
         }
     }
 
     /// AutoFill uses what is in the vault, also while the session is locked: the codes are calculated on the device.
     private func updateAutoFill() {
-        if vault != nil {
-            autoFill?.update(codes)
+        if let vault {
+            autoFill?.update { Self.codes(in: vault) }
         } else {
             autoFill?.remove()
         }

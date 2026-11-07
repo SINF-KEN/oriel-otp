@@ -100,6 +100,9 @@ jobs:
       # Fetching the provisioning profiles sometimes fails on Apple's side ("The network connection was lost", "The
       # data couldn't be read because it isn't in the correct format"), which Xcode then reports as "No profiles for
       # ... were found". Only that failure is retried.
+      #
+      # The project's Release setting doesn't reach the Swift packages, which build with -O unless it's set here. -Osize
+      # makes the iPhone app's binary about 1.2 MB smaller, and only makes signing in to Ente a little slower.
       - name: Archive
         timeout-minutes: 30
         env:
@@ -124,6 +127,7 @@ jobs:
               -authenticationKeyID "$KEY_ID" \
               -authenticationKeyIssuerID "$ISSUER_ID" \
               ORIEL_COMMIT="$(git rev-parse --short HEAD)" \
+              SWIFT_OPTIMIZATION_LEVEL=-Osize \
               2>&1 | tee "$RUNNER_TEMP/attempt.log" && status=0 || status=$?
             cat "$RUNNER_TEMP/attempt.log" >> "$RUNNER_TEMP/archive.log"
             [[ $status -eq 0 ]] && exit 0

@@ -66,7 +66,8 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
 
     /// Merges entities pulled from the server, decrypted, and remembers where to pull from next time.
     mutating func merge(_ pulled: [(entity: EnteAuthenticatorEntity, rawData: String?)], latest: Int64) {
-        for (entity, rawData) in pulled.sorted(by: { $0.entity.updatedAt < $1.entity.updatedAt }) {
+        // By id too, as they come from a dictionary: new accounts are listed in the same order on every device.
+        for (entity, rawData) in pulled.sorted(by: { ($0.entity.updatedAt, $0.entity.id) < ($1.entity.updatedAt, $1.entity.id) }) {
             let index = items.firstIndex { $0.entityID == entity.id }
                 // An item whose upload reached the server although its answer didn't.
                 ?? items.firstIndex { $0.entityID == nil && $0.rawData != nil && $0.rawData == rawData && !entity.isDeleted }

@@ -20,6 +20,7 @@ import Clibsodium
 enum EnteCryptoError: Error, Equatable {
     case sodiumInitFailed
     case keyDerivationFailed
+    case invalidKeyLimits
     case invalidLength
     case decryptionFailed
     case encryptionFailed
@@ -47,6 +48,7 @@ nonisolated enum EnteCrypto {
     static func deriveKeyEncryptionKey(password: String, salt: Data, opsLimit: UInt64, memLimit: UInt64) throws -> Data {
         try ensureInitialized()
         guard salt.count == saltLength else { throw EnteCryptoError.invalidLength }
+        guard isAllowed(opsLimit: opsLimit, memLimit: memLimit) else { throw EnteCryptoError.invalidKeyLimits }
         var key = [UInt8](repeating: 0, count: keyLength)
         let password = Array(password.utf8CString.dropLast())
         defer { sodium_memzero(&key, key.count) }
@@ -55,6 +57,22 @@ nonisolated enum EnteCrypto {
             throw EnteCryptoError.keyDerivationFailed
         }
         return Data(key)
+    }
+
+    /// Whether Argon2 limits sent by a server are safe to use. The limits come with the account and aren't
+    /// authenticated, so a server could otherwise have the password hashed cheaply, and then guess it from the SRP
+    /// proof, or run the app out of memory or keep it busy for good.
+    ///
+    /// Ente's clients start from libsodium's sensitive limits and double the passes as they halve the memory on devices
+    /// that need it, which leaves memory times passes the same. A few times that leaves room without allowing anything
+    /// unreasonable. The floor is libsodium's interactive limits, so that older accounts keep working.
+    static func isAllowed(opsLimit: UInt64, memLimit: UInt64) -> Bool {
+        let minMemory = UInt64(crypto_pwhash_memlimit_interactive())
+        let maxMemory = UInt64(crypto_pwhash_memlimit_sensitive())
+        let maxWork = 4 * maxMemory * UInt64(crypto_pwhash_opslimit_sensitive())
+        let (work, overflow) = memLimit.multipliedReportingOverflow(by: opsLimit)
+        return opsLimit >= UInt64(crypto_pwhash_opslimit_interactive()) && (minMemory...maxMemory).contains(memLimit)
+            && !overflow && work <= maxWork
     }
 
     /// Derives the 16 byte SRP password from the key encryption key.

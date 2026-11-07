@@ -10,7 +10,7 @@ Oriel OTP does not run analytics or advertising and does not collect personal da
 - On iPhone and iPad, a copied code stays on the device: it isn't shared with your other devices through Universal Clipboard, and is removed from the clipboard after a minute.
 - On the Mac, a copied code is marked so that clipboard managers don't keep it, and is removed from the clipboard after a minute unless you have copied something else since.
 - A YubiKey password is saved in the device keychain only if you choose to save it. You can remove saved OATH passwords in the app under the YubiKey settings.
-- App settings and favorites are stored locally on the device.
+- App settings are stored locally on the device. Favorites are kept in a file encrypted with a random key kept in the device keychain, and aren't included in backups.
 
 ## Optional smart card extension
 
@@ -37,7 +37,7 @@ Accounts you save to **This device** are kept in a file in the app's storage, in
 
 ## App lock
 
-If you turn on **App lock**, the app keeps the lock method you chose in the device keychain, only on this device. For a code or password it keeps a salted PBKDF2-SHA256 hash, never the code or password itself. Face ID, Touch ID and the device passcode are checked by the system; the app only learns whether it succeeded. The number of wrong attempts and the time of the last one are kept in preferences the app shares with its AutoFill extension, on this device, to make you wait after too many. Nothing about the lock leaves the device. The lock covers this app only: the Apple Watch app keeps showing codes while the watch is unlocked.
+If you turn on **App lock**, the app keeps the lock method you chose in the device keychain, only on this device. For a code or password it keeps a salted PBKDF2-SHA256 hash, never the code or password itself. Face ID, Touch ID and the device passcode are checked by the system; the app only learns whether it succeeded. The number of wrong attempts and when the last one happened are kept in the device keychain too, shared with the AutoFill extension and only on this device, to make you wait after too many. Nothing about the lock leaves the device. The lock covers this app only: the Apple Watch app keeps showing codes while the watch is unlocked.
 
 ## Optional Apple Watch app
 
@@ -67,7 +67,7 @@ unlocked, and excluded from backups. Counter-based (HOTP) accounts and the accou
 So that the system can suggest a code above the keyboard, the app gives it the website domains you chose for each
 account, or ones guessed from its issuer, with the account's name. The system keeps them on the device and only uses
 them while AutoFill from Oriel OTP is on; secrets and codes are never given to it until you choose a code. The websites
-you choose are kept in local app preferences. If App lock is on, the extension asks for it before filling in a code.
+you choose are kept in a file protected like that copy, and excluded from backups. If App lock is on, the extension asks for it before filling in a code.
 
 ## Retention, deletion, and revoking access
 

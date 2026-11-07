@@ -54,11 +54,13 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
 
     /// The list of codes, from the key button above the keyboard or the AutoFill menu.
     override func prepareOneTimeCodeCredentialList(for serviceIdentifiers: [ASCredentialServiceIdentifier]) {
+        AppLock.shared.relock()
         model.load(for: serviceIdentifiers)
     }
 
     /// A suggestion was chosen. Without App Lock its code is filled in right away.
     override func provideCredentialWithoutUserInteraction(for credentialRequest: any ASCredentialRequest) {
+        AppLock.shared.relock()
         guard !AppLock.shared.isLocked else {
             cancel(.userInteractionRequired)
             return
@@ -73,6 +75,7 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
 
     /// A suggestion was chosen with App Lock on: the lock is shown, and the code filled in once it's unlocked.
     override func prepareInterfaceToProvideCredential(for credentialRequest: any ASCredentialRequest) {
+        AppLock.shared.relock()
         model.load(for: [])
         guard let account = model.account(for: credentialRequest) else {
             cancel(.credentialIdentityNotFound)
