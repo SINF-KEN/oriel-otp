@@ -15,6 +15,7 @@
  */
 
 import Foundation
+import CryptoKit
 import Testing
 @testable import OrielOTP
 
@@ -60,19 +61,12 @@ struct AccessKeyCacheTests {
     }
 }
 
-// The tests read and write the shared UserDefaults keys the app uses, so they must not run in parallel.
-@Suite(.serialized)
-final class FavoritesStorageTests {
+struct FavoritesStorageTests {
 
-    private let storage = FavoritesStorage()
-    private let savedFavorites = UserDefaults.standard.data(forKey: "Favorites")
-
-    deinit {
-        for key in UserDefaults.standard.dictionaryRepresentation().keys where key.starts(with: "Favorites-") {
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        UserDefaults.standard.set(savedFavorites, forKey: "Favorites")
-    }
+    private let url = URL.temporaryDirectory.appending(components: "FavoritesStorageTests-\(UUID().uuidString)", "Favorites")
+    private let keychain = InMemoryVaultKey()
+    private let defaults = UserDefaults(suiteName: "FavoritesStorageTests-\(UUID().uuidString)")!
+    private var storage: FavoritesStorage { FavoritesStorage(url: url, keychain: keychain, defaults: defaults) }
 
     private func archive(_ favorites: Set<String>) throws -> Data {
         try NSKeyedArchiver.archivedData(withRootObject: favorites, requiringSecureCoding: true)
@@ -83,27 +77,70 @@ final class FavoritesStorageTests {
         #expect(storage.readFavorites() == ["Example:alice", "60/bob"])
     }
 
+    @Test func theAccountNamesAreNotInTheFile() throws {
+        storage.saveFavorites(["Example:alice"])
+        let file = try Data(contentsOf: url)
+        #expect(file.range(of: Data("alice".utf8)) == nil)
+    }
+
+    // Favorites used to be kept in UserDefaults, in the clear.
+    @Test func favoritesAreMovedOutOfUserDefaults() throws {
+        defaults.set(try archive(["Example:alice"]), forKey: "Favorites")
+        #expect(storage.readFavorites() == ["Example:alice"])
+        #expect(defaults.object(forKey: "Favorites") == nil)
+        #expect(storage.readFavorites() == ["Example:alice"])
+    }
+
+    @Test func favoritesStayInUserDefaultsUntilTheyAreSaved() throws {
+        let storage = FavoritesStorage(url: url, keychain: UnavailableVaultKey(), defaults: defaults)
+        defaults.set(try archive(["Example:alice"]), forKey: "Favorites")
+        #expect(storage.readFavorites() == ["Example:alice"])
+        #expect(defaults.object(forKey: "Favorites") != nil)
+    }
+
     @Test func missingFavoritesReadAsEmpty() {
-        UserDefaults.standard.removeObject(forKey: "Favorites")
         #expect(storage.readFavorites().isEmpty)
     }
 
     @Test func unreadableFavoritesReadAsEmpty() {
-        UserDefaults.standard.set(Data("not an archive".utf8), forKey: "Favorites")
+        defaults.set(Data("not an archive".utf8), forKey: "Favorites")
         #expect(storage.readFavorites().isEmpty)
     }
 
     // Favorites used to be saved per YubiKey under "Favorites-<device id>".
     @Test func migrationMergesPerDeviceFavorites() throws {
-        UserDefaults.standard.removeObject(forKey: "Favorites")
-        UserDefaults.standard.set(try archive(["Example:alice"]), forKey: "Favorites-1234")
-        UserDefaults.standard.set(try archive(["Example:alice", "GitHub:bob"]), forKey: "Favorites-5678")
+        defaults.set(try archive(["Example:alice"]), forKey: "Favorites-1234")
+        defaults.set(try archive(["Example:alice", "GitHub:bob"]), forKey: "Favorites-5678")
 
         storage.migrate()
 
         #expect(storage.readFavorites() == ["Example:alice", "GitHub:bob"])
-        #expect(UserDefaults.standard.object(forKey: "Favorites-1234") == nil)
-        #expect(UserDefaults.standard.object(forKey: "Favorites-5678") == nil)
+        #expect(defaults.object(forKey: "Favorites-1234") == nil)
+        #expect(defaults.object(forKey: "Favorites-5678") == nil)
+    }
+
+    @Test func migrationAddsToTheFavoritesAlreadySaved() throws {
+        storage.saveFavorites(["Example:alice"])
+        defaults.set(try archive(["GitHub:bob"]), forKey: "Favorites-1234")
+        storage.migrate()
+        #expect(storage.readFavorites() == ["Example:alice", "GitHub:bob"])
+    }
+
+    @Test func migrationThatCanNotSaveKeepsTheOldFavoritesAndTriesAgain() throws {
+        defaults.set(try archive(["GitHub:bob"]), forKey: "Favorites-1234")
+        FavoritesStorage(url: url, keychain: UnavailableVaultKey(), defaults: defaults).migrate()
+        #expect(defaults.object(forKey: "Favorites-1234") != nil)
+
+        storage.migrate()
+        #expect(storage.readFavorites() == ["GitHub:bob"])
+        #expect(defaults.object(forKey: "Favorites-1234") == nil)
+    }
+
+    @Test func migrationRunsOnce() throws {
+        storage.migrate()
+        defaults.set(try archive(["GitHub:bob"]), forKey: "Favorites-1234")
+        storage.migrate()
+        #expect(storage.readFavorites().isEmpty)
     }
 
     @Test func migrationWithoutPerDeviceFavoritesKeepsFavorites() {
@@ -111,6 +148,13 @@ final class FavoritesStorageTests {
         storage.migrate()
         #expect(storage.readFavorites() == ["Example:alice"])
     }
+}
+
+/// A keychain that can't be read, like while the device is locked.
+private struct UnavailableVaultKey: EnteVaultKeychain {
+    func existingKey() throws -> SymmetricKey? { throw EnteVaultError.unavailable }
+    func createKey() throws -> SymmetricKey { throw EnteVaultError.unavailable }
+    func removeKey() {}
 }
 
 struct PasswordPreferencesTests {

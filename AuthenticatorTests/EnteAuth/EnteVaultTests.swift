@@ -210,6 +210,12 @@ struct EnteVaultTests {
         return vault
     }
 
+    @Test func accountsChangedAtTheSameTimeAreAddedInTheSameOrder() {
+        let items: [(id: String, uri: String, updatedAt: Int64)] = ["c", "a", "b"].map { ($0, "otpauth://totp/\($0):alice?secret=JBSWY3DPEHPK3PXP", 1) }
+        #expect(vault(with: items).items.map(\.id) == ["a", "b", "c"])
+        #expect(vault(with: items.reversed()).items.map(\.id) == ["a", "b", "c"])
+    }
+
     @Test func pullAddsChangesAndDeletes() {
         var vault = vault(with: [("a", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP", 1), ("b", "otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", 2)])
         #expect(vault.items.map(\.id) == ["a", "b"])
@@ -345,6 +351,21 @@ struct EnteVaultTests {
         let storage = InMemoryVaultStorage()
         try storage.save(vault)
         return EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+    }
+
+    @Test func theListFollowsTheAccountsInOrder() throws {
+        let device = DeviceAccounts(storage: MemoryDeviceStorage())
+        let cloud = try cloud(with: ["otpauth://totp/Zebra:alice?secret=\(rfcSecret)", "otpauth://totp/Apple:alice?secret=\(rfcSecret)"])
+        let model = MainViewModel(cloud: cloud, device: device)
+        #expect(model.accounts.map(\.title) == ["Apple", "Zebra"])
+
+        let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: try #require(URL(string: "otpauth://totp/Mango:alice?secret=\(rfcSecret)")))
+        _ = try model.addDeviceAccount(template)
+        #expect(model.accounts.map(\.title) == ["Apple", "Mango", "Zebra"])
+
+        let apple = try #require(model.accounts.first)
+        cloud.delete(try #require(apple.location.enteID))
+        #expect(model.accounts.map(\.title) == ["Mango", "Zebra"])
     }
 
     @Test func listsTheAccountsWithCodesCalculatedHere() throws {
@@ -695,3 +716,9 @@ struct EnteCloudSyncTests {
 }
 
 #endif
+
+private extension Account.Location {
+    var enteID: String? {
+        if case .ente(let id) = self { id } else { nil }
+    }
+}

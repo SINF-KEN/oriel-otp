@@ -57,7 +57,8 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
         self.rounds = rounds
         if method.hasSecret, let secret {
             var salt = Data(count: 16)
-            _ = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            let status = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            precondition(status == errSecSuccess, "No random bytes for the salt")
             self.salt = salt
             hash = Self.derive(secret, salt: salt, rounds: rounds)
         } else {
@@ -166,8 +167,9 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 /// Face ID) is started: it waits in `whenUnlocked`.
 ///
 /// After 5 wrong codes or passwords, the next attempt has to wait 30 seconds, doubling with each wrong one up to an
-/// hour. There's no way around a forgotten code or password other than deleting the app, which forgets the lock: the
-/// accounts are on the YubiKey and in Ente Auth, not only in the app.
+/// hour. The wait is measured with the time since the device started, as changing the clock must not end it. There's no
+/// way around a forgotten code or password other than deleting the app, which forgets the lock: the accounts are on the
+/// YubiKey and in Ente Auth, not only in the app.
 @MainActor @Observable final class AppLock {
     static let shared = Bundle.main.bundleURL.pathExtension == "appex"
         // The AutoFill extension can't tell which installation of the app saved the lock, the app forgets an earlier
@@ -177,7 +179,10 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 
     private static let enabledKey = "AppLock.Enabled"
     private static let failedAttemptsKey = "AppLock.FailedAttempts"
-    private static let lastFailureKey = "AppLock.LastFailure"
+    /// The device's uptime at the last wrong attempt.
+    private static let lastFailureKey = "AppLock.LastFailureUptime"
+    /// The wall clock time of the last wrong attempt, kept by earlier versions.
+    private static let oldLastFailureKey = "AppLock.LastFailure"
     private static let freeAttempts = 5
 
     /// The lock, nil when the app isn't locked or the lock can't be read yet.
@@ -200,6 +205,7 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
     @ObservationIgnored private let attempts: UserDefaults
     @ObservationIgnored private let keepsSavedLock: Bool
     @ObservationIgnored private let now: () -> Date
+    @ObservationIgnored private let uptime: () -> TimeInterval
     @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> KeychainAuthentication?
     @ObservationIgnored private var pendingActions: [@MainActor () -> Void] = []
     @ObservationIgnored private var didAskForDeviceOwner = false
@@ -213,13 +219,16 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
          attempts: UserDefaults? = nil,
          keepsSavedLock: Bool = false,
          now: @escaping () -> Date = Date.init,
+         uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
          authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
         self.storage = storage
         self.defaults = defaults
         self.attempts = attempts ?? defaults
         self.keepsSavedLock = keepsSavedLock
         self.now = now
+        self.uptime = uptime
         self.authenticateDeviceOwner = authenticateDeviceOwner
+        self.attempts.removeObject(forKey: Self.oldLastFailureKey)
         isLocked = true
         reload()
         isLocked = isUnavailable || method != .off
@@ -309,7 +318,7 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
             return true
         }
         attempts.set(attempts.integer(forKey: Self.failedAttemptsKey) + 1, forKey: Self.failedAttemptsKey)
-        attempts.set(now().timeIntervalSinceReferenceDate, forKey: Self.lastFailureKey)
+        attempts.set(uptime(), forKey: Self.lastFailureKey)
         updateRetryDate()
         return false
     }
@@ -346,9 +355,21 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
             return
         }
         let delay = min(30 * pow(2, Double(failures - Self.freeAttempts)), 3600)
-        let lastFailure = Date(timeIntervalSinceReferenceDate: attempts.double(forKey: Self.lastFailureKey))
-        let retryDate = lastFailure.addingTimeInterval(delay)
-        self.retryDate = retryDate > now() ? retryDate : nil
+        let uptime = uptime()
+        var lastFailure = attempts.object(forKey: Self.lastFailureKey) as? TimeInterval
+        // The uptime starts over when the device restarts, so how long it's been is unknown and the wait starts over too.
+        // Otherwise the uptime can only have grown by less than the time that really passed.
+        if lastFailure.map({ $0 > uptime }) ?? true {
+            lastFailure = uptime
+            attempts.set(uptime, forKey: Self.lastFailureKey)
+        }
+        let remaining = (lastFailure ?? uptime) + delay - uptime
+        retryDate = remaining > 0 ? now().addingTimeInterval(remaining) : nil
+    }
+
+    /// The time since the device started, including while it slept. Changing the clock doesn't affect it.
+    nonisolated static func deviceUptime() -> TimeInterval {
+        TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW)) / 1_000_000_000
     }
 
     private func unlock(authentication: KeychainAuthentication? = nil) {
