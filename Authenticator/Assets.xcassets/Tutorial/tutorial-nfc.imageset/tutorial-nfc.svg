@@ -1,17 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="954" height="1056" viewBox="0 0 954 1056">
-<rect x="237" y="440" width="480" height="960" rx="76.8" fill="#8E8E93"/>
-<rect x="251" y="454" width="452" height="932" rx="64.8" fill="#F2F2F7"/>
-<rect x="409.8" y="472" width="134.4" height="36" rx="18" fill="#3A3A3C"/>
-<path d="M442.59,470.85 A60,60 0 0 1 511.41,470.85" fill="none" stroke="#B2001F" stroke-width="10" stroke-linecap="round"/>
-<path d="M419.64,438.08 A100,100 0 0 1 534.36,438.08" fill="none" stroke="#B2001F" stroke-width="10" stroke-linecap="round"/>
-<path d="M396.70,405.32 A140,140 0 0 1 557.30,405.32" fill="none" stroke="#B2001F" stroke-width="10" stroke-linecap="round"/>
-<g transform="translate(477 300) rotate(90) translate(0 -127) scale(0.72)">
-<rect x="-38" y="244" width="76" height="84" rx="14" fill="#C7C7CC"/>
-<rect x="-48" y="244" width="96" height="20" rx="6" fill="#8E8E93"/>
-<path fill-rule="evenodd" fill="#B2001F" d="M-49 0H49A36 36 0 0 1 85 36V214A36 36 0 0 1 49 250H-49A36 36 0 0 1 -85 214V36A36 36 0 0 1 -49 0ZM-15 42a15 15 0 1 0 30 0a15 15 0 1 0 -30 0Z"/>
-<rect x="-46" y="106" width="92" height="92" rx="29.44" fill="#F7C6CE"/>
-<rect x="-36.8" y="115.2" width="73.6" height="73.6" rx="23" fill="#B2001F"/>
-<rect x="-29.44" y="122.56" width="58.88" height="58.88" rx="17.48" fill="#F7C6CE"/>
-</g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="954" height="1056" viewBox="0 0 954 1056"><rect width="480" height="960" x="237" y="440" fill="#8e8e93" rx="76.8"/><rect width="452" height="932" x="251" y="454" fill="#f2f2f7" rx="64.8"/><rect width="134.4" height="36" x="409.8" y="472" fill="#3a3a3c" rx="18"/><path fill="none" stroke="#b2001f" stroke-linecap="round" stroke-width="10" d="M442.59 470.85a60 60 0 0 1 68.82 0m-91.77-32.77a100 100 0 0 1 114.72 0M396.7 405.32a140 140 0 0 1 160.6 0"/><g transform="rotate(90 152 452)scale(.72)"><rect width="76" height="84" x="-38" y="244" fill="#c7c7cc" rx="14"/><rect width="96" height="20" x="-48" y="244" fill="#8e8e93" rx="6"/><path fill="#b2001f" fill-rule="evenodd" d="M-49 0h98a36 36 0 0 1 36 36v178a36 36 0 0 1-36 36h-98a36 36 0 0 1-36-36V36A36 36 0 0 1-49 0m34 42a15 15 0 1 0 30 0 15 15 0 1 0-30 0"/><rect width="92" height="92" x="-46" y="106" fill="#f7c6ce" rx="29.44"/><rect width="73.6" height="73.6" x="-36.8" y="115.2" fill="#b2001f" rx="23"/><rect width="58.88" height="58.88" x="-29.44" y="122.56" fill="#f7c6ce" rx="17.48"/></g></svg>

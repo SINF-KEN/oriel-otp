@@ -30,6 +30,12 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
     private var items: [String: Data] = [:]
     private var protectedItems: Set<String> = []
     private var _writes: [Write] = []
+    private var _authentications: [KeychainAuthentication?] = []
+
+    /// The authentication of each read.
+    var authentications: [KeychainAuthentication?] {
+        lock.withLock { _authentications }
+    }
 
     var writes: [Write] {
         lock.withLock { _writes }
@@ -55,7 +61,8 @@ nonisolated final class InMemoryKeychain: EnteSessionKeychain, @unchecked Sendab
         }
     }
 
-    func getValue(for userAccount: String) async throws -> Data {
+    func getValue(for userAccount: String, authentication: KeychainAuthentication?) async throws -> Data {
+        lock.withLock { _authentications.append(authentication) }
         guard let value = lock.withLock({ items[userAccount] }) else { throw SecureStoreError.itemNotFound }
         return value
     }
@@ -149,12 +156,14 @@ func makeTestDefaults() -> UserDefaults {
     }
 
     @Test func signOutForgetsTheSessionWithoutWaitingForTheServer() async throws {
-        URLProtocol.registerClass(UnansweredLogoutServer.self)
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [UnansweredLogoutServer.self]
         let watch = WatchAccountSync(defaults: defaults)
         watch.enable()
         try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
                                         authenticatorKey: Data(repeating: 7, count: 32)))
-        await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch))
+        await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
+                            session: URLSession(configuration: configuration))
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
         #expect(!watch.isEnabled)

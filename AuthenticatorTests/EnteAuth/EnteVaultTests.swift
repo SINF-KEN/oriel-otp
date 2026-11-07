@@ -16,6 +16,7 @@
 
 import CryptoKit
 import Foundation
+import LocalAuthentication
 import Testing
 import YubiKit
 
@@ -209,6 +210,12 @@ struct EnteVaultTests {
         return vault
     }
 
+    @Test func accountsChangedAtTheSameTimeAreAddedInTheSameOrder() {
+        let items: [(id: String, uri: String, updatedAt: Int64)] = ["c", "a", "b"].map { ($0, "otpauth://totp/\($0):alice?secret=JBSWY3DPEHPK3PXP", 1) }
+        #expect(vault(with: items).items.map(\.id) == ["a", "b", "c"])
+        #expect(vault(with: items.reversed()).items.map(\.id) == ["a", "b", "c"])
+    }
+
     @Test func pullAddsChangesAndDeletes() {
         var vault = vault(with: [("a", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP", 1), ("b", "otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", 2)])
         #expect(vault.items.map(\.id) == ["a", "b"])
@@ -346,11 +353,26 @@ struct EnteVaultTests {
         return EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
     }
 
+    @Test func theListFollowsTheAccountsInOrder() throws {
+        let device = DeviceAccounts(storage: MemoryDeviceStorage())
+        let cloud = try cloud(with: ["otpauth://totp/Zebra:alice?secret=\(rfcSecret)", "otpauth://totp/Apple:alice?secret=\(rfcSecret)"])
+        let model = MainViewModel(cloud: cloud, device: device)
+        #expect(model.accounts.map(\.title) == ["Apple", "Zebra"])
+
+        let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: try #require(URL(string: "otpauth://totp/Mango:alice?secret=\(rfcSecret)")))
+        _ = try model.addDeviceAccount(template)
+        #expect(model.accounts.map(\.title) == ["Apple", "Mango", "Zebra"])
+
+        let apple = try #require(model.accounts.first)
+        cloud.delete(try #require(apple.location.enteID))
+        #expect(model.accounts.map(\.title) == ["Mango", "Zebra"])
+    }
+
     @Test func listsTheAccountsWithCodesCalculatedHere() throws {
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=\(rfcSecret)",
                                      "otpauth://hotp/VPN:alice?secret=\(rfcSecret)&counter=0",
                                      "otpauth://totp/Old:alice?secret=\(rfcSecret)&codeDisplay=%7B%22trashed%22%3Atrue%7D"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(model.cloudAccounts.map(\.title) == ["GitHub", "VPN"])
         #expect(model.accounts.allSatisfy { $0.isInEnte })
         #expect(model.hasAccounts)
@@ -374,7 +396,7 @@ struct EnteVaultTests {
 
     @Test func changesGoToTheVault() throws {
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         let github = try #require(model.cloudAccounts.first { $0.title == "GitHub" })
 
         github.isPinned = true
@@ -401,6 +423,22 @@ struct EnteVaultTests {
         #expect(!cloud.hasPendingChanges)
     }
 
+    @Test func theFaceIDThatUnlockedTheAppUnlocksTheSession() async throws {
+        let defaults = makeTestDefaults()
+        let keychain = InMemoryKeychain()
+        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
+        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        let storage = InMemoryVaultStorage()
+        try storage.save(EnteVault(email: "alice@example.com", server: server))
+        let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+
+        let context = LAContext()
+        await cloud.syncAutomatically(authentication: KeychainAuthentication(context: context))
+
+        #expect(keychain.authentications.count == 1)
+        #expect(keychain.authentications.first??.context === context)
+    }
+
     @Test func readsAVaultLockedAtLaunchOnceTheDeviceIsUnlocked() async throws {
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
@@ -414,7 +452,7 @@ struct EnteVaultTests {
 
         // Launched in the background while the device is locked.
         let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(!cloud.isEnabled)
         #expect(model.cloudAccounts.isEmpty)
 
@@ -430,7 +468,7 @@ struct EnteVaultTests {
                                      "otpauth://hotp/VPN:alice?secret=JBSWY3DPEHPK3PXP&counter=5",
                                      "otpauth://steam/Steam:alice?secret=JBSWY3DPEHPK3PXP",
                                      "otpauth://totp/Long:alice?secret=JBSWY3DPEHPK3PXP&digits=10"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         func account(_ title: String) throws -> Account { try #require(model.cloudAccounts.first { $0.title == title }) }
 
         let github = try account("GitHub")
@@ -456,7 +494,7 @@ struct EnteVaultTests {
 
     @Test func sortsTheAccountsByName() throws {
         let cloud = try cloud(with: ["otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP"])
-        let model = MainViewModel(cloud: cloud)
+        let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(model.accounts.map(\.title) == ["A", "B"])
     }
 }
@@ -678,3 +716,9 @@ struct EnteCloudSyncTests {
 }
 
 #endif
+
+private extension Account.Location {
+    var enteID: String? {
+        if case .ente(let id) = self { id } else { nil }
+    }
+}

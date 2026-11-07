@@ -1296,6 +1296,35 @@
         }
       }
     },
+    "Accounts on this device are deleted for good, as there is no other copy. You won’t be able to generate codes for them anymore. Accounts on a YubiKey or in Ente Auth are removed from there." : {
+      "comment" : "Delete several accounts alert when some are on this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten auf diesem Gerät werden endgültig gelöscht, da es keine andere Kopie gibt. Du kannst für sie keine Codes mehr erzeugen. Konten auf einem YubiKey oder in Ente Auth werden dort entfernt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les comptes sur cet appareil sont supprimés définitivement, car il n’en existe aucune autre copie. Vous ne pourrez plus générer de codes pour eux. Les comptes sur une YubiKey ou dans Ente Auth en sont retirés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイス上のアカウントは、ほかにコピーがないため完全に削除され、コードを生成できなくなります。YubiKeyまたはEnte Auth上のアカウントは、それぞれから削除されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty v tomto zariadení sa odstránia natrvalo, pretože neexistuje žiadna iná kópia. Už pre ne nebudete môcť generovať kódy. Účty na YubiKey alebo v Ente Auth sa odtiaľ odstránia."
+          }
+        }
+      }
+    },
     "Accounts that require touch will need an extra NFC tap to calculate its code. Bypassing it minimizes the number of NFC taps needed." : {
       "comment" : "NFC settings footer",
       "localizations" : {
@@ -1629,60 +1658,89 @@
         }
       }
     },
-    "Add an account to Ente Auth" : {
+    "Add an account" : {
       "comment" : "Toolbar help",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konto zu Ente Auth hinzufügen"
+            "value" : "Konto hinzufügen"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter un compte à Ente Auth"
+            "value" : "Ajouter un compte"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente Authにアカウントを追加"
+            "value" : "アカウントを追加"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pridať účet do Ente Auth"
+            "value" : "Pridať účet"
           }
         }
       }
     },
-    "Add an account to the YubiKey" : {
-      "comment" : "Toolbar help",
+    "Add the accounts of the services you wish to secure and get their security codes right here.\n\nThey're kept on this device. A YubiKey with NFC or USB-C and Ente Auth are optional." : {
+      "comment" : "Tutorial",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konto zum YubiKey hinzufügen"
+            "value" : "Füge die Konten der Dienste hinzu, die du absichern möchtest, und erhalte ihre Sicherheitscodes direkt hier.\n\nSie werden auf diesem Gerät gespeichert. Ein YubiKey mit NFC oder USB-C und Ente Auth sind optional."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ajouter un compte à la YubiKey"
+            "value" : "Ajoutez les comptes des services que vous souhaitez sécuriser et obtenez leurs codes de sécurité directement ici.\n\nIls sont conservés sur cet appareil. Une YubiKey avec NFC ou USB-C et Ente Auth sont facultatifs."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "YubiKeyにアカウントを追加"
+            "value" : "保護したいサービスのアカウントを追加すると、ここでセキュリティコードを取得できます。\n\nアカウントはこのデバイスに保存されます。NFCまたはUSB-C対応のYubiKeyとEnte Authは任意です。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pridať účet do YubiKey"
+            "value" : "Pridajte účty služieb, ktoré chcete zabezpečiť, a získajte ich bezpečnostné kódy priamo tu.\n\nÚčty sa uchovávajú v tomto zariadení. YubiKey s NFC alebo USB-C a Ente Auth sú voliteľné."
+          }
+        }
+      }
+    },
+    "Add the accounts of the services you wish to secure and get their security codes right here.\n\nThey're kept on this Mac. A YubiKey with a USB-C or USB-A connector and Ente Auth are optional." : {
+      "comment" : "Mac tutorial",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füge die Konten der Dienste hinzu, die du absichern möchtest, und erhalte ihre Sicherheitscodes direkt hier.\n\nSie werden auf diesem Mac gespeichert. Ein YubiKey mit USB-C- oder USB-A-Anschluss und Ente Auth sind optional."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajoutez les comptes des services que vous souhaitez sécuriser et obtenez leurs codes de sécurité directement ici.\n\nIls sont conservés sur ce Mac. Une YubiKey avec un connecteur USB-C ou USB-A et Ente Auth sont facultatifs."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保護したいサービスのアカウントを追加すると、ここでセキュリティコードを取得できます。\n\nアカウントはこのMacに保存されます。USB-CまたはUSB-AコネクタのYubiKeyとEnte Authは任意です。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridajte účty služieb, ktoré chcete zabezpečiť, a získajte ich bezpečnostné kódy priamo tu.\n\nÚčty sa uchovávajú v tomto Macu. YubiKey s konektorom USB-C alebo USB-A a Ente Auth sú voliteľné."
           }
         }
       }
@@ -1875,6 +1933,35 @@
         }
       }
     },
+    "Added to this device" : {
+      "comment" : "Toast after adding an account to this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu diesem Gerät hinzugefügt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouté à cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスに追加しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pridané do tohto zariadenia"
+          }
+        }
+      }
+    },
     "Advanced settings" : {
       "comment" : "Add account section header",
       "localizations" : {
@@ -1987,6 +2074,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Už je v Ente Auth"
+          }
+        }
+      }
+    },
+    "Already on this device" : {
+      "comment" : "Toast when this device already has the account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereits auf diesem Gerät"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjà sur cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでにこのデバイスにあります"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Už je v tomto zariadení"
           }
         }
       }
@@ -4272,6 +4388,35 @@
         }
       }
     },
+    "Delete the account from this device" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto von diesem Gerät löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le compte de cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスからアカウントを削除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odstrániť účet z tohto zariadenia"
+          }
+        }
+      }
+    },
     "Delete…" : {
       "comment" : "Mac Account menu",
       "localizations" : {
@@ -5510,63 +5655,6 @@
         }
       }
     },
-    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with NFC or USB-C to get started." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Besorge Dir ein shared Secret/Seed von jedem Dienst, den Du mit Deinem YubiKey absichern möchtest, speichere es auf Deinem YubiKey und verwende es, um OTP Codes zu generieren.\n\nDu benötigst einen YubiKey mit NFC oder USB-C um loszulegen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obtenez un secret partagé de tout service que vous souhaitez sécuriser, stockez-le sur la YubiKey et utilisez-le pour générer vos codes de sécurité.\n\nVous aurez besoin d'une YubiKey avec NFC ou USB-C pour commencer."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "セキュリティを確保したいサービスから共有シークレットを取得し、YubiKeyに保存してセキュリティコードの生成に使用します。\n\n利用開始にはNFCまたはUSB-C対応のYubiKeyが必要です。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Získajte zdieľané tajomstvo z akejkoľvek služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a použite ho na generovanie bezpečnostných kódov.\n\nNa začatie budete potrebovať YubiKey s NFC alebo USB-C."
-          }
-        }
-      }
-    },
-    "Get a shared secret from any service you wish to secure, store it on the YubiKey and use it to generate your security codes.\n\nYou will need a YubiKey with a USB-C or USB-A connector to get started." : {
-      "comment" : "Mac tutorial",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Holen Sie sich von jedem Dienst, den Sie schützen möchten, einen gemeinsamen geheimen Schlüssel, speichern Sie ihn auf dem YubiKey und erzeugen Sie damit Ihre Sicherheitscodes.\n\nSie benötigen einen YubiKey mit USB-C- oder USB-A-Anschluss."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Obtenez une clé secrète partagée auprès du service à sécuriser, enregistrez-la sur la YubiKey et utilisez-la pour générer vos codes de sécurité.\n\nIl vous faut une YubiKey avec un connecteur USB-C ou USB-A pour commencer."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "保護したいサービスから共有シークレットを取得してYubiKeyに保存し、セキュリティコードの生成に使います。\n\nはじめるには、USB-CまたはUSB-AコネクタのYubiKeyが必要です。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Získajte zdieľaný tajný kľúč od služby, ktorú chcete zabezpečiť, uložte ho do YubiKey a generujte ním bezpečnostné kódy.\n\nNa začiatok potrebujete YubiKey s konektorom USB-C alebo USB-A."
-          }
-        }
-      }
-    },
     "Go back to the app that asked for the certificate." : {
       "comment" : "PIV extension completed message",
       "localizations" : {
@@ -5592,6 +5680,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vráťte sa do aplikácie, ktorá si vyžiadala certifikát."
+          }
+        }
+      }
+    },
+    "Have a YubiKey? Insert it or pull down to activate NFC." : {
+      "comment" : "Empty account list",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hast du einen YubiKey? Verbinde ihn oder ziehe nach unten, um NFC zu aktivieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez une YubiKey ? Insérez-la ou tirez vers le bas pour activer le NFC."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyをお持ちですか？挿入するか、下に引いてNFCを有効にしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máte YubiKey? Vložte ho alebo potiahnutím nadol aktivujte NFC."
+          }
+        }
+      }
+    },
+    "Have a YubiKey? Insert it or scan it over NFC to see its accounts." : {
+      "comment" : "Empty account list, with VoiceOver on",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hast du einen YubiKey? Verbinde ihn oder scanne ihn per NFC, um seine Konten zu sehen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez une YubiKey ? Insérez-la ou scannez-la via NFC pour voir ses comptes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyをお持ちですか？挿入するかNFCでスキャンするとアカウントが表示されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máte YubiKey? Vložte ho alebo naskenujte cez NFC a zobrazia sa jeho účty."
+          }
+        }
+      }
+    },
+    "Have a YubiKey? Insert it to see its accounts." : {
+      "comment" : "Empty account list on a device without NFC",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hast du einen YubiKey? Verbinde ihn, um seine Konten zu sehen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez une YubiKey ? Insérez-la pour voir ses comptes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyをお持ちですか？挿入するとアカウントが表示されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Máte YubiKey? Vložte ho a zobrazia sa jeho účty."
           }
         }
       }
@@ -6690,6 +6865,35 @@
         }
       }
     },
+    "Move to Ente Auth" : {
+      "comment" : "Menu",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Ente Auth verschieben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacer vers Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authに移動"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presunúť do Ente Auth"
+          }
+        }
+      }
+    },
     "Move to YubiKey" : {
       "comment" : "Menu",
       "localizations" : {
@@ -6715,6 +6919,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presunúť do YubiKey"
+          }
+        }
+      }
+    },
+    "Moved to Ente Auth" : {
+      "comment" : "Toast after moving an account from this device to Ente Auth",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu Ente Auth verschoben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacé vers Ente Auth"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ente Authに移動しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presunuté do Ente Auth"
+          }
+        }
+      }
+    },
+    "Moved to the YubiKey" : {
+      "comment" : "Toast after moving an account from this device to the YubiKey",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf den YubiKey verschoben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déplacé sur la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyに移動しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Presunuté na YubiKey"
           }
         }
       }
@@ -7003,6 +7265,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ďalej"
+          }
+        }
+      }
+    },
+    "No accounts yet" : {
+      "comment" : "Account list without accounts",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Konten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte pour le moment"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントはまだありません"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zatiaľ žiadne účty"
           }
         }
       }
@@ -9018,6 +9309,35 @@
         }
       }
     },
+    "Put the account on the YubiKey and delete it from this device" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto auf den YubiKey übertragen und von diesem Gerät löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placer le compte sur la YubiKey et le supprimer de cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをYubiKeyに保存し、このデバイスから削除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť účet na YubiKey a odstrániť ho z tohto zariadenia"
+          }
+        }
+      }
+    },
     "Put the account on the YubiKey and keep it in Ente Auth" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -9043,6 +9363,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uložiť účet do YubiKey a ponechať ho v Ente Auth"
+          }
+        }
+      }
+    },
+    "Put the account on the YubiKey and keep it on this device" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto auf den YubiKey übertragen und auf diesem Gerät behalten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Placer le compte sur la YubiKey et le conserver sur cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをYubiKeyに保存し、このデバイスにも残す"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť účet na YubiKey a ponechať ho v tomto zariadení"
           }
         }
       }
@@ -9134,30 +9483,30 @@
         }
       }
     },
-    "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add your YubiKey and generate your own security codes." : {
+    "QR codes are available from the services you wish to secure.\n\nSimply scan the QR code when you add an account and get your own security codes." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Du erhälst QR Codes direkt bei den Diensten die Du absichern möchtest.\n\nScanne einfach den QR-Code um das shared Secret/Seed Deinem YubiKey hinzuzufügen und OTP Codes zu generieren."
+            "value" : "Du erhältst QR-Codes direkt bei den Diensten, die du absichern möchtest.\n\nScanne einfach den QR-Code, wenn du ein Konto hinzufügst, und erhalte deine eigenen Sicherheitscodes."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les codes QR sont disponibles auprès des services que vous souhaitez sécuriser.\n\nIl vous suffit de scanner le code QR lorsque vous ajoutez votre YubiKey et de générer vos propres codes de sécurité."
+            "value" : "Les codes QR sont disponibles auprès des services que vous souhaitez sécuriser.\n\nIl vous suffit de scanner le code QR lorsque vous ajoutez un compte pour obtenir vos propres codes de sécurité."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "QRコードは、セキュリティを確保したいサービスから入手できます。\n\nYubiKeyを追加する際にQRコードを読み取るだけで、独自のセキュリティコードを生成できます。"
+            "value" : "QRコードは、保護したいサービスから入手できます。\n\nアカウントを追加するときにQRコードをスキャンするだけで、セキュリティコードを取得できます。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "QR kódy sú k dispozícii od služieb, ktoré chcete zabezpečiť.\n\nJednoducho naskenujte QR kód, keď pridáte svoj YubiKey a vygenerujte si vlastné bezpečnostné kódy."
+            "value" : "QR kódy sú dostupné v službách, ktoré chcete zabezpečiť.\n\nStačí naskenovať QR kód pri pridávaní účtu a získate vlastné bezpečnostné kódy."
           }
         }
       }
@@ -9964,6 +10313,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uložiť heslo?"
+          }
+        }
+      }
+    },
+    "Save the account in Ente Auth and delete it from this device" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konto in Ente Auth speichern und von diesem Gerät löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer le compte dans Ente Auth et le supprimer de cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをEnte Authに保存し、このデバイスから削除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť účet do Ente Auth a odstrániť ho z tohto zariadenia"
           }
         }
       }
@@ -11153,6 +11531,35 @@
         }
       }
     },
+    "Stored on this device" : {
+      "comment" : "Where an account is stored",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät gespeichert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stocké sur cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスに保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložené v tomto zariadení"
+          }
+        }
+      }
+    },
     "Stored on YubiKey" : {
       "comment" : "Where an account is stored",
       "localizations" : {
@@ -11611,6 +12018,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Toto okno sa nepodarilo prečítať. Namiesto toho skopírujte QR kód alebo sem presuňte jeho obrázok."
+          }
+        }
+      }
+    },
+    "The account is kept only on this device and isn't in its backups. Keep the service's recovery codes, as you'd lose the account with the device." : {
+      "comment" : "Add account footer when adding to this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Konto wird nur auf diesem Gerät gespeichert und ist nicht in dessen Backups enthalten. Bewahre die Wiederherstellungscodes des Dienstes auf, denn mit dem Gerät würdest du auch das Konto verlieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le compte est conservé uniquement sur cet appareil et n’est pas inclus dans ses sauvegardes. Gardez les codes de récupération du service, car vous perdriez le compte avec l’appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントはこのデバイスにのみ保存され、バックアップには含まれません。デバイスを失うとアカウントも失われるため、サービスのリカバリーコードを保管してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účet sa uchováva iba v tomto zariadení a nie je súčasťou jeho záloh. Uschovajte si obnovovacie kódy služby, pretože so zariadením by ste stratili aj účet."
+          }
+        }
+      }
+    },
+    "The accounts on this device can't be read right now. Unlock the device and try again." : {
+      "comment" : "Error when changing an account on this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Konten auf diesem Gerät können gerade nicht gelesen werden. Entsperre das Gerät und versuche es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les comptes sur cet appareil ne peuvent pas être lus pour le moment. Déverrouillez l’appareil et réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在、このデバイス上のアカウントを読み取れません。デバイスのロックを解除して、もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty v tomto zariadení sa momentálne nedajú prečítať. Odomknite zariadenie a skúste to znova."
           }
         }
       }
@@ -12506,6 +12971,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tieto certifikáty boli pridané na tento %@ a môžu ich používať iné aplikácie."
+          }
+        }
+      }
+    },
+    "This deletes the account for good, as there is no other copy. You won’t be able to generate codes for it anymore." : {
+      "comment" : "Delete account alert for an account on this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Konto wird endgültig gelöscht, da es keine andere Kopie gibt. Du kannst dafür keine Codes mehr erzeugen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le compte est supprimé définitivement, car il n’en existe aucune autre copie. Vous ne pourrez plus générer de codes pour ce compte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほかにコピーがないため、このアカウントは完全に削除され、コードを生成できなくなります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účet sa odstráni natrvalo, pretože neexistuje žiadna iná kópia. Už preň nebudete môcť generovať kódy."
+          }
+        }
+      }
+    },
+    "This device" : {
+      "comment" : "Add account destination",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Gerät"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet appareil"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイス"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toto zariadenie"
           }
         }
       }
@@ -14000,6 +14523,35 @@
         }
       }
     },
+    "Website" : {
+      "comment" : "AutoFill website field, for VoiceOver",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Website"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Site web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webサイト"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webová stránka"
+          }
+        }
+      }
+    },
     "What's new" : {
       "comment" : "About navigation title",
       "localizations" : {
@@ -14855,35 +15407,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "zadajte heslo"
-          }
-        }
-      }
-    },
-    "example.com" : {
-      "comment" : "AutoFill website field placeholder",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "example.com"
           }
         }
       }

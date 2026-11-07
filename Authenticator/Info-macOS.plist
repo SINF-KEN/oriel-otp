@@ -44,5 +44,7 @@
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Kenzi Voyer</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Connect to a self-hosted Ente server on your local network, if you use one.</string>
 </dict>
 </plist>

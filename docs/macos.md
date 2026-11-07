@@ -46,7 +46,8 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
 - **One window** (`Window`, not `WindowGroup`): the accounts all come from the one plugged-in YubiKey, so a second
   window would only show the same list. It opens at 900 × 600 points with a minimum of 280 × 420, and macOS
   remembers its size and position. The account list is the sidebar of the split view and the details are on the
-  right, each at least 320 points wide. In a narrower window, or as the text gets bigger, the two become one column
+  right, each at least 320 points wide. In a narrower window, or as the text gets bigger, the two become one column,
+  once a resize ends, as replacing the list during one crashes the app,
   like on an iPhone, with the details opening over the list (→ opens the selected account, Back or Escape returns) and the search field above the list, and in the narrowest windows the
   codes go below the names. Closing the window keeps the app running for the menu bar; the Dock icon or the menu bar opens it again.
 - **Menu bar commands** (`Authenticator/Mac/MainCommands.swift`): File > Add Account… (⌘N) and Sync from Ente
@@ -73,7 +74,8 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
 
 - **Menu bar extra** (`MenuBarAccountsView`): the pinned accounts, or all of them if none are pinned; a click copies
   the code. It connects to the YubiKey itself while the main window is closed. Settings can hide it, or show the app
-  only in the menu bar (no Dock icon, `NSApplication.ActivationPolicy.accessory`).
+  only in the menu bar (no Dock icon, `NSApplication.ActivationPolicy.accessory`). While the app is locked, the lock
+  screen replaces the accounts, and it connects to the YubiKey only after unlocking.
 - **QR codes without a camera** (`QRCodeReader`): Scan QR Code on Screen opens the system's window picker
   (`SCContentSharingPicker`) and takes one frame of the window picked, leaving out the app's own windows. This needs
   no Screen Recording permission, but only with an `SCStream`: `SCScreenshotManager` is refused the picker's filter

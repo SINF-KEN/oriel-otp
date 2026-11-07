@@ -17,7 +17,31 @@
 
 import SwiftUI
 
-/// The menu bar extra: the pinned accounts, or all of them when none are pinned. Clicking one copies its code.
+/// The menu bar extra's panel: the accounts, or the lock screen while the app is locked.
+///
+/// The lock screen replaces the accounts rather than covering them, so the panel fits it and keeps the system's
+/// background, which would show the accounts through a cover.
+struct MenuBarView: View {
+
+    var body: some View {
+        if AppLock.shared.isLocked {
+            ScrollView {
+                AppLockPrompt()
+                    .padding(16)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            // Tall enough for the number pad at the default text size.
+            .frame(maxHeight: 640)
+            .fixedSize(horizontal: false, vertical: true)
+            .textScaledFrame(width: 300)
+            .scaledBodyFont()
+        } else {
+            MenuBarAccountsView()
+        }
+    }
+}
+
+/// The pinned accounts, or all of them when none are pinned. Clicking one copies its code.
 ///
 /// It connects to the YubiKey while it's open if the main window isn't, and lets go of it again when it closes.
 struct MenuBarAccountsView: View {
@@ -36,13 +60,19 @@ struct MenuBarAccountsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if !model.hasAccounts {
-                Label {
-                    Text(model.isKeyPluggedIn ? String(localized: "Reading YubiKey…", comment: "Mac menu bar") : String(localized: "Insert YubiKey"))
-                } icon: {
-                    InsertKeyIcon()
+                if model.isKeyPluggedIn {
+                    Label {
+                        Text(String(localized: "Reading YubiKey…", comment: "Mac menu bar"))
+                    } icon: {
+                        InsertKeyIcon()
+                    }
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+                } else {
+                    Text(String(localized: "No accounts yet", comment: "Account list without accounts"))
+                        .foregroundStyle(.secondary)
+                        .padding(8)
                 }
-                .foregroundStyle(.secondary)
-                .padding(8)
             } else if accounts.isEmpty {
                 Text("No accounts on YubiKey")
                     .foregroundStyle(.secondary)

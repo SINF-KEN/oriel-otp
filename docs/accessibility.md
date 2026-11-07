@@ -36,7 +36,7 @@ All text uses text styles. Icons and images that sit next to text use `@ScaledMe
 would crowd out the text. Screens that can get taller than the display scroll (`scrollsWhenTooTall()`), and on the
 iPhone and iPad the account row puts the issuer and name on one line with the code in large type below it whenever
 the name would get narrower than about 150 points beside the code: from one size up on most iPhones, and at every
-size on an iPhone mini. The app lock's number keys stop growing at a
+size on an iPhone mini. In an iPad's sidebar that's about 110 points, so that a code of 8 digits fits too. The app lock's number keys stop growing at a
 size where three still fit across the smallest iPhone; held, they show the Large Content Viewer, like the navigation
 bar's buttons.
 
@@ -80,6 +80,8 @@ short of that in places, as in Apple's own apps; everything the app draws itself
   expired or not yet calculated code is dimmed to 70%, still above 4.5:1, and not at all with Increase Contrast (`colorSchemeContrast`).
 - Swipe actions have white labels on Favorite, DeleteAction and CopyAction, which are darker than the system yellow,
   red and blue for at least 4.5:1 in both appearances.
+- The app lock's buttons have white labels on UnlockButton, the accent in light mode and a darker pink in dark mode,
+  for at least 4.5:1. The accent itself stays light in dark mode, as the codes are drawn in it.
 - Every asset color has a high contrast variant, for light and dark mode.
 
 A selected row is highlighted in the accent color, so everything on it changes with it: on iOS the code and the

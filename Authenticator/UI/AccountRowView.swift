@@ -55,7 +55,13 @@ struct AccountRowView<Accessory: View>: View {
     private let titleStyle = Font.TextStyle.subheadline
     private let subtitleStyle = Font.TextStyle.footnote
     private let codeStyle = Font.TextStyle.body
-    @ScaledSize(relativeTo: .subheadline) private var minimumNameWidth: CGFloat = 150
+    @ScaledSize(relativeTo: .subheadline) private var phoneMinimumNameWidth: CGFloat = 150
+    @ScaledSize(relativeTo: .subheadline) private var sidebarMinimumNameWidth: CGFloat = 110
+    /// Less in an iPad's sidebar, whose width the system limits, so an 8 digit code fits beside the name like the others.
+    /// By the device, as a sidebar's size class is compact.
+    private var minimumNameWidth: CGFloat {
+        UIDevice.current.userInterfaceIdiom == .pad ? sidebarMinimumNameWidth : phoneMinimumNameWidth
+    }
     #endif
     @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3
     private let headlineCodeStyle = Font.TextStyle.title
@@ -88,7 +94,7 @@ struct AccountRowView<Accessory: View>: View {
         // code is copied with the row's Copy action.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(account.accessibilityLabel)
-        .accessibilityValue(accessibilityValue)
+        .modifier(AccountCodeStateValue(account: account, showsLocation: showsLocation))
         #if os(iOS)
         // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
         .accessibilityHint(copyCode == nil ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
@@ -97,11 +103,11 @@ struct AccountRowView<Accessory: View>: View {
         .accessibilityInputLabels([account.title] + [account.subTitle.map { "\(account.title) \($0)" }].compactMap { $0 })
         // Stable for UI tests and agents, e.g. "account-row.GitHub:alice@example.com", see docs/accessibility.md.
         .accessibilityIdentifier("account-row.\(account.accountId)")
-        .onChange(of: account.state) { _, state in
+        .onChange(of: account.canCopyCode) { _, canCopyCode in
             // Not sure why we have to schedule this in the next runloop
             Task {
                 withAnimation {
-                    isDimmed = state == .expired || account.otp == nil
+                    isDimmed = !canCopyCode
                 }
             }
         }
@@ -197,7 +203,7 @@ struct AccountRowView<Accessory: View>: View {
             ZStack(alignment: .leading) {
                 Capsule()
                     .fill(.quaternary)
-                BarProgressView(progress: remaining, color: pillColor, animate: animate)
+                CountdownBar(account: account, color: pillColor, animate: animate)
             }
             .frame(height: barHeight)
             // In the tint, like the code in its button above.
@@ -225,7 +231,7 @@ struct AccountRowView<Accessory: View>: View {
             if isCopied {
                 copiedSymbol
                     .imageScale(.small)
-            } else if case .countingdown = account.state {} else {
+            } else if !account.isCountingDown {
                 Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
                     .imageScale(.small)
                     .accessibilityHidden(true)
@@ -256,11 +262,6 @@ struct AccountRowView<Accessory: View>: View {
         #endif
     }
 
-    /// The part of the code's validity that's left, or none while there's no code.
-    private var remaining: Double {
-        if case .countingdown(let remaining) = account.state { remaining } else { 0 }
-    }
-
     // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
     // Increase Contrast the way the system's label colors do, so the primary one is used then.
     private var secondaryStyle: HierarchicalShapeStyle {
@@ -268,26 +269,19 @@ struct AccountRowView<Accessory: View>: View {
         colorSchemeContrast == .increased || isSelected ? .primary : .secondary
     }
 
-    private var accessibilityValue: String {
-        showsLocation ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription : account.accessibilityCodeState
-    }
-
     private var codePill: some View {
         HStack {
             Group {
-                switch(account.state) {
-                case .requiresCalculation, .expired:
+                if account.isCountingDown {
+                    CountdownPie(account: account, color: pillColor, animate: animate)
+                        .frame(width: statusSize, height: statusSize)
+                        .padding(1)
+                        .accessibilityHidden(true)
+                } else {
                     Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
                         .font(.system(size: account.requiresTouch ? statusSize * 18 / 22 : statusSize))
                         // In the code's color, as the pill is dimmed while it shows.
                         .foregroundStyle(HierarchicalShapeStyle.primary)
-                        .frame(width: statusSize, height: statusSize)
-                        .padding(1)
-                        .accessibilityHidden(true)
-                case .countingdown(let remaining):
-                    PieProgressView(progress: remaining,
-                                    color: pillColor,
-                                    animate: animate)
                         .frame(width: statusSize, height: statusSize)
                         .padding(1)
                         .accessibilityHidden(true)
@@ -354,20 +348,56 @@ struct AccountRowView<Accessory: View>: View {
     }
 }
 
+// What changes every second is read in these views of its own, so a row isn't calculated again with both its layouts.
+
+/// The time left as a pie, for the code's pill.
+private struct CountdownPie: View {
+    let account: Account
+    let color: HierarchicalShapeStyle
+    let animate: Bool
+
+    var body: some View {
+        PieProgressView(progress: account.remaining, color: color, animate: animate)
+    }
+}
+
+/// The time left as a bar, under the code with larger text.
+private struct CountdownBar: View {
+    let account: Account
+    let color: HierarchicalShapeStyle
+    let animate: Bool
+
+    var body: some View {
+        BarProgressView(progress: account.remaining, color: color, animate: animate)
+    }
+}
+
+/// VoiceOver's value for a row, with the time left.
+private struct AccountCodeStateValue: ViewModifier {
+    let account: Account
+    let showsLocation: Bool
+
+    func body(content: Content) -> some View {
+        content.accessibilityValue(showsLocation ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription : account.accessibilityCodeState)
+    }
+}
+
 extension AccountRowView where Accessory == EmptyView {
     init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false) {
         self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied, isSelected: isSelected) { EmptyView() }
     }
 }
 
-/// A key for an account on the YubiKey, a cloud for one in Ente Auth, and a clock while a change to an Ente Auth
-/// account waits to be uploaded.
+/// A key for an account on the YubiKey, a drive for one on this device, a cloud for one in Ente Auth, and a clock while
+/// a change to an Ente Auth account waits to be uploaded.
 struct AccountLocationIcon: View {
     let account: Account
 
     var body: some View {
         Group {
-            if account.isInEnte {
+            if account.isOnDevice {
+                Image(systemName: "internaldrive")
+            } else if account.isInEnte {
                 Image(systemName: account.isPendingSync ? "clock.arrow.circlepath" : "cloud")
             } else {
                 Image("securitykey")
@@ -409,8 +439,10 @@ extension Account {
     }
 
     var locationDescription: String {
-        if !isInEnte {
+        if isOnYubiKey {
             String(localized: "Stored on YubiKey", comment: "Where an account is stored")
+        } else if isOnDevice {
+            String(localized: "Stored on this device", comment: "Where an account is stored")
         } else if isPendingSync {
             String(localized: "Stored in Ente Auth, not synced yet", comment: "Where an account is stored, for an Ente Auth account with changes that haven't been uploaded")
         } else {

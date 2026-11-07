@@ -70,7 +70,7 @@ import YubiKit
     /// The vault file couldn't be read when the app started because the device was locked.
     @ObservationIgnored private var isVaultLocked = false
 
-    init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .shared,
+    init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
          watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil) {
         self.store = store
         self.storage = storage
@@ -134,7 +134,9 @@ import YubiKit
     }
 
     /// The accounts as the sync sheet lists them, sorted, including ones that couldn't be read.
-    var codes: [EnteCode] {
+    var codes: [EnteCode] { Self.codes(in: vault) }
+
+    nonisolated private static func codes(in vault: EnteVault?) -> [EnteCode] {
         (vault?.items ?? []).compactMap { item -> EnteCode? in
             guard let rawData = item.rawData else {
                 return EnteCode(id: item.id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
@@ -185,14 +187,14 @@ import YubiKit
     }
 
     /// The session in memory, or the saved one after Face ID or Touch ID if `unlock` is set. Nil if it can't be had.
-    private func unlockedSession(unlock: Bool) async -> EnteSavedSession? {
+    private func unlockedSession(unlock: Bool, authentication: KeychainAuthentication? = nil) async -> EnteSavedSession? {
         if let session { return session }
         guard unlock else { return nil }
         if let unlockTask { return await unlockTask.value }
         didAskToUnlock = true
         let task = Task { () -> EnteSavedSession? in
             do {
-                return try await store.unlock()
+                return try await store.unlock(authentication: authentication)
             } catch EnteAuthenticatorSyncError.signedOut {
                 sessionRejected()
                 return nil
@@ -224,16 +226,17 @@ import YubiKit
     // MARK: - Sync
 
     /// Syncs if the session is unlocked, or after asking to unlock it the first time since the app started. For when
-    /// the app comes to the foreground. Errors aren't shown, except for a rejected session.
-    func syncAutomatically() async {
-        await sync(unlock: !didAskToUnlock)
+    /// the app comes to the foreground. Errors aren't shown, except for a rejected session. `authentication` is the
+    /// Face ID or Touch ID that just unlocked the app, if any, so the session doesn't ask for it a second time.
+    func syncAutomatically(authentication: KeychainAuthentication? = nil) async {
+        await sync(unlock: !didAskToUnlock, authentication: authentication)
     }
 
     /// Syncs, asking to unlock the session if needed. Errors are shown if `reportsErrors` is set, e.g. when the user
     /// pulled down the list; changes made offline just wait for the next sync.
-    func sync(unlock: Bool = true, reportsErrors: Bool = false) async {
+    func sync(unlock: Bool = true, reportsErrors: Bool = false, authentication: KeychainAuthentication? = nil) async {
         loadVaultIfLocked()
-        guard vault != nil, let session = await unlockedSession(unlock: unlock) else { return }
+        guard vault != nil, let session = await unlockedSession(unlock: unlock, authentication: authentication) else { return }
         do {
             try await enqueueSync(session).value
         } catch EnteAuthenticatorSyncError.signedOut {
@@ -337,15 +340,15 @@ import YubiKit
         onChange?()
         updateAutoFill()
         // The watch shows what is in the vault. It's only sent while the session is unlocked, i.e. it is still valid.
-        if session != nil {
+        if session != nil, watch.isEnabled {
             watch.send(codes)
         }
     }
 
     /// AutoFill uses what is in the vault, also while the session is locked: the codes are calculated on the device.
     private func updateAutoFill() {
-        if vault != nil {
-            autoFill?.update(codes)
+        if let vault {
+            autoFill?.update { Self.codes(in: vault) }
         } else {
             autoFill?.remove()
         }
@@ -374,7 +377,21 @@ import YubiKit
         let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
                                                 period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
         guard !codes.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
-        let rawData = String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self)
+        return insert(rawData: String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self))
+    }
+
+    /// Adds an account kept on this device and uploads it, with its pin and HOTP counter, unless the vault has one
+    /// with the same name.
+    func add(rawData: String) throws -> AddResult {
+        guard vault != nil else { throw EnteAuthenticatorSyncError.signedOut }
+        if let credentialId = EnteCodeParser.parse(id: "", rawData: rawData)?.credentialId,
+           codes.contains(where: { $0.credentialId == credentialId }) {
+            return .alreadyPresent
+        }
+        return insert(rawData: rawData)
+    }
+
+    private func insert(rawData: String) -> AddResult {
         update { _ = $0.add(rawData: rawData) }
         syncChanges()
         return .added

@@ -19,12 +19,23 @@ import SwiftUI
 /// The screen shown over the app while it's locked.
 struct AppLockView: View {
 
+    var body: some View {
+        AppLockPrompt()
+            .padding(24)
+            .scrollsWhenTooTall()
+            .background(Color(.systemBackground))
+    }
+}
+
+/// The lock icon and title, and whatever unlocks the app. Has no background of its own, so it also fits the Mac's menu
+/// bar extra.
+struct AppLockPrompt: View {
+
     private var lock: AppLock { .shared }
     @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 40
 
     var body: some View {
         VStack(spacing: 24) {
-            Spacer(minLength: 0)
             Image(systemName: "lock.fill")
                 .font(.system(size: iconSize, weight: .semibold))
                 .foregroundStyle(.secondary)
@@ -45,6 +56,7 @@ struct AppLockView: View {
                         .padding(.horizontal, 8)
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(Color(.unlockButton))
                 .controlSize(.large)
                 .disabled(lock.isAuthenticating)
                 .accessibilityIdentifier("app-lock.unlock")
@@ -56,11 +68,7 @@ struct AppLockView: View {
                     lock.unlock(with: $0)
                 }
             }
-            Spacer(minLength: 0)
         }
-        .padding(24)
-        .scrollsWhenTooTall()
-        .background(Color(.systemBackground))
     }
 }
 
@@ -248,6 +256,7 @@ private struct AppLockPasswordField: View {
                 .modifier(Shake(animatableData: reduceMotion ? 0 : CGFloat(wrongAttempts)))
             Button(String(localized: "Continue", comment: "App lock password button"), action: enter)
                 .buttonStyle(.borderedProminent)
+                .tint(Color(.unlockButton))
                 .disabled(password.count < max(1, minimumLength))
         }
         .onAppear { isFocused = true }
@@ -275,7 +284,7 @@ nonisolated private struct Shake: GeometryEffect {
 
 #if os(macOS)
 extension View {
-    /// Covers the view with the lock screen while the app is locked: the Mac's windows, its sheets and the menu bar.
+    /// Covers the view with the lock screen while the app is locked: the Mac's windows and sheets.
     func appLockCover() -> some View {
         modifier(AppLockCover())
     }

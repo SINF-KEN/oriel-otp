@@ -31,12 +31,23 @@ import YubiKit
         case yubiKey
         /// In the Ente Auth vault on this device, with the id of the vault item. Its codes are calculated by the app.
         case ente(id: String)
+        /// Only on this device, with the id of the item in `DeviceAccounts`. Its codes are calculated by the app.
+        case device(id: String)
     }
 
-    var otp: OATHSession.OTP?
+    var otp: OATHSession.OTP? {
+        didSet { updateCodeStatus() }
+    }
     var title: String
     var subTitle: String?
-    var state: AccountState
+    /// Changes every second while counting down, so only views that show the countdown should read it.
+    var state: AccountState {
+        didSet { updateCodeStatus() }
+    }
+    /// Whether there's a code to copy. Unlike `state` it doesn't change with the countdown, so the toolbar can use it.
+    private(set) var canCopyCode = false
+    /// Whether the code is counting down. Unlike `state` it doesn't change every second, so a row can use it.
+    private(set) var isCountingDown = false
     var isPinned: Bool {
         didSet { onPinnedChange?(self) }
     }
@@ -51,6 +62,7 @@ import YubiKit
         switch location {
         case .yubiKey: credential.id
         case .ente(let id): "ente/" + id
+        case .device(let id): "device/" + id
         }
     }
     var credential: OATHSession.Credential
@@ -59,11 +71,13 @@ import YubiKit
     var isPendingSync = false
     var keyVersion: Version
     var color: Color = .red
-    var enableRefresh: Bool = true
+    private(set) var enableRefresh: Bool = true
     @ObservationIgnored private var timeLeft: Double?
     @ObservationIgnored private var requestRefresh: (Account) -> Void
     @ObservationIgnored private var connectionType: OATHSession.ConnectionType
     @ObservationIgnored private var calculateCompletion: ((OATHSession.OTP) -> ())? = nil
+    /// Asks for the next code when this one expires. Replaced with each new code, whose expiry is the one that counts.
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
     
     init(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, requestRefresh: @escaping (Account) -> Void, connectionType: OATHSession.ConnectionType, isPinned: Bool, location: Location = .yubiKey) {
 
@@ -87,15 +101,39 @@ import YubiKit
         self.update(otp: code)
     }
     
+    private func updateCodeStatus() {
+        let canCopyCode = otp != nil && state != .expired
+        if self.canCopyCode != canCopyCode {
+            self.canCopyCode = canCopyCode
+        }
+        var isCountingDown = false
+        if case .countingdown = state {
+            isCountingDown = true
+        }
+        if self.isCountingDown != isCountingDown {
+            self.isCountingDown = isCountingDown
+        }
+    }
+
     func calculate(completion: ((OATHSession.OTP) -> ())? = nil) {
         calculateCompletion = completion
         requestRefresh(self)
     }
     
-    var isInEnte: Bool { location != .yubiKey }
+    var isOnYubiKey: Bool { location == .yubiKey }
+
+    var isInEnte: Bool {
+        if case .ente = location { return true }
+        return false
+    }
+
+    var isOnDevice: Bool {
+        if case .device = location { return true }
+        return false
+    }
 
     /// Renaming on a YubiKey needs firmware 5.3 or later.
-    var canRename: Bool { isInEnte || keyVersion >= Version("5.3.0")! }
+    var canRename: Bool { !isOnYubiKey || keyVersion >= Version("5.3.0")! }
 
     func updateTitles() {
         title = credential.title
@@ -116,9 +154,10 @@ import YubiKit
             
             // Schedule refresh if connection is wired
             if let timeLeft, connectionType == .wired {
-                Task { [weak self] in
+                refreshTask?.cancel()
+                refreshTask = Task { [weak self] in
                     try? await Task.sleep(for: .seconds(max(timeLeft, 0)))
-                    guard let self else { return }
+                    guard !Task.isCancelled, let self else { return }
                     self.requestRefresh(self)
                 }
             }
@@ -130,7 +169,7 @@ import YubiKit
     
     /// The code to show, or none while there's no code or it has expired.
     var formattedCode: String? {
-        guard let otp, state != .expired else { return nil }
+        guard let otp, canCopyCode else { return nil }
         if self.credential.isSteam {
             return otp.code
         } else {
@@ -162,13 +201,24 @@ import YubiKit
             break
         }
 #endif
-        let value = abs(accountId.hash) % Color.colorSetForAccountIcons.count
-        return Color.colorSetForAccountIcons[value]
+        return Color.colorSetForAccountIcons[Self.colorIndex(for: accountId, count: Color.colorSetForAccountIcons.count)]
+    }
+
+    /// The same for an account on every launch, unlike `String.hash`, which is seeded for each one. FNV-1a.
+    static func colorIndex(for accountId: String, count: Int) -> Int {
+        let hash = accountId.utf8.reduce(0xcbf2_9ce4_8422_2325 as UInt64) { ($0 ^ UInt64($1)) &* 0x100_0000_01b3 }
+        return Int(hash % UInt64(count))
+    }
+
+    /// The part of the code's validity that's left, or none while there's no code. Changes every second, so only views
+    /// that show the countdown should read it.
+    var remaining: Double {
+        if case .countingdown(let remaining) = state { remaining } else { 0 }
     }
 
     func updateState() {
         guard credential.type == .totp else {
-            self.enableRefresh = true
+            setEnableRefresh(true)
             self.state = .requiresCalculation
             return
         }
@@ -178,14 +228,21 @@ import YubiKit
             self.timeLeft = timeLeft
             if timeLeft > 0 {
                 self.state = .countingdown(timeLeft / validInterval.duration)
-                self.enableRefresh = false
+                setEnableRefresh(false)
             } else if timeLeft < 0 {
                 self.state = .expired
-                self.enableRefresh = true
+                setEnableRefresh(true)
             } else if connectionType == .nfc {
                 self.state = .expired
-                self.enableRefresh = true
+                setEnableRefresh(true)
             }
+        }
+    }
+
+    /// Only when it changes, as `updateState()` runs every second and the toolbar reads this.
+    private func setEnableRefresh(_ enableRefresh: Bool) {
+        if self.enableRefresh != enableRefresh {
+            self.enableRefresh = enableRefresh
         }
     }
 }
@@ -200,8 +257,8 @@ extension Account: Comparable {
 
     /// By name, the YubiKey's account first when the same name is in Ente Auth too.
     static func < (lhs: Account, rhs: Account) -> Bool {
-        return (lhs.credential.id.lowercased(), lhs.isInEnte ? 1 : 0, lhs.accountId.lowercased())
-            < (rhs.credential.id.lowercased(), rhs.isInEnte ? 1 : 0, rhs.accountId.lowercased())
+        return (lhs.credential.id.lowercased(), lhs.isOnYubiKey ? 0 : 1, lhs.accountId.lowercased())
+            < (rhs.credential.id.lowercased(), rhs.isOnYubiKey ? 0 : 1, rhs.accountId.lowercased())
     }
 }
 

@@ -182,7 +182,7 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test.log"
 
       - name: Summarize test results
-        if: always()
+        if: ${{ !cancelled() }}
         run: |
           set -euo pipefail
           RESULT_BUNDLE="$RUNNER_TEMP/OrielOTP.xcresult"
@@ -224,7 +224,7 @@ jobs:
           check_coverage TokenResponseStore.swift 0.90
 
       - name: Upload test results and logs
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: OrielOTP-test-results
@@ -304,7 +304,7 @@ jobs:
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test-macos.log"
 
       - name: Upload test results and logs
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: OrielOTP-macOS-test-results

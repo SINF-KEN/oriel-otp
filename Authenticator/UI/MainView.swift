@@ -38,6 +38,8 @@ struct MainView: View {
     @State var commands = MainWindowCommands.shared
     /// The account open over the list in the single column layout.
     @State var singleColumnPath: [String] = []
+    /// The layout kept while the window is being resized, true for the single column. See `mainLayout`.
+    @State private var layoutDuringResize: Bool?
     /// For the arrow keys, which only reach the list while it has the focus.
     @FocusState private var isListFocused: Bool
     #else
@@ -72,10 +74,10 @@ struct MainView: View {
         DeviceCapabilities.supportsNFC || model.isKeyPluggedIn
     }
 
-    /// Where a new account can be saved. Without a YubiKey to reach, accounts can still be added to Ente Auth.
+    /// Where a new account can be saved. This device always works, with neither a YubiKey nor an Ente account.
     var addDestinations: AccountDestinations {
-        var destinations: AccountDestinations = []
-        if canAddToYubiKey || !model.cloud.isEnabled { destinations.insert(.yubiKey) }
+        var destinations: AccountDestinations = .device
+        if canAddToYubiKey { destinations.insert(.yubiKey) }
         if model.cloud.isEnabled { destinations.insert(.ente) }
         return destinations
     }
@@ -94,7 +96,9 @@ struct MainView: View {
             addAccountCancellable = addAccountSubject.sink { (template, requiresTouch, destinations) in
                 oathURL = nil
                 guard let template else { return }
-                if destinations.contains(.yubiKey) {
+                if destinations.contains(.device) {
+                    addAccountToDevice(template)
+                } else if destinations.contains(.yubiKey) {
                     model.addAccount(template, requiresTouch: requiresTouch) {
                         if destinations.contains(.ente) {
                             addAccountToEnte(template)
@@ -156,7 +160,8 @@ struct MainView: View {
                 // session's Face ID would come up over it or compete with it.
                 AppLock.shared.whenUnlocked {
                     model.start() // This is called when app becomes active
-                    Task { await model.cloud.syncAutomatically() }
+                    let authentication = AppLock.shared.unlockAuthentication
+                    Task { await model.cloud.syncAutomatically(authentication: authentication) }
                     performPendingQuickAction()
                 }
             } else if phase == .active {
@@ -249,13 +254,24 @@ struct MainView: View {
     /// Two columns while both fit, otherwise one, as on an iPhone, which also happens as the text gets bigger. A split
     /// view doesn't do this itself on the Mac, and when its columns don't fit, it's centered in the window and cut off
     /// on both sides.
+    ///
+    /// The layout only changes once a resize ends. Replacing the list during one crashes the app: AppKit ends the
+    /// table's live resize as it's removed, which adds rows to a table SwiftUI is already destroying.
     private var mainLayout: some View {
         GeometryReader { reader in
             let minimumWidth = Self.minimumColumnWidth * textScale
-            if reader.size.width < 2 * minimumWidth {
-                singleColumnView
-            } else {
-                splitView(sidebarWidth: minimumWidth...(reader.size.width - minimumWidth))
+            let isSingleColumn = layoutDuringResize ?? (reader.size.width < 2 * minimumWidth)
+            ZStack {
+                LiveResizeObserver { isResizing in
+                    layoutDuringResize = isResizing ? isSingleColumn : nil
+                }
+                if isSingleColumn {
+                    singleColumnView
+                } else {
+                    // The window can be too narrow for two columns during a resize. They share it until it ends.
+                    let sidebarMinimum = min(minimumWidth, reader.size.width / 2)
+                    splitView(sidebarWidth: sidebarMinimum...(reader.size.width - sidebarMinimum))
+                }
             }
         }
     }
@@ -287,7 +303,9 @@ struct MainView: View {
                     }
                 }
         }
-        .onAppear(perform: focusList)
+        // AppKit gives the search field the first focus, mostly with larger text, which would keep the arrow keys from
+        // the list. With something typed in it, it came from the two columns, so it keeps the focus.
+        .onAppear { focusList(overSearch: searchText.isEmpty) }
         // Leaving the search field with Escape goes back to the list.
         .onChange(of: isSearchFocused) { _, isFocused in
             if !isFocused {
@@ -305,10 +323,10 @@ struct MainView: View {
     }
 
     /// Gives the list the focus once it's on screen, unless the search field is about to take it.
-    private func focusList() {
+    private func focusList(overSearch: Bool = false) {
         Task {
             try? await Task.sleep(for: Self.navigationDelay)
-            if !isSearchFocused {
+            if overSearch || !isSearchFocused {
                 isListFocused = true
             }
         }
@@ -499,7 +517,13 @@ struct MainView: View {
                 model.deleteAccounts(accounts) {}
             }
         } message: { accounts in
-            if accounts.contains(where: \.isInEnte) {
+            if accounts.contains(where: \.isOnDevice) {
+                if accounts.count > 1 {
+                    Text(String(localized: "Accounts on this device are deleted for good, as there is no other copy. You won’t be able to generate codes for them anymore. Accounts on a YubiKey or in Ente Auth are removed from there.", comment: "Delete several accounts alert when some are on this device"))
+                } else {
+                    Text(String(localized: "This deletes the account for good, as there is no other copy. You won’t be able to generate codes for it anymore.", comment: "Delete account alert for an account on this device"))
+                }
+            } else if accounts.contains(where: \.isInEnte) {
                 if accounts.count > 1 {
                     Text(String(localized: "Accounts on the YubiKey are deleted from it. Accounts in Ente Auth are moved to its trash on all your devices, where the Ente Auth app can restore them.", comment: "Delete several accounts alert when some are in Ente Auth"))
                 } else {
@@ -549,8 +573,14 @@ struct MainView: View {
                 }
             }
             if !model.hasAccounts {
-                ListStatusView(image: Image("InsertKey"), message: insertYubiKeyMessage, height: reader.size.height, isArtwork: true) {
+                ListStatusView(image: Image(systemName: "person.crop.circle.badge.plus"), message: String(localized: "No accounts yet", comment: "Account list without accounts"), height: reader.size.height) {
+                    addAccountButton
                     enteSyncButton
+                    // The accounts of a YubiKey join the list once it has been read.
+                    Text(String.optionalYubiKey(isVoiceOverEnabled: isVoiceOverEnabled))
+                        .scaledFont(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
                 }
             } else if !searchText.isEmpty {
                 if searchResults.count > 0 {
@@ -559,7 +589,7 @@ struct MainView: View {
                     }
                 } else {
                     ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"),
-                                   message: model.cloudAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"),
+                                   message: model.cloudAccounts.isEmpty && model.deviceAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"),
                                    height: reader.size.height)
                 }
             } else if model.pinnedAccounts.count > 0 {
@@ -587,17 +617,13 @@ struct MainView: View {
                 }
             } else {
                 ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
-                    Button(action: { addAccount() }) {
-                        Label("Add account", systemImage: "plus")
-                    }
-                    .accessibilityInputLabels(VoiceControlNames.addAccount)
-                    .buttonStyle(.borderedProminent)
-                    .disabled(!canAddToYubiKey)
+                    addAccountButton
                     enteSyncButton
                 }
             }
-            if !model.accountsLoaded && !model.cloudAccounts.isEmpty && searchText.isEmpty {
-                // The Ente Auth accounts are listed, the YubiKey's join them once it has been read.
+            if !model.accountsLoaded && model.hasAccounts && model.hasReadYubiKey && searchText.isEmpty {
+                // The other accounts are listed, the YubiKey's join them once it has been read. Not asked of people
+                // who don't use one.
                 Label {
                     Text(insertYubiKeyMessage)
                 } icon: {
@@ -608,10 +634,18 @@ struct MainView: View {
                 .listRowSeparator(.hidden)
             }
         }
+        #if os(macOS)
+        .background { ListScrollerInset(hasSectionHeader: showsSectionHeader) }
+        #endif
     }
     }
 
     #if os(macOS)
+    /// Whether the list starts with a section's header, as search results and an unsorted list don't have any.
+    private var showsSectionHeader: Bool {
+        otp != nil || (model.hasAccounts && searchText.isEmpty && model.pinnedAccounts.count > 0)
+    }
+
     @ToolbarContentBuilder private var macToolbar: some CustomizableToolbarContent {
         // Together, not on their own: a secondary action floats in the middle of the Mac sidebar's toolbar.
         ToolbarItem(id: "sync-from-ente", placement: .primaryAction) {
@@ -696,7 +730,6 @@ struct MainView: View {
             }
             .accessibilityInputLabels(VoiceControlNames.configuration)
             .accessibilityIdentifier("accounts.configuration")
-            .disabled(!DeviceCapabilities.supportsNFC && !model.isKeyPluggedIn)
             // In the Debug menu on the Mac, so it isn't in the screenshots.
             #if DEBUG && targetEnvironment(simulator)
             if SimulatedYubiKey.isEnabled {
@@ -810,9 +843,9 @@ struct MainView: View {
         }
     }
 
-    /// Each row shows where its account is stored once there are Ente Auth accounts in the list.
+    /// Each row shows where its account is stored once the list has accounts from different places.
     private var showsLocation: Bool {
-        !model.cloudAccounts.isEmpty
+        model.showsAccountLocations
     }
 
     private func copyButton(_ account: Account) -> some View {
@@ -835,6 +868,14 @@ struct MainView: View {
         }
     }
 
+    private var addAccountButton: some View {
+        Button(action: { addAccount() }) {
+            Label("Add account", systemImage: "plus")
+        }
+        .accessibilityInputLabels(VoiceControlNames.addAccount)
+        .accessibilityIdentifier("accounts.empty-add-account")
+    }
+
     private var enteSyncButton: some View {
         Button(action: { showEnteSync.toggle() }) {
             Label(String(localized: "Sync from Ente Auth", comment: "Main view menu item"), systemImage: "arrow.trianglehead.2.clockwise.rotate.90")
@@ -850,7 +891,7 @@ struct MainView: View {
 
     private var menuState: MainWindowMenuState {
         let selection = selectedAccounts
-        return MainWindowMenuState(canAddAccount: model.isKeyPluggedIn || model.cloud.isEnabled,
+        return MainWindowMenuState(canAddAccount: true,
                                    canRefresh: model.canRefresh,
                                    canSearch: true,
                                    selectionCount: selection.count,
@@ -865,7 +906,6 @@ struct MainView: View {
         let selection = selectedAccounts
         switch command {
         case .addAccount:
-            guard model.isKeyPluggedIn || model.cloud.isEnabled else { return }
             addAccount()
         case .syncFromEnte:
             showEnteSync = true
@@ -908,7 +948,6 @@ struct MainView: View {
 
     private var addAccountToolbarItem: some CustomizableToolbarContent {
         ToolbarItem(id: "add-account", placement: .primaryAction) {
-            // Without a YubiKey to reach, accounts can still be added to Ente Auth.
             Button(action: { addAccount() }) {
                 Label("Add account", systemImage: "plus")
             }
@@ -918,9 +957,7 @@ struct MainView: View {
             // With a hardware keyboard. In the menu bar on the Mac.
             .keyboardShortcut("n")
             #endif
-            .help(canAddToYubiKey || !model.cloud.isEnabled ? String(localized: "Add an account to the YubiKey", comment: "Toolbar help")
-                  : String(localized: "Add an account to Ente Auth", comment: "Toolbar help"))
-            .disabled(!canAddToYubiKey && !model.cloud.isEnabled)
+            .help(String(localized: "Add an account", comment: "Toolbar help"))
         }
     }
 
@@ -944,6 +981,19 @@ struct MainView: View {
 
     /// Adds an account to the Ente Auth vault, which uploads it. For an account that was just put on the YubiKey,
     /// this is the only time it can be copied, as the YubiKey can't give the secret back later.
+    private func addAccountToDevice(_ template: YubiKitOATHSession.CredentialTemplate) {
+        do {
+            switch try model.addDeviceAccount(template) {
+            case .added:
+                toastPresenter.toast(message: String(localized: "Added to this device", comment: "Toast after adding an account to this device"))
+            case .alreadyPresent:
+                toastPresenter.toast(message: String(localized: "Already on this device", comment: "Toast when this device already has the account"))
+            }
+        } catch {
+            model.sessionError = error
+        }
+    }
+
     private func addAccountToEnte(_ template: YubiKitOATHSession.CredentialTemplate) {
         do {
             switch try model.addCloudAccount(template) {
@@ -1068,6 +1118,16 @@ private struct AlertOrConfirmationDialog<A: View>: ViewModifier {
 }
 
 extension String {
+    /// How to use a YubiKey, for the empty list, where it's one option among others.
+    static func optionalYubiKey(isVoiceOverEnabled: Bool) -> String {
+        guard DeviceCapabilities.supportsNFC else {
+            return String(localized: "Have a YubiKey? Insert it to see its accounts.", comment: "Empty account list on a device without NFC")
+        }
+        return isVoiceOverEnabled
+            ? String(localized: "Have a YubiKey? Insert it or scan it over NFC to see its accounts.", comment: "Empty account list, with VoiceOver on")
+            : String(localized: "Have a YubiKey? Insert it or pull down to activate NFC.", comment: "Empty account list")
+    }
+
     /// What to do to see the YubiKey's accounts, as one sentence so it can be translated as a whole.
     static func insertYubiKey(isVoiceOverEnabled: Bool) -> String {
         guard DeviceCapabilities.supportsNFC else { return String(localized: "Insert YubiKey") }

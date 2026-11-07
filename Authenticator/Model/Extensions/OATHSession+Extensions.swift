@@ -60,7 +60,7 @@ extension YubiKitOATHSession.Code {
     }
 }
 
-enum OATHCredentialId {
+nonisolated enum OATHCredentialId {
     /// The identifier of a credential on the YubiKey, e.g. "60/Issuer:account".
     static func key(accountName: String, issuer: String?, period: UInt, isTOTP: Bool) -> String {
         var key = ""
@@ -121,7 +121,7 @@ enum CredentialTemplateError: Error, LocalizedError {
     }
 }
 
-extension YubiKitOATHSession.CredentialTemplate {
+nonisolated extension YubiKitOATHSession.CredentialTemplate {
 
     /// The issuer and account name, e.g. "GitHub (alice)", for listing the account in a message.
     var displayName: String {
@@ -221,7 +221,7 @@ extension YubiKitOATHSession.CredentialTemplate {
     }
 }
 
-extension Data {
+nonisolated extension Data {
     /// Decodes RFC 4648 Base32, ignoring case and padding, the same way the Objective-C YubiKit did.
     init?(base32Encoded string: String) {
         guard string.allSatisfy({ ("A"..."Z").contains($0) || ("a"..."z").contains($0) || ("2"..."7").contains($0) || $0 == "=" }) else {

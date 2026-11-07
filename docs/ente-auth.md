@@ -62,10 +62,15 @@ adding stops and an alert names the accounts that weren't added.
 
 ## Adding to Ente Auth
 
-The *Add account* sheet has a **Save to** choice: **YubiKey**, **Ente Auth** or **YubiKey and Ente Auth**
-(`AccountDestinations`). It is offered when a YubiKey can be reached (NFC, or one plugged in) and you have signed in
-with **Stay signed in**. The last choice is remembered (`AddAccount.Destinations`; the earlier *Also add to Ente Auth*
-switch is carried over). Without a YubiKey to reach, the add button saves to Ente Auth; signed out, to the YubiKey.
+The *Add account* sheet has a **Save to** choice: **This device**, **YubiKey**, **Ente Auth** or **YubiKey and Ente
+Auth** (`AccountDestinations`). **This device** is always there; the others are offered when a YubiKey can be reached
+(NFC, or one plugged in) or you have signed in with **Stay signed in**. The last choice is remembered
+(`AddAccount.Destinations`; the earlier *Also add to Ente Auth* switch is carried over). With neither a YubiKey nor an
+Ente account, the account is saved on this device.
+
+Accounts on this device (`DeviceAccounts`) have their own encrypted file, apart from the vault, which is replaced when
+another Ente account signs in. They stay when signing out of Ente, and **Move to Ente Auth** uploads one with its pin
+and counter.
 
 A YubiKey never gives its OATH secrets back, so an account that is already on a key can't be copied to Ente. The app
 only has the secret while an account is being added, and the sheet says so when only the YubiKey is chosen. The
@@ -142,7 +147,9 @@ is taken to be that item. Ente's server has no compare-and-swap, so two devices 
 sync of each other can still overwrite each other; the last write wins there.
 
 A sync needs the saved session. It is unlocked with Face ID or Touch ID (Touch ID or the password on the Mac) the
-first time it is needed after the app starts, and then kept in memory until the app quits. The app syncs:
+first time it is needed after the app starts, and then kept in memory until the app quits. When the app lock is
+set to Face ID or Touch ID, the check that unlocks the app also unlocks the session, so it is only asked for once.
+If the device passcode was used instead, Face ID is still asked for, as the session needs it. The app syncs:
 
 - when it comes to the foreground, asking for the unlock only once per launch,
 - when the list is pulled down (iPhone and iPad) or refreshed (Mac), which also shows errors,
@@ -208,6 +215,10 @@ revoked with `POST /users/logout`.
 ## Self-hosted servers
 
 Enter the API URL of the server, e.g. `https://ente.example.com`, under Options. Only `https` URLs are accepted.
+
+A server on the local network makes the system ask for Local Network access the first time the app connects to it, using
+`NSLocalNetworkUsageDescription`. If that's declined, the connection fails until it's allowed in the system's privacy
+settings. Servers on the internet don't trigger the prompt.
 
 ## Code
 

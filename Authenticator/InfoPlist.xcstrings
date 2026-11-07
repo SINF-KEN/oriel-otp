@@ -180,6 +180,42 @@
           }
         }
       }
+    },
+    "NSLocalNetworkUsageDescription" : {
+      "comment" : "Privacy - Local Network Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Verbinde dich mit einem selbst gehosteten Ente-Server in deinem lokalen Netzwerk, falls du einen nutzt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Connect to a self-hosted Ente server on your local network, if you use one."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Connectez-vous à un serveur Ente auto-hébergé sur votre réseau local, si vous en utilisez un."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ローカルネットワーク上のセルフホスト型Enteサーバーを使用している場合に、そのサーバーに接続します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pripojte sa k vlastnému serveru Ente vo vašej lokálnej sieti, ak ho používate."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

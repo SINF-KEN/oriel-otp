@@ -57,7 +57,8 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
         self.rounds = rounds
         if method.hasSecret, let secret {
             var salt = Data(count: 16)
-            _ = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            let status = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            precondition(status == errSecSuccess, "No random bytes for the salt")
             self.salt = salt
             hash = Self.derive(secret, salt: salt, rounds: rounds)
         } else {
@@ -151,6 +152,14 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     }
 }
 
+/// A Face ID, Touch ID or passcode check that already succeeded. Reading a protected item with it doesn't ask again,
+/// as long as the check satisfies the item's access control: the device passcode doesn't satisfy `biometryCurrentSet`.
+/// Keep it only as long as it's needed, as it reads protected items without the user knowing.
+nonisolated struct KeychainAuthentication: @unchecked Sendable {
+    // Only ever passed to the keychain, never changed after it was evaluated.
+    let context: LAContext
+}
+
 /// Locks the account list behind Face ID or Touch ID, a 4 or 6 digit code, or a password.
 ///
 /// The app locks when it starts and whenever it goes to the background, or on the Mac when the screen locks or the
@@ -158,8 +167,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 /// Face ID) is started: it waits in `whenUnlocked`.
 ///
 /// After 5 wrong codes or passwords, the next attempt has to wait 30 seconds, doubling with each wrong one up to an
-/// hour. There's no way around a forgotten code or password other than deleting the app, which forgets the lock: the
-/// accounts are on the YubiKey and in Ente Auth, not only in the app.
+/// hour. The wait is measured with the time since the device started, as changing the clock must not end it. There's no
+/// way around a forgotten code or password other than deleting the app, which forgets the lock: the accounts are on the
+/// YubiKey and in Ente Auth, not only in the app.
 @MainActor @Observable final class AppLock {
     static let shared = Bundle.main.bundleURL.pathExtension == "appex"
         // The AutoFill extension can't tell which installation of the app saved the lock, the app forgets an earlier
@@ -169,7 +179,10 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 
     private static let enabledKey = "AppLock.Enabled"
     private static let failedAttemptsKey = "AppLock.FailedAttempts"
-    private static let lastFailureKey = "AppLock.LastFailure"
+    /// The device's uptime at the last wrong attempt.
+    private static let lastFailureKey = "AppLock.LastFailureUptime"
+    /// The wall clock time of the last wrong attempt, kept by earlier versions.
+    private static let oldLastFailureKey = "AppLock.LastFailure"
     private static let freeAttempts = 5
 
     /// The lock, nil when the app isn't locked or the lock can't be read yet.
@@ -182,6 +195,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     private(set) var retryDate: Date?
     /// Face ID or Touch ID is being asked for.
     private(set) var isAuthenticating = false
+    /// The Face ID or Touch ID that just unlocked the app, for what's waiting in `whenUnlocked` to read the keychain
+    /// without asking again. Only set while those actions run, so it can't approve anything later on.
+    @ObservationIgnored private(set) var unlockAuthentication: KeychainAuthentication?
 
     @ObservationIgnored private let storage: AppLockStorage
     @ObservationIgnored private let defaults: UserDefaults
@@ -189,7 +205,8 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     @ObservationIgnored private let attempts: UserDefaults
     @ObservationIgnored private let keepsSavedLock: Bool
     @ObservationIgnored private let now: () -> Date
-    @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> Bool
+    @ObservationIgnored private let uptime: () -> TimeInterval
+    @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> KeychainAuthentication?
     @ObservationIgnored private var pendingActions: [@MainActor () -> Void] = []
     @ObservationIgnored private var didAskForDeviceOwner = false
 
@@ -202,13 +219,16 @@ nonisolated struct AppLockKeychain: AppLockStorage {
          attempts: UserDefaults? = nil,
          keepsSavedLock: Bool = false,
          now: @escaping () -> Date = Date.init,
-         authenticateDeviceOwner: @escaping @MainActor (String) async -> Bool = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
+         uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
+         authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
         self.storage = storage
         self.defaults = defaults
         self.attempts = attempts ?? defaults
         self.keepsSavedLock = keepsSavedLock
         self.now = now
+        self.uptime = uptime
         self.authenticateDeviceOwner = authenticateDeviceOwner
+        self.attempts.removeObject(forKey: Self.oldLastFailureKey)
         isLocked = true
         reload()
         isLocked = isUnavailable || method != .off
@@ -275,9 +295,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     func unlockWithDeviceOwner() async {
         guard isLocked, method == .device, !isAuthenticating else { return }
         isAuthenticating = true
-        let success = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
+        let authentication = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
         isAuthenticating = false
-        if success { unlock() }
+        if let authentication { unlock(authentication: authentication) }
     }
 
     /// Unlocks if `secret` is the code or password. Returns false when it isn't, or it's too early to try again.
@@ -298,14 +318,14 @@ nonisolated struct AppLockKeychain: AppLockStorage {
             return true
         }
         attempts.set(attempts.integer(forKey: Self.failedAttemptsKey) + 1, forKey: Self.failedAttemptsKey)
-        attempts.set(now().timeIntervalSinceReferenceDate, forKey: Self.lastFailureKey)
+        attempts.set(uptime(), forKey: Self.lastFailureKey)
         updateRetryDate()
         return false
     }
 
     /// Asks for Face ID, Touch ID or the device passcode before the lock is changed from or to the device method.
     func verifyDeviceOwner() async -> Bool {
-        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock"))
+        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
     }
 
     /// Changes the lock. `secret` is the new code or password, for the methods that have one.
@@ -335,21 +355,36 @@ nonisolated struct AppLockKeychain: AppLockStorage {
             return
         }
         let delay = min(30 * pow(2, Double(failures - Self.freeAttempts)), 3600)
-        let lastFailure = Date(timeIntervalSinceReferenceDate: attempts.double(forKey: Self.lastFailureKey))
-        let retryDate = lastFailure.addingTimeInterval(delay)
-        self.retryDate = retryDate > now() ? retryDate : nil
+        let uptime = uptime()
+        var lastFailure = attempts.object(forKey: Self.lastFailureKey) as? TimeInterval
+        // The uptime starts over when the device restarts, so how long it's been is unknown and the wait starts over too.
+        // Otherwise the uptime can only have grown by less than the time that really passed.
+        if lastFailure.map({ $0 > uptime }) ?? true {
+            lastFailure = uptime
+            attempts.set(uptime, forKey: Self.lastFailureKey)
+        }
+        let remaining = (lastFailure ?? uptime) + delay - uptime
+        retryDate = remaining > 0 ? now().addingTimeInterval(remaining) : nil
     }
 
-    private func unlock() {
+    /// The time since the device started, including while it slept. Changing the clock doesn't affect it.
+    nonisolated static func deviceUptime() -> TimeInterval {
+        TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW)) / 1_000_000_000
+    }
+
+    private func unlock(authentication: KeychainAuthentication? = nil) {
         isLocked = false
         let actions = pendingActions
         pendingActions = []
+        unlockAuthentication = authentication
         actions.forEach { $0() }
+        unlockAuthentication = nil
     }
 
-    nonisolated static func evaluateDeviceOwner(reason: String) async -> Bool {
+    nonisolated static func evaluateDeviceOwner(reason: String) async -> KeychainAuthentication? {
         let context = LAContext()
-        return (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) ?? false
+        guard (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) == true else { return nil }
+        return KeychainAuthentication(context: context)
     }
 
     /// Whether the device can check its owner, i.e. a passcode or password is set.

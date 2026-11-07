@@ -66,7 +66,8 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
 
     /// Merges entities pulled from the server, decrypted, and remembers where to pull from next time.
     mutating func merge(_ pulled: [(entity: EnteAuthenticatorEntity, rawData: String?)], latest: Int64) {
-        for (entity, rawData) in pulled.sorted(by: { $0.entity.updatedAt < $1.entity.updatedAt }) {
+        // By id too, as they come from a dictionary: new accounts are listed in the same order on every device.
+        for (entity, rawData) in pulled.sorted(by: { ($0.entity.updatedAt, $0.entity.id) < ($1.entity.updatedAt, $1.entity.id) }) {
             let index = items.firstIndex { $0.entityID == entity.id }
                 // An item whose upload reached the server although its answer didn't.
                 ?? items.firstIndex { $0.entityID == nil && $0.rawData != nil && $0.rawData == rawData && !entity.isDeleted }
@@ -342,23 +343,14 @@ nonisolated protocol EnteVaultKeychain: Sendable {
     func removeKey()
 }
 
-/// Keeps the vault in a file encrypted with ChaChaPoly, with a random key in the keychain that is only readable on
-/// this device while it is unlocked. The file is excluded from backups, which couldn't decrypt it anyway.
-nonisolated struct EnteVaultFile: EnteVaultStorage {
+/// A value kept in a file encrypted with ChaChaPoly, with a random key in the keychain that is only readable on this
+/// device while it is unlocked. The file is excluded from backups, which couldn't decrypt it anyway.
+nonisolated struct EncryptedFile<Value: Codable> {
 
     let url: URL
     let keychain: EnteVaultKeychain
 
-    static var defaultURL: URL {
-        URL.applicationSupportDirectory.appending(components: "EnteAuth", "Vault")
-    }
-
-    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey()) {
-        self.url = url
-        self.keychain = keychain
-    }
-
-    func load() throws -> EnteVault? {
+    func load() throws -> Value? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         guard let key = try keychain.existingKey() else { throw EnteVaultError.unreadable }
         let data: Data
@@ -370,15 +362,15 @@ nonisolated struct EnteVaultFile: EnteVaultStorage {
         }
         do {
             let box = try ChaChaPoly.SealedBox(combined: data)
-            return try JSONDecoder().decode(EnteVault.self, from: try ChaChaPoly.open(box, using: key))
+            return try JSONDecoder().decode(Value.self, from: try ChaChaPoly.open(box, using: key))
         } catch {
             throw EnteVaultError.unreadable
         }
     }
 
-    func save(_ vault: EnteVault) throws {
+    func save(_ value: Value) throws {
         let key = try keychain.existingKey() ?? keychain.createKey()
-        let sealed = try ChaChaPoly.seal(try JSONEncoder().encode(vault), using: key).combined
+        let sealed = try ChaChaPoly.seal(try JSONEncoder().encode(value), using: key).combined
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         #if os(iOS)
         try sealed.write(to: url, options: [.atomic, .completeFileProtection])
@@ -397,12 +389,34 @@ nonisolated struct EnteVaultFile: EnteVaultStorage {
     }
 }
 
+/// Keeps the Ente vault in an encrypted file.
+nonisolated struct EnteVaultFile: EnteVaultStorage {
+
+    private let file: EncryptedFile<EnteVault>
+
+    static var defaultURL: URL {
+        URL.applicationSupportDirectory.appending(components: "EnteAuth", "Vault")
+    }
+
+    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey()) {
+        file = EncryptedFile(url: url, keychain: keychain)
+    }
+
+    func load() throws -> EnteVault? { try file.load() }
+    func save(_ vault: EnteVault) throws { try file.save(vault) }
+    func remove() { file.remove() }
+}
+
 /// The vault key in the keychain: `WhenUnlockedThisDeviceOnly`, so it never leaves the device and can be read
 /// without Face ID or Touch ID, like the codes of any authenticator app.
 nonisolated struct EnteVaultKeychainKey: EnteVaultKeychain {
 
-    private let service = "EnteAuth.Vault"
+    private let service: String
     private let account = "key"
+
+    init(service: String = "EnteAuth.Vault") {
+        self.service = service
+    }
 
     private var query: [String: Any] {
         var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
