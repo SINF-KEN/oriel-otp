@@ -24,6 +24,7 @@ import Testing
 nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Sendable {
     private let lock = NSLock()
     private var _configuration: AppLockConfiguration?
+    private var _attempts: AppLockAttempts?
     private var _isUnavailable = false
     private var _loadError: Error?
     private var _saveError: Error?
@@ -50,6 +51,15 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         set { lock.withLock { _saveError = newValue } }
     }
 
+    var attempts: AppLockAttempts? {
+        get { lock.withLock { _attempts } }
+        set { lock.withLock { _attempts = newValue } }
+    }
+
+    func loadAttempts() -> AppLockAttempts? { attempts }
+
+    func saveAttempts(_ attempts: AppLockAttempts?) throws { self.attempts = attempts }
+
     func load() throws -> AppLockConfiguration? {
         if isUnavailable { throw AppLockUnavailableError() }
         if let loadError { throw loadError }
@@ -74,8 +84,12 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
     }
 
     func makeLock(now: @escaping () -> Date = { Date(timeIntervalSinceReferenceDate: 800_000_000) },
+                  uptime: @escaping () -> TimeInterval = { 1000 },
+                  keepsSavedLock: Bool = false,
+                  hasDeviceOwner: Bool = true,
                   deviceOwner: Bool = true) -> AppLock {
-        AppLock(storage: storage, defaults: defaults, now: now, authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil })
+        AppLock(storage: storage, defaults: defaults, keepsSavedLock: keepsSavedLock, now: now, uptime: uptime, deviceOwnerIsAvailable: { hasDeviceOwner },
+                authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil })
     }
 
     @Test func notLockedWithoutALock() {
@@ -134,7 +148,7 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
 
     @Test func waitsAfterTooManyWrongAttempts() throws {
         var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
-        let lock = AppLock(storage: storage, defaults: defaults, now: { now }, authenticateDeviceOwner: { _ in KeychainAuthentication(context: LAContext()) })
+        let lock = makeLock(now: { now }, uptime: { now.timeIntervalSinceReferenceDate })
         try lock.setMethod(.code4, secret: "1234")
         lock.lock()
         for _ in 0..<4 {
@@ -151,7 +165,7 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(lock.retryDate == now.addingTimeInterval(60))
 
         // The wait survives the app being restarted.
-        let restarted = AppLock(storage: storage, defaults: defaults, now: { now }, authenticateDeviceOwner: { _ in KeychainAuthentication(context: LAContext()) })
+        let restarted = makeLock(now: { now }, uptime: { now.timeIntervalSinceReferenceDate })
         #expect(restarted.retryDate == now.addingTimeInterval(60))
 
         now = now.addingTimeInterval(61)
@@ -160,6 +174,96 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         restarted.lock()
         #expect(!restarted.unlock(with: "0000"))
         #expect(restarted.retryDate == nil)
+    }
+
+    @Test func movingTheClockForwardDoesNotShortenTheWait() throws {
+        var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+        let lock = makeLock(now: { now })
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        for _ in 0..<5 {
+            #expect(!lock.unlock(with: "0000"))
+        }
+
+        now = now.addingTimeInterval(86_400)
+        lock.updateRetryDate()
+        #expect(lock.retryDate == now.addingTimeInterval(30))
+        #expect(!lock.unlock(with: "1234"))
+    }
+
+    @Test func theWaitStartsOverWhenTheDeviceRestarts() throws {
+        var uptime: TimeInterval = 5000
+        let lock = makeLock(uptime: { uptime })
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        for _ in 0..<5 {
+            #expect(!lock.unlock(with: "0000"))
+        }
+
+        uptime = 10
+        lock.updateRetryDate()
+        #expect(lock.retryDate != nil)
+        #expect(storage.attempts?.lastFailure == 10)
+        uptime = 39
+        lock.updateRetryDate()
+        #expect(lock.retryDate != nil)
+        uptime = 41
+        #expect(lock.unlock(with: "1234"))
+    }
+
+    @Test func wrongAttemptsAreKeptWithTheLockNotInThePreferences() throws {
+        let lock = makeLock()
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        #expect(!lock.unlock(with: "0000"))
+        #expect(storage.attempts?.failures == 1)
+        #expect(defaults.dictionaryRepresentation().keys.filter { $0.hasPrefix("AppLock.") } == ["AppLock.Enabled"])
+
+        #expect(lock.unlock(with: "1234"))
+        #expect(storage.attempts == nil)
+    }
+
+    @Test func relockingLocksAgainWithTheCurrentLock() throws {
+        let lock = makeLock(keepsSavedLock: true)
+        #expect(!lock.isLocked)
+
+        // Turned on in the app after the extension started.
+        storage.configuration = AppLockConfiguration(method: .code4, secret: "1234", rounds: 1)
+        lock.relock()
+        #expect(lock.isLocked)
+        #expect(lock.method == .code4)
+        #expect(lock.unlock(with: "1234"))
+
+        // The next request has to unlock again.
+        lock.relock()
+        #expect(lock.isLocked)
+
+        // Turned off in the app.
+        storage.configuration = nil
+        lock.relock()
+        #expect(!lock.isLocked)
+    }
+
+    @Test func relockingDropsWaitingActions() throws {
+        let lock = makeLock()
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        var ran = 0
+        lock.whenUnlocked { ran += 1 }
+        lock.relock()
+        lock.unlock(with: "1234")
+        #expect(ran == 0)
+    }
+
+    @Test func relockingStaysLockedWhenTheKeychainCantBeRead() throws {
+        let lock = makeLock()
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        lock.unlock(with: "1234")
+        storage.isUnavailable = true
+        lock.relock()
+        #expect(lock.isLocked)
+        #expect(lock.isUnavailable)
     }
 
     @Test func deviceOwnerUnlocks() async throws {
@@ -185,13 +289,46 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(!makeLock().isLocked)
     }
 
-    @Test func lockLeftByAnEarlierInstallationIsForgotten() throws {
-        // The keychain keeps items when the app is deleted, its preferences don't.
+    @Test func lockMissingFromThePreferencesIsForgottenOnceTheDeviceOwnerConfirms() async throws {
+        // The keychain keeps items when the app is deleted, its preferences don't. They can also be edited, so they
+        // alone don't open the app.
         storage.configuration = AppLockConfiguration(method: .code4, secret: "1234", rounds: 1)
+        storage.attempts = AppLockAttempts(failures: 9, lastFailure: 1000)
+
+        let refused = makeLock(deviceOwner: false)
+        #expect(refused.isLocked)
+        #expect(refused.method == .device)
+        await refused.unlockWithDeviceOwner()
+        #expect(refused.isLocked)
+        #expect(storage.configuration != nil)
+
         let lock = makeLock()
+        #expect(lock.isLocked)
+        #expect(!lock.unlock(with: "1234"))
+        await lock.unlockWithDeviceOwner()
         #expect(!lock.isLocked)
         #expect(lock.method == .off)
         #expect(storage.configuration == nil)
+        #expect(storage.attempts == nil)
+        #expect(!makeLock().isLocked)
+    }
+
+    @Test func lockMissingFromThePreferencesIsForgottenWithoutADeviceOwner() throws {
+        storage.configuration = AppLockConfiguration(method: .code4, secret: "1234", rounds: 1)
+        let lock = makeLock(hasDeviceOwner: false)
+        #expect(!lock.isLocked)
+        #expect(lock.method == .off)
+        #expect(storage.configuration == nil)
+    }
+
+    @Test func settingALockReplacesOneWaitingForTheDeviceOwner() async throws {
+        storage.configuration = AppLockConfiguration(method: .code4, secret: "1234", rounds: 1)
+        let lock = makeLock()
+        try lock.setMethod(.code6, secret: "123456")
+        lock.lock()
+        await lock.unlockWithDeviceOwner()
+        #expect(lock.isLocked)
+        #expect(storage.configuration?.method == .code6)
     }
 
     @Test func staysLockedUntilTheKeychainCanBeRead() throws {
@@ -223,10 +360,15 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(lock.unlock(with: "1234"))
     }
 
-    @Test func lockThatCantBeDecodedIsForgotten() throws {
+    @Test func lockThatCantBeDecodedIsForgottenOnceTheDeviceOwnerConfirms() async throws {
         try makeLock().setMethod(.code4, secret: "1234")
         storage.loadError = DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "corrupt"))
         let lock = makeLock()
+        #expect(lock.isLocked)
+        #expect(lock.method == .device)
+        #expect(storage.configuration != nil)
+
+        await lock.unlockWithDeviceOwner()
         #expect(!lock.isLocked)
         #expect(lock.method == .off)
         #expect(storage.configuration == nil)

@@ -96,6 +96,22 @@ struct EnteLoginFlowTests {
         return try #require(JSONSerialization.jsonObject(with: data) as? [String: String])
     }
 
+    @Test func weakKeyLimitsFromTheServerStopTheSignInBeforeAnyProofIsSent() async throws {
+        EnteLoginURLProtocol.requests = []
+        EnteLoginURLProtocol.handler = { request in
+            guard request.url?.path == "/users/srp/attributes" else { return (404, Data()) }
+            var attributes = EnteLoginTestData.emailMFAAttributes()
+            attributes["isEmailMFAEnabled"] = false
+            attributes["kekSalt"] = Data(count: EnteCrypto.saltLength).base64EncodedString()
+            return (200, try! JSONSerialization.data(withJSONObject: ["attributes": attributes]))
+        }
+
+        await #expect(throws: EnteLoginError.invalidAccountData) {
+            try await EnteLoginFlow.start(api: EnteLoginURLProtocol.makeAPI(), email: "a@b.c", password: "password")
+        }
+        #expect(EnteLoginURLProtocol.requests.map(\.url?.path) == ["/users/srp/attributes"])
+    }
+
     @Test func emailCodeAndTOTPAdvanceThroughTheLoginFlow() async throws {
         EnteLoginURLProtocol.requests = []
         EnteLoginURLProtocol.handler = { request in

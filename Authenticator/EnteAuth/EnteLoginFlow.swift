@@ -225,7 +225,11 @@ final class EnteLoginFlow {
     // MARK: - Crypto, run off the main actor
 
     @concurrent nonisolated private static func deriveKeyEncryptionKey(password: String, salt: Data, opsLimit: UInt64, memLimit: UInt64) async throws -> Data {
-        try EnteCrypto.deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: opsLimit, memLimit: memLimit)
+        do {
+            return try EnteCrypto.deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: opsLimit, memLimit: memLimit)
+        } catch EnteCryptoError.invalidKeyLimits {
+            throw EnteLoginError.invalidAccountData
+        }
     }
 
     @concurrent nonisolated private static func makeSRPClient(identity: String, keyEncryptionKey: Data, salt: Data) async throws -> EnteSRPClient {
