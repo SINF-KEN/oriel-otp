@@ -24,6 +24,7 @@ struct EnteSyncView: View {
     @Environment(\.openURL) private var openURL
     @State private var model: EnteSyncViewModel
     @FocusState private var focusedField: Field?
+    @State private var isCreatingAccount = false
 
     /// Whether a YubiKey can be reached, over NFC or because one is plugged in.
     let canAddToYubiKey: Bool
@@ -130,6 +131,16 @@ struct EnteSyncView: View {
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .focused($focusedField, equals: .server)
+                if let server = model.signUpServer {
+                    Button(String(localized: "Create an account on this server", comment: "Ente button that opens account creation on a self-hosted server")) {
+                        isCreatingAccount = true
+                    }
+                    .accessibilityIdentifier("ente.create-account")
+                    // On the button: on the section each row would present it, and the sheets would close each other.
+                    .sheet(isPresented: $isCreatingAccount) {
+                        EnteSignUpView(server: server, email: model.email) { model.email = $0 }
+                    }
+                }
                 if model.canSaveSession {
                     Toggle(String(localized: "Stay signed in", comment: "Ente sign in toggle"), isOn: $model.staySignedIn)
                         .accessibilityIdentifier("ente.stay-signed-in")

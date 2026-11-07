@@ -27,7 +27,7 @@ import YubiKit
         case accounts
     }
 
-    private static let serverKey = "EnteAuth.ServerURL"
+    static let serverKey = "EnteAuth.ServerURL"
 
     var phase: Phase
     var email = ""
@@ -140,6 +140,11 @@ import YubiKit
 
     // MARK: - Sign in
 
+    /// The server accounts can be created on, nil for Ente's own or a server that isn't filled in yet.
+    var signUpServer: URL? {
+        EnteSignUpViewModel.server(from: server)
+    }
+
     var canSignIn: Bool {
         !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !password.isEmpty
     }
@@ -153,7 +158,7 @@ import YubiKit
         run {
             // Only the flow keeps the password, while the email code or second factor it's needed for can be retried.
             defer { self.password = "" }
-            let server = try self.serverURL()
+            let server = try EnteAPIClient.serverURL(from: self.server)
             if let flow = self.flow, flow.needsPassword, flow.email == email, flow.api.server == server {
                 try await self.handle { try await flow.submitPassword(password) }
                 return
@@ -391,13 +396,6 @@ import YubiKit
     /// The server as typed on the sign in screen, empty for Ente's own server.
     private static func serverField(for server: URL) -> String {
         server == EnteAPIClient.defaultServer ? "" : server.absoluteString
-    }
-
-    private func serverURL() throws -> URL {
-        let server = server.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !server.isEmpty else { return EnteAPIClient.defaultServer }
-        guard let url = URL(string: server) else { throw EnteAPIError.invalidServerURL }
-        return url
     }
 
     private func run(_ operation: @escaping () async throws -> Void) {
