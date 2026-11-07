@@ -42,6 +42,18 @@ extension CGRect {
             (min(a.width, a.height), a.width * a.height) < (min(b.width, b.height), b.width * b.height)
         } ?? self
     }
+
+    // The same with a fold, whose upper half wins when the fold runs across: that half stands up facing the reader while
+    // the lower half lies flat. Unless it's much the smaller one, as with a sheet that only just reaches over the fold.
+    func largestClearRect(avoiding occlusions: [CGRect], folds: [CGRect]) -> CGRect {
+        if let fold = folds.first(where: { $0.width > $0.height && $0.intersects(self) }) {
+            let upperHalf = CGRect(x: minX, y: minY, width: width, height: fold.minY - minY)
+            if upperHalf.height > 0, upperHalf.height >= (maxY - fold.maxY) / 2 {
+                return upperHalf.largestClearRect(avoiding: occlusions)
+            }
+        }
+        return largestClearRect(avoiding: folds + occlusions)
+    }
 }
 
 #if canImport(UIKit)
@@ -49,8 +61,8 @@ extension UIView {
     // The largest part of the bounds that the fold and the camera housing leave clear, on devices that reserve regions.
     var boundsClearOfReservedRegions: CGRect {
         guard #available(iOS 27.1, *) else { return bounds }
-        let regions = reservedRegions(kind: .division) + reservedRegions(kind: .occlusion)
-        return bounds.largestClearRect(avoiding: regions.map(\.frame))
+        return bounds.largestClearRect(avoiding: reservedRegions(kind: .occlusion).map(\.frame),
+                                       folds: reservedRegions(kind: .division).map(\.frame))
     }
 }
 #endif

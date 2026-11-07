@@ -113,7 +113,7 @@ struct ConfirmButton: View {
 }
 
 extension View {
-    // Lays the view out in the largest part of its frame that the fold and the camera housing leave clear.
+    // Lays the view out in the part of its frame that the fold and the camera housing leave clear, see `largestClearRect`.
     func avoidingReservedRegions() -> some View {
         self.modifier(ReservedRegionAvoidingModifier())
     }
@@ -125,8 +125,9 @@ struct ReservedRegionAvoidingModifier: ViewModifier {
         #if os(iOS)
         if #available(iOS 27.1, *) {
             GeometryReader { proxy in
-                let regions = proxy.reservedRegions(kind: .division) + proxy.reservedRegions(kind: .occlusion)
-                let clearRect = CGRect(origin: .zero, size: proxy.size).largestClearRect(avoiding: regions.map(\.frame))
+                let clearRect = CGRect(origin: .zero, size: proxy.size)
+                    .largestClearRect(avoiding: proxy.reservedRegions(kind: .occlusion).map(\.frame),
+                                      folds: proxy.reservedRegions(kind: .division).map(\.frame))
                 content.padding(EdgeInsets(top: clearRect.minY,
                                            leading: clearRect.minX,
                                            bottom: proxy.size.height - clearRect.maxY,
