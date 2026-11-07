@@ -156,12 +156,14 @@ func makeTestDefaults() -> UserDefaults {
     }
 
     @Test func signOutForgetsTheSessionWithoutWaitingForTheServer() async throws {
-        URLProtocol.registerClass(UnansweredLogoutServer.self)
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [UnansweredLogoutServer.self]
         let watch = WatchAccountSync(defaults: defaults)
         watch.enable()
         try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
                                         authenticatorKey: Data(repeating: 7, count: 32)))
-        await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch))
+        await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
+                            session: URLSession(configuration: configuration))
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
         #expect(!watch.isEnabled)

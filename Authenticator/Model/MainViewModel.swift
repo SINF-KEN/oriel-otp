@@ -23,13 +23,20 @@ import YubiKit
 @Observable class MainViewModel {
 
     /// The accounts on the YubiKey that was read last.
-    private(set) var keyAccounts: [Account] = []
+    private(set) var keyAccounts: [Account] = [] {
+        didSet { sortAccounts() }
+    }
     /// The accounts in the Ente Auth vault on this device, whose codes the app calculates.
-    private(set) var cloudAccounts: [Account] = []
+    private(set) var cloudAccounts: [Account] = [] {
+        didSet { sortAccounts() }
+    }
     /// The accounts kept only on this device, whose codes the app calculates.
-    private(set) var deviceAccounts: [Account] = []
-    /// The accounts of all three, by name.
-    var accounts: [Account] { (keyAccounts + cloudAccounts + deviceAccounts).sorted() }
+    private(set) var deviceAccounts: [Account] = [] {
+        didSet { sortAccounts() }
+    }
+    /// The accounts of all three, by name. Kept rather than calculated, as the list reads it several times each time
+    /// it's drawn and the countdown every second.
+    private(set) var accounts: [Account] = []
     var pinnedAccounts: [Account] { accounts.filter(\.isPinned) }
     var otherAccounts: [Account] { accounts.filter { !$0.isPinned } }
     var accountsLoaded: Bool = false
@@ -80,11 +87,16 @@ import YubiKit
     init(cloud: EnteCloud = .shared, device: DeviceAccounts = .shared) {
         self.cloud = cloud
         self.device = device
+        favoritesStorage.migrate()
         self.favorites = favoritesStorage.readFavorites()
         cloud.onChange = { [weak self] in self?.updateCloudAccounts() }
         device.onChange = { [weak self] in self?.updateDeviceAccounts() }
         updateCloudAccounts()
         updateDeviceAccounts()
+    }
+
+    private func sortAccounts() {
+        accounts = (keyAccounts + cloudAccounts + deviceAccounts).sorted()
     }
 
     /// Whether there are accounts to list, from a YubiKey, Ente Auth or this device.
@@ -471,6 +483,8 @@ import YubiKit
                 useSession = try await OATHSessionHandler.shared.anySession()
             }
             
+            // They can't be read if the app was started while the device was locked.
+            favorites = favoritesStorage.readFavorites()
             let credentials = try await useSession.calculateAll()
             let updatedAccounts = try await credentials.asyncMap { (credential, otp)  in
                 if credential.type == .totp && (
@@ -592,6 +606,7 @@ import YubiKit
                 }
                 account.credential = credential
                 account.updateTitles()
+                sortAccounts()
                 account.isPinned = wasPinned
                 await updateAccounts(using: session)
                 ConnectionManager.shared.closeNFC(message: String(localized: "Account renamed", comment: "OATH NFC account renamed"))

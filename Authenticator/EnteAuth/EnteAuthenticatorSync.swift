@@ -18,7 +18,7 @@ import Foundation
 import YubiKit
 
 /// An account read from Ente Auth.
-struct EnteCode: Identifiable, Sendable {
+nonisolated struct EnteCode: Identifiable, Sendable {
     let id: String
     let issuer: String?
     let accountName: String
@@ -47,7 +47,7 @@ struct EnteCode: Identifiable, Sendable {
     }
 }
 
-enum EnteCodeParser {
+nonisolated enum EnteCodeParser {
 
     /// Parses the decrypted data of an authenticator entity. Returns nil for accounts that are in Ente's trash.
     static func parse(id: String, rawData: String) -> EnteCode? {
