@@ -93,6 +93,8 @@ struct EnteSyncView: View {
 
     private var signInSection: some View {
         Group {
+            serverSection
+
             Section {
                 TextField(String(localized: "Email", comment: "Ente sign in field"), text: $model.email)
                     .textContentType(.username)
@@ -113,7 +115,9 @@ struct EnteSyncView: View {
                     .disabled(!model.canSignIn)
                     .accessibilityIdentifier("ente.sign-in")
             } header: {
-                Text(String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
+                Text(model.usesOwnServer
+                     ? String(localized: "Sign in to your server", comment: "Ente sign in section header for a self-hosted server")
+                     : String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
                 if model.isDerivingKeys {
                     derivingKeysText
@@ -122,15 +126,42 @@ struct EnteSyncView: View {
                 }
             }
 
-            Section {
-                // On the Mac the title is the label on the left, so the field itself stays empty.
-                TextField(String(localized: "API provider", comment: "Ente sign in server field"), text: $model.server, prompt: serverPrompt)
+            if model.canSaveSession {
+                Section {
+                    Toggle(String(localized: "Stay signed in", comment: "Ente sign in toggle"), isOn: $model.staySignedIn)
+                        .accessibilityIdentifier("ente.stay-signed-in")
+                } footer: {
+                    #if os(macOS)
+                    Text(String(localized: "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your password, which is never stored.", comment: "Mac Ente sign in stay signed in footer"))
+                    #else
+                    Text(String(localized: "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored.", comment: "Ente sign in stay signed in footer"))
+                    #endif
+                }
+            }
+        }
+        .onAppear {
+            focusedField = model.usesOwnServer && model.server.isEmpty ? .server : model.email.isEmpty ? .email : .password
+        }
+    }
+
+    /// Picks Ente's server or a self-hosted one, whose address and account creation are shown when it's picked.
+    private var serverSection: some View {
+        Section {
+            Picker(String(localized: "Server", comment: "Ente sign in server picker"), selection: $model.usesOwnServer) {
+                Text(String(localized: "Ente", comment: "Ente sign in server picker option for Ente's own server")).tag(false)
+                Text(String(localized: "My own server", comment: "Ente sign in server picker option for a self-hosted server")).tag(true)
+            }
+            .accessibilityIdentifier("ente.server-choice")
+            if model.usesOwnServer {
+                TextField(String(localized: "Server address", comment: "Ente sign in server field"), text: $model.server, prompt: serverPrompt)
                     .accessibilityIdentifier("ente.server")
                     .keyboardType(.URL)
                     .textContentType(.URL)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
+                    .submitLabel(.next)
                     .focused($focusedField, equals: .server)
+                    .onSubmit { focusedField = .email }
                 if let server = model.signUpServer {
                     Button(String(localized: "Create an account on this server", comment: "Ente button that opens account creation on a self-hosted server")) {
                         isCreatingAccount = true
@@ -141,32 +172,24 @@ struct EnteSyncView: View {
                         EnteSignUpView(server: server, email: model.email) { model.email = $0 }
                     }
                 }
-                if model.canSaveSession {
-                    Toggle(String(localized: "Stay signed in", comment: "Ente sign in toggle"), isOn: $model.staySignedIn)
-                        .accessibilityIdentifier("ente.stay-signed-in")
-                }
-            } header: {
-                Text(String(localized: "Options", comment: "Ente sign in options header"))
-            } footer: {
-                if model.canSaveSession {
-                    #if os(macOS)
-                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password, which is never stored.", comment: "Mac Ente sign in options footer"))
-                    #else
-                    Text(String(localized: "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored.", comment: "Ente sign in options footer"))
-                    #endif
-                } else {
-                    Text(String(localized: "Leave the server empty unless you host Ente yourself.", comment: "Ente sign in options footer without stay signed in"))
-                }
+            }
+        } footer: {
+            if model.usesOwnServer {
+                Text(String(localized: "The address of the Ente server you host, the one its apps use, like https://auth.example.com. Your email and sign-in requests only go to that server.", comment: "Ente sign in footer for a self-hosted server"))
+            } else {
+                Text(String(localized: "Choose My own server if you host Ente yourself.", comment: "Ente sign in footer for Ente's own server"))
             }
         }
-        .onAppear { focusedField = model.email.isEmpty ? .email : .password }
+        .onChange(of: model.usesOwnServer) { _, ownServer in
+            if ownServer && model.server.isEmpty { focusedField = .server }
+        }
     }
 
-    private var serverPrompt: Text? {
+    private var serverPrompt: Text {
         #if os(macOS)
         Text(verbatim: "")
         #else
-        nil
+        Text(verbatim: "https://auth.example.com")
         #endif
     }
 

@@ -2397,35 +2397,6 @@
         }
       }
     },
-    "API provider" : {
-      "comment" : "Ente sign in server field",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "API-Anbieter"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fournisseur d’API"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "APIプロバイダ"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Poskytovateľ API"
-          }
-        }
-      }
-    },
     "Already use Ente Auth? Choose File > Sync from Ente Auth, sign in and pick the accounts to add to your YubiKey.\n\nWith Stay signed in, your Ente Auth accounts are listed here too, and changes you make are saved in Ente Auth. Your Ente Auth data is decrypted on this Mac." : {
       "comment" : "Mac tutorial",
       "localizations" : {
@@ -3360,6 +3331,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zvoľte heslo s aspoň 4 znakmi"
+          }
+        }
+      }
+    },
+    "Choose My own server if you host Ente yourself." : {
+      "comment" : "Ente sign in footer for Ente's own server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wählen Sie „Eigener Server“, wenn Sie Ente selbst betreiben."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choisissez « Mon propre serveur » si vous hébergez Ente vous-même."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enteを自分でホストしている場合は「自分のサーバ」を選んでください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak Ente prevádzkujete sami, vyberte Vlastný server."
           }
         }
       }
@@ -5164,6 +5164,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Povolené"
+          }
+        }
+      }
+    },
+    "Ente" : {
+      "comment" : "Ente sign in server picker option for Ente's own server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente"
           }
         }
       }
@@ -7070,93 +7099,6 @@
         }
       }
     },
-    "Leave the server empty unless you host Ente yourself." : {
-      "comment" : "Ente sign in options footer without stay signed in",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lass das Serverfeld leer, außer du betreibst Ente selbst."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Laissez le serveur vide, sauf si vous hébergez Ente vous-même."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ente をセルフホストしていない場合は、サーバーを空欄のままにしてください。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ak Ente neprevádzkujete sami, nechajte server prázdny."
-          }
-        }
-      }
-    },
-    "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored." : {
-      "comment" : "Ente sign in options footer",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lassen Sie den Server leer, außer Sie betreiben Ente selbst. „Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Face ID oder Touch ID, damit Sie ohne Ihr Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Laissez le serveur vide sauf si vous hébergez Ente vous-même. Rester connecté conserve votre session et la clé qui déchiffre vos comptes dans le trousseau, protégées par Face ID ou Touch ID, pour synchroniser à nouveau sans votre mot de passe, qui n’est jamais enregistré."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enteを自分でホストしていない限り、サーバは空欄のままにしてください。サインインしたままにすると、セッションとアカウントを復号する鍵がFace IDまたはTouch IDで保護されてキーチェーンに保存され、パスワードなしで再び同期できます。パスワード自体は保存されません。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Server nechajte prázdny, pokiaľ si Ente neprevádzkujete sami. Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Face ID alebo Touch ID, takže môžete znova synchronizovať bez hesla. Samotné heslo sa nikdy neukladá."
-          }
-        }
-      }
-    },
-    "Leave the server empty unless you host Ente yourself. Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your Ente password, which is never stored." : {
-      "comment" : "Mac Ente sign in options footer",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lassen Sie den Server leer, außer Sie betreiben Ente selbst. „Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Touch ID oder das Passwort Ihres Mac, damit Sie ohne Ihr Ente-Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Laissez le serveur vide sauf si vous hébergez Ente vous-même. Rester connecté conserve votre session et la clé qui déchiffre vos comptes dans le trousseau, protégées par Touch ID ou le mot de passe de votre Mac, pour synchroniser à nouveau sans votre mot de passe Ente, qui n’est jamais enregistré."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enteを自分でホストしていない限り、サーバは空欄のままにしてください。サインインしたままにすると、セッションとアカウントを復号する鍵がTouch IDまたはMacのパスワードで保護されてキーチェーンに保存され、Enteのパスワードなしで再び同期できます。パスワード自体は保存されません。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Server nechajte prázdny, pokiaľ si Ente neprevádzkujete sami. Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Touch ID alebo heslom vášho Macu, takže môžete znova synchronizovať bez hesla k Ente. Samotné heslo sa nikdy neukladá."
-          }
-        }
-      }
-    },
     "Licensing" : {
       "comment" : "Licensing view navigation title",
       "localizations" : {
@@ -7760,6 +7702,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presunuté do YubiKey. Ente Auth ho ponechá v koši."
+          }
+        }
+      }
+    },
+    "My own server" : {
+      "comment" : "Ente sign in server picker option for a self-hosted server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eigener Server"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mon propre serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自分のサーバ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vlastný server"
           }
         }
       }
@@ -9028,35 +8999,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voliteľné"
-          }
-        }
-      }
-    },
-    "Options" : {
-      "comment" : "Ente sign in options header",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Optionen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Options"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "オプション"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Možnosti"
           }
         }
       }
@@ -11592,6 +11534,35 @@
         }
       }
     },
+    "Server address" : {
+      "comment" : "Ente sign in server field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Serveradresse"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adresse du serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サーバのアドレス"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adresa servera"
+          }
+        }
+      }
+    },
     "Set" : {
       "localizations" : {
         "de" : {
@@ -11962,6 +11933,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prihlásenie do Ente Auth"
+          }
+        }
+      }
+    },
+    "Sign in to your server" : {
+      "comment" : "Ente sign in section header for a self-hosted server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bei Ihrem Server anmelden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se connecter à votre serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自分のサーバにサインイン"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prihlásenie do vášho servera"
           }
         }
       }
@@ -12368,6 +12368,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zostať prihlásený"
+          }
+        }
+      }
+    },
+    "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored." : {
+      "comment" : "Ente sign in stay signed in footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Face ID oder Touch ID, damit Sie ohne Ihr Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rester connecté conserve votre session et la clé qui déchiffre vos comptes dans le trousseau, protégées par Face ID ou Touch ID, pour synchroniser à nouveau sans votre mot de passe, qui n’est jamais enregistré."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サインインしたままにすると、セッションとアカウントを復号する鍵がFace IDまたはTouch IDで保護されてキーチェーンに保存され、パスワードなしで再び同期できます。パスワード自体は保存されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Face ID alebo Touch ID, takže môžete znova synchronizovať bez hesla. Samotné heslo sa nikdy neukladá."
+          }
+        }
+      }
+    },
+    "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your password, which is never stored." : {
+      "comment" : "Mac Ente sign in stay signed in footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "„Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Touch ID oder das Passwort Ihres Mac, damit Sie ohne Ihr Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rester connecté conserve votre session et la clé qui déchiffre vos comptes dans le trousseau, protégées par Touch ID ou le mot de passe de votre Mac, pour synchroniser à nouveau sans votre mot de passe, qui n’est jamais enregistré."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サインインしたままにすると、セッションとアカウントを復号する鍵がTouch IDまたはMacのパスワードで保護されてキーチェーンに保存され、パスワードなしで再び同期できます。パスワード自体は保存されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Touch ID alebo heslom vášho Macu, takže môžete znova synchronizovať bez hesla. Samotné heslo sa nikdy neukladá."
           }
         }
       }
@@ -13004,6 +13062,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Účty v tomto zariadení sa momentálne nedajú prečítať. Odomknite zariadenie a skúste to znova."
+          }
+        }
+      }
+    },
+    "The address of the Ente server you host, the one its apps use, like https://auth.example.com. Your email and sign-in requests only go to that server." : {
+      "comment" : "Ente sign in footer for a self-hosted server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Adresse des Ente-Servers, den Sie betreiben, dieselbe, die seine Apps verwenden, z. B. https://auth.example.com. Ihre E-Mail-Adresse und Anmeldeanfragen gehen nur an diesen Server."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’adresse du serveur Ente que vous hébergez, celle qu’utilisent ses apps, par exemple https://auth.example.com. Votre e-mail et vos demandes de connexion ne sont envoyés qu’à ce serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自分でホストしているEnteサーバのアドレスで、そのアプリが使うものです（例：https://auth.example.com）。メールアドレスとサインインのリクエストはそのサーバにのみ送信されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Adresa servera Ente, ktorý prevádzkujete, tá istá, ktorú používajú jeho aplikácie, napríklad https://auth.example.com. Váš e-mail a žiadosti o prihlásenie idú len na tento server."
           }
         }
       }
