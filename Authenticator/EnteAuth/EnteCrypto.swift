@@ -59,6 +59,23 @@ nonisolated enum EnteCrypto {
         return Data(key)
     }
 
+    /// Turns the password of a new account into a key encryption key. Ente's server only takes limits with exactly the
+    /// work of libsodium's sensitive limits, so devices short of memory halve it and double the passes, like Ente's apps.
+    /// This is slow and memory hungry by design, call it off the main actor.
+    static func deriveNewKeyEncryptionKey(password: String) throws -> (key: Data, salt: Data, opsLimit: UInt64, memLimit: UInt64) {
+        let salt = randomBytes(saltLength)
+        var memLimit: UInt64 = 256 * 1024 * 1024
+        var opsLimit: UInt64 = 16
+        while true {
+            do {
+                return (try deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: opsLimit, memLimit: memLimit), salt, opsLimit, memLimit)
+            } catch EnteCryptoError.keyDerivationFailed where memLimit > 128 * 1024 * 1024 {
+                memLimit /= 2
+                opsLimit *= 2
+            }
+        }
+    }
+
     /// Whether Argon2 limits sent by a server are safe to use. The limits come with the account and aren't
     /// authenticated, so a server could otherwise have the password hashed cheaply, and then guess it from the SRP
     /// proof, or run the app out of memory or keep it busy for good.

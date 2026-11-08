@@ -74,6 +74,35 @@
         }
       }
     },
+    "%@ accounts can't be decrypted and won't be copied. They stay on the old server." : {
+      "comment" : "Ente migration review warning. The placeholder is the number of accounts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ Konten können nicht entschlüsselt werden und werden nicht kopiert. Sie bleiben auf dem alten Server."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ comptes ne peuvent pas être déchiffrés et ne seront pas copiés. Ils restent sur l’ancien serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@件のアカウントは復号できないためコピーされません。移行元のサーバに残ります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účty, ktoré nemožno dešifrovať a neskopírujú sa: %@. Zostanú na starom serveri."
+          }
+        }
+      }
+    },
     "%@ · %@" : {
       "comment" : "An account's issuer and name on one line, in the account list with larger text",
       "localizations" : {
@@ -1064,6 +1093,35 @@
         }
       }
     },
+    "Account created" : {
+      "comment" : "Ente account creation finished header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto erstellt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Compte créé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを作成しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet bol vytvorený"
+          }
+        }
+      }
+    },
     "Account deleted" : {
       "comment" : "OATH NFC account deleted",
       "localizations" : {
@@ -1267,6 +1325,93 @@
         }
       }
     },
+    "Accounts already on the new server stay as they are." : {
+      "comment" : "Ente migration review footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten, die bereits auf dem neuen Server sind, bleiben unverändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les comptes déjà sur le nouveau serveur restent tels quels."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行先のサーバにすでにあるアカウントは変更されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účty, ktoré už sú na novom serveri, zostanú bez zmeny."
+          }
+        }
+      }
+    },
+    "Accounts can't be created on Ente's servers here. Create one in Ente's apps, or use a server you host yourself." : {
+      "comment" : "Ente account creation error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten auf den Servern von Ente können hier nicht erstellt werden. Erstellen Sie eines in den Apps von Ente oder verwenden Sie einen selbst gehosteten Server."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Impossible de créer ici un compte sur les serveurs d’Ente. Créez-en un dans les apps d’Ente ou utilisez un serveur que vous hébergez vous-même."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ここではEnteのサーバにアカウントを作成できません。Enteのアプリで作成するか、ご自身でホストしているサーバをお使いください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účty na serveroch Ente tu nemožno vytvoriť. Vytvorte si ho v aplikáciách Ente alebo použite server, ktorý si hostujete sami."
+          }
+        }
+      }
+    },
+    "Accounts copied" : {
+      "comment" : "Ente migration finished label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopierte Konten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Comptes copiés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コピーしたアカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopírované účty"
+          }
+        }
+      }
+    },
     "Accounts on the YubiKey are deleted from it. Accounts in Ente Auth are moved to its trash on all your devices, where the Ente Auth app can restore them." : {
       "comment" : "Delete several accounts alert when some are in Ente Auth",
       "localizations" : {
@@ -1350,6 +1495,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Účty, ktoré vyžadujú dotykové ovládanie, budú na výpočet kódu potrebovať ďalšie ťuknutie NFC. Jeho vynechanie minimalizuje počet potrebných dotykov NFC."
+          }
+        }
+      }
+    },
+    "Accounts to copy" : {
+      "comment" : "Ente migration review label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zu kopierende Konten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Comptes à copier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コピーするアカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účty na skopírovanie"
           }
         }
       }
@@ -2020,6 +2194,64 @@
         }
       }
     },
+    "All accounts are on the new server, and this device now syncs with it. They are still on %@. Check that your codes work before you delete them there, and sign in to the new server on your other devices." : {
+      "comment" : "Ente migration finished footer. The placeholder is the old server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle Konten sind auf dem neuen Server, und dieses Gerät synchronisiert jetzt damit. Sie sind weiterhin auf %@. Prüfen Sie, ob Ihre Codes funktionieren, bevor Sie sie dort löschen, und melden Sie sich auf Ihren anderen Geräten beim neuen Server an."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tous les comptes sont sur le nouveau serveur et cet appareil se synchronise désormais avec lui. Ils sont toujours sur %@. Vérifiez que vos codes fonctionnent avant de les y supprimer, et connectez-vous au nouveau serveur sur vos autres appareils."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべてのアカウントが移行先のサーバにあり、このデバイスは今後そのサーバと同期します。アカウントは%@にも残っています。そちらから削除する前にコードが機能することを確認し、ほかのデバイスでも移行先のサーバにサインインしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Všetky účty sú na novom serveri a toto zariadenie sa s ním teraz synchronizuje. Stále sú aj na %@. Pred ich odstránením odtiaľ skontrolujte, či kódy fungujú, a na ostatných zariadeniach sa prihláste na nový server."
+          }
+        }
+      }
+    },
+    "All accounts are on the new server. They are still on %@. Nothing else changed on this device." : {
+      "comment" : "Ente migration finished footer when the device didn't switch. The placeholder is the old server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle Konten sind auf dem neuen Server. Sie sind weiterhin auf %@. Sonst hat sich auf diesem Gerät nichts geändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tous les comptes sont sur le nouveau serveur. Ils sont toujours sur %@. Rien d’autre n’a changé sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべてのアカウントが移行先のサーバにあります。アカウントは%@にも残っています。このデバイスのほかの設定は変わっていません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Všetky účty sú na novom serveri. Stále sú aj na %@. Na tomto zariadení sa nič iné nezmenilo."
+          }
+        }
+      }
+    },
     "Allow notifications" : {
       "comment" : "PIV extension notifications explanation title",
       "localizations" : {
@@ -2074,6 +2306,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Už je v Ente Auth"
+          }
+        }
+      }
+    },
+    "Already on the new server" : {
+      "comment" : "Ente migration review label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bereits auf dem neuen Server"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déjà sur le nouveau serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行先のサーバに登録済み"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Už na novom serveri"
           }
         }
       }
@@ -3450,6 +3711,35 @@
         }
       }
     },
+    "Confirm password" : {
+      "comment" : "Ente account creation field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Passwort bestätigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Confirmer le mot de passe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードを確認"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Potvrdiť heslo"
+          }
+        }
+      }
+    },
     "Connection cancelled by user" : {
       "comment" : "Internal error message not to be displayed to the user.",
       "localizations" : {
@@ -3767,6 +4057,35 @@
         }
       }
     },
+    "Copy recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copier la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopírovať kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "Copy Yubico OTP automatically to clipboard when a YubiKey has been passively scanned using the NFC NDEF tag functionality." : {
       "comment" : "NFC settings footer",
       "localizations" : {
@@ -3941,6 +4260,35 @@
         }
       }
     },
+    "Copying your accounts. Keep the app open until this is done." : {
+      "comment" : "Ente migration progress",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihre Konten werden kopiert. Lassen Sie die App geöffnet, bis der Vorgang abgeschlossen ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie de vos comptes. Gardez l’app ouverte jusqu’à la fin."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントをコピーしています。完了するまでアプリを開いたままにしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopírujú sa vaše účty. Nechajte aplikáciu otvorenú, kým sa to nedokončí."
+          }
+        }
+      }
+    },
     "Couldn't change the login item" : {
       "comment" : "Mac setting error",
       "localizations" : {
@@ -3995,6 +4343,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QR kód sa nepodarilo prečítať"
+          }
+        }
+      }
+    },
+    "Create account" : {
+      "comment" : "Ente account creation navigation title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto erstellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Créer un compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを作成"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vytvoriť účet"
+          }
+        }
+      }
+    },
+    "Create an account on this server" : {
+      "comment" : "Ente button that opens account creation on a self-hosted server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto auf diesem Server erstellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Créer un compte sur ce serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このサーバにアカウントを作成"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vytvoriť účet na tomto serveri"
           }
         }
       }
@@ -5139,6 +5545,35 @@
         }
       }
     },
+    "Enter the verification code sent to %@. Without email on your server, it's in the server's log." : {
+      "comment" : "Ente account creation email code footer. The placeholder is the email address.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Geben Sie den an %@ gesendeten Bestätigungscode ein. Ohne E-Mail auf Ihrem Server steht er im Protokoll des Servers."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Saisissez le code de vérification envoyé à %@. Si votre serveur n’envoie pas d’e-mails, il se trouve dans le journal du serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@に送信された確認コードを入力してください。サーバでメールを使用していない場合は、サーバのログに記載されています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zadajte overovací kód odoslaný na %@. Ak váš server nemá e-mail, nájdete ho v denníku servera."
+          }
+        }
+      }
+    },
     "Enter your code" : {
       "comment" : "App lock screen prompt",
       "localizations" : {
@@ -5627,6 +6062,35 @@
         }
       }
     },
+    "From" : {
+      "comment" : "Ente migration review label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Von"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "De"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行元"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Z"
+          }
+        }
+      }
+    },
     "General" : {
       "localizations" : {
         "de" : {
@@ -5914,6 +6378,35 @@
         }
       }
     },
+    "I saved my recovery key" : {
+      "comment" : "Ente account creation toggle",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ich habe meinen Wiederherstellungsschlüssel gesichert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "J’ai enregistré ma clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを保存しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uložil(a) som si kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "If enabled, scanning the YubiKey will display a notification. Tapping the notification will reveal the One-Time Password." : {
       "localizations" : {
         "de" : {
@@ -5970,6 +6463,35 @@
         }
       }
     },
+    "If you forget your password, this key is the only way to get your accounts back. Your server can't reset the password, and this key is shown only now. Keep it somewhere safe, away from this device." : {
+      "comment" : "Ente account creation recovery key footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wenn Sie Ihr Passwort vergessen, können Sie Ihre Konten nur mit diesem Schlüssel wiederherstellen. Ihr Server kann das Passwort nicht zurücksetzen, und dieser Schlüssel wird nur jetzt angezeigt. Bewahren Sie ihn an einem sicheren Ort auf, nicht auf diesem Gerät."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Si vous oubliez votre mot de passe, cette clé est le seul moyen de récupérer vos comptes. Votre serveur ne peut pas réinitialiser le mot de passe et cette clé n’est affichée que maintenant. Conservez-la en lieu sûr, à l’écart de cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードを忘れた場合、アカウントを取り戻す方法はこのキーのみです。サーバではパスワードをリセットできず、このキーが表示されるのは今だけです。このデバイス以外の安全な場所に保管してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak zabudnete heslo, tento kľúč je jediný spôsob, ako získať účty späť. Váš server heslo nedokáže obnoviť a tento kľúč sa zobrazí iba teraz. Uložte si ho na bezpečné miesto mimo tohto zariadenia."
+          }
+        }
+      }
+    },
     "If you have a YubiKey with NFC, pull down the main view to activate NFC.\n\nHold the key horizontally and tilt the iPhone towards the key.\n\nTouch the center of the key to the edge of the phone." : {
       "localizations" : {
         "de" : {
@@ -6022,6 +6544,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ak má váš YubiKey konektor USB-C, pripojte ho.\n\nPo výzve sa dotknite YubiKey."
+          }
+        }
+      }
+    },
+    "In the trash, kept there" : {
+      "comment" : "Ente migration review label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Im Papierkorb, bleiben dort"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dans la corbeille, y restent"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ゴミ箱内（そのまま保持）"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "V koši, zostanú tam"
           }
         }
       }
@@ -6836,6 +7387,93 @@
         }
       }
     },
+    "Migrate from" : {
+      "comment" : "Ente migration old server field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Migrieren von"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Migrer depuis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行元"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Migrovať z"
+          }
+        }
+      }
+    },
+    "Migrate to" : {
+      "comment" : "Ente migration new server field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Migrieren nach"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Migrer vers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行先"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Migrovať na"
+          }
+        }
+      }
+    },
+    "Move accounts" : {
+      "comment" : "Ente migration button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten umziehen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déplacer les comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを移行"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presunúť účty"
+          }
+        }
+      }
+    },
     "Move the account to the trash in Ente Auth" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -6861,6 +7499,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presunúť účet do koša v Ente Auth"
+          }
+        }
+      }
+    },
+    "Move to another server" : {
+      "comment" : "Ente migration navigation title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf anderen Server umziehen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déplacer vers un autre serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "別のサーバに移行"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presunúť na iný server"
+          }
+        }
+      }
+    },
+    "Move to another server…" : {
+      "comment" : "Ente settings button that opens the migration sheet",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf anderen Server umziehen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déplacer vers un autre serveur…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "別のサーバに移行…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presunúť na iný server…"
           }
         }
       }
@@ -6919,6 +7615,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presunúť do YubiKey"
+          }
+        }
+      }
+    },
+    "Move your accounts to %@?" : {
+      "comment" : "Ente migration confirmation. The placeholder is the new server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihre Konten nach %@ umziehen?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déplacer vos comptes vers %@ ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを%@に移行しますか？"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presunúť vaše účty na %@?"
+          }
+        }
+      }
+    },
+    "Moved to %@" : {
+      "comment" : "Ente migration finished header. The placeholder is the new server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach %@ umgezogen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déplacés vers %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@に移行しました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Presunuté na %@"
           }
         }
       }
@@ -7006,6 +7760,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Presunuté do YubiKey. Ente Auth ho ponechá v koši."
+          }
+        }
+      }
+    },
+    "New account on %@" : {
+      "comment" : "Ente account creation header. The placeholder is the server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Neues Konto auf %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nouveau compte sur %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@の新しいアカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nový účet na %@"
           }
         }
       }
@@ -11125,6 +11908,35 @@
         }
       }
     },
+    "Sign in to %@" : {
+      "comment" : "Ente migration sign in header. The placeholder is the server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bei %@ anmelden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se connecter à %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@にサインイン"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prihlásiť sa na %@"
+          }
+        }
+      }
+    },
     "Sign in to Ente Auth" : {
       "comment" : "Ente sign in section header",
       "localizations" : {
@@ -11150,6 +11962,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prihlásenie do Ente Auth"
+          }
+        }
+      }
+    },
+    "Sign in with your new password to start using it." : {
+      "comment" : "Ente account creation finished footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Melden Sie sich mit Ihrem neuen Passwort an, um es zu verwenden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Connectez-vous avec votre nouveau mot de passe pour commencer à l’utiliser."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "新しいパスワードでサインインすると使用を開始できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak ho chcete začať používať, prihláste sa novým heslom."
           }
         }
       }
@@ -11328,6 +12169,35 @@
         }
       }
     },
+    "Some accounts didn't reach the new server. Nothing was switched, and your accounts are still on the old server. Try again." : {
+      "comment" : "Ente migration error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Einige Konten sind nicht auf dem neuen Server angekommen. Es wurde nichts umgestellt, und Ihre Konten sind weiterhin auf dem alten Server. Versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Certains comptes n’ont pas atteint le nouveau serveur. Rien n’a été basculé et vos comptes sont toujours sur l’ancien serveur. Réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一部のアカウントが移行先のサーバに届きませんでした。切り替えは行われておらず、アカウントは移行元のサーバに残っています。もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Niektoré účty sa nedostali na nový server. Nič sa neprepolo a vaše účty sú stále na starom serveri. Skúste to znova."
+          }
+        }
+      }
+    },
     "Something went wrong" : {
       "localizations" : {
         "de" : {
@@ -11440,6 +12310,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spustiť NFC a načítať účty OATH po otvorení aplikácie načítaním tagu OTP na kľúči YubiKey."
+          }
+        }
+      }
+    },
+    "Start over" : {
+      "comment" : "Ente migration button that goes back to the servers",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Neu beginnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recommencer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "最初からやり直す"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Začať odznova"
           }
         }
       }
@@ -12051,6 +12950,35 @@
         }
       }
     },
+    "The account on the new server, which may have another email and password. Your password never leaves this device." : {
+      "comment" : "Ente migration new server sign in footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Konto auf dem neuen Server, das eine andere E-Mail-Adresse und ein anderes Passwort haben kann. Ihr Passwort verlässt dieses Gerät nie."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le compte sur le nouveau serveur, qui peut avoir une autre adresse e-mail et un autre mot de passe. Votre mot de passe ne quitte jamais cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行先のサーバのアカウントです。メールアドレスとパスワードは異なっていてもかまいません。パスワードがこのデバイスの外に送信されることはありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet na novom serveri, ktorý môže mať iný e-mail a heslo. Vaše heslo toto zariadenie nikdy neopustí."
+          }
+        }
+      }
+    },
     "The accounts on this device can't be read right now. Unlock the device and try again." : {
       "comment" : "Error when changing an account on this device",
       "localizations" : {
@@ -12105,6 +13033,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kódy sa nezhodujú. Zvoľte kód."
+          }
+        }
+      }
+    },
+    "The Ente account your codes are in now. Your password never leaves this device." : {
+      "comment" : "Ente migration old server sign in footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Ente-Konto, in dem sich Ihre Codes jetzt befinden. Ihr Passwort verlässt dieses Gerät nie."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le compte Ente qui contient actuellement vos codes. Votre mot de passe ne quitte jamais cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "現在コードが保存されているEnteアカウントです。パスワードがこのデバイスの外に送信されることはありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet Ente, v ktorom sú teraz vaše kódy. Vaše heslo toto zariadenie nikdy neopustí."
           }
         }
       }
@@ -12167,6 +13124,64 @@
         }
       }
     },
+    "The old and new server are the same." : {
+      "comment" : "Ente migration error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der alte und der neue Server sind identisch."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’ancien et le nouveau serveur sont identiques."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行元と移行先のサーバが同じです。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Starý a nový server sú rovnaké."
+          }
+        }
+      }
+    },
+    "The old server ended this session. Open Sync from Ente Auth and enter your password, then try again." : {
+      "comment" : "Ente migration error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der alte Server hat diese Sitzung beendet. Öffnen Sie „Aus Ente Auth synchronisieren“, geben Sie Ihr Passwort ein und versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "L’ancien serveur a mis fin à cette session. Ouvrez Synchroniser depuis Ente Auth, saisissez votre mot de passe, puis réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行元のサーバがこのセッションを終了しました。「Ente Auth から同期」を開いてパスワードを入力してから、もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Starý server ukončil túto reláciu. Otvorte Synchronizovať z Ente Auth, zadajte heslo a skúste to znova."
+          }
+        }
+      }
+    },
     "The passwords didn't match. Choose a password." : {
       "comment" : "App lock change prompt",
       "localizations" : {
@@ -12196,6 +13211,35 @@
         }
       }
     },
+    "The passwords don't match." : {
+      "comment" : "Ente account creation error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Passwörter stimmen nicht überein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les mots de passe ne correspondent pas."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードが一致しません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Heslá sa nezhodujú."
+          }
+        }
+      }
+    },
     "The PIN doesn't meet the requirements of this YubiKey." : {
       "localizations" : {
         "de" : {
@@ -12220,6 +13264,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN kód nespĺňa požiadavky tohto kľúča YubiKey."
+          }
+        }
+      }
+    },
+    "The server didn't save the account as expected. Try signing in, or create it again with another email." : {
+      "comment" : "Ente account creation error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der Server hat das Konto nicht wie erwartet gespeichert. Versuchen Sie, sich anzumelden, oder erstellen Sie es mit einer anderen E-Mail-Adresse neu."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le serveur n’a pas enregistré le compte comme prévu. Essayez de vous connecter ou recréez-le avec une autre adresse e-mail."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サーバがアカウントを正しく保存しませんでした。サインインを試すか、別のメールアドレスで作成し直してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Server neuložil účet podľa očakávania. Skúste sa prihlásiť alebo ho vytvorte znova s iným e-mailom."
           }
         }
       }
@@ -12917,6 +13990,35 @@
         }
       }
     },
+    "There are no accounts on the old server." : {
+      "comment" : "Ente migration error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf dem alten Server sind keine Konten vorhanden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Il n’y a aucun compte sur l’ancien serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行元のサーバにアカウントがありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na starom serveri nie sú žiadne účty."
+          }
+        }
+      }
+    },
     "There's already an account named %@ on this YubiKey." : {
       "comment" : "OATH add account duplicate error. The placeholder is the issuer and account name.",
       "localizations" : {
@@ -13059,6 +14161,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tento QR kód nie je podporovaný"
+          }
+        }
+      }
+    },
+    "This server already has an account with this email. Sign in instead." : {
+      "comment" : "Ente account creation error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf diesem Server gibt es bereits ein Konto mit dieser E-Mail-Adresse. Melden Sie sich stattdessen an."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce serveur a déjà un compte avec cette adresse e-mail. Connectez-vous plutôt."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このサーバにはこのメールアドレスのアカウントがすでにあります。サインインしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento server už má účet s týmto e-mailom. Namiesto toho sa prihláste."
+          }
+        }
+      }
+    },
+    "This server doesn't allow new accounts. Turn registration on in its settings, then try again." : {
+      "comment" : "Ente account creation error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieser Server lässt keine neuen Konten zu. Aktivieren Sie die Registrierung in seinen Einstellungen und versuchen Sie es erneut."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce serveur n’autorise pas les nouveaux comptes. Activez l’inscription dans ses réglages, puis réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このサーバでは新しいアカウントを作成できません。サーバの設定で登録を有効にしてから、もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento server nepovoľuje nové účty. Zapnite registráciu v jeho nastaveniach a skúste to znova."
           }
         }
       }
@@ -13373,6 +14533,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tým sa z vášho YubiKey nenávratne odstránia všetky účty U2F a FIDO2 vrátane prístupových kľúčov."
+          }
+        }
+      }
+    },
+    "To" : {
+      "comment" : "Ente migration review label",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nach"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vers"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行先"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na"
           }
         }
       }
@@ -14264,6 +15453,35 @@
         }
       }
     },
+    "Use at least %lld characters for your password." : {
+      "comment" : "Ente account creation error. The placeholder is the number of characters.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Verwenden Sie mindestens %lld Zeichen für Ihr Passwort."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Utilisez au moins %lld caractères pour votre mot de passe."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードには%lld文字以上を使用してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pre heslo použite aspoň tento počet znakov: %lld."
+          }
+        }
+      }
+    },
     "Use suggested websites" : {
       "comment" : "AutoFill websites button",
       "localizations" : {
@@ -14839,6 +16057,122 @@
         }
       }
     },
+    "Your accounts are copied from the old server to the new one, end-to-end encrypted. Nothing is deleted from the old server. If you host the new server yourself, you can create an account on it in the next step." : {
+      "comment" : "Ente migration servers footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihre Konten werden Ende-zu-Ende-verschlüsselt vom alten auf den neuen Server kopiert. Vom alten Server wird nichts gelöscht. Wenn Sie den neuen Server selbst hosten, können Sie im nächsten Schritt ein Konto darauf erstellen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vos comptes sont copiés de l’ancien serveur vers le nouveau, chiffrés de bout en bout. Rien n’est supprimé de l’ancien serveur. Si vous hébergez vous-même le nouveau serveur, vous pourrez y créer un compte à l’étape suivante."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントはエンドツーエンドで暗号化されたまま、移行元から移行先のサーバにコピーされます。移行元のサーバからは何も削除されません。移行先のサーバをご自身でホストしている場合は、次のステップでアカウントを作成できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše účty sa skopírujú zo starého servera na nový, šifrované end-to-end. Zo starého servera sa nič neodstráni. Ak si nový server hostujete sami, v ďalšom kroku si na ňom môžete vytvoriť účet."
+          }
+        }
+      }
+    },
+    "Your accounts are copied to the new server and stay on the old one. Nothing else changes on this device." : {
+      "comment" : "Ente migration confirmation message when the device doesn't switch to the new server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihre Konten werden auf den neuen Server kopiert und bleiben auf dem alten. Sonst ändert sich auf diesem Gerät nichts."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vos comptes sont copiés sur le nouveau serveur et restent sur l’ancien. Rien d’autre ne change sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントは移行先のサーバにコピーされ、移行元のサーバにも残ります。このデバイスのほかの設定は変わりません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše účty sa skopírujú na nový server a zostanú aj na starom. Na tomto zariadení sa nič iné nezmení."
+          }
+        }
+      }
+    },
+    "Your accounts are copied, then this device syncs with the new server instead of %@. The accounts stay on the old server, and your other devices keep using it until you sign in to the new server there." : {
+      "comment" : "Ente migration confirmation message. The placeholder is the old server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihre Konten werden kopiert, danach synchronisiert dieses Gerät mit dem neuen Server statt mit %@. Die Konten bleiben auf dem alten Server, und Ihre anderen Geräte nutzen ihn weiter, bis Sie sich dort beim neuen Server anmelden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vos comptes sont copiés, puis cet appareil se synchronise avec le nouveau serveur au lieu de %@. Les comptes restent sur l’ancien serveur, et vos autres appareils continuent de l’utiliser jusqu’à ce que vous vous y connectiez au nouveau serveur."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントをコピーした後、このデバイスは%@の代わりに移行先のサーバと同期します。アカウントは移行元のサーバに残り、ほかのデバイスでは移行先のサーバにサインインするまで移行元のサーバを使い続けます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše účty sa skopírujú a toto zariadenie sa potom bude synchronizovať s novým serverom namiesto %@. Účty zostanú na starom serveri a vaše ostatné zariadenia ho budú používať, kým sa na nich neprihlásite na nový server."
+          }
+        }
+      }
+    },
+    "Your accounts changed during the move. Nothing was switched. Try again to copy the changes too." : {
+      "comment" : "Ente migration error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihre Konten haben sich während des Umzugs geändert. Es wurde nichts umgestellt. Versuchen Sie es erneut, um auch die Änderungen zu kopieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vos comptes ont changé pendant le déplacement. Rien n’a été basculé. Réessayez pour copier aussi les modifications."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移行中にアカウントが変更されました。切り替えは行われていません。変更もコピーするには、もう一度お試しください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše účty sa počas presunu zmenili. Nič sa neprepolo. Skúste to znova, aby sa skopírovali aj zmeny."
+          }
+        }
+      }
+    },
     "Your email and sign-in requests are sent to Ente, or to your own server. Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too." : {
       "comment" : "Ente sign in footer",
       "localizations" : {
@@ -14926,6 +16260,35 @@
         }
       }
     },
+    "Your password never leaves this device, and your server can't reset it. A code is sent to this email, or written to your server's log if it can't send email." : {
+      "comment" : "Ente account creation footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Passwort verlässt dieses Gerät nie, und Ihr Server kann es nicht zurücksetzen. Ein Code wird an diese E-Mail-Adresse gesendet oder in das Protokoll Ihres Servers geschrieben, wenn er keine E-Mails senden kann."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre mot de passe ne quitte jamais cet appareil et votre serveur ne peut pas le réinitialiser. Un code est envoyé à cette adresse e-mail, ou écrit dans le journal de votre serveur s’il ne peut pas envoyer d’e-mails."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードがこのデバイスの外に送信されることはなく、サーバでリセットすることもできません。コードはこのメールアドレスに送信されます。サーバがメールを送信できない場合は、サーバのログに書き込まれます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vaše heslo toto zariadenie nikdy neopustí a váš server ho nedokáže obnoviť. Na tento e-mail sa odošle kód, alebo sa zapíše do denníka servera, ak server nedokáže odosielať e-maily."
+          }
+        }
+      }
+    },
     "Your PIN has ben blocked" : {
       "comment" : "PIV extension pin blocked title",
       "localizations" : {
@@ -15008,6 +16371,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vaše kľúče sa nepodarilo odvodiť. Zariadeniu možno chýba pamäť."
+          }
+        }
+      }
+    },
+    "Your recovery key" : {
+      "comment" : "Ente account creation header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Wiederherstellungsschlüssel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Votre clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Váš kľúč na obnovenie"
           }
         }
       }

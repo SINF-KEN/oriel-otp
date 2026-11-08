@@ -35,13 +35,20 @@ import SwiftUI
 /// diff returns the entities changed after `sinceTime`, oldest first, so the app's incremental sync can be tried.
 ///
 /// Each `*.new.ente.test` host is an account of its own that has never used Ente Auth: it has no authenticator key
-/// and no accounts until the app creates the key.
+/// and no accounts until the app creates the key. Each `*.empty.ente.test` host has no account at all until one is created
+/// in the app, with the checks of Ente's server. "+closed" in the email acts like a server with registration turned off.
 nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
 
     static let server = URL(string: "https://demo.ente.test")!
     static let password = "demo"
     static let code = "123456"
     private static let newAccountDomain = "new.ente.test"
+    fileprivate static let emptyServerDomain = "empty.ente.test"
+
+    /// A server without an account, where one can be created.
+    static func emptyServer() -> URL {
+        URL(string: "https://\(UUID().uuidString.lowercased()).\(emptyServerDomain)")!
+    }
 
     /// A server with a new account that has never used Ente Auth.
     static func newAccountServer() -> URL {
@@ -63,7 +70,7 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
 
     override class func canInit(with request: URLRequest) -> Bool {
         guard let host = request.url?.host else { return false }
-        return host == server.host || host.hasSuffix("." + newAccountDomain)
+        return host == server.host || host.hasSuffix("." + newAccountDomain) || host.hasSuffix("." + emptyServerDomain)
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -94,7 +101,8 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     static func account(for host: String) -> FakeEnteAccount {
         accountsLock.withLock {
             if let account = accounts[host] { return account }
-            let account = FakeEnteAccount(usesEnteAuth: host == FakeEnteServer.server.host)
+            let account = FakeEnteAccount(usesEnteAuth: host == FakeEnteServer.server.host,
+                                          isRegistered: !host.hasSuffix("." + FakeEnteServer.emptyServerDomain))
             accounts[host] = account
             return account
         }
@@ -106,16 +114,23 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     /// Passkey sessions, with whether they were checked before. The first check finds the passkey not verified yet.
     private var passkeySessions: [String: Bool] = [:]
 
-    private let srpUserID = UUID().uuidString.lowercased()
-    private let srpSalt = EnteCrypto.randomBytes(16)
-    private let kekSalt = EnteCrypto.randomBytes(16)
+    private var srpUserID = UUID().uuidString.lowercased()
+    private var srpSalt = EnteCrypto.randomBytes(16)
+    private var kekSalt = EnteCrypto.randomBytes(16)
     // Low limits so signing in is quick. Real accounts use far more memory.
-    private let opsLimit: UInt64 = 2
-    private let memLimit: UInt64 = 64 * 1024 * 1024
+    private var opsLimit: UInt64 = 2
+    private var memLimit: UInt64 = 64 * 1024 * 1024
     private let loginKey: Data
-    private let keyAttributes: [String: Any]
-    private let encryptedToken: String
+    private var keyAttributes: [String: Any]
+    private var encryptedToken: String
+    private let tokenBytes: Data
     private let token: String
+    /// False until an account has been created on a server that starts without one.
+    private var isRegistered: Bool
+    /// Set when the account was created in the app, whose password this server doesn't know.
+    private var createdVerifier: BigUInt?
+    /// SRP setups waiting to be completed.
+    private var setups: [String: (srpUserID: String, salt: Data, verifier: BigUInt, sessionID: String)] = [:]
     private var authenticatorKey: [String: Any]?
     /// The rows of the entity table, like Ente's server keeps them: deleted entities stay, without their data.
     private var entities: [[String: Any]]
@@ -126,7 +141,8 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         lock.withLock { authenticatorKey != nil }
     }
 
-    private init(usesEnteAuth: Bool) {
+    private init(usesEnteAuth: Bool, isRegistered: Bool) {
+        self.isRegistered = isRegistered
         let keyEncryptionKey = try! EnteCrypto.deriveKeyEncryptionKey(password: FakeEnteServer.password, salt: kekSalt,
                                                                       opsLimit: opsLimit, memLimit: memLimit)
         loginKey = try! EnteCrypto.deriveLoginKey(keyEncryptionKey: keyEncryptionKey)
@@ -142,7 +158,7 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
                          "encryptedSecretKey": encryptedSecretKey.cipherText.base64EncodedString(),
                          "secretKeyDecryptionNonce": encryptedSecretKey.nonce.base64EncodedString(),
                          "memLimit": memLimit, "opsLimit": opsLimit]
-        let tokenBytes = EnteCrypto.randomBytes(32)
+        tokenBytes = EnteCrypto.randomBytes(32)
         token = tokenBytes.enteURLSafeBase64
         encryptedToken = try! EnteCrypto.sealedBox(tokenBytes, publicKey: publicKey).base64EncodedString()
 
@@ -169,7 +185,7 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         case ("GET", "/users/srp/attributes"):
             let email = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "email" }?.value ?? ""
-            guard !Self.has("nosrp", email) else { return (404, [:]) }
+            guard !Self.has("nosrp", email), isRegistered, !isAwaitingSRP else { return (404, [:]) }
             return (200, ["attributes": ["srpUserID": srpUserID(twoFactor: Self.has("2fa", email)), "srpSalt": srpSalt.base64EncodedString(),
                                          "memLimit": memLimit, "opsLimit": opsLimit,
                                          "kekSalt": kekSalt.base64EncodedString(),
@@ -179,9 +195,12 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         case ("POST", "/users/srp/verify-session"):
             return verifySession(body)
         case ("POST", "/users/ott"):
-            return (200, [:])
+            guard body["purpose"] as? String == "signup" else { return (200, [:]) }
+            if Self.has("closed", body["email"] as? String ?? "") { return (403, [:]) }
+            return (isRegistered ? 409 : 200, [:])
         case ("POST", "/users/verify-email"):
             guard body["ott"] as? String == FakeEnteServer.code else { return (401, [:]) }
+            guard isRegistered else { return (200, ["id": 42, "token": token]) }
             let email = body["email"] as? String ?? ""
             if Self.has("passkey", email) { return (200, startPasskey()) }
             return Self.has("2fa", email) ? (200, startTwoFactor()) : (200, signedIn())
@@ -200,6 +219,15 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             }
             passkeySessions[sessionID] = nil
             return (200, signedIn())
+        case ("PUT", "/users/attributes"):
+            guard authorized else { return (401, [:]) }
+            return setAttributes(body["keyAttributes"] as? [String: Any] ?? [:])
+        case ("POST", "/users/srp/setup"):
+            guard authorized else { return (401, [:]) }
+            return setUpSRP(body)
+        case ("POST", "/users/srp/complete"):
+            guard authorized else { return (401, [:]) }
+            return completeSRPSetup(body)
         case ("GET", "/authenticator/key"):
             guard authorized else { return (401, [:]) }
             return authenticatorKey.map { (200, $0) } ?? (404, [:])
@@ -269,7 +297,54 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         twoFactor ? srpUserID + "-2fa" : srpUserID
     }
 
+    /// Keys were set, but SRP wasn't yet.
+    private var isAwaitingSRP: Bool { isRegistered && createdVerifier == nil && keyAttributes["recoveryKeyDecryptionNonce"] != nil }
+
+    /// Takes what Ente's server takes: exactly the work of libsodium's sensitive limits, and keys of the right length.
+    private func setAttributes(_ attributes: [String: Any]) -> (Int, Any) {
+        guard !isRegistered else { return (409, [:]) }
+        func bytes(_ key: String, _ count: Int) -> Data? {
+            (attributes[key] as? String).flatMap { Data(enteBase64: $0) }.flatMap { $0.count == count ? $0 : nil }
+        }
+        guard let memLimit = (attributes["memLimit"] as? NSNumber)?.uint64Value, let opsLimit = (attributes["opsLimit"] as? NSNumber)?.uint64Value,
+              memLimit * opsLimit == 4 * 1_073_741_824, memLimit >= 128 * 1024 * 1024,
+              let kekSalt = bytes("kekSalt", 16), bytes("encryptedKey", 48) != nil, bytes("keyDecryptionNonce", 24) != nil,
+              let publicKey = bytes("publicKey", 32), bytes("encryptedSecretKey", 48) != nil, bytes("secretKeyDecryptionNonce", 24) != nil,
+              bytes("masterKeyEncryptedWithRecoveryKey", 48) != nil, bytes("masterKeyDecryptionNonce", 24) != nil,
+              bytes("recoveryKeyEncryptedWithMasterKey", 48) != nil, bytes("recoveryKeyDecryptionNonce", 24) != nil else { return (400, [:]) }
+        self.memLimit = memLimit
+        self.opsLimit = opsLimit
+        self.kekSalt = kekSalt
+        keyAttributes = attributes
+        encryptedToken = try! EnteCrypto.sealedBox(tokenBytes, publicKey: publicKey).base64EncodedString()
+        isRegistered = true
+        return (200, [:])
+    }
+
+    private func setUpSRP(_ body: [String: Any]) -> (Int, Any) {
+        guard isAwaitingSRP, let srpUserID = body["srpUserID"] as? String, UUID(uuidString: srpUserID) != nil,
+              let salt = (body["srpSalt"] as? String).flatMap({ Data(enteBase64: $0) }),
+              let verifier = (body["srpVerifier"] as? String).flatMap({ Data(enteBase64: $0) }),
+              let srpA = (body["srpA"] as? String).flatMap({ Data(enteBase64: $0) }) else { return (400, [:]) }
+        let (sessionID, srpB) = startSession(srpUserID: srpUserID, A: BigUInt(srpA), verifier: BigUInt(verifier))
+        let setupID = UUID().uuidString.lowercased()
+        setups[setupID] = (srpUserID, salt, BigUInt(verifier), sessionID)
+        return (200, ["setupID": setupID, "srpB": srpB])
+    }
+
+    private func completeSRPSetup(_ body: [String: Any]) -> (Int, Any) {
+        guard let setupID = body["setupID"] as? String, let setup = setups.removeValue(forKey: setupID),
+              let session = sessions.removeValue(forKey: setup.sessionID),
+              let srpM1 = (body["srpM1"] as? String).flatMap({ Data(enteBase64: $0) }) else { return (400, [:]) }
+        guard let srpM2 = serverProof(session, verifier: setup.verifier, srpM1: srpM1) else { return (401, [:]) }
+        srpUserID = setup.srpUserID
+        srpSalt = setup.salt
+        createdVerifier = setup.verifier
+        return (200, ["setupID": setupID, "srpM2": srpM2.base64EncodedString()])
+    }
+
     private func verifier(srpUserID: String) -> BigUInt {
+        if let createdVerifier { return createdVerifier }
         let x = BigUInt(Self.hash(srpSalt, Self.hash(Data(srpUserID.utf8), Data(":".utf8), loginKey)))
         return EnteSRPClient.g.power(x, modulus: EnteSRPClient.N)
     }
@@ -297,30 +372,41 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
               let srpA = (body["srpA"] as? String).flatMap({ Data(enteBase64: $0) }) else { return (400, [:]) }
         let A = BigUInt(srpA)
         guard !(A % N).isZero else { return (400, [:]) }
+        let (sessionID, srpB) = startSession(srpUserID: srpUserID, A: A, verifier: verifier(srpUserID: srpUserID))
+        return (200, ["sessionID": sessionID, "srpB": srpB])
+    }
+
+    private func startSession(srpUserID: String, A: BigUInt, verifier: BigUInt) -> (sessionID: String, srpB: String) {
+        let N = EnteSRPClient.N
         let b = BigUInt(EnteCrypto.randomBytes(64))
-        let B = (EnteSRPClient.k * verifier(srpUserID: srpUserID) + EnteSRPClient.g.power(b, modulus: N)) % N
+        let B = (EnteSRPClient.k * verifier + EnteSRPClient.g.power(b, modulus: N)) % N
         let sessionID = UUID().uuidString.lowercased()
         sessions[sessionID] = (srpUserID, A, b, B)
-        return (200, ["sessionID": sessionID, "srpB": B.serialize().base64EncodedString()])
+        return (sessionID, B.serialize().base64EncodedString())
     }
 
     private func verifySession(_ body: [String: Any]) -> (Int, Any) {
         guard let sessionID = body["sessionID"] as? String, let session = sessions.removeValue(forKey: sessionID),
               let srpM1 = (body["srpM1"] as? String).flatMap({ Data(enteBase64: $0) }) else { return (400, [:]) }
+        // A wrong password gives a different S, so the proof doesn't match.
+        guard let srpM2 = serverProof(session, verifier: verifier(srpUserID: session.srpUserID), srpM1: srpM1) else { return (401, [:]) }
+        var response = session.srpUserID == srpUserID(twoFactor: true) ? startTwoFactor() : signedIn()
+        response["srpM2"] = srpM2.base64EncodedString()
+        return (200, response)
+    }
+
+    /// Checks the client's proof and returns the server's, nil if it doesn't match.
+    private func serverProof(_ session: (srpUserID: String, A: BigUInt, b: BigUInt, B: BigUInt), verifier: BigUInt, srpM1: Data) -> Data? {
         let N = EnteSRPClient.N
         let paddedA = EnteSRPClient.pad(session.A.serialize())
         let paddedB = EnteSRPClient.pad(session.B.serialize())
         let u = BigUInt(Self.hash(paddedA, paddedB))
         // S = (A * v^u)^b % N, the server's side of the shared secret.
-        let S = (session.A * verifier(srpUserID: session.srpUserID).power(u, modulus: N) % N).power(session.b, modulus: N)
+        let S = (session.A * verifier.power(u, modulus: N) % N).power(session.b, modulus: N)
         let paddedS = EnteSRPClient.pad(S.serialize())
         let expectedM1 = Self.hash(paddedA, paddedB, paddedS)
-        // A wrong password gives a different S, so the proof doesn't match.
-        guard srpM1 == expectedM1 else { return (401, [:]) }
-        let srpM2 = Self.hash(paddedA, expectedM1, Self.hash(paddedS))
-        var response = session.srpUserID == srpUserID(twoFactor: true) ? startTwoFactor() : signedIn()
-        response["srpM2"] = srpM2.base64EncodedString()
-        return (200, response)
+        guard srpM1 == expectedM1 else { return nil }
+        return Self.hash(paddedA, expectedM1, Self.hash(paddedS))
     }
 
     private static func demoEntities(key: Data) -> [[String: Any]] {
