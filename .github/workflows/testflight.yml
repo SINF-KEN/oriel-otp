@@ -46,7 +46,7 @@ jobs:
             exit 0
           fi
           code=$(git diff --name-only HEAD^ HEAD \
-            | grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|crowdin\.yml|\.github/.*)$' || true)
+            | grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|\.github/.*)$' || true)
           if [[ -n "$code" ]]; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else

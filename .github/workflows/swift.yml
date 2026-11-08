@@ -42,7 +42,7 @@ jobs:
             echo "code=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          code=$(grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|crowdin\.yml|\.github/dependabot\.yml)$' <<< "$files" || true)
+          code=$(grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|\.github/dependabot\.yml)$' <<< "$files" || true)
           if [[ -n "$code" ]]; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
@@ -109,6 +109,10 @@ jobs:
             OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
           test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 10
           test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 10
+
+      # A translation that reads an argument as the wrong type crashes the app; see the script for what it checks.
+      - name: Check translation format specifiers
+        run: python3 -I tools/check-format-specifiers.py
 
       - name: Select simulator
         id: simulator
