@@ -72,7 +72,13 @@ final class MacScreenshotTests: XCTestCase {
         let staySignedIn = window.sheets.switches["ente.stay-signed-in"].firstMatch
         XCTAssertTrue(staySignedIn.waitForExistence(timeout: 5))
         if staySignedIn.value as? Int == 1 {
+            // The switch is in the last section, below the sheet's visible part, where a click lands on nothing.
+            let form = window.sheets.scrollViews.firstMatch
+            for _ in 0..<5 where !form.frame.contains(staySignedIn.frame) {
+                form.scroll(byDeltaX: 0, deltaY: -200)
+            }
             staySignedIn.click()
+            XCTAssertEqual(staySignedIn.value as? Int, 0, "Stay signed in didn't turn off")
         }
         password.click()
         password.typeText("demo\r")
