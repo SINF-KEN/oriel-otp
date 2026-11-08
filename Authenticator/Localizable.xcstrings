@@ -15338,6 +15338,35 @@
         }
       }
     },
+    "This code is too easy to guess. Choose another code." : {
+      "comment" : "App lock change prompt after a code such as 1234 or 1111",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieser Code ist zu leicht zu erraten. Wähle einen anderen Code."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce code est trop facile à deviner. Choisissez-en un autre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このコードは簡単に推測されます。別のコードを設定してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento kód sa dá príliš ľahko uhádnuť. Zvoľte iný kód."
+          }
+        }
+      }
+    },
     "This deletes the account for good, as there is no other copy. You won’t be able to generate codes for it anymore." : {
       "comment" : "Delete account alert for an account on this device",
       "localizations" : {
