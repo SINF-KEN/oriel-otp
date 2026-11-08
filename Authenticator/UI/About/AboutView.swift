@@ -82,7 +82,7 @@ struct AboutView: View {
                         Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)
                     } label: {
                         HStack {
-                            ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
+                            ListIconView(image: Image(systemName: "doc.text"), color: Color(.systemGray))
                             Text("Terms of use")
                                 .foregroundStyle(.primary)
                         }
@@ -91,7 +91,7 @@ struct AboutView: View {
                         Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/PRIVACY.md")!)
                     } label: {
                         HStack {
-                            ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.secondaryLabel))
+                            ListIconView(image: Image(systemName: "person.badge.shield.checkmark"), color: Color(.systemGray))
                             Text("Privacy policy")
                                 .foregroundStyle(.primary)
                         }
@@ -100,7 +100,7 @@ struct AboutView: View {
                         LicensingView()
                     } label: {
                         HStack {
-                            ListIconView(image: Image(systemName: "doc.text"), color: Color(.secondaryLabel))
+                            ListIconView(image: Image(systemName: "doc.text"), color: Color(.systemGray))
                             Text("Licensing")
                         }
                     }

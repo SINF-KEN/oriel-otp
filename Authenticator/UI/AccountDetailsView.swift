@@ -232,9 +232,11 @@ private struct AccountCodeButton: View {
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     let account: Account
 
-    private let codeColor = Color(.secondaryLabel)
-    @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 44
-    @ScaledSize(relativeTo: .largeTitle) private var statusSize: CGFloat = 28
+    // The code is what the screen is for, so it's the largest thing on it and in the accent color, like the codes in the
+    // list. The asset has darker and lighter variants for Increase Contrast, so it stays readable on the gray capsule.
+    private let codeColor = Color.accentColor
+    @ScaledSize(relativeTo: .largeTitle) private var codeFontSize: CGFloat = 56
+    @ScaledSize(relativeTo: .largeTitle) private var statusSize: CGFloat = 34
 
     var body: some View {
         Button(action: { toastPresenter.copyCode(of: account) }) {
