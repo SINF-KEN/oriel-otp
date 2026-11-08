@@ -120,6 +120,45 @@ final class EnteMigrationUITests: XCTestCase {
 
     /// Types a new password. On a sign up form iOS first offers a strong password in place of the keyboard, which isn't
     /// part of the app, so it's closed by the position of its close button on an iPhone.
+    /// Signs in to a self-hosted server picked on the sign in screen, starting from Ente's own.
+    @MainActor func testSignsInToOwnServer() throws {
+        continueAfterFailure = false
+        let app = XCUIApplication()
+        // An empty server is Ente's own, so the sign in starts there.
+        app.launchArguments = ["-DemoDate", "1798761612", "-EnteAuth.ServerURL", ""]
+        app.launch()
+
+        XCTAssertTrue(app.descendants(matching: .any)["account-row.GitHub:alice@example.com"].firstMatch.waitForExistence(timeout: 20),
+                      "The account list didn't show")
+        app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch.tap()
+        app.buttons["Sync from Ente Auth"].firstMatch.tap()
+
+        let choice = app.buttons["ente.server-choice"].firstMatch
+        XCTAssertTrue(choice.waitForExistence(timeout: 20), "The server choice didn't show")
+        XCTAssertFalse(app.textFields["ente.server"].exists, "The address is only asked for with one's own server")
+        attach("ente-server", app)
+        choice.tap()
+        app.buttons["My own server"].firstMatch.tap()
+
+        let server = app.textFields["ente.server"]
+        XCTAssertTrue(server.waitForExistence(timeout: 20), "The server address didn't show")
+        XCTAssertTrue(app.buttons["ente.create-account"].exists == false, "Creating an account needs an address")
+        server.tap()
+        server.typeText("https://demo.ente.test\n")
+        XCTAssertTrue(app.buttons["ente.create-account"].firstMatch.waitForExistence(timeout: 10), "Creating an account wasn't offered")
+        attach("own-server", app)
+
+        let email = app.textFields["ente.email"]
+        email.tap()
+        email.typeText("alice@example.com\n")
+        let password = app.secureTextFields["ente.password"]
+        XCTAssertTrue(password.waitForExistence(timeout: 20), "The password field didn't show")
+        password.tap()
+        password.typeText("demo\n")
+        XCTAssertTrue(app.buttons["ente.add"].firstMatch.waitForExistence(timeout: 30), "The accounts on the server didn't show")
+        attach("own-server-accounts", app)
+    }
+
     @MainActor private func typePassword(_ text: String, into field: XCUIElement, _ app: XCUIApplication) {
         field.tap()
         if !app.keyboards.firstMatch.waitForExistence(timeout: 5) {

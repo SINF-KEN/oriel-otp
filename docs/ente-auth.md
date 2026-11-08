@@ -214,7 +214,9 @@ revoked with `POST /users/logout`.
 
 ## Self-hosted servers
 
-Enter the API URL of the server, e.g. `https://ente.example.com`, under Options. Only `https` URLs are accepted.
+Pick **My own server** under **Server** at the top of the sign in screen and enter the API URL of the server, e.g.
+`https://ente.example.com`. Only `https` URLs are accepted. The choice and address are remembered after signing in;
+picking **Ente** again signs in to Ente's server without clearing the address.
 
 A server on the local network makes the system ask for Local Network access the first time the app connects to it, using
 `NSLocalNetworkUsageDescription`. If that's declined, the connection fails until it's allowed in the system's privacy
