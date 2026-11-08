@@ -67,6 +67,30 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
         }
     }
 
+    /// Common codes that aren't a run or a repeated pattern, e.g. keypad columns and years. Codes are guessed from
+    /// the most common first, so these go first.
+    private static let commonCodes: Set<String> = [
+        "0852", "1004", "1984", "2000", "2001", "2020", "2580", "5683", "7410", "8520", "9630",
+        "112233", "123321", "147258", "159753", "258456", "520520", "654456", "789456",
+    ]
+
+    /// Whether a code is among the first ones tried when guessing: all the same digit, a run up or down like 1234 or
+    /// 8765, a repeated pattern like 1212 or 123123, or another common one. Codes already set keep working, only new
+    /// ones are checked.
+    static func isEasyToGuess(code: String) -> Bool {
+        let digits = code.compactMap(\.wholeNumberValue)
+        guard digits.count == code.count, digits.count > 1 else { return false }
+        let steps = Set(zip(digits, digits.dropFirst()).map { ($1 - $0 + 10) % 10 })
+        // The same digit, or a run up or down, wrapping around from 9 to 0.
+        if steps.count == 1, let step = steps.first, [0, 1, 9].contains(step) { return true }
+        // A short pattern repeated, e.g. 1212, 6969 or 123123.
+        for length in 1...(digits.count / 2) where digits.count % length == 0 {
+            let pattern = Array(digits.prefix(length))
+            if (0..<digits.count).allSatisfy({ digits[$0] == pattern[$0 % length] }) { return true }
+        }
+        return commonCodes.contains(code)
+    }
+
     /// Whether `secret` is the code or password, compared in constant time.
     func matches(_ secret: String) -> Bool {
         guard method.hasSecret, !hash.isEmpty else { return false }
@@ -198,8 +222,9 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 /// Mac sleeps. While it's locked, nothing that would show codes or ask for something else (NFC, the Ente session's
 /// Face ID) is started: it waits in `whenUnlocked`.
 ///
-/// After 5 wrong codes or passwords, the next attempt has to wait 30 seconds, doubling with each wrong one up to an
-/// hour. The wait follows the system's uptime, which can't be set like the clock, and starts over when the device
+/// After 5 wrong codes or passwords, the next attempt has to wait 30 seconds, doubling with each wrong one up to a
+/// day, so a code can't be guessed slowly over months, while the owner can always try again the next day. The wait
+/// follows the system's uptime, which can't be set like the clock, and starts over when the device
 /// restarts. There's no way around a forgotten code or password other than deleting the app: the accounts are on the
 /// YubiKey and in Ente Auth, not only in the app.
 ///
@@ -215,6 +240,8 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 
     private static let enabledKey = "AppLock.Enabled"
     private static let freeAttempts = 5
+    /// The longest wait between attempts.
+    static let maximumWait: TimeInterval = 24 * 3600
 
     /// The lock, nil when the app isn't locked or the lock can't be read yet.
     private(set) var configuration: AppLockConfiguration?
@@ -419,7 +446,7 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
             attempts.lastFailure = uptime
             try? storage.saveAttempts(attempts)
         }
-        let delay = min(30 * pow(2, Double(attempts.failures - Self.freeAttempts)), 3600)
+        let delay = min(30 * pow(2, Double(min(attempts.failures - Self.freeAttempts, 32))), Self.maximumWait)
         let remaining = delay - (uptime - attempts.lastFailure)
         retryDate = remaining > 0 ? now().addingTimeInterval(remaining) : nil
     }
