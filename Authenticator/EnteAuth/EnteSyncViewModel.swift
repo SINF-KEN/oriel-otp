@@ -27,13 +27,18 @@ import YubiKit
         case accounts
     }
 
-    private static let serverKey = "EnteAuth.ServerURL"
+    static let serverKey = "EnteAuth.ServerURL"
 
     var phase: Phase
     var email = ""
     var password = ""
     var code = ""
-    var server: String
+    /// The server address as typed, only used when signing in to one's own server.
+    var server: String {
+        didSet { if !server.isEmpty { usesOwnServer = true } }
+    }
+    /// Whether to sign in to a self-hosted server rather than Ente's.
+    var usesOwnServer: Bool
     var staySignedIn: Bool
     var isBusy = false
     /// Whether the password is being turned into keys, the part of signing in that can take a few seconds.
@@ -71,7 +76,9 @@ import YubiKit
         self.session = session
         self.watch = watch
         self.cloud = cloud
-        self.server = defaults.string(forKey: Self.serverKey) ?? ""
+        let savedServer = defaults.string(forKey: Self.serverKey) ?? ""
+        self.server = savedServer
+        self.usesOwnServer = !savedServer.isEmpty
         // Staying signed in is the default where the device can protect the session, like in Ente's own apps.
         self.staySignedIn = store.canSave
         if let account = store.savedAccount {
@@ -80,7 +87,10 @@ import YubiKit
             } else {
                 // The server rejected the session, so the account only needs the password again.
                 email = account.email
-                server = Self.serverField(for: account.server)
+                let accountServer = Self.serverField(for: account.server)
+                server = accountServer
+                // Observers aren't called in init.
+                usesOwnServer = !accountServer.isEmpty
                 phase = .signIn
             }
         } else {
@@ -140,8 +150,19 @@ import YubiKit
 
     // MARK: - Sign in
 
+    /// The server accounts can be created on, nil for Ente's own or a server that isn't filled in yet.
+    var signUpServer: URL? {
+        EnteSignUpViewModel.server(from: selectedServer)
+    }
+
+    /// The server to sign in to as typed, empty for Ente's own.
+    var selectedServer: String {
+        usesOwnServer ? server.trimmingCharacters(in: .whitespacesAndNewlines) : ""
+    }
+
     var canSignIn: Bool {
         !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !password.isEmpty
+            && (!usesOwnServer || !selectedServer.isEmpty)
     }
 
     /// Signs in with the email and password. After a wrong password following the email code, the codes aren't asked
@@ -153,7 +174,7 @@ import YubiKit
         run {
             // Only the flow keeps the password, while the email code or second factor it's needed for can be retried.
             defer { self.password = "" }
-            let server = try self.serverURL()
+            let server = try EnteAPIClient.serverURL(from: self.selectedServer)
             if let flow = self.flow, flow.needsPassword, flow.email == email, flow.api.server == server {
                 try await self.handle { try await flow.submitPassword(password) }
                 return
@@ -231,7 +252,7 @@ import YubiKit
         case .complete:
             guard let flow, let keys = flow.keys, let api else { throw EnteLoginError.invalidAccountData }
             self.flow = nil
-            defaults.set(server.isEmpty ? nil : server, forKey: Self.serverKey)
+            defaults.set(selectedServer.isEmpty ? nil : selectedServer, forKey: Self.serverKey)
             let saveSession = staySignedIn && canSaveSession
             // Only the authenticator key is kept, the master key goes away with the flow. An account that has never
             // used Ente Auth gets its key now, while the master key is there, so it stays signed in too.
@@ -391,13 +412,6 @@ import YubiKit
     /// The server as typed on the sign in screen, empty for Ente's own server.
     private static func serverField(for server: URL) -> String {
         server == EnteAPIClient.defaultServer ? "" : server.absoluteString
-    }
-
-    private func serverURL() throws -> URL {
-        let server = server.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !server.isEmpty else { return EnteAPIClient.defaultServer }
-        guard let url = URL(string: server) else { throw EnteAPIError.invalidServerURL }
-        return url
     }
 
     private func run(_ operation: @escaping () async throws -> Void) {

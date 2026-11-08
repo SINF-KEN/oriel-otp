@@ -214,11 +214,74 @@ revoked with `POST /users/logout`.
 
 ## Self-hosted servers
 
-Enter the API URL of the server, e.g. `https://ente.example.com`, under Options. Only `https` URLs are accepted.
+Pick **My own server** under **Server** at the top of the sign in screen and enter the API URL of the server, e.g.
+`https://ente.example.com`. Only `https` URLs are accepted. The choice and address are remembered after signing in;
+picking **Ente** again signs in to Ente's server without clearing the address.
 
 A server on the local network makes the system ask for Local Network access the first time the app connects to it, using
 `NSLocalNetworkUsageDescription`. If that's declined, the connection fails until it's allowed in the system's privacy
 settings. Servers on the internet don't trigger the prompt.
+
+## Moving to another server
+
+**Move to another server…** in the Ente Auth section of the settings copies the accounts from one server to another,
+e.g. from Ente's to a self-hosted one. It has two fields, **Migrate from** and **Migrate to**. The first starts with the
+server of the saved account, or Ente's. The account on the new server can be [created in the app](#creating-an-account-on-a-self-hosted-server)
+on a self-hosted server. If it has never used Ente Auth, its authenticator key is created during the sign in.
+
+1. **Old server.** If it's the server of the saved session, that session is unlocked and synced, so changes waiting
+   on this device are uploaded first. Otherwise the app signs in with the password, like the sheet does. A saved
+   account the server rejected has to sign in again from the sheet first, as its vault can hold changes that aren't
+   uploaded yet.
+2. **New server.** The app signs in, starting with the same email.
+3. **Review.** Both servers are read, and the sheet shows how many accounts will be copied, how many the new server
+   already has, how many are in the trash and how many couldn't be decrypted. Nothing has changed yet.
+4. **Confirm and copy.** After the confirmation both servers are read again. Each account is encrypted with the new
+   server's authenticator key and sent with `POST /authenticator/entity`. The plain text isn't changed, so Ente's tags,
+   notes, pins and trash stay.
+5. **Check.** The new server is read back, and every account that could be decrypted has to be there. If this device
+   uses the old server, everything in the vault has to be there too, in case an account was changed during the move.
+6. **Switch.** The new session replaces the saved one, the vault is filled from the new server and the old session is
+   ended with `POST /users/logout`.
+
+An account counts as already on the new server only if its plain text is identical, so two accounts with the same name
+and different secrets are both copied. That also makes the move safe to repeat: if it stops halfway, nothing has been
+switched, and moving again only copies what's missing.
+
+**Nothing is deleted from the old server.** Accounts that can't be decrypted can't be copied, so they stay there, and the
+review warns about them. Other devices keep using the old server until they sign in to the new one. Accounts on this
+device and on a YubiKey aren't affected.
+
+A device that doesn't switch still copies the accounts: one that can't save a session, and one whose saved account is on
+a third server, which is left alone. The sessions of the move are then ended when the sheet closes.
+
+## Creating an account on a self-hosted server
+
+**Create an account on this server** is offered on the sign in screen once a self-hosted server is filled in, and when
+signing in to the new server of a move. Accounts can't be created on Ente's own servers. `EnteAPIClient` refuses every
+request that creates an account for `ente.io`, `ente.com` and their subdomains, before anything is sent, so this doesn't
+depend on the button being hidden. A proxy under another name that forwards to Ente can't be told apart.
+
+It follows Ente's own apps (`rust/crates/accounts/src/signup.rs`):
+
+1. `POST /users/ott` with `purpose: signup` sends the code. The server answers `403` if `internal.disable-registration`
+   is set and `409` if the account is complete. Without email set up, it writes the code to its log.
+2. `POST /users/verify-email` answers with a plain `token`. An answer with key attributes or a second factor means the
+   account already exists.
+3. The keys are made on the device. The master key and the recovery key are random, and each encrypts the other. Argon2id
+   turns the password into the key encryption key, which encrypts the master key, and the master key encrypts a new X25519
+   secret key. Ente's server only takes limits whose product is exactly 4 GiB, with at least 128 MB of memory, so it uses
+   256 MiB and 16 passes, or 128 MiB and 32 where memory runs out, like Ente's apps.
+4. The recovery key is shown, and nothing more happens until **I saved my recovery key** is on. It's in hex, which Ente's
+   apps take when recovering an account along with their 24 words. This app can't recover an account, that's done in
+   Ente's apps pointed at the server. It's shown in fixed lines, as wrapped text gets hyphens that aren't part of the key.
+5. `PUT /users/attributes` stores the encrypted keys. `POST /users/srp/setup` and `/users/srp/complete` set up SRP, and
+   the server's proof is checked. `GET /users/srp/attributes` then has to return the same SRP user and salt. Failing
+   after the keys are stored can be retried, without sending them again.
+
+The token is then ended, and the account is signed in to from the sign in screen, with its email filled in. That proves the
+password and keys work. On a sign up form iOS offers a strong password in place of the keyboard, which is saved in
+Passwords.
 
 ## Code
 
@@ -234,7 +297,9 @@ Everything lives in `Authenticator/EnteAuth/` and is added to the project as a s
 | `EnteVault.swift` | The vault: entities with their pending changes, the conflict rule, editing entities like Ente Auth, codes and the encrypted file |
 | `EnteCloud.swift` | Keeps the vault in step with Ente: unlocking, pulling, pushing, and the changes made in the app |
 | `EnteSessionStore.swift` | The saved account and session in the keychain |
-| `EnteAccountSection.swift` | The saved account and **Sign out** in the settings |
+| `EnteAccountSection.swift` | The saved account, **Sign out** and **Move to another server…** in the settings |
+| `EnteMigration.swift`, `EnteMigrationViewModel.swift`, `EnteMigrationView.swift` | Moving the accounts to another server |
+| `EnteSignUp.swift`, `EnteSignUpViewModel.swift`, `EnteSignUpView.swift` | Creating an account on a self-hosted server |
 | `EnteSyncViewModel.swift`, `EnteSyncView.swift` | The sheet |
 | `FakeEnteServer.swift` | The demo server for Debug builds in the simulator and on the Mac, and the tests |
 
