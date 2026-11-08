@@ -636,8 +636,7 @@ struct MainView: View {
                                    message: model.cloudAccounts.isEmpty && model.deviceAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"))
                 }
             } else if selectedTag != nil && taggedAccounts.isEmpty {
-                ListStatusView(image: Image(systemName: "tag"), message: String(localized: "No accounts with this tag", comment: "Account list filtered by a tag that no account has any more"),
-                               height: reader.size.height)
+                ListStatusView(image: Image(systemName: "tag"), message: String(localized: "No accounts with this tag", comment: "Account list filtered by a tag that no account has any more"))
             } else if pinnedAccounts.count > 0 {
                 Section("Pinned") {
                     ForEach(pinnedAccounts, id: \.id) { account in
