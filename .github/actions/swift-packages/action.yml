@@ -5,7 +5,14 @@ description: >-
 # SwiftPM keeps a full mirror of each package's history next to its checkout. yubikit-swift's alone is about 580 MB,
 # so a cache of the whole directory took 3 to 6 minutes to restore, no faster than cloning. The checkouts and
 # workspace-state.json are about 45 MB, and with -skipPackageUpdates xcodebuild builds from them without the mirrors.
-# The key is exact, so a restored cache always matches Package.resolved; the verify step checks that anyway.
+# A cache could hold anything a workflow run saved under the key, so the verify step checks each checkout's files
+# against the commit Package.resolved pins, fetched from the package's repository, whether they came from the cache
+# or not.
+
+inputs:
+  use-cache:
+    description: Whether to restore and save the checkouts. The TestFlight upload resolves them anew.
+    default: 'true'
 
 outputs:
   path:
@@ -31,6 +38,7 @@ runs:
 
     - name: Restore Swift packages
       id: restore
+      if: inputs.use-cache == 'true'
       uses: actions/cache/restore@v6
       with:
         path: |
@@ -52,24 +60,70 @@ runs:
           -skipPackageUpdates \
           2>&1 | tee "$RUNNER_TEMP/resolve-packages.log"
 
+    # The checkouts borrow their Git objects from the mirrors, which aren't cached, so Git can't check them in place.
+    # Instead each checkout's files are hashed into a Git tree, which must be the tree of the pinned commit. Fetching
+    # only that commit object (--filter=tree:0) takes under a second per package, and Git checks that its contents
+    # hash to the pinned revision.
     - name: Verify package checkouts
       shell: bash
+      env:
+        PACKAGES: ${{ steps.paths.outputs.path }}
+        # The prebuilt libsodium in swift-sodium 0.11.0: the SHA-256 of `shasum -a 256` over its files, sorted by
+        # path. A swift-sodium update fails here until the new binary has been looked at and this is updated.
+        CLIBSODIUM_SHA256: d7b2f55ce9ed5a2d2da4a2c629b99188c6957e7e6516e6f1c8e0a13698553647
       run: |
         set -euo pipefail
+        resolved=OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
         pins() { jq -cS "$1" "$2"; }
-        expected=$(pins '[.pins[] | {identity, revision: .state.revision}] | sort_by(.identity)' \
-          OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved)
+        expected=$(pins '[.pins[] | {identity, revision: .state.revision}] | sort_by(.identity)' "$resolved")
         actual=$(pins '[.object.dependencies[] | {identity: .packageRef.identity, revision: .state.checkoutState.revision}] | sort_by(.identity)' \
-          "${{ steps.paths.outputs.path }}/workspace-state.json")
+          "$PACKAGES/workspace-state.json")
         if [[ "$expected" != "$actual" ]]; then
           echo "::error::The package checkouts don't match Package.resolved."
           echo "Expected: $expected"
           echo "Actual:   $actual"
           exit 1
         fi
+        # No package downloads a binary; swift-sodium's is part of its checkout.
+        if [[ -n "$(ls -A "$PACKAGES/artifacts" 2>/dev/null)" ]]; then
+          echo "::error::Unexpected downloaded package artifacts:"
+          ls -lA "$PACKAGES/artifacts"
+          exit 1
+        fi
+        expected_dirs=$(jq -r '.pins[].location | sub("\\.git$"; "") | split("/") | last' "$resolved" | LC_ALL=C sort)
+        actual_dirs=$(ls -A "$PACKAGES/checkouts" | LC_ALL=C sort)
+        if [[ "$expected_dirs" != "$actual_dirs" ]]; then
+          echo "::error::The package checkouts aren't the pinned packages."
+          echo "Expected: $expected_dirs"
+          echo "Actual:   $actual_dirs"
+          exit 1
+        fi
+        jq -r '.pins[] | "\(.identity) \(.location) \(.state.revision)"' "$resolved" |
+        while read -r identity location revision; do
+          checkout="$PACKAGES/checkouts/$(basename "$location" .git)"
+          verify=$(mktemp -d "$RUNNER_TEMP/verify-package.XXXXXX")
+          git init -q --bare -b main "$verify"
+          git -C "$verify" fetch -q --depth=1 --filter=tree:0 "$location" "$revision"
+          pinned=$(git -C "$verify" rev-parse --verify "$revision^{tree}")
+          # -f also hashes files the package's .gitignore matches, so an added build product shows as a difference.
+          files=$(GIT_DIR="$verify" GIT_INDEX_FILE="$verify/index" GIT_WORK_TREE="$checkout" \
+            bash -c 'git add -A -f . && git write-tree')
+          rm -rf "$verify"
+          if [[ "$pinned" != "$files" ]]; then
+            echo "::error::The $identity checkout differs from $revision (tree $files, expected $pinned)."
+            exit 1
+          fi
+          echo "$identity matches $revision"
+        done
+        clibsodium=$(cd "$PACKAGES/checkouts/swift-sodium" && find Clibsodium.xcframework -type f | LC_ALL=C sort \
+          | tr '\n' '\0' | xargs -0 shasum -a 256 | shasum -a 256 | awk '{ print $1 }')
+        if [[ "$clibsodium" != "$CLIBSODIUM_SHA256" ]]; then
+          echo "::error::Clibsodium.xcframework has changed (SHA-256 $clibsodium). Check the new binary, then update CLIBSODIUM_SHA256."
+          exit 1
+        fi
 
     - name: Save Swift packages
-      if: steps.restore.outputs.cache-hit != 'true'
+      if: inputs.use-cache == 'true' && steps.restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v6
       with:
         path: |

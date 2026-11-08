@@ -69,10 +69,14 @@ jobs:
         with:
           ref: ${{ needs.changes.outputs.sha }}
 
+      # The upload is signed and goes to testers, so it clones the packages rather than trust a cache that other
+      # workflow runs can write.
       - name: Resolve Swift packages
         id: packages
         timeout-minutes: 15
         uses: ./.github/actions/swift-packages
+        with:
+          use-cache: 'false'
 
       # Archiving signs for development, with the team's Apple Development certificate. Without one on the runner,
       # Xcode would create a new certificate on every run. Distribution signing happens at upload, with a certificate
