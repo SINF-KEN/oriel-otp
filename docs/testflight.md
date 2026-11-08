@@ -3,7 +3,8 @@
 The `TestFlight` workflow (`.github/workflows/testflight.yml`) uploads the iPhone app, with the watch app inside it,
 and the Mac app to App Store Connect. It runs after `OrielOTPTests` passes for a push to `main`, so a pull request is
 uploaded once it merges. Commits that only change documentation or CI (the same list the tests skip for pull
-requests, plus `.github/`) aren't uploaded. To upload another branch, run the workflow by hand from the Actions tab.
+requests, plus `.github/`) aren't uploaded. To upload again, run the workflow by hand from the Actions tab. Once
+the `testflight` environment is limited to `main` (see [Secrets](#secrets)), only `main` can be uploaded.
 
 Uploads queue instead of cancelling each other. App Store Connect gives each upload the next free build number
 (`manageAppVersionAndBuildNumber`), so `CURRENT_PROJECT_VERSION` doesn't need bumping; the version shown in TestFlight

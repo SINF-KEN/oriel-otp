@@ -1,7 +1,7 @@
 name: TestFlight
 
 # Uploads the iPhone (with the watch app) and Mac builds to App Store Connect after the tests pass on main. Commits
-# that only change documentation aren't uploaded. Run it by hand to upload any branch. See docs/testflight.md for the
+# that only change documentation aren't uploaded. Run it by hand to upload again. See docs/testflight.md for the
 # secrets it needs.
 on:
   workflow_run:
