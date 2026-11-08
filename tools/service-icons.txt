@@ -13,8 +13,6 @@ amd
 americanexpress
 ansible
 anthropic
-apple
-appstore
 arxiv
 asana
 atlassian
@@ -102,7 +100,6 @@ gojek
 goodreads
 google
 googlecloud
-googleplay
 grab
 grafana
 grammarly
