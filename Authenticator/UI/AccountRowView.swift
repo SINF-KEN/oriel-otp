@@ -124,16 +124,9 @@ struct AccountRowView<Accessory: View>: View {
     private var inlineRow: some View {
         HStack {
             HStack {
-                Text(String(account.title.first ?? "?"))
-                    .scaledFont(.body)
-                    // Not the row's, which changes on a selected row, on an icon that doesn't.
-                    .foregroundStyle(Color(.label))
-                    // Grows with the text, but not so much that it crowds the name out.
-                    .frame(width: min(iconSize, 64), height: min(iconSize, 64))
-                    .background(account.iconColor)
-                    .clipShape(.circle)
+                // Grows with the text, but not so much that it crowds the name out.
+                AccountIconView(account: account, size: min(iconSize, 64), letterStyle: .body)
                     .padding(.trailing, 5)
-                    .accessibilityHidden(true)
                 HStack {
                     VStack(alignment: .leading) {
                         HStack(spacing: 4) {

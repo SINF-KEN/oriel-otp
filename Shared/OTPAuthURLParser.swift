@@ -25,6 +25,8 @@ nonisolated struct EnteEntry: Sendable, Equatable {
     let components: URLComponents?
     let isTrashed: Bool
     let isPinned: Bool
+    /// The icon chosen for the account in Ente Auth, by name, nil to use the one of its issuer.
+    let iconID: String?
 
     init(rawData: String) {
         var urlString: String?
@@ -55,6 +57,9 @@ nonisolated struct EnteEntry: Sendable, Equatable {
         }
         isTrashed = displays.contains { $0["trashed"] as? Bool == true }
         isPinned = displays.contains { $0["pinned"] as? Bool == true }
+        // The URL's settings win over the object's, like the editor reads them.
+        let iconID = displays.last { $0["iconID"] != nil }?["iconID"] as? String
+        self.iconID = iconID.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 }
     }
 }
 

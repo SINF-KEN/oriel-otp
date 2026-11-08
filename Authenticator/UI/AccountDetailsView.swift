@@ -36,13 +36,8 @@ struct AccountDetailView: View {
     var body: some View {
         VStack(spacing: 12) {
             Spacer()
-            Text(String(account.title.first ?? "?"))
-                .scaledFont(.largeTitle)
-                // Grows with the text, but not so much that the name and code go off screen.
-                .frame(width: min(iconSize, 120), height: min(iconSize, 120))
-                .background(account.iconColor)
-                .clipShape(Circle())
-                .accessibilityHidden(true)
+            // Grows with the text, but not so much that the name and code go off screen.
+            AccountIconView(account: account, size: min(iconSize, 120), letterStyle: .largeTitle)
             Text(account.title.leftToRightIfAddress)
                 .scaledFont(.title2) { $0.weight(.medium) }
                 .multilineTextAlignment(.center)

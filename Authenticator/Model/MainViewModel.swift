@@ -122,6 +122,7 @@ import YubiKit
                 if account.isPinned != entry.code.isPinned {
                     account.isPinned = entry.code.isPinned
                 }
+                Self.updateDisplay(of: account, from: entry.code)
                 return account
             }
             return cloudAccount(id: entry.id, code: entry.code, isPending: entry.isPending)
@@ -144,9 +145,18 @@ import YubiKit
 
     private func calculatedAccount(credential: OATHSession.Credential, otp: (code: String, validity: DateInterval)?, code: EnteCloudCode,
                                    location: Account.Location) -> Account {
-        Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
-                keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
-                connectionType: .wired, isPinned: code.isPinned, location: location)
+        let account = Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
+                              keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
+                              connectionType: .wired, isPinned: code.isPinned, location: location)
+        Self.updateDisplay(of: account, from: code)
+        return account
+    }
+
+    /// The icon, which can change without the account being made again.
+    private static func updateDisplay(of account: Account, from code: EnteCloudCode) {
+        if account.iconID != code.iconID {
+            account.iconID = code.iconID
+        }
     }
 
     /// Calculates the code of an account in Ente Auth or on this device.
@@ -203,6 +213,7 @@ import YubiKit
                 if account.isPinned != entry.code.isPinned {
                     account.isPinned = entry.code.isPinned
                 }
+                Self.updateDisplay(of: account, from: entry.code)
                 return account
             }
             return deviceAccount(id: entry.id, code: entry.code)
