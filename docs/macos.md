@@ -118,6 +118,13 @@ CI signs the Mac build ad hoc without it, and the keychain tests skip themselves
 - Debug builds use the simulated YubiKey and the fake Ente server when launched with `-SimulatedYubiKey YES`, with a
   Debug menu to plug and unplug it. Without that argument they use a real YubiKey.
 - A real YubiKey, Touch ID, the window picker, Continuity Camera and the notification can only be checked by hand.
+- The Mac Debug build is `io.github.sinf-ken.OrielOTP.debug` (its AutoFill extension
+  `io.github.sinf-ken.OrielOTP.debug.AutoFillExtension`), so running or testing it from Xcode gets its own sandbox
+  container and preferences instead of the installed app's: the accounts, the Ente vault and its saved-session
+  marker. iOS and Release builds keep the real identifiers. The keychain access group and the app group are literal
+  in the entitlements and the code, so a Debug build signed with the team still shares the keychain items (the Ente
+  session, saved passwords, the app lock) and the app group (the AutoFill accounts) with an installed app. The ad
+  hoc builds CI and `tools/screenshots-macos.sh` make leave both out, so they share nothing.
 
 ## App icon
 
