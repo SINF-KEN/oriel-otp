@@ -40,6 +40,8 @@ struct MainView: View {
     @State var singleColumnPath: [String] = []
     /// The layout kept while the window is being resized, true for the single column. See `mainLayout`.
     @State private var layoutDuringResize: Bool?
+    /// Whether the window is wide enough for the list and the details beside each other.
+    @State private var fitsTwoColumns = true
     /// For the arrow keys, which only reach the list while it has the focus.
     @FocusState private var isListFocused: Bool
     #else
@@ -61,6 +63,10 @@ struct MainView: View {
     @State var oathURL: URL? = nil
     @State var accountsToDelete: [Account] = []
     @State var accountToRename: Account?
+    /// The account whose tags are being changed, from a row's menu.
+    @State var accountToTag: Account?
+    /// The tag whose accounts the list shows, nil for all.
+    @State var selectedTag: String?
     @State var quickActions = QuickActionCenter.shared
     @ScaledSize(relativeTo: .largeTitle) private var placeholderSize: CGFloat = 64
     
@@ -168,6 +174,7 @@ struct MainView: View {
                 performPendingQuickAction()
             } else if phase == .background {
                 didEnterBackground = true
+                CodeVisibility.shared.hideAll()
 
                 #if os(iOS)
                 // Keep running until the YubiKey connection is closed.
@@ -187,6 +194,9 @@ struct MainView: View {
         }
         // Quick actions and the Scan NFC YubiKey intent wait for the scene to be active, as NFC can't start before that.
         .onChange(of: quickActions.pending, initial: true) { _, _ in
+            performPendingQuickAction()
+        }
+        .onChange(of: quickActions.pendingAccountID, initial: true) { _, _ in
             performPendingQuickAction()
         }
         // One that came while the app was locked. On the Mac the app locks without going to the background, so
@@ -257,23 +267,28 @@ struct MainView: View {
     ///
     /// The layout only changes once a resize ends. Replacing the list during one crashes the app: AppKit ends the
     /// table's live resize as it's removed, which adds rows to a table SwiftUI is already destroying.
+    ///
+    /// Only whether the columns fit is read here, so the window's content is drawn again when that changes rather than
+    /// at every step of a resize. The width the account column can take is read by `SidebarColumnWidth`.
     private var mainLayout: some View {
-        GeometryReader { reader in
-            let minimumWidth = Self.minimumColumnWidth * textScale
-            let isSingleColumn = layoutDuringResize ?? (reader.size.width < 2 * minimumWidth)
-            ZStack {
-                LiveResizeObserver { isResizing in
-                    layoutDuringResize = isResizing ? isSingleColumn : nil
-                }
-                if isSingleColumn {
-                    singleColumnView
-                } else {
-                    // The window can be too narrow for two columns during a resize. They share it until it ends.
-                    let sidebarMinimum = min(minimumWidth, reader.size.width / 2)
-                    splitView(sidebarWidth: sidebarMinimum...(reader.size.width - sidebarMinimum))
-                }
+        let minimumWidth = Self.minimumColumnWidth * textScale
+        let isSingleColumn = layoutDuringResize ?? !fitsTwoColumns
+        return ZStack {
+            LiveResizeObserver { isResizing in
+                layoutDuringResize = isResizing ? isSingleColumn : nil
+            }
+            if isSingleColumn {
+                singleColumnView
+            } else {
+                splitView
             }
         }
+        .onGeometryChange(for: Bool.self) { geometry in
+            geometry.size.width >= 2 * minimumWidth
+        } action: { fitsTwoColumns in
+            self.fitsTwoColumns = fitsTwoColumns
+        }
+        .providesContainerSize()
     }
 
     private var singleColumnView: some View {
@@ -332,15 +347,13 @@ struct MainView: View {
         }
     }
 
-    private func splitView(sidebarWidth: ClosedRange<CGFloat>) -> some View {
+    private var splitView: some View {
         NavigationSplitView {
             accountColumn()
                 .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
                 .searchFocusedBinding($isSearchFocused)
                 .autocorrectionDisabled(true)
-                .navigationSplitViewColumnWidth(min: sidebarWidth.lowerBound,
-                                                ideal: min(360 * textScale, sidebarWidth.upperBound),
-                                                max: sidebarWidth.upperBound)
+                .modifier(SidebarColumnWidth(minimumColumnWidth: Self.minimumColumnWidth))
         } detail: {
             detailColumn
         }
@@ -446,6 +459,11 @@ struct MainView: View {
     private var presentations: some View {
         @Bindable var model = model
         return mainLayout
+        .onChange(of: model.allTags) { _, tags in
+            if let selectedTag, !tags.contains(selectedTag) {
+                self.selectedTag = nil
+            }
+        }
         .onChange(of: model.accounts.map(\.accountId)) { _, accountIDs in
             // Drop the selection when the account goes away, e.g. the YubiKey was removed or the account deleted.
             #if os(macOS)
@@ -485,6 +503,11 @@ struct MainView: View {
         // Rename from the Mac's menu bar, or from a row's VoiceOver actions.
         .sheet(item: $accountToRename) { account in
             EditView(account: account, viewModel: model, showEditing: Binding(get: { accountToRename != nil }, set: { if !$0 { accountToRename = nil } }))
+                .scaledBodyFont()
+                .appLockCover()
+        }
+        .sheet(item: $accountToTag) { account in
+            AccountTagsView(account: account, isPresented: Binding(get: { accountToTag != nil }, set: { if !$0 { accountToTag = nil } }))
                 .scaledBodyFont()
                 .appLockCover()
         }
@@ -551,6 +574,13 @@ struct MainView: View {
         // The Mac has no app switcher snapshots, and codes are read from the window while another app is in front.
         .redacted(reason: scenePhase == .active ? [] : .privacy)
         #else
+        // The countdowns pause while the window is covered by others or on another Space, and catch up when it's seen.
+        .background {
+            WindowOcclusionObserver { isVisible in
+                model.setCountdownsVisible(isVisible, in: .mainWindow)
+            }
+            .accessibilityHidden(true)
+        }
         // The lock screen only covers the window, the menu bar's commands would still copy codes and delete accounts.
         .focusedSceneValue(\.mainWindowMenuState, AppLock.shared.isLocked ? nil : menuState)
         .onChange(of: commands.pending) { _, command in
@@ -570,7 +600,7 @@ struct MainView: View {
     }
 
     private var accountList: some View {
-    GeometryReader { reader in
+    Group {
         #if os(macOS)
         let selection = $selectedAccountIDs
         #else
@@ -582,8 +612,12 @@ struct MainView: View {
                     YubiOtpRowView(otp: otp)
                 }
             }
+            if showsTagFilter {
+                TagFilterBar(tags: model.allTags, selection: $selectedTag)
+                    .listRowSeparator(.hidden)
+            }
             if !model.hasAccounts {
-                ListStatusView(image: Image(systemName: "person.crop.circle.badge.plus"), message: String(localized: "No accounts yet", comment: "Account list without accounts"), height: reader.size.height) {
+                ListStatusView(image: Image(systemName: "person.crop.circle.badge.plus"), message: String(localized: "No accounts yet", comment: "Account list without accounts")) {
                     addAccountButton
                     enteSyncButton
                     // The accounts of a YubiKey join the list once it has been read.
@@ -599,34 +633,35 @@ struct MainView: View {
                     }
                 } else {
                     ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"),
-                                   message: model.cloudAccounts.isEmpty && model.deviceAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"),
-                                   height: reader.size.height)
+                                   message: model.cloudAccounts.isEmpty && model.deviceAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"))
                 }
-            } else if model.pinnedAccounts.count > 0 {
+            } else if selectedTag != nil && taggedAccounts.isEmpty {
+                ListStatusView(image: Image(systemName: "tag"), message: String(localized: "No accounts with this tag", comment: "Account list filtered by a tag that no account has any more"))
+            } else if pinnedAccounts.count > 0 {
                 Section("Pinned") {
-                    ForEach(model.pinnedAccounts, id: \.id) { account in
+                    ForEach(pinnedAccounts, id: \.id) { account in
                         accountRow(account)
                     }
                 }
-                if model.otherAccounts.count > 0 {
+                if otherAccounts.count > 0 {
                     Section("Other") {
-                        ForEach(model.otherAccounts, id: \.id) { account in
+                        ForEach(otherAccounts, id: \.id) { account in
                             accountRow(account)
                         }
                     }
                 }
-            } else if model.accounts.count > 0 && otp != nil {
+            } else if taggedAccounts.count > 0 && otp != nil {
                 Section("Accounts") {
-                    ForEach(model.otherAccounts, id: \.id) { account in
+                    ForEach(otherAccounts, id: \.id) { account in
                         accountRow(account)
                     }
                 }
-            } else if model.accounts.count > 0 {
-                ForEach(model.accounts, id: \.id) { account in
+            } else if taggedAccounts.count > 0 {
+                ForEach(taggedAccounts, id: \.id) { account in
                     accountRow(account)
                 }
             } else {
-                ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
+                ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey")) {
                     addAccountButton
                     enteSyncButton
                 }
@@ -648,12 +683,33 @@ struct MainView: View {
         .background { ListScrollerInset(hasSectionHeader: showsSectionHeader) }
         #endif
     }
+    // For the status views' height. Only they are drawn again as it changes, not the rows.
+    .providesContainerSize()
+    }
+
+    /// The tags show above the list once an account has one.
+    private var showsTagFilter: Bool {
+        model.hasAccounts && !model.allTags.isEmpty
+    }
+
+    /// The accounts with the selected tag, or all of them.
+    private var taggedAccounts: [Account] {
+        selectedTag == nil ? model.accounts : model.accounts.filter { $0.isTagged(selectedTag) }
+    }
+
+    private var pinnedAccounts: [Account] {
+        taggedAccounts.filter(\.isPinned)
+    }
+
+    private var otherAccounts: [Account] {
+        taggedAccounts.filter { !$0.isPinned }
     }
 
     #if os(macOS)
     /// Whether the list starts with a section's header, as search results and an unsorted list don't have any.
     private var showsSectionHeader: Bool {
-        otp != nil || (model.hasAccounts && searchText.isEmpty && model.pinnedAccounts.count > 0)
+        guard !showsTagFilter else { return false }
+        return otp != nil || (model.hasAccounts && searchText.isEmpty && pinnedAccounts.count > 0)
     }
 
     @ToolbarContentBuilder private var macToolbar: some CustomizableToolbarContent {
@@ -757,7 +813,9 @@ struct MainView: View {
     #endif
 
     private func performPendingQuickAction() {
-        guard scenePhase == .active, !AppLock.shared.isLocked, let action = quickActions.pending else { return }
+        guard scenePhase == .active, !AppLock.shared.isLocked else { return }
+        showPendingAccount()
+        guard let action = quickActions.pending else { return }
         quickActions.pending = nil
         guard !notificationsViewModel.showPIVTokenView && !notificationsViewModel.presentDisableOTP else { return }
         switch action {
@@ -778,6 +836,21 @@ struct MainView: View {
             showEnteSync = false
             addAccount()
         }
+    }
+
+    /// Shows an account opened from Spotlight or Shortcuts, with nothing in front of it.
+    private func showPendingAccount() {
+        guard let accountID = quickActions.pendingAccountID else { return }
+        quickActions.pendingAccountID = nil
+        guard model.accounts.contains(where: { $0.accountId == accountID }),
+              !notificationsViewModel.showPIVTokenView && !notificationsViewModel.presentDisableOTP else { return }
+        showConfiguration = false
+        showAbout = false
+        showEnteSync = false
+        showAddAccount = false
+        searchText = ""
+        selectedTag = nil
+        selectedAccountID = accountID
     }
 
     private func addAccount() {
@@ -830,6 +903,7 @@ struct MainView: View {
         .contextMenu {
             copyButton(account)
             pinButton(account)
+            tagsButton(account)
             CopyToYubiKeyButtons(account: account)
             Divider()
             deleteButton(account)
@@ -845,6 +919,7 @@ struct MainView: View {
             if account.canRename {
                 Button(String(localized: "Rename", comment: "Menu")) { accountToRename = account }
             }
+            tagsButton(account)
             #if os(macOS)
             deleteButton(account)
             #endif
@@ -867,6 +942,12 @@ struct MainView: View {
         Button(action: { account.isPinned.toggle() }) {
             Label(account.isPinned ? String(localized: "Unpin", comment: "Menu") : String(localized: "Pin", comment: "Menu"),
                   systemImage: account.isPinned ? "pin.slash" : "pin")
+        }
+    }
+
+    private func tagsButton(_ account: Account) -> some View {
+        Button(action: { accountToTag = account }) {
+            Label(String(localized: "Tags", comment: "Menu"), systemImage: "tag")
         }
     }
 
@@ -1025,8 +1106,10 @@ struct MainView: View {
             return [Account]()
         } else {
             // Ignores case, accents and Arabic and Hebrew vowel marks, so "gerard" finds "Gérard".
-            return model.accounts.filter { $0.title.localizedStandardContains(searchText) ||
-                $0.subTitle?.localizedStandardContains(searchText) == true }
+            // Tags are found too, e.g. "work".
+            return taggedAccounts.filter { $0.title.localizedStandardContains(searchText) ||
+                $0.subTitle?.localizedStandardContains(searchText) == true ||
+                $0.tags.contains { $0.localizedStandardContains(searchText) } }
         }
     }
 }

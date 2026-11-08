@@ -30,7 +30,7 @@ struct AuthenticatorApp: App {
     @Environment(\.scenePhase) var scenePhase
     @State var toastPresenter = ToastPresenter()
     @State var notificationsViewModel = NotificationsViewModel()
-    @State var mainViewModel = MainViewModel()
+    @State var mainViewModel = MainViewModel(spotlight: .shared)
 
     init() {
         // The requests to Ente have the email address in their URL and carry the vault. Nothing keeps them on disk,

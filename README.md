@@ -41,7 +41,17 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
 - **Everyday use.** Search, pin favorites, tap a code to copy it, rename and delete accounts, Steam codes, and an optional
-  password for the YubiKey's OATH application.
+  password for the YubiKey's OATH application. Accounts show the icon of their service, from
+  [Simple Icons](https://simpleicons.org), or the one chosen in Ente Auth.
+- **Tags.** File accounts under tags and show one tag's accounts. Tags of Ente Auth accounts sync with Ente Auth; a
+  YubiKey has no room for them, so the tags of its accounts stay on this device.
+- **Hide codes.** An optional privacy mode for sharing the screen or using the app in public: codes show as dots until
+  one is tapped, which also copies it.
+- **Shortcuts, Siri and Spotlight.** A Copy Code action for any account the app calculates codes for, also on iPhone
+  (and the plugged-in YubiKey's on the Mac). Optionally, account names can be found in Spotlight; codes and secrets are
+  never added.
+- **YubiKey details.** The Configuration shows the device, serial number, firmware, how many accounts the OATH
+  application holds and how many more fit, and can reset it.
 - **App lock.** Optionally lock the app with Face ID or Touch ID, a 4 or 6 digit code, or a password.
 - **Apple Watch.** Optionally shows the codes of your Ente Auth accounts on Apple Watch, without the iPhone nearby.
 - **AutoFill.** Fills in the codes of your Ente Auth accounts in Safari and other

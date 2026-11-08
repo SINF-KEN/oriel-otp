@@ -29,68 +29,6 @@ struct AddAccountIntent: AppIntent {
     }
 }
 
-/// Copies the code of an account on the plugged-in YubiKey, without opening the app.
-struct CopyCodeIntent: AppIntent {
-    static let title: LocalizedStringResource = "Copy Code"
-    static let description = IntentDescription("Copies the code of an account on your YubiKey to the clipboard. The YubiKey has to be plugged in.")
-
-    @Parameter(title: "Account")
-    var account: YubiKeyAccountEntity
-
-    static var parameterSummary: some ParameterSummary {
-        Summary("Copy the code for \(\.$account)")
-    }
-
-    @MainActor func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        let code = try await YubiKeyAccess.code(for: account.id)
-        Platform.copy(code)
-        return .result(value: code)
-    }
-}
-
-struct OrielOTPShortcuts: AppShortcutsProvider {
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: CopyCodeIntent(),
-                    phrases: ["Copy a code with \(.applicationName)",
-                              "Copy a YubiKey code with \(.applicationName)"],
-                    shortTitle: "Copy Code",
-                    systemImageName: "doc.on.doc")
-        AppShortcut(intent: AddAccountIntent(),
-                    phrases: ["Add an account to \(.applicationName)"],
-                    shortTitle: "Add Account",
-                    systemImageName: "plus")
-    }
-}
-
-/// An account on the plugged-in YubiKey, for Shortcuts and Spotlight.
-struct YubiKeyAccountEntity: AppEntity {
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = "YubiKey Account"
-    static let defaultQuery = YubiKeyAccountQuery()
-
-    /// The credential id, as the YubiKey stores it, e.g. "GitHub:alice@example.com".
-    let id: String
-    let issuer: String?
-    let accountName: String
-
-    var displayRepresentation: DisplayRepresentation {
-        if let issuer {
-            DisplayRepresentation(title: "\(issuer)", subtitle: "\(accountName)")
-        } else {
-            DisplayRepresentation(title: "\(accountName)")
-        }
-    }
-}
-
-struct YubiKeyAccountQuery: EntityQuery {
-    @MainActor func entities(for identifiers: [String]) async throws -> [YubiKeyAccountEntity] {
-        try await YubiKeyAccess.accounts().filter { identifiers.contains($0.id) }
-    }
-
-    @MainActor func suggestedEntities() async throws -> [YubiKeyAccountEntity] {
-        try await YubiKeyAccess.accounts()
-    }
-}
-
 /// Reads the plugged-in YubiKey for Shortcuts, connecting to it if the app isn't already.
 @MainActor enum YubiKeyAccess {
 
@@ -111,10 +49,10 @@ struct YubiKeyAccountQuery: EntityQuery {
         }
     }
 
-    static func accounts() async throws -> [YubiKeyAccountEntity] {
+    static func accounts() async throws -> [AccountEntity] {
         try await withSession { session in
             try await session.calculateAll().map { credential, _ in
-                YubiKeyAccountEntity(id: credential.id, issuer: credential.issuer, accountName: credential.accountName)
+                AccountEntity(id: credential.id, issuer: credential.issuer, accountName: credential.accountName)
             }
         }
     }

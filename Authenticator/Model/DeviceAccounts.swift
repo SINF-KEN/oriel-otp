@@ -144,6 +144,12 @@ enum DeviceAccountsError: Error, LocalizedError {
         try? edit(id) { $0.isPinned = isPinned }
     }
 
+    /// In the format Ente Auth keeps them, so they go along when the account moves there.
+    func setTags(_ id: String, _ tags: [String]) throws {
+        guard let code = code(of: id), code.tags != EnteEntry.cleaned(tags) else { return }
+        try edit(id) { $0.tags = tags }
+    }
+
     func delete(_ id: String) throws {
         try update { $0.removeAll { $0.id == id } }
     }

@@ -107,12 +107,15 @@ struct MenuBarAccountsView: View {
         .padding(6)
         .textScaledFrame(width: 300)
         .onAppear {
+            // Counting down also while the main window is covered and its countdowns are paused.
+            model.setCountdownsVisible(true, in: .menuBar)
             guard !mainWindow.isVisible, !model.isStarted else { return }
             startedModel = true
             ConnectionManager.shared.resumeWiredConnections()
             model.start()
         }
         .onDisappear {
+            model.setCountdownsVisible(false, in: .menuBar)
             guard startedModel, !mainWindow.isVisible else { return }
             startedModel = false
             model.stop()
@@ -159,7 +162,7 @@ private struct MenuBarAccountRow: View {
                     Image(systemName: "hand.tap")
                         .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
                 } else {
-                    Text(account.formattedCode ?? "*** ***")
+                    Text(account.displayedCode ?? "*** ***")
                         .scaledFont(.body) { $0.monospacedDigit().bold() }
                         .privacySensitive()
                 }

@@ -28,11 +28,17 @@ import YubiKit
     }
     /// The accounts in the Ente Auth vault on this device, whose codes the app calculates.
     private(set) var cloudAccounts: [Account] = [] {
-        didSet { sortAccounts() }
+        didSet {
+            sortAccounts()
+            spotlight?.update()
+        }
     }
     /// The accounts kept only on this device, whose codes the app calculates.
     private(set) var deviceAccounts: [Account] = [] {
-        didSet { sortAccounts() }
+        didSet {
+            sortAccounts()
+            spotlight?.update()
+        }
     }
     /// The accounts of all three, by name. Kept rather than calculated, as the list reads it several times each time
     /// it's drawn and the countdown every second.
@@ -53,6 +59,14 @@ import YubiKit
     var showTouchToast: Bool = false
 
     @ObservationIgnored private var tickTask: Task<Void, Never>?
+    /// What shows the countdowns and can be seen now. The main window counts as seen until it says otherwise.
+    @ObservationIgnored private var countdownViewers: Set<CountdownViewer> = [.mainWindow]
+
+    /// What shows the countdowns of the codes.
+    enum CountdownViewer {
+        case mainWindow
+        case menuBar
+    }
 
     @ObservationIgnored var accessKeyMemoryCache = AccessKeyCache()
     let accessKeySecureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: "OATH"))
@@ -70,6 +84,9 @@ import YubiKit
     
     @ObservationIgnored private var favoritesStorage = FavoritesStorage()
     @ObservationIgnored private var favorites: Set<String> = []
+    @ObservationIgnored private let tagsStorage = AccountTagsStorage()
+    /// The tags of YubiKey accounts by credential id, nil while they can't be read.
+    @ObservationIgnored private var keyTags: [String: [String]]?
 
     @ObservationIgnored private var refreshRequestCount = 0
 
@@ -84,11 +101,16 @@ import YubiKit
     /// Whether a YubiKey was ever read here. Until then the app doesn't ask for one next to the accounts it has.
     private(set) var hasReadYubiKey = UserDefaults.standard.bool(forKey: MainViewModel.hasReadYubiKeyKey)
 
-    init(cloud: EnteCloud = .shared, device: DeviceAccounts = .shared) {
+    /// Nil in the tests, which mustn't change what Spotlight has of the app.
+    @ObservationIgnored private let spotlight: AccountSpotlight?
+
+    init(cloud: EnteCloud = .shared, device: DeviceAccounts = .shared, spotlight: AccountSpotlight? = nil) {
         self.cloud = cloud
         self.device = device
+        self.spotlight = spotlight
         favoritesStorage.migrate()
         self.favorites = favoritesStorage.readFavorites()
+        self.keyTags = tagsStorage.read()
         cloud.onChange = { [weak self] in self?.updateCloudAccounts() }
         device.onChange = { [weak self] in self?.updateDeviceAccounts() }
         updateCloudAccounts()
@@ -97,6 +119,57 @@ import YubiKit
 
     private func sortAccounts() {
         accounts = (keyAccounts + cloudAccounts + deviceAccounts).sorted()
+        let tags = Self.tags(of: accounts)
+        if tags != allTags {
+            allTags = tags
+        }
+    }
+
+    // MARK: - Tags
+
+    /// The tags of all accounts, by name.
+    private(set) var allTags: [String] = []
+
+    /// The tags in the order the list shows them: by name, the same tag in another case only once.
+    static func tags(of accounts: [Account]) -> [String] {
+        EnteEntry.cleaned(accounts.flatMap(\.tags)).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+    }
+
+    /// Files the account under the tags, in Ente Auth for its accounts, like Ente Auth does.
+    func setTags(_ tags: [String], of account: Account) {
+        let tags = EnteEntry.cleaned(tags)
+        guard tags != account.tags else { return }
+        switch account.location {
+        case .ente(let id):
+            cloud.setTags(id, tags)
+        case .device(let id):
+            do {
+                try device.setTags(id, tags)
+            } catch {
+                sessionError = error
+                return
+            }
+        case .yubiKey:
+            do {
+                try saveKeyTags(tags, for: account.credential.id)
+            } catch {
+                sessionError = error
+                return
+            }
+        }
+        account.tags = tags
+        sortAccounts()
+    }
+
+    /// Keeps the tags of an account on a YubiKey, or forgets them when there are none.
+    private func saveKeyTags(_ tags: [String], for credentialId: String, movingFrom oldId: String? = nil) throws {
+        guard var all = keyTags ?? tagsStorage.read() else { throw DeviceAccountsError.unavailable }
+        if let oldId {
+            all[oldId] = nil
+        }
+        all[credentialId] = tags.isEmpty ? nil : tags
+        try tagsStorage.save(all)
+        keyTags = all
     }
 
     /// Whether there are accounts to list, from a YubiKey, Ente Auth or this device.
@@ -122,6 +195,7 @@ import YubiKit
                 if account.isPinned != entry.code.isPinned {
                     account.isPinned = entry.code.isPinned
                 }
+                Self.updateDisplay(of: account, from: entry.code)
                 return account
             }
             return cloudAccount(id: entry.id, code: entry.code, isPending: entry.isPending)
@@ -144,9 +218,21 @@ import YubiKit
 
     private func calculatedAccount(credential: OATHSession.Credential, otp: (code: String, validity: DateInterval)?, code: EnteCloudCode,
                                    location: Account.Location) -> Account {
-        Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
-                keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
-                connectionType: .wired, isPinned: code.isPinned, location: location)
+        let account = Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
+                              keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
+                              connectionType: .wired, isPinned: code.isPinned, location: location)
+        Self.updateDisplay(of: account, from: code)
+        return account
+    }
+
+    /// The tags and icon, which can change without the account being made again.
+    private static func updateDisplay(of account: Account, from code: EnteCloudCode) {
+        if account.tags != code.tags {
+            account.tags = code.tags
+        }
+        if account.iconID != code.iconID {
+            account.iconID = code.iconID
+        }
     }
 
     /// Calculates the code of an account in Ente Auth or on this device.
@@ -203,6 +289,7 @@ import YubiKit
                 if account.isPinned != entry.code.isPinned {
                     account.isPinned = entry.code.isPinned
                 }
+                Self.updateDisplay(of: account, from: entry.code)
                 return account
             }
             return deviceAccount(id: entry.id, code: entry.code)
@@ -277,9 +364,20 @@ import YubiKit
         addAccounts([template], requiresTouch: false) { [weak self] result in
             if let error = result.error {
                 self?.sessionError = error.isOATHStorageFull ? OATHSessionError.storageFull(notAdded: [template.displayName]) : error
+                return
             } else if result.added.isEmpty {
                 completion(.alreadyOnYubiKey)
-            } else if moving {
+                return
+            }
+            // The copy on the YubiKey is filed under the same tags.
+            if !account.tags.isEmpty {
+                let id = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
+                                              period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
+                try? self?.saveKeyTags(account.tags, for: id)
+                self?.keyAccounts.first { $0.credential.id == id }?.tags = account.tags
+                self?.sortAccounts()
+            }
+            if moving {
                 self?.removeAfterMove(account)
                 completion(.moved)
             } else {
@@ -361,14 +459,7 @@ import YubiKit
         device.loadIfLocked()
         refreshCalculatedCodes()
 
-        tickTask = Task { [weak self] in
-            while !Task.isCancelled {
-                for account in self?.accounts ?? [] {
-                    account.updateState()
-                }
-                try? await Task.sleep(for: .seconds(1))
-            }
-        }
+        startTicking()
 
         sessionTask = Task { [weak self] in
             do {
@@ -399,6 +490,36 @@ import YubiKit
                 } else {
                     self?.connectionError = error
                 }
+            }
+        }
+    }
+
+    /// Whether a viewer of the countdowns can be seen. While none can, e.g. when the window is covered by others or on
+    /// another Space, the countdowns aren't updated every second, which saves energy. They catch up as soon as one can be
+    /// seen again. The codes are still renewed as they expire, each on its own timer.
+    func setCountdownsVisible(_ isVisible: Bool, in viewer: CountdownViewer) {
+        let wasTicking = !countdownViewers.isEmpty
+        if isVisible {
+            countdownViewers.insert(viewer)
+        } else {
+            countdownViewers.remove(viewer)
+        }
+        guard isStarted, wasTicking == countdownViewers.isEmpty else { return }
+        startTicking()
+    }
+
+    /// Updates the countdowns now and then every second, while a viewer can see them.
+    private func startTicking() {
+        tickTask?.cancel()
+        tickTask = nil
+        guard !countdownViewers.isEmpty else { return }
+        tickTask = Task { [weak self] in
+            while !Task.isCancelled {
+                for account in self?.accounts ?? [] {
+                    account.updateState()
+                }
+                // The tolerance lets the system wake the app together with other work. Too little to see in the countdown.
+                try? await Task.sleep(for: .seconds(1), tolerance: .milliseconds(50))
             }
         }
     }
@@ -485,6 +606,9 @@ import YubiKit
             
             // They can't be read if the app was started while the device was locked.
             favorites = favoritesStorage.readFavorites()
+            if let tags = tagsStorage.read() {
+                keyTags = tags
+            }
             let credentials = try await useSession.calculateAll()
             let updatedAccounts = try await credentials.asyncMap { (credential, otp)  in
                 if credential.type == .totp && (
@@ -525,11 +649,16 @@ import YubiKit
     }
     
     private func account(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, connectionType: OATHSession.ConnectionType) -> Account {
+        let tags = keyTags?[credential.id] ?? []
         if let account = (keyAccounts.filter { $0.credential.id == credential.id }).first {
             account.update(otp: code)
+            if account.tags != tags {
+                account.tags = tags
+            }
             return account
         } else {
             let account = Account(credential: credential, code: code, keyVersion: keyVersion, requestRefresh: { [weak self] in self?.requestRefresh($0) }, connectionType: connectionType, isPinned: favorites.contains(credential.id))
+            account.tags = tags
             return account
         }
     }
@@ -600,7 +729,12 @@ import YubiKit
             do {
                 let wasPinned = account.isPinned
                 let session = try await OATHSessionHandler.shared.anySession()
+                let oldId = account.credential.id
                 let credential = try await session.renameCredential(account.credential, issuer: issuer, accountName: accountName)
+                // The tags are kept by the account's id, which the new name changes.
+                if !account.tags.isEmpty {
+                    try? saveKeyTags(account.tags, for: credential.id, movingFrom: oldId)
+                }
                 if wasPinned {
                     account.isPinned = false
                 }
@@ -638,6 +772,9 @@ import YubiKit
                 let session = try await OATHSessionHandler.shared.anySession()
                 try await session.deleteCredential(account.credential)
                 keyAccounts.removeAll { $0.accountId == account.accountId }
+                if !account.tags.isEmpty {
+                    try? saveKeyTags([], for: account.credential.id)
+                }
                 session.endNFC(message: String(localized: "Account deleted", comment: "OATH NFC account deleted"))
                 completion()
             } catch {

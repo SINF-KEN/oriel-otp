@@ -87,6 +87,7 @@ private struct GeneralSettingsView: View {
                 Toggle(String(localized: "Open at login", comment: "Mac setting"), isOn: $opensAtLogin)
             }
             AppLockSection()
+            PrivacySection()
             AutoFillSection()
             EnteAccountSection()
         }

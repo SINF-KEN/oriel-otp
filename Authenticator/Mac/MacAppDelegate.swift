@@ -79,6 +79,11 @@ extension QuickAction {
     func perform() {
         NSWorkspace.shared.open(url)
     }
+
+    /// Brings up the main window, also when it was closed, e.g. to show an account opened from Spotlight.
+    static func openMainWindow() {
+        NSWorkspace.shared.open(URL(string: "orielotp://open")!)
+    }
 }
 
 #endif

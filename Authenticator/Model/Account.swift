@@ -52,6 +52,16 @@ import YubiKit
         didSet { onPinnedChange?(self) }
     }
     var requiresTouch: Bool
+    /// The tags the account is filed under, in the order they were added.
+    var tags: [String] = []
+    /// The icon chosen for an Ente Auth account in Ente Auth, by name.
+    var iconID: String? {
+        didSet {
+            if iconID != oldValue { updateServiceIcon() }
+        }
+    }
+    /// The brand's icon, nil to show the first letter of the name.
+    private(set) var serviceIcon: ServiceIcon?
     
     /// Called every time `isPinned` is set.
     @ObservationIgnored var onPinnedChange: ((Account) -> Void)?
@@ -99,6 +109,14 @@ import YubiKit
         self.connectionType = connectionType
         self.requestRefresh = requestRefresh
         self.update(otp: code)
+        updateServiceIcon()
+    }
+
+    private func updateServiceIcon() {
+        let icon = ServiceIcon.icon(issuer: credential.issuer, accountName: credential.accountName, iconID: iconID)
+        if icon != serviceIcon {
+            serviceIcon = icon
+        }
     }
     
     private func updateCodeStatus() {
@@ -138,6 +156,7 @@ import YubiKit
     func updateTitles() {
         title = credential.title
         subTitle = credential.subTitle
+        updateServiceIcon()
     }
     
     func update(otp: OATHSession.OTP?) {
