@@ -198,6 +198,12 @@ nonisolated struct EnteEntryEditor {
         set { display["trashed"] = newValue }
     }
 
+    /// The tags, like Ente Auth keeps them: a list of names.
+    var tags: [String] {
+        get { EnteEntry.cleaned(display["tags"] as? [String] ?? []) }
+        set { display["tags"] = EnteEntry.cleaned(newValue) }
+    }
+
     /// The counter of a HOTP account.
     var counter: UInt64? {
         get { Self.value(of: "counter", in: components).flatMap { UInt64($0) } }
@@ -257,6 +263,9 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
     /// The counter of the next HOTP code.
     let counter: UInt64
     let isPinned: Bool
+    let tags: [String]
+    /// The icon chosen in Ente Auth, nil to use the issuer's.
+    let iconID: String?
 
     /// Returns nil for accounts in Ente's trash and data that can't be read or used.
     init?(rawData: String) {
@@ -277,17 +286,18 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
             guard (1...10).contains(digits) else { return nil }
             let (issuer, accountName) = OTPAuthURLParser.label(of: components)
             self.init(issuer: issuer, accountName: accountName, kind: .hotp, secret: secret, algorithm: algorithm, digits: digits,
-                      period: 0, counter: items["counter"].flatMap { UInt64($0) } ?? 0, isPinned: entry.isPinned)
+                      period: 0, counter: items["counter"].flatMap { UInt64($0) } ?? 0, isPinned: entry.isPinned, tags: entry.tags,
+                      iconID: entry.iconID)
         } else {
             guard let account = OTPAuthURLParser.account(id: "", components: components, isPinned: entry.isPinned) else { return nil }
             self.init(issuer: account.issuer, accountName: account.accountName, kind: account.kind == .steam ? .steam : .totp,
                       secret: account.secret, algorithm: account.algorithm, digits: account.digits, period: account.period,
-                      counter: 0, isPinned: account.isPinned)
+                      counter: 0, isPinned: account.isPinned, tags: entry.tags, iconID: entry.iconID)
         }
     }
 
     private init(issuer: String?, accountName: String, kind: Kind, secret: Data, algorithm: OTPAccount.Algorithm, digits: Int,
-                 period: Int, counter: UInt64, isPinned: Bool) {
+                 period: Int, counter: UInt64, isPinned: Bool, tags: [String], iconID: String?) {
         self.issuer = issuer
         self.accountName = accountName
         self.kind = kind
@@ -297,9 +307,12 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
         self.period = period
         self.counter = counter
         self.isPinned = isPinned
+        self.tags = tags
+        self.iconID = iconID
     }
 
-    /// Whether both are the same account, ignoring the pin and the HOTP counter.
+    /// Whether both are the same account, ignoring the pin, the tags, the icon and the HOTP counter, which an account
+    /// in the list follows without being made again.
     func isSameAccount(as other: EnteCloudCode) -> Bool {
         (issuer, accountName, kind) == (other.issuer, other.accountName, other.kind)
             && (secret, algorithm, digits, period) == (other.secret, other.algorithm, other.digits, other.period)

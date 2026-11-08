@@ -47,6 +47,8 @@ enum QuickAction: String {
 @MainActor @Observable final class QuickActionCenter {
     static let shared = QuickActionCenter()
     var pending: QuickAction?
+    /// The account to show, e.g. one opened from Spotlight, by `Account.accountId`.
+    var pendingAccountID: String?
 }
 
 #if os(iOS)
@@ -118,18 +120,4 @@ struct AddAccountIntent: AppIntent {
     }
 }
 
-struct OrielOTPShortcuts: AppShortcutsProvider {
-    static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: ScanNFCYubiKeyIntent(),
-                    phrases: ["Scan a YubiKey with \(.applicationName)",
-                              "Show my codes in \(.applicationName)"],
-                    shortTitle: "Scan NFC YubiKey",
-                    systemImageName: "wave.3.right")
-        AppShortcut(intent: AddAccountIntent(),
-                    phrases: ["Add an account to \(.applicationName)",
-                              "Add a YubiKey account with \(.applicationName)"],
-                    shortTitle: "Add Account",
-                    systemImageName: "plus")
-    }
-}
 #endif

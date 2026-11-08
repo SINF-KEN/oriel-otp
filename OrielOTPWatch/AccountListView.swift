@@ -76,7 +76,9 @@ private struct AccountRow: View {
                         : AnyLayout(HStackLayout(alignment: .center, spacing: 6))
                     layout {
                         Text(verbatim: OTPGenerator.grouped(code))
-                            .font(.system(.title2, design: .monospaced, weight: .semibold))
+                            .font(.system(.title2, weight: .semibold))
+                            // Tabular digits keep the code from shifting as it changes, without a monospaced typeface.
+                            .monospacedDigit()
                             .lineLimit(1)
                             .minimumScaleFactor(0.5)
                             .frame(maxWidth: .infinity, alignment: .leading)
