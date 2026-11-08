@@ -4173,31 +4173,60 @@
         }
       }
     },
-    "Copies the code of an account to the clipboard. On a Mac, accounts on a YubiKey work while it's plugged in." : {
+    "Copies the code of an account to the clipboard." : {
       "comment" : "Shortcuts action description",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kopiert den Code eines Kontos in die Zwischenablage. Auf einem Mac funktionieren Konten auf einem YubiKey, solange er angeschlossen ist."
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Copie le code d’un compte dans le presse-papiers. Sur un Mac, les comptes d’une YubiKey fonctionnent tant qu’elle est branchée."
+            "value" : "Copie le code d’un compte dans le presse-papiers."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "アカウントのコードをクリップボードにコピーします。Macでは、YubiKeyが接続されている間はYubiKey上のアカウントも使用できます。"
+            "value" : "アカウントのコードをクリップボードにコピーします。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Skopíruje kód účtu do schránky. Na Macu fungujú účty na YubiKey, kým je pripojený."
+            "value" : "Skopíruje kód účtu do schránky."
+          }
+        }
+      }
+    },
+    "Copies the code of an account to the clipboard. Accounts on a YubiKey work while it's plugged in." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage. Konten auf einem YubiKey funktionieren, solange er angeschlossen ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie le code d’un compte dans le presse-papiers. Les comptes d’une YubiKey fonctionnent tant qu’elle est branchée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントのコードをクリップボードにコピーします。YubiKeyが接続されている間はYubiKey上のアカウントも使用できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopíruje kód účtu do schránky. Účty na YubiKey fungujú, kým je pripojený."
           }
         }
       }
