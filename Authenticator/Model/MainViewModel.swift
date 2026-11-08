@@ -53,6 +53,14 @@ import YubiKit
     var showTouchToast: Bool = false
 
     @ObservationIgnored private var tickTask: Task<Void, Never>?
+    /// What shows the countdowns and can be seen now. The main window counts as seen until it says otherwise.
+    @ObservationIgnored private var countdownViewers: Set<CountdownViewer> = [.mainWindow]
+
+    /// What shows the countdowns of the codes.
+    enum CountdownViewer {
+        case mainWindow
+        case menuBar
+    }
 
     @ObservationIgnored var accessKeyMemoryCache = AccessKeyCache()
     let accessKeySecureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: "OATH"))
@@ -361,14 +369,7 @@ import YubiKit
         device.loadIfLocked()
         refreshCalculatedCodes()
 
-        tickTask = Task { [weak self] in
-            while !Task.isCancelled {
-                for account in self?.accounts ?? [] {
-                    account.updateState()
-                }
-                try? await Task.sleep(for: .seconds(1))
-            }
-        }
+        startTicking()
 
         sessionTask = Task { [weak self] in
             do {
@@ -399,6 +400,36 @@ import YubiKit
                 } else {
                     self?.connectionError = error
                 }
+            }
+        }
+    }
+
+    /// Whether a viewer of the countdowns can be seen. While none can, e.g. when the window is covered by others or on
+    /// another Space, the countdowns aren't updated every second, which saves energy. They catch up as soon as one can be
+    /// seen again. The codes are still renewed as they expire, each on its own timer.
+    func setCountdownsVisible(_ isVisible: Bool, in viewer: CountdownViewer) {
+        let wasTicking = !countdownViewers.isEmpty
+        if isVisible {
+            countdownViewers.insert(viewer)
+        } else {
+            countdownViewers.remove(viewer)
+        }
+        guard isStarted, wasTicking == countdownViewers.isEmpty else { return }
+        startTicking()
+    }
+
+    /// Updates the countdowns now and then every second, while a viewer can see them.
+    private func startTicking() {
+        tickTask?.cancel()
+        tickTask = nil
+        guard !countdownViewers.isEmpty else { return }
+        tickTask = Task { [weak self] in
+            while !Task.isCancelled {
+                for account in self?.accounts ?? [] {
+                    account.updateState()
+                }
+                // The tolerance lets the system wake the app together with other work. Too little to see in the countdown.
+                try? await Task.sleep(for: .seconds(1), tolerance: .milliseconds(50))
             }
         }
     }

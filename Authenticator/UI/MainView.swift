@@ -40,6 +40,8 @@ struct MainView: View {
     @State var singleColumnPath: [String] = []
     /// The layout kept while the window is being resized, true for the single column. See `mainLayout`.
     @State private var layoutDuringResize: Bool?
+    /// Whether the window is wide enough for the list and the details beside each other.
+    @State private var fitsTwoColumns = true
     /// For the arrow keys, which only reach the list while it has the focus.
     @FocusState private var isListFocused: Bool
     #else
@@ -257,23 +259,28 @@ struct MainView: View {
     ///
     /// The layout only changes once a resize ends. Replacing the list during one crashes the app: AppKit ends the
     /// table's live resize as it's removed, which adds rows to a table SwiftUI is already destroying.
+    ///
+    /// Only whether the columns fit is read here, so the window's content is drawn again when that changes rather than
+    /// at every step of a resize. The width the account column can take is read by `SidebarColumnWidth`.
     private var mainLayout: some View {
-        GeometryReader { reader in
-            let minimumWidth = Self.minimumColumnWidth * textScale
-            let isSingleColumn = layoutDuringResize ?? (reader.size.width < 2 * minimumWidth)
-            ZStack {
-                LiveResizeObserver { isResizing in
-                    layoutDuringResize = isResizing ? isSingleColumn : nil
-                }
-                if isSingleColumn {
-                    singleColumnView
-                } else {
-                    // The window can be too narrow for two columns during a resize. They share it until it ends.
-                    let sidebarMinimum = min(minimumWidth, reader.size.width / 2)
-                    splitView(sidebarWidth: sidebarMinimum...(reader.size.width - sidebarMinimum))
-                }
+        let minimumWidth = Self.minimumColumnWidth * textScale
+        let isSingleColumn = layoutDuringResize ?? !fitsTwoColumns
+        return ZStack {
+            LiveResizeObserver { isResizing in
+                layoutDuringResize = isResizing ? isSingleColumn : nil
+            }
+            if isSingleColumn {
+                singleColumnView
+            } else {
+                splitView
             }
         }
+        .onGeometryChange(for: Bool.self) { geometry in
+            geometry.size.width >= 2 * minimumWidth
+        } action: { fitsTwoColumns in
+            self.fitsTwoColumns = fitsTwoColumns
+        }
+        .providesContainerSize()
     }
 
     private var singleColumnView: some View {
@@ -332,15 +339,13 @@ struct MainView: View {
         }
     }
 
-    private func splitView(sidebarWidth: ClosedRange<CGFloat>) -> some View {
+    private var splitView: some View {
         NavigationSplitView {
             accountColumn()
                 .searchable(text: $searchText, placement: .sidebar, prompt: String(localized: "Search"))
                 .searchFocusedBinding($isSearchFocused)
                 .autocorrectionDisabled(true)
-                .navigationSplitViewColumnWidth(min: sidebarWidth.lowerBound,
-                                                ideal: min(360 * textScale, sidebarWidth.upperBound),
-                                                max: sidebarWidth.upperBound)
+                .modifier(SidebarColumnWidth(minimumColumnWidth: Self.minimumColumnWidth))
         } detail: {
             detailColumn
         }
@@ -551,6 +556,13 @@ struct MainView: View {
         // The Mac has no app switcher snapshots, and codes are read from the window while another app is in front.
         .redacted(reason: scenePhase == .active ? [] : .privacy)
         #else
+        // The countdowns pause while the window is covered by others or on another Space, and catch up when it's seen.
+        .background {
+            WindowOcclusionObserver { isVisible in
+                model.setCountdownsVisible(isVisible, in: .mainWindow)
+            }
+            .accessibilityHidden(true)
+        }
         // The lock screen only covers the window, the menu bar's commands would still copy codes and delete accounts.
         .focusedSceneValue(\.mainWindowMenuState, AppLock.shared.isLocked ? nil : menuState)
         .onChange(of: commands.pending) { _, command in
@@ -570,7 +582,7 @@ struct MainView: View {
     }
 
     private var accountList: some View {
-    GeometryReader { reader in
+    Group {
         #if os(macOS)
         let selection = $selectedAccountIDs
         #else
@@ -583,7 +595,7 @@ struct MainView: View {
                 }
             }
             if !model.hasAccounts {
-                ListStatusView(image: Image(systemName: "person.crop.circle.badge.plus"), message: String(localized: "No accounts yet", comment: "Account list without accounts"), height: reader.size.height) {
+                ListStatusView(image: Image(systemName: "person.crop.circle.badge.plus"), message: String(localized: "No accounts yet", comment: "Account list without accounts")) {
                     addAccountButton
                     enteSyncButton
                     // The accounts of a YubiKey join the list once it has been read.
@@ -599,8 +611,7 @@ struct MainView: View {
                     }
                 } else {
                     ListStatusView(image: Image(systemName: "person.crop.circle.badge.questionmark"),
-                                   message: model.cloudAccounts.isEmpty && model.deviceAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"),
-                                   height: reader.size.height)
+                                   message: model.cloudAccounts.isEmpty && model.deviceAccounts.isEmpty ? String(localized: "No matching accounts on YubiKey") : String(localized: "No matching accounts", comment: "Search without results when Ente Auth accounts are listed too"))
                 }
             } else if model.pinnedAccounts.count > 0 {
                 Section("Pinned") {
@@ -626,7 +637,7 @@ struct MainView: View {
                     accountRow(account)
                 }
             } else {
-                ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey"), height: reader.size.height) {
+                ListStatusView(image: Image(systemName: "person.crop.circle"), message: String(localized: "No accounts on YubiKey")) {
                     addAccountButton
                     enteSyncButton
                 }
@@ -648,6 +659,8 @@ struct MainView: View {
         .background { ListScrollerInset(hasSectionHeader: showsSectionHeader) }
         #endif
     }
+    // For the status views' height. Only they are drawn again as it changes, not the rows.
+    .providesContainerSize()
     }
 
     #if os(macOS)

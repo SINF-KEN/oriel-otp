@@ -107,12 +107,15 @@ struct MenuBarAccountsView: View {
         .padding(6)
         .textScaledFrame(width: 300)
         .onAppear {
+            // Counting down also while the main window is covered and its countdowns are paused.
+            model.setCountdownsVisible(true, in: .menuBar)
             guard !mainWindow.isVisible, !model.isStarted else { return }
             startedModel = true
             ConnectionManager.shared.resumeWiredConnections()
             model.start()
         }
         .onDisappear {
+            model.setCountdownsVisible(false, in: .menuBar)
             guard startedModel, !mainWindow.isVisible else { return }
             startedModel = false
             model.stop()
