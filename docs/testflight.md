@@ -20,9 +20,31 @@ keychain for the run. At upload, Xcode re-signs it for the App Store with a clou
 the private key stays with Apple and isn't in the repository's secrets. The API key lets Xcode create and download
 the App Store provisioning profiles, including the Mac one the keychain access group needs.
 
+The credentials are on the runner for as short a time as the steps allow:
+
+- The packages are cloned for each upload instead of restored from the cache other workflow runs write, and checked
+  against their pinned commits (see [ci.md](ci.md)), before any secret is on the runner.
+- The keychain is created after that, and locked as soon as the archive step ends. It's deleted right after the
+  upload, before the logs are uploaded.
+- The API key is written to `AuthKey.p8` at the start of the archive and upload steps and removed when each ends.
+- Every action is pinned to a commit.
+
+The packages are built during the archive, while the keychain is unlocked: that can't be avoided, as Xcode signs
+the app at the end of the same build. `security import` only takes the certificate's password as an argument, so it
+shows in the process list while the import runs; the runner is a fresh virtual machine used for this job only.
+
 ## Secrets
 
-Add these as repository secrets (Settings → Secrets and variables → Actions):
+The upload job runs in the `testflight` environment. Set it up once (Settings → Environments → New environment):
+
+1. Name it `testflight`.
+2. Under *Deployment branches and tags*, choose *Selected branches and tags* and add `main`, so only main's runs
+   (including a manual run of main) can read its secrets.
+3. Add the five secrets below as environment secrets, then delete the repository secrets of the same names
+   (Settings → Secrets and variables → Actions), so no other workflow or branch can read them.
+
+Until the environment exists, GitHub creates it without protection on the first run, and the job keeps reading the
+repository secrets.
 
 | Secret | Value |
 | --- | --- |
@@ -32,10 +54,14 @@ Add these as repository secrets (Settings → Secrets and variables → Actions)
 | `DEVELOPMENT_CERTIFICATE_P12` | An Apple Development certificate and its private key, exported as `.p12` and base64 encoded: `base64 -i development.p12 \| pbcopy`. |
 | `DEVELOPMENT_CERTIFICATE_PASSWORD` | The password chosen when exporting the `.p12`. |
 
-The API key needs the **Admin** role, or **App Manager** with *Access to Cloud Managed Distribution Certificate*:
-cloud signing isn't available to other roles. To export the certificate, open Keychain Access, select the
-"Apple Development" certificate for team `XW69FY82W3` under My Certificates (so the private key comes with it), and
-choose File → Export Items.
+Use an **App Manager** key with *Access to Cloud Managed Distribution Certificate*, not an Admin key: that's all
+the workflow needs, and an Admin key can also manage users and every app. Cloud signing isn't available to roles
+below App Manager. To switch, create the new key (App Store Connect → Users and Access → Integrations → App Store
+Connect API → Team Keys), update the three `APP_STORE_CONNECT_*` secrets, run the workflow by hand once, then
+revoke the old key.
+
+To export the certificate, open Keychain Access, select the "Apple Development" certificate for team `XW69FY82W3`
+under My Certificates (so the private key comes with it), and choose File → Export Items.
 
 ## If an upload fails
 

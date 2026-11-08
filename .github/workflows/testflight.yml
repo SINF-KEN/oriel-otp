@@ -58,6 +58,9 @@ jobs:
     name: upload (${{ matrix.platform }})
     needs: changes
     if: needs.changes.outputs.code == 'true'
+    # The signing and App Store Connect secrets belong to this environment, which only main can use. See
+    # docs/testflight.md.
+    environment: testflight
     runs-on: xcode-27
     timeout-minutes: 60
     strategy:
@@ -81,25 +84,28 @@ jobs:
       # Archiving signs for development, with the team's Apple Development certificate. Without one on the runner,
       # Xcode would create a new certificate on every run. Distribution signing happens at upload, with a certificate
       # Apple keeps in the cloud, so the distribution certificate never leaves Apple.
+      #
+      # The certificate is installed only now, after the packages are resolved, and its keychain is locked as soon as
+      # the archive is signed. security import only takes the password as an argument (-P); it's visible to other
+      # processes on this single-use runner only while the import runs.
       - name: Install signing credentials
         env:
           CERTIFICATE_P12: ${{ secrets.DEVELOPMENT_CERTIFICATE_P12 }}
           CERTIFICATE_PASSWORD: ${{ secrets.DEVELOPMENT_CERTIFICATE_PASSWORD }}
-          API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
           set -euo pipefail
+          umask 077
           keychain="$RUNNER_TEMP/signing.keychain-db"
           password=$(uuidgen)
           security create-keychain -p "$password" "$keychain"
           security set-keychain-settings -lut 3600 "$keychain"
           security unlock-keychain -p "$password" "$keychain"
+          trap 'rm -f "$RUNNER_TEMP/development.p12"' EXIT
           base64 --decode <<< "$CERTIFICATE_P12" > "$RUNNER_TEMP/development.p12"
           security import "$RUNNER_TEMP/development.p12" -k "$keychain" -P "$CERTIFICATE_PASSWORD" \
             -T /usr/bin/codesign -T /usr/bin/security
-          rm "$RUNNER_TEMP/development.p12"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$password" "$keychain" >/dev/null
           security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
-          printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8"
 
       # Fetching the provisioning profiles sometimes fails on Apple's side ("The network connection was lost", "The
       # data couldn't be read because it isn't in the correct format"), which Xcode then reports as "No profiles for
@@ -107,13 +113,18 @@ jobs:
       #
       # The project's Release setting doesn't reach the Swift packages, which build with -O unless it's set here. -Osize
       # makes the iPhone app's binary about 1.2 MB smaller, and only makes signing in to Ente a little slower.
+      #
+      # The App Store Connect key is written only for the steps that use it and removed when each ends.
       - name: Archive
         timeout-minutes: 30
         env:
+          API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
           set -euo pipefail
+          trap 'rm -f "$RUNNER_TEMP/AuthKey.p8"; security lock-keychain "$RUNNER_TEMP/signing.keychain-db" || true' EXIT
+          (umask 077 && printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8")
           for attempt in 1 2 3; do
             rm -rf "$RUNNER_TEMP/OrielOTP.xcarchive"
             xcodebuild archive \
@@ -149,11 +160,14 @@ jobs:
       - name: Upload to App Store Connect
         timeout-minutes: 45
         env:
+          API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           SHA: ${{ needs.changes.outputs.sha }}
         run: |
           set -euo pipefail
+          trap 'rm -f "$RUNNER_TEMP/AuthKey.p8"' EXIT
+          (umask 077 && printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8")
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -189,6 +203,13 @@ jobs:
           done
           echo "Uploaded the ${{ matrix.platform }} build of ${SHA::7} to App Store Connect." >> "$GITHUB_STEP_SUMMARY"
 
+      # Before any other action runs.
+      - name: Remove signing credentials
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/AuthKey.p8"
+
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -198,9 +219,3 @@ jobs:
             ${{ runner.temp }}/archive.log
             ${{ runner.temp }}/upload.log
           if-no-files-found: ignore
-
-      - name: Remove signing credentials
-        if: always()
-        run: |
-          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
-          rm -f "$RUNNER_TEMP/AuthKey.p8"
