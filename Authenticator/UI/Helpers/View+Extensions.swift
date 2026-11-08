@@ -540,3 +540,30 @@ extension View {
         #endif
     }
 }
+
+extension EnvironmentValues {
+    /// The size of the nearest container that provides it, zero until it has been laid out. See `providesContainerSize()`.
+    @Entry var containerSize: CGSize = .zero
+}
+
+extension View {
+    /// Gives the views inside this one its size, in `containerSize`. Only the views that read it are drawn again as the
+    /// size changes, rather than everything inside, as with a `GeometryReader`.
+    func providesContainerSize() -> some View {
+        modifier(ContainerSizeProvider())
+    }
+}
+
+private struct ContainerSizeProvider: ViewModifier {
+    @State private var size = CGSize.zero
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.containerSize, size)
+            .onGeometryChange(for: CGSize.self) { geometry in
+                geometry.size
+            } action: { size in
+                self.size = size
+            }
+    }
+}

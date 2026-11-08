@@ -21,12 +21,13 @@ struct ListStatusView<Actions: View>: View {
     
     let image: Image
     let message: String
-    let height: CGFloat
     /// The image is a colored drawing rather than a symbol, which is sized by the font.
     var isArtwork = false
     /// Buttons for what to do next, shown below the message.
     @ViewBuilder let actions: Actions
     @State var showWhatsNew = false
+    /// The list's height, which the view fills.
+    @Environment(\.containerSize.height) private var height
     @ScaledSize(relativeTo: .largeTitle) private var imageSize: CGFloat = 100
     
     var body: some View {
@@ -107,11 +108,12 @@ struct WhatsNewView: View {
 }
 
 #Preview {
-    ListStatusView(image: Image(systemName: "figure.surfing"), message: "Gone surfing, will be back tomorrow", height: 300)
+    ListStatusView(image: Image(systemName: "figure.surfing"), message: "Gone surfing, will be back tomorrow")
+        .environment(\.containerSize, CGSize(width: 300, height: 300))
 }
 
 extension ListStatusView where Actions == EmptyView {
-    init(image: Image, message: String, height: CGFloat) {
-        self.init(image: image, message: message, height: height) { EmptyView() }
+    init(image: Image, message: String) {
+        self.init(image: image, message: message) { EmptyView() }
     }
 }

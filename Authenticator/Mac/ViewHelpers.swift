@@ -58,6 +58,49 @@ struct LiveResizeObserver: NSViewRepresentable {
     }
 }
 
+/// Tells whether any part of the window around it can be seen. It can't while the window is covered by other windows,
+/// on another Space, minimized, or the app is hidden. Apple asks apps to stop work for windows that can't be seen.
+struct WindowOcclusionObserver: NSViewRepresentable {
+    let onChange: (_ isVisible: Bool) -> Void
+
+    func makeNSView(context: Context) -> ObserverView {
+        ObserverView()
+    }
+
+    func updateNSView(_ view: ObserverView, context: Context) {
+        view.onChange = onChange
+    }
+
+    final class ObserverView: NSView {
+        var onChange: ((Bool) -> Void)?
+        private var isVisible: Bool?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            NotificationCenter.default.removeObserver(self, name: NSWindow.didChangeOcclusionStateNotification, object: nil)
+            if let window {
+                NotificationCenter.default.addObserver(self, selector: #selector(occlusionStateDidChange),
+                                                       name: NSWindow.didChangeOcclusionStateNotification, object: window)
+            }
+            // Not while SwiftUI is adding the view to the window.
+            DispatchQueue.main.async { [weak self] in
+                self?.update()
+            }
+        }
+
+        @objc private func occlusionStateDidChange(_ notification: Notification) {
+            update()
+        }
+
+        private func update() {
+            let isVisible = window?.occlusionState.contains(.visible) ?? false
+            guard isVisible != self.isVisible else { return }
+            self.isVisible = isVisible
+            onChange?(isVisible)
+        }
+    }
+}
+
 /// Starts the scroller of the list it's behind below the section header, which stays at the top of the list while the
 /// rows go under it. `contentMargins` for the scroll indicators does nothing for a list on the Mac.
 struct ListScrollerInset: NSViewRepresentable {
@@ -174,6 +217,27 @@ struct SingleColumnSearchField: View {
         .onChange(of: focus) { _, focus in
             isFocused = focus
         }
+    }
+}
+
+/// The widths the account column can take beside the details: from the narrowest either column gets to what leaves the
+/// details that much. Reads the window's width, so only this is updated during a resize, not the column's content.
+struct SidebarColumnWidth: ViewModifier {
+    /// The narrowest the list and the details get beside each other, in points at 100% text size.
+    let minimumColumnWidth: CGFloat
+    @Environment(\.containerSize.width) private var width
+    @Environment(\.textScale) private var textScale
+
+    func body(content: Content) -> some View {
+        let minimumWidth = minimumColumnWidth * textScale
+        let idealWidth = 360 * textScale
+        // The window can be too narrow for two columns during a resize. They share it until it ends.
+        let sidebarMinimum = width > 0 ? min(minimumWidth, width / 2) : minimumWidth
+        // No maximum until the window has been laid out.
+        let sidebarMaximum: CGFloat? = width > 0 ? width - sidebarMinimum : nil
+        content.navigationSplitViewColumnWidth(min: sidebarMinimum,
+                                               ideal: sidebarMaximum.map { min(idealWidth, $0) } ?? idealWidth,
+                                               max: sidebarMaximum)
     }
 }
 
