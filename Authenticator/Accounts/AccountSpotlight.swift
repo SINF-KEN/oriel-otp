@@ -32,40 +32,60 @@ import OSLog
     static let isEnabledKey = "Spotlight.Enabled"
 
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let indexes: Bool
+    @ObservationIgnored private let updateShortcuts: @MainActor () -> Void
     @ObservationIgnored private var updateTask: Task<Void, Never>?
+    /// Set when it's turned on or off, until the suggestions are updated.
+    @ObservationIgnored private var shortcutsNeedUpdate = false
 
     var isEnabled: Bool {
         didSet {
             guard isEnabled != oldValue else { return }
             defaults.set(isEnabled, forKey: Self.isEnabledKey)
+            shortcutsNeedUpdate = true
             update()
         }
     }
 
-    init(defaults: UserDefaults = .standard) {
+    /// Without `indexes`, in the tests, nothing is added to Spotlight.
+    init(defaults: UserDefaults = .standard, indexes: Bool = true,
+         updateShortcuts: @escaping @MainActor () -> Void = { OrielOTPShortcuts.updateAppShortcutParameters() }) {
         self.defaults = defaults
+        self.indexes = indexes
+        self.updateShortcuts = updateShortcuts
         isEnabled = defaults.bool(forKey: Self.isEnabledKey)
     }
 
     /// Indexes the accounts again a moment after they last changed, or removes them once it is turned off. Siri and
-    /// Spotlight's Copy Code suggestions for each account are updated with it.
+    /// Spotlight's Copy Code suggestions for each account are updated with it while it's on, and once more when it's
+    /// turned off, which clears them: `AccountQuery` suggests no accounts then.
     func update() {
         updateTask?.cancel()
         updateTask = Task {
             try? await Task.sleep(for: .seconds(1))
             guard !Task.isCancelled else { return }
-            let index = CSSearchableIndex.default()
-            do {
-                // Whatever was added before goes, so deleted and renamed accounts don't stay behind.
-                try await index.deleteAppEntities(ofType: AccountEntity.self)
-                if isEnabled {
-                    try await index.indexAppEntities(CalculatedAccounts.entities())
+            if indexes {
+                let index = CSSearchableIndex.default()
+                do {
+                    // Whatever was added before goes, so deleted and renamed accounts don't stay behind.
+                    try await index.deleteAppEntities(ofType: AccountEntity.self)
+                    if isEnabled {
+                        try await index.indexAppEntities(CalculatedAccounts.entities())
+                    }
+                } catch {
+                    Logger.spotlight.error("Spotlight: \(error)")
                 }
-            } catch {
-                Logger.spotlight.error("Spotlight: \(error)")
             }
-            OrielOTPShortcuts.updateAppShortcutParameters()
+            if isEnabled || shortcutsNeedUpdate {
+                shortcutsNeedUpdate = false
+                updateShortcuts()
+            }
         }
+    }
+
+    /// Waits for the update under way.
+    func finishUpdating() async {
+        await updateTask?.value
     }
 }
 
