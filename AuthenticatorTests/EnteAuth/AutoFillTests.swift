@@ -147,6 +147,16 @@ nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sen
     }
 }
 
+/// Whether AutoFill from Oriel OTP is on in Settings.
+private nonisolated final class ProviderState: @unchecked Sendable {
+    private let lock = NSLock()
+    private var enabled = true
+    var isEnabled: Bool {
+        get { lock.withLock { enabled } }
+        set { lock.withLock { enabled = newValue } }
+    }
+}
+
 /// Runs a value's reads and tells where they ran.
 private nonisolated final class Recorder: @unchecked Sendable {
     private let lock = NSLock()
@@ -162,9 +172,12 @@ struct AutoFillAccountSyncTests {
     private let defaults = UserDefaults(suiteName: "AutoFillAccountSyncTests-\(UUID().uuidString)")!
     private let websitesURL = URL.temporaryDirectory.appending(components: "AutoFillAccountSyncTests-\(UUID().uuidString)", "Websites")
     private let websitesKey = InMemoryVaultKey()
+    private let provider = ProviderState()
 
     private func sync(keychain: EnteVaultKeychain? = nil) -> AutoFillAccountSync {
-        AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults, updatesSystem: false)
+        let provider = provider
+        return AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults,
+                                   updatesSystem: false, providerIsEnabled: { provider.isEnabled })
     }
 
     private func update(_ sync: AutoFillAccountSync, with codes: [EnteCode] = Self.codes) async {
@@ -200,6 +213,22 @@ struct AutoFillAccountSyncTests {
         sync.setWebsites(["co.uk", "example.co.uk"], for: "github")
         await sync.finishWriting()
         #expect(try storage.load()?.first?.websites == ["example.co.uk"])
+    }
+
+    @Test func keepsNoAccountsWhileAutoFillIsOff() async throws {
+        provider.isEnabled = false
+        await update(sync())
+        #expect(try storage.load() == nil)
+
+        let sync = sync()
+        provider.isEnabled = true
+        await update(sync)
+        #expect(try storage.load()?.map(\.id) == ["github"])
+
+        // Turned off in Settings, then the app starts again.
+        provider.isEnabled = false
+        await update(self.sync())
+        #expect(try storage.load() == nil)
     }
 
     @Test func parsesTheAccountsOffTheMainThread() async {
