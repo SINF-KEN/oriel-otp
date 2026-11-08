@@ -267,3 +267,9 @@ This product contains a derivation of the lock implementation and various script
       of your accepting any such warranty or additional liability.
 
    END OF TERMS AND CONDITIONS
+
+---
+
+Simple Icons (https://simpleicons.org), the service icons
+
+CC0 1.0 Universal. The icons are dedicated to the public domain. The brands they show are trademarks of their owners.

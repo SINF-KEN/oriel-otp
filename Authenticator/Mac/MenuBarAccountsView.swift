@@ -159,7 +159,7 @@ private struct MenuBarAccountRow: View {
                     Image(systemName: "hand.tap")
                         .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
                 } else {
-                    Text(account.formattedCode ?? "*** ***")
+                    Text(account.displayedCode ?? "*** ***")
                         .scaledFont(.body) { $0.monospacedDigit().bold() }
                         .privacySensitive()
                 }

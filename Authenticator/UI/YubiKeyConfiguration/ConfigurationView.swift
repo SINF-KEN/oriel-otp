@@ -114,6 +114,9 @@ struct ConfigurationView: View {
                     }
                 }
                 Section("OATH") {
+                    if let storage = model.oathStorage {
+                        OATHStorageRow(storage: storage)
+                    }
                     ConfigurationLink {
                         OATHPasswordView()
                             .onDisappear {
@@ -177,6 +180,7 @@ struct ConfigurationView: View {
                 }
                 // The Mac shows the app lock, AutoFill and the Ente account in the General tab of its Settings window.
                 AppLockSection()
+                PrivacySection()
                 AutoFillSection()
                 EnteAccountSection()
                 #endif
@@ -269,6 +273,42 @@ private struct ConfigurationLink<Destination: View, Label: View>: View {
         #else
         NavigationLink(destination: destination, label: label)
         #endif
+    }
+}
+
+/// How many accounts the YubiKey has, and how many more it can take.
+private struct OATHStorageRow: View {
+    let storage: ConfigurationViewModel.OATHStorage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            LabeledContent {
+                if let used = storage.used, let free = storage.free {
+                    Text(String(localized: "\(used) of \(storage.capacity) used", comment: "YubiKey OATH storage. The placeholders are the number of accounts and how many fit."))
+                        .accessibilityValue(String(localized: "\(free) free", comment: "YubiKey OATH storage, for VoiceOver. The placeholder is the number of accounts that still fit."))
+                } else {
+                    Text(String(localized: "Locked with a password", comment: "YubiKey OATH storage of a YubiKey whose password isn't saved"))
+                }
+            } label: {
+                HStack {
+                    ListIconView(image: Image(systemName: "person.2"), color: Color(.systemPurple), padding: 5)
+                    Text(String(localized: "Accounts", comment: "YubiKey OATH storage"))
+                }
+            }
+            .accessibilityIdentifier("configuration.oath-storage")
+            if let used = storage.used {
+                // Read out in the row above.
+                ProgressView(value: Double(min(used, storage.capacity)), total: Double(storage.capacity))
+                    .tint(used >= storage.capacity ? Color(.systemRed) : Color(.systemPurple))
+                    .accessibilityHidden(true)
+                if let free = storage.free {
+                    Text(free == 0 ? String(localized: "The YubiKey is full. Delete an account to add another.", comment: "YubiKey OATH storage when full")
+                         : String(localized: "Room for \(free) more accounts.", comment: "YubiKey OATH storage. The placeholder is the number of accounts that still fit."))
+                        .scaledFont(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
     }
 }
 

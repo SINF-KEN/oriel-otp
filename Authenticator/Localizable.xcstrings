@@ -216,6 +216,35 @@
         }
       }
     },
+    "%lld free" : {
+      "comment" : "YubiKey OATH storage, for VoiceOver. The placeholder is the number of accounts that still fit.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld frei"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld libres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "空き%lld件"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Voľné: %lld"
+          }
+        }
+      }
+    },
     "%lld of %lld digits entered" : {
       "comment" : "App lock code dots for VoiceOver",
       "localizations" : {
@@ -514,6 +543,35 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "%lld of %lld used" : {
+      "comment" : "YubiKey OATH storage. The placeholders are the number of accounts and how many fit.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$lld von %2$lld belegt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$lld sur %2$lld utilisés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%2$lld件中%1$lld件を使用"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Použité: %1$lld z %2$lld"
           }
         }
       }
@@ -915,6 +973,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN kód musí mať aspoň %llu znakov, musí obsahovať aspoň 2 jedinečné znaky a nesmie byť bežne používaným PIN kódom ako napríklad „123456“. Môže obsahovať písmená, číslice a špeciálne znaky."
+          }
+        }
+      }
+    },
+    "A YubiKey has no room for tags, so they are kept on this device." : {
+      "comment" : "Tags sheet footer for a YubiKey account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf einem YubiKey ist kein Platz für Tags, daher werden sie auf diesem Gerät gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une YubiKey n’a pas de place pour les étiquettes : elles sont donc conservées sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKeyにはタグを保存する場所がないため、タグはこのデバイスに保存されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey nemá miesto na štítky, preto sa uchovávajú v tomto zariadení."
           }
         }
       }
@@ -2190,6 +2277,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Algoritmus"
+          }
+        }
+      }
+    },
+    "All" : {
+      "comment" : "Tag filter showing the accounts with any tag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tous"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべて"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Všetky"
           }
         }
       }
@@ -3624,6 +3740,35 @@
         }
       }
     },
+    "Code hidden" : {
+      "comment" : "Accessibility label for a code while Hide codes is on",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code ausgeblendet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code masqué"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードは非表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kód je skrytý"
+          }
+        }
+      }
+    },
     "Code not calculated" : {
       "comment" : "Accessibility label",
       "localizations" : {
@@ -3883,6 +4028,35 @@
         }
       }
     },
+    "Copied the code for %@." : {
+      "comment" : "Shortcuts result. The placeholder is the account's name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code für %@ kopiert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code de %@ copié."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のコードをコピーしました。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kód pre %@ bol skopírovaný."
+          }
+        }
+      }
+    },
     "Copied to clipboard" : {
       "comment" : "Toast copied to clipboard message",
       "localizations" : {
@@ -3995,6 +4169,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skopíruje kód účtu z vášho YubiKey do schránky. YubiKey musí byť pripojený."
+          }
+        }
+      }
+    },
+    "Copies the code of an account to the clipboard. On a Mac, accounts on a YubiKey work while it's plugged in." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage. Auf einem Mac funktionieren Konten auf einem YubiKey, solange er angeschlossen ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie le code d’un compte dans le presse-papiers. Sur un Mac, les comptes d’une YubiKey fonctionnent tant qu’elle est branchée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントのコードをクリップボードにコピーします。Macでは、YubiKeyが接続されている間はYubiKey上のアカウントも使用できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopíruje kód účtu do schránky. Na Macu fungujú účty na YubiKey, kým je pripojený."
           }
         }
       }
@@ -5976,6 +6179,35 @@
         }
       }
     },
+    "File the account under tags" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto mit Tags versehen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Classer le compte avec des étiquettes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントにタグを付ける"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zaradiť účet pod štítky"
+          }
+        }
+      }
+    },
     "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first." : {
       "comment" : "Mac AutoFill settings footer",
       "localizations" : {
@@ -6289,6 +6521,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pomocník"
+          }
+        }
+      }
+    },
+    "Hidden codes show as dots until you tap one, which also copies it. In Spotlight, the names of your Ente Auth accounts and the accounts on this device can be searched for; their codes and secrets are never added." : {
+      "comment" : "Privacy settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ausgeblendete Codes werden als Punkte angezeigt, bis Sie auf einen tippen, wodurch er auch kopiert wird. In Spotlight können die Namen Ihrer Ente Auth-Konten und der Konten auf diesem Gerät gesucht werden; ihre Codes und Geheimnisse werden nie hinzugefügt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les codes masqués s’affichent sous forme de points jusqu’à ce que vous en touchiez un, ce qui le copie aussi. Dans Spotlight, les noms de vos comptes Ente Auth et des comptes de cet appareil peuvent être recherchés ; leurs codes et secrets ne sont jamais ajoutés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "非表示のコードは、タップするまでドットで表示されます。タップするとコードはコピーもされます。Spotlightでは、Ente Authのアカウントとこのデバイス上のアカウントの名前を検索できます。コードやシークレットが追加されることはありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skryté kódy sa zobrazujú ako bodky, kým na jeden neklepnete, čím sa aj skopíruje. V Spotlighte možno vyhľadávať názvy vašich účtov Ente Auth a účtov v tomto zariadení; ich kódy a tajné kľúče sa nikdy nepridávajú."
+          }
+        }
+      }
+    },
+    "Hide codes" : {
+      "comment" : "Privacy setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Codes ausblenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Masquer les codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードを非表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skryť kódy"
           }
         }
       }
@@ -7157,6 +7447,35 @@
         }
       }
     },
+    "Locked with a password" : {
+      "comment" : "YubiKey OATH storage of a YubiKey whose password isn't saved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mit Passwort geschützt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Protégée par un mot de passe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードでロックされています"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zamknutý heslom"
+          }
+        }
+      }
+    },
     "Mac password" : {
       "comment" : "App lock method on a Mac without Touch ID",
       "localizations" : {
@@ -7764,6 +8083,35 @@
         }
       }
     },
+    "New tag" : {
+      "comment" : "Tags sheet field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Neuer Tag"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nouvelle étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "新しいタグ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nový štítok"
+          }
+        }
+      }
+    },
     "NFC" : {
       "comment" : "Voice Control name for the Scan NFC YubiKey button",
       "localizations" : {
@@ -8019,6 +8367,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ďalej"
+          }
+        }
+      }
+    },
+    "No accounts with this tag" : {
+      "comment" : "Account list filtered by a tag that no account has any more",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keine Konten mit diesem Tag"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aucun compte avec cette étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このタグのアカウントはありません"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Žiadne účty s týmto štítkom"
           }
         }
       }
@@ -8801,6 +9178,35 @@
         }
       }
     },
+    "Open Account" : {
+      "comment" : "Shortcuts action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvrir le compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvoriť účet"
+          }
+        }
+      }
+    },
     "Open AutoFill settings" : {
       "comment" : "AutoFill setting button",
       "localizations" : {
@@ -8855,6 +9261,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otvoriť Oriel OTP"
+          }
+        }
+      }
+    },
+    "Open Oriel OTP to get the codes of accounts on a YubiKey." : {
+      "comment" : "Shortcuts error on iOS for a YubiKey account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Öffnen Sie Oriel OTP, um die Codes von Konten auf einem YubiKey abzurufen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvrez Oriel OTP pour obtenir les codes des comptes d’une YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey上のアカウントのコードを取得するには、Oriel OTPを開いてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak chcete získať kódy účtov na YubiKey, otvorte Oriel OTP."
           }
         }
       }
@@ -8941,6 +9376,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otvorí Oriel OTP a načíta kódy z YubiKey cez NFC."
+          }
+        }
+      }
+    },
+    "Opens Oriel OTP on an account." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Öffnet Oriel OTP bei einem Konto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvre Oriel OTP sur un compte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Oriel OTPでアカウントを開きます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvorí Oriel OTP na účte."
           }
         }
       }
@@ -9948,6 +10412,35 @@
         }
       }
     },
+    "Privacy" : {
+      "comment" : "Settings section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datenschutz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Confidentialité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "プライバシー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Súkromie"
+          }
+        }
+      }
+    },
     "Privacy Policy" : {
       "comment" : "Mac Help menu",
       "localizations" : {
@@ -10927,6 +11420,107 @@
         }
       }
     },
+    "Room for %lld more accounts." : {
+      "comment" : "YubiKey OATH storage. The placeholder is the number of accounts that still fit.",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Platz für %lld weiteres Konto."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Platz für %lld weitere Konten."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Room for %lld more account."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Room for %lld more accounts."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Place pour %lld compte de plus."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Place pour %lld comptes de plus."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "あと%lld件のアカウントを追加できます。"
+                }
+              }
+            }
+          }
+        },
+        "sk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalší účet."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalšie účty."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalšieho účtu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalších účtov."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Save" : {
       "comment" : "Save button",
       "localizations" : {
@@ -11701,6 +12295,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nastavenia…"
+          }
+        }
+      }
+    },
+    "Show accounts in Spotlight" : {
+      "comment" : "Privacy setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten in Spotlight anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Afficher les comptes dans Spotlight"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spotlightにアカウントを表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zobraziť účty v Spotlighte"
           }
         }
       }
@@ -12893,6 +13516,122 @@
         }
       }
     },
+    "Tags" : {
+      "comment" : "Menu, Tag filter, for VoiceOver, Tags sheet title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Étiquettes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タグ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky"
+          }
+        }
+      }
+    },
+    "Tags are saved in Ente Auth, which shows them too." : {
+      "comment" : "Tags sheet footer for an Ente Auth account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags werden in Ente Auth gespeichert und dort ebenfalls angezeigt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les étiquettes sont enregistrées dans Ente Auth, qui les affiche aussi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タグはEnte Authに保存され、Ente Authにも表示されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky sa ukladajú v Ente Auth, ktorý ich tiež zobrazuje."
+          }
+        }
+      }
+    },
+    "Tags go along when the account moves to Ente Auth." : {
+      "comment" : "Tags sheet footer for an account on this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags werden mitgenommen, wenn das Konto zu Ente Auth verschoben wird."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les étiquettes suivent le compte lorsqu’il est déplacé vers Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントをEnte Authに移動すると、タグも一緒に移動します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky sa presunú spolu s účtom do Ente Auth."
+          }
+        }
+      }
+    },
+    "Tags: %@" : {
+      "comment" : "Account details tags, for VoiceOver. The placeholder is a list of tags.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Étiquettes : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タグ: %@"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky: %@"
+          }
+        }
+      }
+    },
     "Terms of use" : {
       "localizations" : {
         "de" : {
@@ -13004,6 +13743,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Účet sa uchováva iba v tomto zariadení a nie je súčasťou jeho záloh. Uschovajte si obnovovacie kódy služby, pretože so zariadením by ste stratili aj účet."
+          }
+        }
+      }
+    },
+    "The account isn't in Oriel OTP any more." : {
+      "comment" : "Shortcuts error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Konto ist nicht mehr in Oriel OTP."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le compte n’est plus dans Oriel OTP."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントはOriel OTPにもうありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet už nie je v Oriel OTP."
           }
         }
       }
@@ -13466,6 +14234,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "YubiKey je plný. Ak chcete uvoľniť miesto, vymažte z neho účty."
+          }
+        }
+      }
+    },
+    "The YubiKey is full. Delete an account to add another." : {
+      "comment" : "YubiKey OATH storage when full",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der YubiKey ist voll. Löschen Sie ein Konto, um ein weiteres hinzuzufügen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La YubiKey est pleine. Supprimez un compte pour en ajouter un autre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKeyがいっぱいです。別のアカウントを追加するには、アカウントを削除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey je plný. Ak chcete pridať ďalší účet, odstráňte niektorý."
           }
         }
       }
@@ -15362,6 +16159,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odomknite Oriel OTP a skúste to znova."
+          }
+        }
+      }
+    },
+    "Unlock Oriel OTP to copy the code." : {
+      "comment" : "Shortcuts prompt when the app is locked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Entsperren Sie Oriel OTP, um den Code zu kopieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déverrouillez Oriel OTP pour copier le code."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードをコピーするには、Oriel OTPのロックを解除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak chcete skopírovať kód, odomknite Oriel OTP."
           }
         }
       }
