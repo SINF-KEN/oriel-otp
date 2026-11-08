@@ -16,6 +16,7 @@
 
 import Foundation
 import Clibsodium
+import os
 
 enum EnteCryptoError: Error, Equatable {
     case sodiumInitFailed
@@ -64,16 +65,49 @@ nonisolated enum EnteCrypto {
     /// This is slow and memory hungry by design, call it off the main actor.
     static func deriveNewKeyEncryptionKey(password: String) throws -> (key: Data, salt: Data, opsLimit: UInt64, memLimit: UInt64) {
         let salt = randomBytes(saltLength)
-        var memLimit: UInt64 = 256 * 1024 * 1024
-        var opsLimit: UInt64 = 16
-        while true {
+        let limits = newKeyLimits(availableMemory: availableMemory())
+        for (index, limit) in limits.enumerated() {
             do {
-                return (try deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: opsLimit, memLimit: memLimit), salt, opsLimit, memLimit)
-            } catch EnteCryptoError.keyDerivationFailed where memLimit > 128 * 1024 * 1024 {
-                memLimit /= 2
-                opsLimit *= 2
+                let key = try deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: limit.opsLimit, memLimit: limit.memLimit)
+                return (key, salt, limit.opsLimit, limit.memLimit)
+            } catch EnteCryptoError.keyDerivationFailed where index < limits.count - 1 {
+                continue
             }
         }
+        throw EnteCryptoError.keyDerivationFailed
+    }
+
+    /// The limits to try for a new account, in order. Like Ente's apps, this starts from libsodium's sensitive limits
+    /// (1 GiB, 4 passes) and, when the memory can't be had, halves it and doubles the passes, down to 128 MiB, the least
+    /// Ente's server takes. Memory times passes stays the same.
+    ///
+    /// Running out of memory on iOS ends the app rather than failing the allocation, so limits that wouldn't leave
+    /// 256 MiB of the memory the app may still use are skipped. `availableMemory` is nil where that isn't known.
+    static func newKeyLimits(availableMemory: UInt64?) -> [(opsLimit: UInt64, memLimit: UInt64)] {
+        let headroom: UInt64 = 256 * 1024 * 1024
+        let minMemory: UInt64 = 128 * 1024 * 1024
+        var memLimit = UInt64(crypto_pwhash_memlimit_sensitive())
+        var opsLimit = UInt64(crypto_pwhash_opslimit_sensitive())
+        var limits: [(opsLimit: UInt64, memLimit: UInt64)] = []
+        while true {
+            if memLimit == minMemory || availableMemory.map({ $0 >= memLimit + headroom }) ?? true {
+                limits.append((opsLimit, memLimit))
+            }
+            guard memLimit > minMemory else { return limits }
+            memLimit /= 2
+            opsLimit *= 2
+        }
+    }
+
+    /// How much more memory the app may use before the system ends it, where that's known.
+    private static func availableMemory() -> UInt64? {
+        #if os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
+        // Where there's no such limit, as in the simulator, this is 0.
+        let available = os_proc_available_memory()
+        return available > 0 ? UInt64(available) : nil
+        #else
+        return nil
+        #endif
     }
 
     /// Whether Argon2 limits sent by a server are safe to use. The limits come with the account and aren't

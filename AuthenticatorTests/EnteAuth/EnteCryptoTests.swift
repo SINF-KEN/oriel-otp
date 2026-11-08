@@ -91,6 +91,20 @@ struct EnteCryptoTests {
         #expect(EnteCrypto.isAllowed(opsLimit: opsLimit, memLimit: memLimit))
     }
 
+    /// New accounts start from libsodium's sensitive limits, like Ente's apps, and fall back with the same work.
+    @Test func newAccountLimitsStartFromTheSensitiveOnes() {
+        let mebibyte = Self.mebibyte
+        let all = EnteCrypto.newKeyLimits(availableMemory: nil)
+        #expect(all.map(\.opsLimit) == [4, 8, 16, 32])
+        #expect(all.map(\.memLimit) == [1024 * mebibyte, 512 * mebibyte, 256 * mebibyte, 128 * mebibyte])
+        for limit in all {
+            #expect(EnteCrypto.isAllowed(opsLimit: limit.opsLimit, memLimit: limit.memLimit))
+        }
+        // Limits that would leave too little memory are skipped, but the last one is always tried.
+        #expect(EnteCrypto.newKeyLimits(availableMemory: 900 * mebibyte).map(\.memLimit) == [512 * mebibyte, 256 * mebibyte, 128 * mebibyte])
+        #expect(EnteCrypto.newKeyLimits(availableMemory: 100 * mebibyte).map(\.memLimit) == [128 * mebibyte])
+    }
+
     @Test func secretBoxRoundTrip() throws {
         let key = EnteCrypto.randomBytes(32)
         let message = Data("master key".utf8)
