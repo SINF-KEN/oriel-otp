@@ -35,7 +35,7 @@ final class MacScreenshotTests: XCTestCase {
                                // A fresh window at its default size, in light mode, every run.
                                "-ApplePersistenceIgnoreState", "YES", "-NSQuitAlwaysKeepsWindows", "NO",
                                "-DemoAppearance", "light", "-DemoWindowSize", "1280x800", "-Mac.ShowInMenuBar", "YES",
-                               // The fake Ente server, even if this Mac's app has signed in to another one.
+                               // The fake Ente server, even if an earlier Debug run signed in to another one.
                                "-EnteAuth.ServerURL", "https://demo.ente.test"]
         app.launch()
         app.activate()
