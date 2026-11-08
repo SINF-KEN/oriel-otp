@@ -14240,6 +14240,35 @@
         }
       }
     },
+    "The link gives the same setting more than once." : {
+      "comment" : "Error for an otpauth link that repeats a parameter, e.g. the secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Link enthält dieselbe Einstellung mehrmals."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le lien indique le même réglage plusieurs fois."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリンクには同じ設定が複数回含まれています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odkaz obsahuje rovnaké nastavenie viackrát."
+          }
+        }
+      }
+    },
     "The OATH application is disabled or not supported on this YubiKey." : {
       "comment" : "OATH disabled error message",
       "localizations" : {

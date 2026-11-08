@@ -103,6 +103,7 @@ extension YubiKitOATHSession.CredentialTemplate: @retroactive @unchecked Sendabl
 /// Errors from creating a credential template, with the messages the Objective-C YubiKit used.
 enum CredentialTemplateError: Error, LocalizedError {
     case scheme, type, label, algorithm, counter, digits, period, missingSecret, invalidSecret, nameIssuerTooLong, issuerContainsColon
+    case repeatedParameter
 
     var errorDescription: String? {
         switch self {
@@ -110,13 +111,15 @@ enum CredentialTemplateError: Error, LocalizedError {
         case .type: return "Failed to get account type from URL"
         case .label: return "Missing account name"
         case .algorithm: return "Unknown algorithm"
-        case .counter: return "Missing counter parameter"
+        case .counter: return "Missing or invalid counter parameter"
         case .digits: return "Unsupported number of digits"
         case .period: return "Invalid period"
         case .missingSecret: return "Missing secret"
         case .invalidSecret: return "Invalid Base32 encoded secret"
         case .nameIssuerTooLong: return "Account name and issuer is to long"
         case .issuerContainsColon: return "Character ':' is not allowed in issuer"
+        case .repeatedParameter:
+            return String(localized: "The link gives the same setting more than once.", comment: "Error for an otpauth link that repeats a parameter, e.g. the secret")
         }
     }
 }
@@ -141,8 +144,10 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.scheme == "otpauth" else {
             throw CredentialTemplateError.scheme
         }
+        // The same lookup as the accounts calculated on the device, so both read the same values from a URL.
+        guard let parameters = OTPAuthURLParser.parameters(of: components) else { throw CredentialTemplateError.repeatedParameter }
         func query(_ name: String) -> String? {
-            components.queryItems?.first { $0.name == name }?.value
+            parameters[name]
         }
 
         // Parse account name and issuer
@@ -151,13 +156,7 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
             throw CredentialTemplateError.label
         }
         guard path.count >= 1 else { throw CredentialTemplateError.label }
-        var name = String(path.dropFirst())
-        var issuer = query("issuer")
-        if name.contains(":") {
-            var labelComponents = name.components(separatedBy: ":")
-            issuer = labelComponents.removeFirst()
-            name = labelComponents.joined(separator: ":")
-        }
+        let (issuer, name) = OTPAuthURLParser.label(of: components)
 
         let isTOTP: Bool
         switch components.host {
@@ -167,8 +166,8 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
         }
 
         let algorithm: YubiKitOATHSession.HashAlgorithm
-        switch query("algorithm") {
-        case nil, "SHA1": algorithm = .sha1
+        switch query("algorithm")?.uppercased() {
+        case nil, "", "SHA1": algorithm = .sha1
         case "SHA256": algorithm = .sha256
         case "SHA512": algorithm = .sha512
         default: throw CredentialTemplateError.algorithm
@@ -181,8 +180,9 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
             let period = query("period").map { Int($0) ?? 0 } ?? 30
             type = .totp(period: TimeInterval(period))
         } else {
-            guard let counter = query("counter") else { throw CredentialTemplateError.counter }
-            type = .hotp(counter: UInt32(max(0, Int32(counter) ?? 0)))
+            // The YubiKey keeps a 32 bit counter.
+            guard let counter = query("counter").flatMap({ UInt32($0) }) else { throw CredentialTemplateError.counter }
+            type = .hotp(counter: counter)
         }
 
         guard let base32EncodedSecret = query("secret") else { throw CredentialTemplateError.missingSecret }
@@ -203,8 +203,11 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
          skip: Validation = []) throws {
         guard !secret.isEmpty else { throw CredentialTemplateError.missingSecret }
         guard [6, 7, 8].contains(digits) else { throw CredentialTemplateError.digits }
-        // A zero or negative period traps when converted to UInt below and when YubiKit calculates a code.
-        if let period = type.period, period <= 0 { throw CredentialTemplateError.period }
+        // A zero or negative period traps when converted to UInt below and when YubiKit calculates a code, and one
+        // too large to be an Int traps when the account is written as a URL.
+        if let period = type.period, !(Int(exactly: period).map(OTPAuthURLParser.periods.contains) ?? false) {
+            throw CredentialTemplateError.period
+        }
         if !skip.contains(.issuer), let issuer, issuer.contains(":") {
             throw CredentialTemplateError.issuerContainsColon
         }
@@ -224,7 +227,8 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
 nonisolated extension Data {
     /// Decodes RFC 4648 Base32, ignoring case and padding, the same way the Objective-C YubiKit did.
     init?(base32Encoded string: String) {
-        guard string.allSatisfy({ ("A"..."Z").contains($0) || ("a"..."z").contains($0) || ("2"..."7").contains($0) || $0 == "=" }) else {
+        // Checked one scalar at a time: a letter followed by a combining mark is a single character.
+        guard string.unicodeScalars.allSatisfy({ ("A"..."Z").contains($0) || ("a"..."z").contains($0) || ("2"..."7").contains($0) || $0 == "=" }) else {
             return nil
         }
         var bytes = [UInt8]()
