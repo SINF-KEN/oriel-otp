@@ -3970,6 +3970,35 @@
         }
       }
     },
+    "Copied the code for %@." : {
+      "comment" : "Shortcuts result. The placeholder is the account's name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code für %@ kopiert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code de %@ copié."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のコードをコピーしました。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kód pre %@ bol skopírovaný."
+          }
+        }
+      }
+    },
     "Copied to clipboard" : {
       "comment" : "Toast copied to clipboard message",
       "localizations" : {
@@ -4082,6 +4111,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skopíruje kód účtu z vášho YubiKey do schránky. YubiKey musí byť pripojený."
+          }
+        }
+      }
+    },
+    "Copies the code of an account to the clipboard." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie le code d’un compte dans le presse-papiers."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントのコードをクリップボードにコピーします。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopíruje kód účtu do schránky."
+          }
+        }
+      }
+    },
+    "Copies the code of an account to the clipboard. Accounts on a YubiKey work while it's plugged in." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage. Konten auf einem YubiKey funktionieren, solange er angeschlossen ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie le code d’un compte dans le presse-papiers. Les comptes d’une YubiKey fonctionnent tant qu’elle est branchée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントのコードをクリップボードにコピーします。YubiKeyが接続されている間はYubiKey上のアカウントも使用できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopíruje kód účtu do schránky. Účty na YubiKey fungujú, kým je pripojený."
           }
         }
       }
@@ -6409,31 +6496,31 @@
         }
       }
     },
-    "Hidden codes show as dots until you tap one, which also copies it." : {
+    "Hidden codes show as dots until you tap one, which also copies it. In Spotlight, the names of your Ente Auth accounts and the accounts on this device can be searched for; their codes and secrets are never added." : {
       "comment" : "Privacy settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ausgeblendete Codes werden als Punkte angezeigt, bis Sie auf einen tippen, wodurch er auch kopiert wird."
+            "value" : "Ausgeblendete Codes werden als Punkte angezeigt, bis Sie auf einen tippen, wodurch er auch kopiert wird. In Spotlight können die Namen Ihrer Ente Auth-Konten und der Konten auf diesem Gerät gesucht werden; ihre Codes und Geheimnisse werden nie hinzugefügt."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Les codes masqués s’affichent sous forme de points jusqu’à ce que vous en touchiez un, ce qui le copie aussi."
+            "value" : "Les codes masqués s’affichent sous forme de points jusqu’à ce que vous en touchiez un, ce qui le copie aussi. Dans Spotlight, les noms de vos comptes Ente Auth et des comptes de cet appareil peuvent être recherchés ; leurs codes et secrets ne sont jamais ajoutés."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "非表示のコードは、タップするまでドットで表示されます。タップするとコードはコピーもされます。"
+            "value" : "非表示のコードは、タップするまでドットで表示されます。タップするとコードはコピーもされます。Spotlightでは、Ente Authのアカウントとこのデバイス上のアカウントの名前を検索できます。コードやシークレットが追加されることはありません。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Skryté kódy sa zobrazujú ako bodky, kým na jeden neklepnete, čím sa aj skopíruje."
+            "value" : "Skryté kódy sa zobrazujú ako bodky, kým na jeden neklepnete, čím sa aj skopíruje. V Spotlighte možno vyhľadávať názvy vašich účtov Ente Auth a účtov v tomto zariadení; ich kódy a tajné kľúče sa nikdy nepridávajú."
           }
         }
       }
@@ -9033,6 +9120,35 @@
         }
       }
     },
+    "Open Account" : {
+      "comment" : "Shortcuts action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto öffnen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvrir le compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを開く"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvoriť účet"
+          }
+        }
+      }
+    },
     "Open AutoFill settings" : {
       "comment" : "AutoFill setting button",
       "localizations" : {
@@ -9087,6 +9203,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otvoriť Oriel OTP"
+          }
+        }
+      }
+    },
+    "Open Oriel OTP to get the codes of accounts on a YubiKey." : {
+      "comment" : "Shortcuts error on iOS for a YubiKey account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Öffnen Sie Oriel OTP, um die Codes von Konten auf einem YubiKey abzurufen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvrez Oriel OTP pour obtenir les codes des comptes d’une YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey上のアカウントのコードを取得するには、Oriel OTPを開いてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak chcete získať kódy účtov na YubiKey, otvorte Oriel OTP."
           }
         }
       }
@@ -9173,6 +9318,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otvorí Oriel OTP a načíta kódy z YubiKey cez NFC."
+          }
+        }
+      }
+    },
+    "Opens Oriel OTP on an account." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Öffnet Oriel OTP bei einem Konto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ouvre Oriel OTP sur un compte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Oriel OTPでアカウントを開きます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Otvorí Oriel OTP na účte."
           }
         }
       }
@@ -11966,6 +12140,35 @@
         }
       }
     },
+    "Show accounts in Spotlight" : {
+      "comment" : "Privacy setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten in Spotlight anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Afficher les comptes dans Spotlight"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Spotlightにアカウントを表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zobraziť účty v Spotlighte"
+          }
+        }
+      }
+    },
     "Show Ente Auth accounts on Apple Watch" : {
       "comment" : "Ente sync Apple Watch toggle",
       "localizations" : {
@@ -13381,6 +13584,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Účet sa uchováva iba v tomto zariadení a nie je súčasťou jeho záloh. Uschovajte si obnovovacie kódy služby, pretože so zariadením by ste stratili aj účet."
+          }
+        }
+      }
+    },
+    "The account isn't in Oriel OTP any more." : {
+      "comment" : "Shortcuts error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Konto ist nicht mehr in Oriel OTP."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le compte n’est plus dans Oriel OTP."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントはOriel OTPにもうありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet už nie je v Oriel OTP."
           }
         }
       }
@@ -15739,6 +15971,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odomknite Oriel OTP a skúste to znova."
+          }
+        }
+      }
+    },
+    "Unlock Oriel OTP to copy the code." : {
+      "comment" : "Shortcuts prompt when the app is locked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Entsperren Sie Oriel OTP, um den Code zu kopieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déverrouillez Oriel OTP pour copier le code."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードをコピーするには、Oriel OTPのロックを解除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ak chcete skopírovať kód, odomknite Oriel OTP."
           }
         }
       }

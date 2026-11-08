@@ -35,11 +35,13 @@ While you stay signed in, the copy of your Ente Auth accounts, including their s
 
 Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device. Deleting an account removes it for good. AutoFill and the Apple Watch app don't use these accounts.
 
-## Tags and hidden codes
+## Tags, hidden codes and Spotlight
 
 Tags you give accounts in Ente Auth or on this device are saved with the account, so tags of Ente Auth accounts are synced to Ente like their names. A YubiKey has no room for tags, so the tags of its accounts are kept in an encrypted file in the app's storage, with a key in the device keychain, excluded from backups.
 
 **Hide codes** only changes what the screen shows; it's kept in the app's preferences.
+
+**Show accounts in Spotlight** is off by default. When you turn it on, the issuer, name and tags of your Ente Auth accounts and the accounts on this device are added to the system's Spotlight index on this device, so you can search for them. Their codes and secrets are never added. Spotlight can show these names outside the app lock. Turning the setting off removes them from the index. The **Copy Code** action in Shortcuts and Siri lists the same accounts and only gives out a code once the app is unlocked.
 
 ## App lock
 

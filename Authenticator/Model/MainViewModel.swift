@@ -28,11 +28,17 @@ import YubiKit
     }
     /// The accounts in the Ente Auth vault on this device, whose codes the app calculates.
     private(set) var cloudAccounts: [Account] = [] {
-        didSet { sortAccounts() }
+        didSet {
+            sortAccounts()
+            spotlight?.update()
+        }
     }
     /// The accounts kept only on this device, whose codes the app calculates.
     private(set) var deviceAccounts: [Account] = [] {
-        didSet { sortAccounts() }
+        didSet {
+            sortAccounts()
+            spotlight?.update()
+        }
     }
     /// The accounts of all three, by name. Kept rather than calculated, as the list reads it several times each time
     /// it's drawn and the countdown every second.
@@ -87,9 +93,13 @@ import YubiKit
     /// Whether a YubiKey was ever read here. Until then the app doesn't ask for one next to the accounts it has.
     private(set) var hasReadYubiKey = UserDefaults.standard.bool(forKey: MainViewModel.hasReadYubiKeyKey)
 
-    init(cloud: EnteCloud = .shared, device: DeviceAccounts = .shared) {
+    /// Nil in the tests, which mustn't change what Spotlight has of the app.
+    @ObservationIgnored private let spotlight: AccountSpotlight?
+
+    init(cloud: EnteCloud = .shared, device: DeviceAccounts = .shared, spotlight: AccountSpotlight? = nil) {
         self.cloud = cloud
         self.device = device
+        self.spotlight = spotlight
         favoritesStorage.migrate()
         self.favorites = favoritesStorage.readFavorites()
         self.keyTags = tagsStorage.read()

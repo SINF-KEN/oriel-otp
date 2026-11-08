@@ -98,19 +98,22 @@ extension Account {
     }
 }
 
-/// **Hide codes**, in Configuration on iOS and the General settings on the Mac.
+/// **Hide codes** and **Show in Spotlight**, in Configuration on iOS and the General settings on the Mac.
 struct PrivacySection: View {
 
     @Bindable private var visibility = CodeVisibility.shared
+    @Bindable private var spotlight = AccountSpotlight.shared
 
     var body: some View {
         Section {
             Toggle(String(localized: "Hide codes", comment: "Privacy setting"), isOn: $visibility.hidesCodes)
                 .accessibilityIdentifier("settings.hide-codes")
+            Toggle(String(localized: "Show accounts in Spotlight", comment: "Privacy setting"), isOn: $spotlight.isEnabled)
+                .accessibilityIdentifier("settings.spotlight")
         } header: {
             Text(String(localized: "Privacy", comment: "Settings section"))
         } footer: {
-            Text(String(localized: "Hidden codes show as dots until you tap one, which also copies it.", comment: "Privacy settings footer"))
+            Text(String(localized: "Hidden codes show as dots until you tap one, which also copies it. In Spotlight, the names of your Ente Auth accounts and the accounts on this device can be searched for; their codes and secrets are never added.", comment: "Privacy settings footer"))
         }
     }
 }

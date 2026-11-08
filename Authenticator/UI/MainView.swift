@@ -194,6 +194,9 @@ struct MainView: View {
         .onChange(of: quickActions.pending, initial: true) { _, _ in
             performPendingQuickAction()
         }
+        .onChange(of: quickActions.pendingAccountID, initial: true) { _, _ in
+            performPendingQuickAction()
+        }
         // One that came while the app was locked. On the Mac the app locks without going to the background, so
         // becoming active doesn't do it.
         .onChange(of: AppLock.shared.isLocked) { _, isLocked in
@@ -798,7 +801,9 @@ struct MainView: View {
     #endif
 
     private func performPendingQuickAction() {
-        guard scenePhase == .active, !AppLock.shared.isLocked, let action = quickActions.pending else { return }
+        guard scenePhase == .active, !AppLock.shared.isLocked else { return }
+        showPendingAccount()
+        guard let action = quickActions.pending else { return }
         quickActions.pending = nil
         guard !notificationsViewModel.showPIVTokenView && !notificationsViewModel.presentDisableOTP else { return }
         switch action {
@@ -819,6 +824,21 @@ struct MainView: View {
             showEnteSync = false
             addAccount()
         }
+    }
+
+    /// Shows an account opened from Spotlight or Shortcuts, with nothing in front of it.
+    private func showPendingAccount() {
+        guard let accountID = quickActions.pendingAccountID else { return }
+        quickActions.pendingAccountID = nil
+        guard model.accounts.contains(where: { $0.accountId == accountID }),
+              !notificationsViewModel.showPIVTokenView && !notificationsViewModel.presentDisableOTP else { return }
+        showConfiguration = false
+        showAbout = false
+        showEnteSync = false
+        showAddAccount = false
+        searchText = ""
+        selectedTag = nil
+        selectedAccountID = accountID
     }
 
     private func addAccount() {
