@@ -919,6 +919,35 @@
         }
       }
     },
+    "A YubiKey has no room for tags, so they are kept on this device." : {
+      "comment" : "Tags sheet footer for a YubiKey account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf einem YubiKey ist kein Platz für Tags, daher werden sie auf diesem Gerät gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une YubiKey n’a pas de place pour les étiquettes : elles sont donc conservées sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKeyにはタグを保存する場所がないため、タグはこのデバイスに保存されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey nemá miesto na štítky, preto sa uchovávajú v tomto zariadení."
+          }
+        }
+      }
+    },
     "A YubiKey never gives its accounts back, so it can't be copied to Ente Auth later. Choose YubiKey and Ente Auth to keep it in both." : {
       "comment" : "Add account footer when adding to the YubiKey only",
       "localizations" : {
@@ -2190,6 +2219,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Algoritmus"
+          }
+        }
+      }
+    },
+    "All" : {
+      "comment" : "Tag filter showing the accounts with any tag",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tous"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "すべて"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Všetky"
           }
         }
       }
@@ -5976,6 +6034,35 @@
         }
       }
     },
+    "File the account under tags" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto mit Tags versehen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Classer le compte avec des étiquettes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントにタグを付ける"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zaradiť účet pod štítky"
+          }
+        }
+      }
+    },
     "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first." : {
       "comment" : "Mac AutoFill settings footer",
       "localizations" : {
@@ -7764,6 +7851,35 @@
         }
       }
     },
+    "New tag" : {
+      "comment" : "Tags sheet field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Neuer Tag"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nouvelle étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "新しいタグ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nový štítok"
+          }
+        }
+      }
+    },
     "NFC" : {
       "comment" : "Voice Control name for the Scan NFC YubiKey button",
       "localizations" : {
@@ -8019,6 +8135,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ďalej"
+          }
+        }
+      }
+    },
+    "No accounts with this tag" : {
+      "comment" : "Account list filtered by a tag that no account has any more",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keine Konten mit diesem Tag"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aucun compte avec cette étiquette"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このタグのアカウントはありません"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Žiadne účty s týmto štítkom"
           }
         }
       }
@@ -12889,6 +13034,122 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Synchronizovať z Ente Auth…"
+          }
+        }
+      }
+    },
+    "Tags" : {
+      "comment" : "Menu, Tag filter, for VoiceOver, Tags sheet title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Étiquettes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タグ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky"
+          }
+        }
+      }
+    },
+    "Tags are saved in Ente Auth, which shows them too." : {
+      "comment" : "Tags sheet footer for an Ente Auth account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags werden in Ente Auth gespeichert und dort ebenfalls angezeigt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les étiquettes sont enregistrées dans Ente Auth, qui les affiche aussi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タグはEnte Authに保存され、Ente Authにも表示されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky sa ukladajú v Ente Auth, ktorý ich tiež zobrazuje."
+          }
+        }
+      }
+    },
+    "Tags go along when the account moves to Ente Auth." : {
+      "comment" : "Tags sheet footer for an account on this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags werden mitgenommen, wenn das Konto zu Ente Auth verschoben wird."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les étiquettes suivent le compte lorsqu’il est déplacé vers Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントをEnte Authに移動すると、タグも一緒に移動します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky sa presunú spolu s účtom do Ente Auth."
+          }
+        }
+      }
+    },
+    "Tags: %@" : {
+      "comment" : "Account details tags, for VoiceOver. The placeholder is a list of tags.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tags: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Étiquettes : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タグ: %@"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Štítky: %@"
           }
         }
       }

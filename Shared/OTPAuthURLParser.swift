@@ -25,6 +25,8 @@ nonisolated struct EnteEntry: Sendable, Equatable {
     let components: URLComponents?
     let isTrashed: Bool
     let isPinned: Bool
+    /// The tags the account is filed under in Ente Auth, in the order they were added.
+    let tags: [String]
     /// The icon chosen for the account in Ente Auth, by name, nil to use the one of its issuer.
     let iconID: String?
 
@@ -58,8 +60,17 @@ nonisolated struct EnteEntry: Sendable, Equatable {
         isTrashed = displays.contains { $0["trashed"] as? Bool == true }
         isPinned = displays.contains { $0["pinned"] as? Bool == true }
         // The URL's settings win over the object's, like the editor reads them.
+        let tags = displays.last { $0["tags"] != nil }?["tags"] as? [String] ?? []
+        self.tags = Self.cleaned(tags)
         let iconID = displays.last { $0["iconID"] != nil }?["iconID"] as? String
         self.iconID = iconID.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 }
+    }
+
+    /// Tags without spaces around them, empty ones or the same one twice, ignoring case.
+    static func cleaned(_ tags: [String]) -> [String] {
+        var seen = Set<String>()
+        return tags.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && seen.insert($0.lowercased()).inserted }
     }
 }
 

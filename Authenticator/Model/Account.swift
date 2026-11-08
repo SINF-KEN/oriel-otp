@@ -52,6 +52,8 @@ import YubiKit
         didSet { onPinnedChange?(self) }
     }
     var requiresTouch: Bool
+    /// The tags the account is filed under, in the order they were added.
+    var tags: [String] = []
     /// The icon chosen for an Ente Auth account in Ente Auth, by name.
     var iconID: String? {
         didSet {

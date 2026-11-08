@@ -30,6 +30,7 @@ struct AccountDetailView: View {
     @State private var showEditing = false
     @State private var showDeleteConfirmation = false
     @State private var showAutoFillWebsites = false
+    @State private var showTags = false
 
     @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
 
@@ -57,6 +58,18 @@ struct AccountDetailView: View {
                 }
                 .scaledFont(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
+            }
+            if !account.tags.isEmpty {
+                Label {
+                    Text(account.tags.joined(separator: ", "))
+                } icon: {
+                    Image(systemName: "tag")
+                        .accessibilityHidden(true)
+                }
+                .scaledFont(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
+                .accessibilityLabel(String(localized: "Tags: \(account.tags.joined(separator: ", "))", comment: "Account details tags, for VoiceOver. The placeholder is a list of tags."))
+                .accessibilityIdentifier("account-details.tag-list")
             }
             if let id = autoFillID {
                 let websites = AutoFillAccountSync.shared.websites(for: id, issuer: account.credential.issuer)
@@ -131,6 +144,11 @@ struct AccountDetailView: View {
                     .help(String(localized: "Rename the account", comment: "Toolbar help"))
                     .accessibilityIdentifier("account-details.rename")
                 }
+                Button(action: { showTags = true }) {
+                    Label(String(localized: "Tags", comment: "Menu"), systemImage: "tag")
+                }
+                .help(String(localized: "File the account under tags", comment: "Toolbar help"))
+                .accessibilityIdentifier("account-details.tags")
                 CopyToYubiKeyButtons(account: account)
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
@@ -141,6 +159,9 @@ struct AccountDetailView: View {
         }
         .sheet(isPresented: $showEditing) {
             EditView(account: account, viewModel: model, showEditing: $showEditing)
+        }
+        .sheet(isPresented: $showTags) {
+            AccountTagsView(account: account, isPresented: $showTags)
         }
         .sheet(isPresented: $showAutoFillWebsites) {
             if let id = autoFillID {

@@ -407,6 +407,12 @@ import YubiKit
         edit(id) { $0.isPinned = isPinned }
     }
 
+    /// Files the account under the tags, which Ente Auth shows too.
+    func setTags(_ id: String, _ tags: [String]) {
+        guard let code = code(of: id), code.tags != EnteEntry.cleaned(tags) else { return }
+        edit(id) { $0.tags = tags }
+    }
+
     /// The credential to put the account on a YubiKey with, nil if a YubiKey can't store it.
     func yubiKeyTemplate(of id: String) -> YubiKitOATHSession.CredentialTemplate? {
         vault?.items.first { $0.id == id }?.rawData.flatMap { EnteCodeParser.parse(id: id, rawData: $0)?.template }
