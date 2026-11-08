@@ -1,31 +1,104 @@
 # CI
 
-## Triggers and required checks
+The workflows are in `.github/workflows`:
 
-The `OrielOTPTests` workflow runs for every pull request, pushes to `main`, and every tag push. Release automation publishes from tags, so the workflow does not also subscribe to the `release` event. There are no path filters: documentation-only changes still produce the required check. A newer run for the same branch or pull request cancels the older run. Job-level Git configuration sets `init.defaultBranch=main` to avoid an irrelevant default-branch hint from checkout's temporary repository.
+| Workflow | Runs | Does |
+| --- | --- | --- |
+| `OrielOTPTests` (`swift.yml`) | Pull requests, pushes to `main`, tag pushes | Builds, lints and tests; its `build` job is the required check |
+| `TestFlight` (`testflight.yml`) | After `OrielOTPTests` passes for a push to `main`, or by hand | Uploads the iPhone and Mac builds, see [testflight.md](testflight.md) |
+| `Screenshots` (`screenshots.yml`) | Pushes to `main` that change the app, or by hand | Regenerates the README screenshots, see [screenshots.md](screenshots.md) |
+| `Accessibility` (`accessibility.yml`) | By hand | Accessibility audits on an iPhone and an iPad, see [accessibility.md](accessibility.md) |
 
-GitHub branch protection for `main` requires a pull request and the Actions `build` status check, requires the branch to be current with its base, and applies to administrators. No approval count is required. This keeps the workflow's sole job as the merge gate; dependency review runs inside that job for pull requests.
+Every action is pinned to a commit SHA, with its version in a comment, and Dependabot (`.github/dependabot.yml`)
+updates the actions and the Swift packages weekly. The macOS jobs run on GitHub-hosted `xcode-27` runners.
 
-## Validation and diagnostics
+## Branch protection
 
-The job checks Swift formatting for the new CI helper and test files, validates the Xcode project, scheme, plists, entitlements, and `Package.resolved`, then runs the simulator tests. Swift 6, complete strict concurrency checking, and warnings-as-errors are set for the app, test, extension, and watch targets. Both test builds pass `SWIFT_OPTIMIZATION_LEVEL=-O`: the Ente sign-in tests run 4096-bit SRP through BigInt against the fake server, which took the unoptimized Debug build 2–3 minutes per platform and takes the optimized one about 15 seconds. `DEBUG`, testability and coverage are unchanged, and the app has no `assert`s whose side effects the optimizer would drop. The optimized Mac app has no debug dylib, so its hardened runtime refuses the ad hoc test bundle; the Mac test build turns the hardened runtime off. The watch app is embedded in the iPhone app, so the simulator test build builds it too; the `test-macos` job also builds it on its own, so watchOS failures are reported as such. The TOTP generator the watch uses is shared with the app (`Shared/`) and tested there against the RFC 4226 and RFC 6238 vectors. The stock formatter reports many existing legacy-file issues, so formatting is scoped to the new files rather than causing a repository-wide formatting change.
+`main` requires a pull request (with no required approvals), the `build` status check, and the branch to be up to
+date with `main` before merging. It isn't enforced for administrators (`enforce_admins` is off), so the owner can
+still push or merge past it.
 
-The `test-macos` job runs on a second runner at the same time as the simulator tests: it builds the watch app for the watchOS simulator, then runs the unit tests on macOS, for the Mac version of the app. The required `build` check waits for both jobs. CI has no provisioning profile, so that build is signed ad hoc with a copy of the Mac entitlements without `keychain-access-groups`, and `SecureStoreTests` skips itself when the entitlement is missing. The other tests run as on iOS. See [macos.md](macos.md).
+## OrielOTPTests
 
-The simulator is selected by exact model name (`iPhone 17`) and the newest installed iOS runtime version. If it is missing, CI prints the available devices. The selected simulator begins booting before package resolution, so startup overlaps package fetching and analysis. Test, analyzer, and package-resolution logs, a test summary, and the `.xcresult` bundle upload even when the test step fails or reaches its step timeout. The test timeout is 30 minutes inside a 45-minute job, leaving time for diagnostics and artifact upload.
+A newer push to a pull request cancels its run in progress; runs for `main` and tags always finish. Release builds are
+tagged, so the workflow tests the tag push and doesn't also run for the `release` event.
 
-## Dependencies and runtime
+- **`changes`** lists a pull request's files. If they're all documentation (`docs/`, top-level `*.md`, `LICENSE`,
+  `NOTICE`) or `.github/dependabot.yml`, the macOS jobs are skipped. Pushes always build.
+- **`dependency-review`** runs on pull requests and fails on a vulnerability of moderate severity or higher in a
+  changed dependency.
+- **`test`** (iOS):
+  1. Lints a few files with `swift-format --strict`. The older files don't follow the configuration, so the lint is
+     limited to the files listed in the workflow rather than reformatting the whole repository.
+  2. Validates the project file, plists, entitlements, privacy manifests and schemes, checks that every
+     `Package.resolved` pin has a 40-character revision, and that the 10 targets' configurations keep complete strict
+     concurrency checking and warnings as errors.
+  3. Checks the translations' format specifiers with `tools/check-format-specifiers.py`: every translation, plural
+     form and substitution must read its key's arguments with the same types, and no others.
+  4. Picks the `iPhone 17` simulator with the newest iOS runtime, resolves the Swift packages (below), and starts
+     booting the simulator so the boot overlaps the build.
+  5. Runs `xcodebuild test` with code coverage, which builds the app, its extensions and the embedded watch app.
+  6. Prints a summary of the result bundle and fails if `EnteLoginFlow.swift` drops below 50% line coverage or
+     `TokenResponseStore.swift` below 90%.
+  7. Uploads the result bundle, the logs and the summary for 7 days, also when a step failed.
+- **`test-macos`**, on a second runner at the same time: builds the watch app on its own for the watchOS simulator,
+  so a watchOS-only failure shows as such, then runs the unit tests on macOS. There's no provisioning profile, so the
+  Mac build is signed ad hoc with a copy of the Mac entitlements without the keychain access group, the app group
+  and AutoFill; the keychain tests skip themselves without the access group. See [macos.md](macos.md).
+- **`build`** always runs and is the required check. It passes only if `changes` passed, dependency review passed
+  (on pull requests), and both test jobs passed, or both were skipped for a documentation-only change.
 
-CI resolves the committed Swift Package Manager lockfile with automatic version selection disabled and only locked versions allowed. It computes the same cache digest as `hashFiles()` for the single lockfile using the runner's `shasum` and `xxd`, then caches the cloned `SourcePackages` directory by OS and lockfile hash. This avoids a GitHub `hashFiles()` timeout without invalidating the existing package cache. It does not cache `DerivedData` across runners; build products are reused within a job, while cross-run DerivedData caching would add large, runner-specific cache data. `xcodebuild clean` is omitted so analysis outputs can be reused by the test build. The prior standalone scheme-list command was redundant with project metadata validation.
+Both test builds pass `SWIFT_OPTIMIZATION_LEVEL=-O`. The Ente sign-in tests run 4096-bit SRP with BigInt against the
+in-process fake server, and an unoptimized BigInt takes long enough for their requests to time out. `DEBUG` and
+testability stay on. The optimized Mac app has no debug dylib, so its hardened runtime would refuse the ad hoc test
+bundle; the Mac test build turns the hardened runtime off.
 
-Dependency review runs on pull requests and fails on vulnerabilities of moderate severity or higher. GitHub Dependabot vulnerability alerts are enabled. The lockfile pins package versions and revisions, including transitive dependencies. A successful GitHub Actions run confirmed dependency review against the Swift lockfile and uploaded the test-result artifact. Action metadata declares Node 24 for checkout v5, dependency review v5, cache v5, and upload-artifact v6; the older cache and artifact releases produced Node 20 deprecation warnings. No project Node version is needed because the repository has no Node project or Node-based build step.
+### Running the tests locally
 
-The pre-change clean test run took 50.86 seconds for 71 tests. The latest post-change local CI-shaped run took 62 seconds for 78 tests, including metadata and formatting checks, analysis, tests, and coverage gates; the test execution phase after analysis took 18.1 seconds. A prior post-change local run took 120 seconds. Those post-change runs had different simulator and cache state: the 62-second repeat reused Swift packages and an already booted simulator. The old run also did not include analysis or metadata and formatting checks, so the full-run times are not a controlled comparison. The current workflow starts the simulator before package resolution, but the repeat had an already booted simulator, so the cold-start overlap savings remain unmeasured. These are local timings, not GitHub-hosted runner timings.
+Pass the same setting to a local run, or those tests fail with "The request timed out":
 
-## Coverage and remaining gaps
+```sh
+xcodebuild test -project OrielOTP.xcodeproj -scheme OrielOTP \
+  -destination 'platform=iOS Simulator,name=iPhone 17' -only-testing:OrielOTPTests SWIFT_OPTIMIZATION_LEVEL=-O
+```
 
-The measured pre-change coverage was 13.83% for the app, 0% for the extension, and 23.16% for `EnteLoginFlow.swift`. After the added tests, the local result bundle reports 14.78% app coverage, 4.74% extension-target coverage, 56.50% for `EnteLoginFlow.swift`, and 100% for `TokenResponseStore.swift`. The extension's reported coverage comes from the shared response-store code; `TokenSession.swift` remains at 0%. CI gates the login flow at 50% and the shared response store at 90%, based on their post-change baselines. A single whole-app threshold would mostly measure still-untested UI and hardware paths, so the initial gates target critical behavior.
+The project can't set this for Debug: Xcode builds Swift packages with their own default settings, so the project's
+and the schemes' settings don't reach BigInt (a Debug build with the project set to `-O` still compiles BigInt with
+`-Onone`); only a setting on the `xcodebuild` command line does. Testing from Xcode (⌘U) has the same timeouts.
 
-New tests cover login transitions, email/TOTP errors and normalization, passkey URL construction and polling, opaque secure-store token data, the protected token-response file handoff, and supported extension-operation policy. Existing tests cover OTP credential parsing and Steam HMAC-to-code conversion. OTP generation itself is performed by a physical YubiKey through YubiKit, so its hardware behavior is not exercised in simulator CI. The tests also do not exercise a full CryptoTokenKit request through the signed app-group container; that OS-managed extension flow remains an integration-test gap.
+Run the Mac tests only in CI or with the ad hoc signing above: the Mac Debug build has its own bundle ID, but a build
+signed with the team still shares the installed app's keychain items and app group (see [macos.md](macos.md)).
 
-The saved Xcode 27.1 result bundle from the iPhone 17 simulator reports 78 tests passed, with zero failures or skips. `xcodebuild analyze` also passed. GitHub Actions trigger behavior, dependency-review execution, artifact retention after a hosted timeout, and hosted-runner timings remain unverified until the workflow runs on GitHub. Xcode 27.1 still prints an App Intents metadata warning for `TokenExtension` and an `IDESchemeActionSDKRecord` `invalidDigitCount` diagnostic for the simulator build identifier. Disabling metadata generation did not suppress the former in local validation; both messages come from Xcode tooling and do not fail analysis or tests.
+## Swift packages
+
+`.github/actions/swift-packages` resolves the packages pinned in `Package.resolved` into `$RUNNER_TEMP/SourcePackages`,
+with automatic resolution and updates turned off, for every workflow that builds.
+
+- **Cache.** Only the checkouts, `artifacts` and `workspace-state.json` (about 45 MB) are cached, keyed by the runner
+  OS, the Xcode build version and the SHA-256 of `Package.resolved` (computed with `shasum` rather than `hashFiles()`,
+  which has timed out on a busy runner). SwiftPM's mirrors aren't cached: yubikit-swift's alone is about 580 MB, which
+  took longer to restore than to clone. DerivedData isn't cached. The TestFlight upload doesn't use the cache at all.
+- **Verification.** A cache can hold whatever a run saved under its key, so after resolving, the action checks the
+  files that will be built, whether they came from the cache or not:
+  - `workspace-state.json` must list the pinned revisions, the checkouts folder must hold exactly the pinned
+    packages, and no package may have downloaded an artifact.
+  - Each checkout's files are hashed into a Git tree and compared with the tree of the pinned commit. Only that
+    commit object is fetched from the package's repository (`git fetch --depth=1 --filter=tree:0`), and Git checks
+    that it hashes to the pinned revision. Any changed, added or removed file fails the step.
+  - swift-sodium ships libsodium prebuilt, as `Clibsodium.xcframework` in its repository. Its SHA-256 (of the
+    `shasum -a 256` list of its files, sorted by path) is recorded in the action as `CLIBSODIUM_SHA256`, so a
+    swift-sodium update fails until the new binary has been looked at and the value updated.
+
+BigInt is pinned to a commit rather than a release: `96fb3b17` ("Bump minimum watchOS to 9", attaswift/BigInt#140)
+fixes a deployment target warning in the watch build, which the warnings-as-errors setting turns into an error, and
+it's newer than the latest release, 6.0.1. Move the pin to a release tag once one includes it.
+
+## TestFlight, Screenshots and Accessibility
+
+- **TestFlight** runs in the `testflight` environment and clones the packages instead of restoring the cache. The
+  signing keychain and App Store Connect key are only on the runner for the steps that need them. See
+  [testflight.md](testflight.md).
+- **Screenshots** runs the iPhone (`tools/screenshots.sh`) and Mac (`tools/screenshots-macos.sh`) screenshot tests
+  on two runners, and pushes changed screenshots to the `bot/screenshots` branch for a pull request.
+- **Accessibility** runs the accessibility audits and tap to copy tests (`tools/screenshots.sh audits`) on an iPhone
+  and an iPad, in several appearances and text sizes.
