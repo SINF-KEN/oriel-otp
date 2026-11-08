@@ -56,6 +56,30 @@ struct LargestClearRectTests {
         #expect(bounds.largestClearRect(avoiding: [fold, housing]) == CGRect(x: 0, y: 0, width: 400, height: 390))
     }
 
+    @Test func foldAcrossPrefersUpperHalfEvenWhenSmaller() {
+        let fold = CGRect(x: 0, y: 380, width: 400, height: 20)
+        #expect(bounds.largestClearRect(avoiding: [], folds: [fold]) == CGRect(x: 0, y: 0, width: 400, height: 380))
+    }
+
+    @Test func foldAcrossAvoidsHousingInUpperHalf() {
+        let landscape = CGRect(x: 0, y: 0, width: 800, height: 600)
+        let fold = CGRect(x: 0, y: 290, width: 800, height: 20)
+        let housing = CGRect(x: 650, y: 0, width: 150, height: 60)
+        #expect(landscape.largestClearRect(avoiding: [housing], folds: [fold]) == CGRect(x: 0, y: 0, width: 650, height: 290))
+    }
+
+    @Test func foldNearTopKeepsLowerPart() {
+        // A sheet that only just reaches over the fold.
+        let fold = CGRect(x: 0, y: 100, width: 400, height: 20)
+        #expect(bounds.largestClearRect(avoiding: [], folds: [fold]) == CGRect(x: 0, y: 120, width: 400, height: 680))
+    }
+
+    @Test func foldBetweenColumnsKeepsLargerHalf() {
+        let landscape = CGRect(x: 0, y: 0, width: 800, height: 400)
+        let fold = CGRect(x: 390, y: 0, width: 20, height: 400)
+        #expect(landscape.largestClearRect(avoiding: [], folds: [fold]) == CGRect(x: 0, y: 0, width: 390, height: 400))
+    }
+
     @Test func obstacleCoveringBoundsKeepsBounds() {
         #expect(bounds.largestClearRect(avoiding: [bounds.insetBy(dx: -10, dy: -10)]) == bounds)
     }
