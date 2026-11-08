@@ -172,6 +172,7 @@ struct MainView: View {
                 performPendingQuickAction()
             } else if phase == .background {
                 didEnterBackground = true
+                CodeVisibility.shared.hideAll()
 
                 #if os(iOS)
                 // Keep running until the YubiKey connection is closed.

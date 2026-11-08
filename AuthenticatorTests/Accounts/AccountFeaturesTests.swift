@@ -188,3 +188,34 @@ struct EnteTagsTests {
         #expect(model.accounts.first?.serviceIcon?.slug == "github")
     }
 }
+
+@MainActor struct CodeVisibilityTests {
+
+    @Test func hidesCodesUntilOneIsTapped() throws {
+        let visibility = CodeVisibility(defaults: makeTestDefaults())
+        #expect(visibility.isShown("a"))
+        visibility.reveal("a")
+        // Nothing to reveal while codes are shown.
+        #expect(visibility.revealed.isEmpty)
+
+        visibility.hidesCodes = true
+        #expect(!visibility.isShown("a"))
+        visibility.reveal("a")
+        #expect(visibility.isShown("a"))
+        #expect(!visibility.isShown("b"))
+        visibility.hideAll()
+        #expect(!visibility.isShown("a"))
+    }
+
+    @Test func remembersTheSetting() {
+        let defaults = makeTestDefaults()
+        CodeVisibility(defaults: defaults).hidesCodes = true
+        #expect(CodeVisibility(defaults: defaults).hidesCodes)
+    }
+
+    @Test func hidesEachDigit() {
+        #expect(CodeVisibility.placeholder(digits: 6) == "••• •••")
+        #expect(CodeVisibility.placeholder(digits: 8) == "•••• ••••")
+        #expect(CodeVisibility.placeholder(digits: 5) == "•••••")
+    }
+}

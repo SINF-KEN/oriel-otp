@@ -313,7 +313,7 @@ struct AccountRowView<Accessory: View>: View {
 
     private var codeText: some View {
         ZStack {
-            if let otp = account.formattedCode {
+            if let otp = account.displayedCode {
                 Text(otp)
                     .privacySensitive()
                     .padding(.trailing, 4)
@@ -412,6 +412,9 @@ extension Account {
         }
         guard let code = formattedCode else {
             return String(localized: "Code not calculated", comment: "Accessibility label")
+        }
+        guard isCodeShown else {
+            return String(localized: "Code hidden", comment: "Accessibility label for a code while Hide codes is on")
         }
         return Self.spokenDigits(code)
     }

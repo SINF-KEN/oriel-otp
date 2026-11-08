@@ -246,7 +246,7 @@ private struct AccountCodeButton: View {
                     .accessibilityHidden(true)
                 // Scales with Dynamic Type, and shrinks rather than truncating or wrapping in a narrow column such as
                 // Slide Over or half of a folded iPhone Duo.
-                Text(account.formattedCode ?? "*** ***")
+                Text(account.displayedCode ?? "*** ***")
                     .privacySensitive()
                     .font(.system(size: codeFontSize, weight: .bold))
                     .monospacedDigit()

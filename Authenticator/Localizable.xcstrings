@@ -3682,6 +3682,35 @@
         }
       }
     },
+    "Code hidden" : {
+      "comment" : "Accessibility label for a code while Hide codes is on",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code ausgeblendet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code masqué"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードは非表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kód je skrytý"
+          }
+        }
+      }
+    },
     "Code not calculated" : {
       "comment" : "Accessibility label",
       "localizations" : {
@@ -6376,6 +6405,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pomocník"
+          }
+        }
+      }
+    },
+    "Hidden codes show as dots until you tap one, which also copies it." : {
+      "comment" : "Privacy settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ausgeblendete Codes werden als Punkte angezeigt, bis Sie auf einen tippen, wodurch er auch kopiert wird."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les codes masqués s’affichent sous forme de points jusqu’à ce que vous en touchiez un, ce qui le copie aussi."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "非表示のコードは、タップするまでドットで表示されます。タップするとコードはコピーもされます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skryté kódy sa zobrazujú ako bodky, kým na jeden neklepnete, čím sa aj skopíruje."
+          }
+        }
+      }
+    },
+    "Hide codes" : {
+      "comment" : "Privacy setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Codes ausblenden"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Masquer les codes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードを非表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skryť kódy"
           }
         }
       }
@@ -10089,6 +10176,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nasmerujte kameru na QR kód a naskenujte ho"
+          }
+        }
+      }
+    },
+    "Privacy" : {
+      "comment" : "Settings section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Datenschutz"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Confidentialité"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "プライバシー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Súkromie"
           }
         }
       }
