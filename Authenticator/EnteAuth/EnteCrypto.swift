@@ -170,7 +170,8 @@ nonisolated enum EnteCrypto {
         return (Data(publicKey), Data(secretKey))
     }
 
-    /// Decrypts data that was encrypted as one secretstream message, the way Ente stores authenticator entities.
+    /// Decrypts data that was encrypted as one final secretstream message, the way Ente stores authenticator entities.
+    /// A message without the final tag is refused: it would be the start of a longer stream, cut short.
     static func secretStreamDecrypt(_ cipherText: Data, header: Data, key: Data) throws -> Data {
         try ensureInitialized()
         let additionalLength = Int(crypto_secretstream_xchacha20poly1305_abytes())
@@ -185,7 +186,8 @@ nonisolated enum EnteCrypto {
         var messageLength: UInt64 = 0
         var tag: UInt8 = 0
         guard crypto_secretstream_xchacha20poly1305_pull(&state, &message, &messageLength, &tag,
-                                                         [UInt8](cipherText), UInt64(cipherText.count), nil, 0) == 0 else {
+                                                         [UInt8](cipherText), UInt64(cipherText.count), nil, 0) == 0,
+              tag == UInt8(crypto_secretstream_xchacha20poly1305_TAG_FINAL) else {
             throw EnteCryptoError.decryptionFailed
         }
         return Data(message.prefix(Int(messageLength)))

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import Clibsodium
 import Foundation
 import Testing
 
@@ -113,6 +114,21 @@ struct EnteCryptoTests {
         tampered[tampered.count - 1] ^= 1
         #expect(throws: EnteCryptoError.decryptionFailed) {
             try EnteCrypto.secretStreamDecrypt(tampered, header: header, key: key)
+        }
+    }
+
+    /// Ente stores each entity as a single final message. One that isn't final is the start of a longer stream.
+    @Test func secretStreamMessageThatIsNotFinalIsRefused() throws {
+        let key = [UInt8](EnteCrypto.randomBytes(32))
+        let message = [UInt8]("\"otpauth://totp/Example:alice?secret=JBSWY3DPEHPK3PXP\"".utf8)
+        var state = crypto_secretstream_xchacha20poly1305_state()
+        var header = [UInt8](repeating: 0, count: Int(crypto_secretstream_xchacha20poly1305_headerbytes()))
+        #expect(crypto_secretstream_xchacha20poly1305_init_push(&state, &header, key) == 0)
+        var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_secretstream_xchacha20poly1305_abytes()))
+        #expect(crypto_secretstream_xchacha20poly1305_push(&state, &cipherText, nil, message, UInt64(message.count), nil, 0,
+                                                           UInt8(crypto_secretstream_xchacha20poly1305_TAG_MESSAGE)) == 0)
+        #expect(throws: EnteCryptoError.decryptionFailed) {
+            try EnteCrypto.secretStreamDecrypt(Data(cipherText), header: Data(header), key: Data(key))
         }
     }
 
