@@ -113,22 +113,45 @@ nonisolated struct EnteAPIClient: Sendable {
     static func serverURL(from text: String) throws -> URL {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return defaultServer }
-        guard let url = URL(string: text) else { throw EnteAPIError.invalidServerURL }
+        guard let url = URL(string: text), isPlainServer(url) else { throw EnteAPIError.invalidServerURL }
         return url
+    }
+
+    /// The host of a URL as URLSession connects to it, in lower case and without a trailing dot. Nil unless it's a plain
+    /// host name or IP address: a percent-encoded or non-ASCII host is decoded before connecting, so it would be checked
+    /// as one host and connected to as another.
+    static func host(of url: URL) -> String? {
+        guard var host = url.host(percentEncoded: true)?.lowercased() else { return nil }
+        if host.hasSuffix(".") {
+            host.removeLast()
+        }
+        let allowed = Set("abcdefghijklmnopqrstuvwxyz0123456789-._:[]".unicodeScalars)
+        guard !host.isEmpty, !host.hasPrefix("."), !host.contains(".."), host.unicodeScalars.allSatisfy(allowed.contains) else { return nil }
+        return host
+    }
+
+    /// Whether a URL can be a server: https, a plain host, and nothing a server URL doesn't need, like a user name, a
+    /// query or a fragment.
+    static func isPlainServer(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https", host(of: url) != nil,
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+        return components.percentEncodedUser == nil && components.percentEncodedPassword == nil
+            && components.percentEncodedQuery == nil && components.percentEncodedFragment == nil
     }
 
     /// Whether two URLs are the same server, however they were typed.
     static func isSameServer(_ first: URL, _ second: URL) -> Bool {
         func parts(_ url: URL) -> [String?] {
-            [url.scheme?.lowercased(), url.host()?.lowercased(), String(url.port ?? 443),
+            [url.scheme?.lowercased(), host(of: url), String(url.port ?? 443),
              url.path().trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
         }
+        guard host(of: first) != nil else { return false }
         return parts(first) == parts(second)
     }
 
     /// Whether accounts can be created on the server. Never on Ente's own servers: only on servers people host themselves.
     static func allowsAccountCreation(on server: URL) -> Bool {
-        guard let host = server.host()?.lowercased().trimmingCharacters(in: CharacterSet(charactersIn: ".")), !host.isEmpty else { return false }
+        guard isPlainServer(server), let host = host(of: server) else { return false }
         return !["ente.io", "ente.com"].contains { host == $0 || host.hasSuffix("." + $0) }
     }
 
@@ -137,7 +160,7 @@ nonisolated struct EnteAPIClient: Sendable {
 
     init(server: URL = defaultServer, session: URLSession = .ente) throws {
         // Credentials and tokens must never travel unencrypted.
-        guard server.scheme == "https", server.host?.isEmpty == false else { throw EnteAPIError.invalidServerURL }
+        guard server.scheme == "https", Self.isPlainServer(server) else { throw EnteAPIError.invalidServerURL }
         self.server = server
         self.session = session
     }
@@ -339,7 +362,7 @@ nonisolated final class EnteRedirectGuard: NSObject, URLSessionTaskDelegate, Sen
 
     static func allows(from origin: URL?, to destination: URL?) -> Bool {
         guard let origin, let destination, origin.scheme?.lowercased() == "https", destination.scheme?.lowercased() == "https",
-              let host = origin.host()?.lowercased(), host == destination.host()?.lowercased() else { return false }
+              let host = EnteAPIClient.host(of: origin), host == EnteAPIClient.host(of: destination) else { return false }
         return (origin.port ?? 443) == (destination.port ?? 443)
     }
 

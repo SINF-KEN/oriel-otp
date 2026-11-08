@@ -33,9 +33,41 @@ struct EnteAccountCreationRulesTests {
     }
 
     @Test func selfHostedServersAreAllowed() throws {
-        for server in ["https://ente.example.com", "https://notente.io", "https://api.ente.io.example.com", "https://192.168.1.2:8080"] {
+        for server in ["https://ente.example.com", "https://notente.io", "https://api.ente.io.example.com", "https://192.168.1.2:8080",
+                       "https://[fd00::1]:8080", "https://ente.example.com/api/"] {
             #expect(EnteAPIClient.allowsAccountCreation(on: try url(server)), "\(server)")
         }
+    }
+
+    /// URLSession decodes a percent-encoded host before connecting, so "api%2Eente%2Eio" is api.ente.io. Hosts that
+    /// aren't plain, and server URLs with a user, a query or a fragment, are refused everywhere.
+    @Test func serversThatArentPlainAreRefused() throws {
+        for server in ["https://api%2Eente%2Eio", "https://api%2eente%2eio/", "https://%61pi.ente.io", "https://api.ente%2Eio:443",
+                       "https://ente.example.com%2F@api.ente.io", "https://user@ente.example.com", "https://ente.example.com?a=b",
+                       "https://ente.example.com#a", "https://..ente.example.com", "https://"] {
+            guard let server = URL(string: server) else { continue }
+            #expect(!EnteAPIClient.allowsAccountCreation(on: server), "\(server)")
+            #expect(throws: EnteAPIError.invalidServerURL, "\(server)") { try EnteAPIClient.serverURL(from: server.absoluteString) }
+            #expect(throws: EnteAPIError.invalidServerURL, "\(server)") { try EnteAPIClient(server: server) }
+        }
+        for server in ["https://api%2Eente%2Eio", "https://%61pi.ente.io", "https://api.ente%2Eio:443"] {
+            let server = try url(server)
+            #expect(!EnteAPIClient.isSameServer(server, EnteAPIClient.defaultServer), "\(server)")
+            #expect(!EnteRedirectGuard.allows(from: server, to: server), "\(server)")
+        }
+        // A host that isn't ASCII is either turned into its ASCII form or refused, never let through as typed.
+        for server in ["https://api\u{FF0E}ente\u{FF0E}io", "https://API.ENTE.IO\u{3002}"] {
+            guard let server = URL(string: server) else { continue }
+            #expect(!EnteAPIClient.allowsAccountCreation(on: server), "\(server)")
+        }
+    }
+
+    @Test func hostsAreComparedAsTheyAreConnectedTo() throws {
+        #expect(EnteAPIClient.host(of: try url("https://API.Ente.IO./users")) == "api.ente.io")
+        #expect(EnteAPIClient.host(of: try url("https://api%2Eente%2Eio")) == nil)
+        #expect(EnteAPIClient.isSameServer(try url("https://API.ENTE.IO./"), EnteAPIClient.defaultServer))
+        #expect(EnteRedirectGuard.allows(from: try url("https://api.ente.io/a"), to: try url("https://API.ente.io./b")))
+        #expect(!EnteRedirectGuard.allows(from: try url("https://ente.example.com/a"), to: try url("https://ente%2Eexample.com/b")))
     }
 
     /// Each request that creates an account fails before it's sent: a request that was sent would fail differently.
