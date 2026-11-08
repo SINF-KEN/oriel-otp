@@ -37,6 +37,7 @@ import SwiftUI
 /// Each `*.new.ente.test` host is an account of its own that has never used Ente Auth: it has no authenticator key
 /// and no accounts until the app creates the key. Each `*.empty.ente.test` host has no account at all until one is created
 /// in the app, with the checks of Ente's server. "+closed" in the email acts like a server with registration turned off.
+/// An account can be deleted like on Ente's server, with the challenge sealed to its public key. Nothing signs in to it after.
 nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
 
     static let server = URL(string: "https://demo.ente.test")!
@@ -136,6 +137,10 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
     private var entities: [[String: Any]]
     /// The `updatedAt` of the latest change, so every change is later than all before it.
     private var clock: Int64 = 0
+    /// The challenge sent to delete the account, which comes back opened.
+    private var deleteChallenge: String?
+    /// Set once the account was deleted: nothing signs in to it any more.
+    private var isDeleted = false
 
     var hasAuthenticatorKey: Bool {
         lock.withLock { authenticatorKey != nil }
@@ -180,12 +185,12 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         defer { lock.unlock() }
         let path = request.url?.path ?? ""
         let body = Self.body(of: request)
-        let authorized = request.value(forHTTPHeaderField: "X-Auth-Token") == token
+        let authorized = !isDeleted && request.value(forHTTPHeaderField: "X-Auth-Token") == token
         switch (request.httpMethod ?? "GET", path) {
         case ("GET", "/users/srp/attributes"):
             let email = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?
                 .queryItems?.first { $0.name == "email" }?.value ?? ""
-            guard !Self.has("nosrp", email), isRegistered, !isAwaitingSRP else { return (404, [:]) }
+            guard !Self.has("nosrp", email), isRegistered, !isAwaitingSRP, !isDeleted else { return (404, [:]) }
             return (200, ["attributes": ["srpUserID": srpUserID(twoFactor: Self.has("2fa", email)), "srpSalt": srpSalt.base64EncodedString(),
                                          "memLimit": memLimit, "opsLimit": opsLimit,
                                          "kekSalt": kekSalt.base64EncodedString(),
@@ -199,6 +204,7 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             if Self.has("closed", body["email"] as? String ?? "") { return (403, [:]) }
             return (isRegistered ? 409 : 200, [:])
         case ("POST", "/users/verify-email"):
+            guard !isDeleted else { return (404, [:]) }
             guard body["ott"] as? String == FakeEnteServer.code else { return (401, [:]) }
             guard isRegistered else { return (200, ["id": 42, "token": token]) }
             let email = body["email"] as? String ?? ""
@@ -265,6 +271,22 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
             guard entities.contains(where: { $0["id"] as? String == id && $0["isDeleted"] as? Bool == false }) else { return (404, [:]) }
             entities.removeAll { $0["id"] as? String == id }
             entities.append(row(id, encryptedData: nil, header: nil))
+            return (200, [:])
+        case ("GET", "/users/delete-challenge"):
+            // Like Ente's server: a token prefixed with "delete-jwt", sealed to the account's public key.
+            guard authorized else { return (401, [:]) }
+            guard let publicKey = (keyAttributes["publicKey"] as? String).flatMap({ Data(enteBase64: $0) }) else { return (500, [:]) }
+            let challenge = "delete-jwt" + EnteCrypto.randomBytes(32).enteURLSafeBase64
+            deleteChallenge = challenge
+            let sealed = try! EnteCrypto.sealedBox(Data(challenge.utf8), publicKey: publicKey)
+            return (200, ["allowDelete": true, "encryptedChallenge": sealed.base64EncodedString(), "apps": []])
+        case ("DELETE", "/users/delete"):
+            guard authorized else { return (401, [:]) }
+            guard let challenge = deleteChallenge, body["challenge"] as? String == challenge else { return (400, [:]) }
+            deleteChallenge = nil
+            isDeleted = true
+            authenticatorKey = nil
+            entities = []
             return (200, [:])
         case ("POST", "/users/logout"):
             return (200, [:])
