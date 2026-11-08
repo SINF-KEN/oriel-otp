@@ -173,6 +173,35 @@
         }
       }
     },
+    "Ente recovery key" : {
+      "comment" : "Ente recovery key file name and share title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente-Wiederherstellungsschlüssel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Clé de récupération Ente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enteリカバリキー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kľúč na obnovenie Ente"
+          }
+        }
+      }
+    },
     "%lld accounts in Ente Auth" : {
       "comment" : "Ente sync accounts header. The placeholder is the number of accounts.",
       "localizations" : {
@@ -4401,35 +4430,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopírovať kód"
-          }
-        }
-      }
-    },
-    "Copy recovery key" : {
-      "comment" : "Ente account creation button",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wiederherstellungsschlüssel kopieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Copier la clé de récupération"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "リカバリキーをコピー"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kopírovať kľúč na obnovenie"
           }
         }
       }
@@ -11926,6 +11926,35 @@
         }
       }
     },
+    "Save recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enregistrer la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uložiť kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "Save the account in Ente Auth and delete it from this device" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -12585,6 +12614,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nastavenia…"
+          }
+        }
+      }
+    },
+    "Share recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel teilen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Partager la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを共有"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zdieľať kľúč na obnovenie"
           }
         }
       }
