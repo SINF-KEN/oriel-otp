@@ -158,9 +158,7 @@ nonisolated final class EnteMockURLProtocol: URLProtocol, @unchecked Sendable {
     }
 
     static func makeAPI() throws -> EnteAPIClient {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [EnteMockURLProtocol.self]
-        return try EnteAPIClient(server: URL(string: "https://ente.test")!, session: URLSession(configuration: configuration))
+        return try EnteAPIClient(server: URL(string: "https://ente.test")!, session: URLSession.stubbed([EnteMockURLProtocol.self]))
     }
 }
 
@@ -317,12 +315,10 @@ struct EnteAuthenticatorSyncTests {
                 return (404, Data())
             }
         }
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [EnteMockURLProtocol.self]
         let session = EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t", authenticatorKey: authenticatorKey)
         let defaults = makeTestDefaults()
         let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                              storage: InMemoryVaultStorage(), session: URLSession(configuration: configuration),
+                              storage: InMemoryVaultStorage(), session: URLSession.stubbed([EnteMockURLProtocol.self]),
                               watch: WatchAccountSync(defaults: defaults))
         cloud.use(session)
         try await cloud.syncNow()
