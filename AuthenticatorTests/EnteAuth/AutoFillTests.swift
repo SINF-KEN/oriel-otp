@@ -32,6 +32,14 @@ struct AutoFillWebsitesTests {
         ("ミクシィ", []),
         ("X", ["x.com", "twitter.com"]),
         ("", []),
+        // A name only: its `.com` could belong to anyone, so it's never used without asking.
+        ("Mastodon", []),
+        ("My Bank", []),
+        ("Home Assistant", []),
+        // Anyone can register a site under these.
+        ("github.io", []),
+        ("co.uk", []),
+        ("alice.github.io", ["alice.github.io"]),
     ])
     func guessesTheWebsiteFromTheIssuer(issuer: String, websites: [String]) {
         #expect(AutoFillWebsites.guess(issuer: issuer) == websites)
@@ -42,11 +50,27 @@ struct AutoFillWebsitesTests {
     }
 
     @Test(arguments: [
+        ("Mastodon", "mastodon.com"),
+        ("Home Assistant", "homeassistant.com"),
+        ("GitHub", nil),
+        ("accounts.google.com", nil),
+        ("github.io", nil),
+        ("ミクシィ", nil),
+        ("A", nil),
+    ] as [(String, String?)])
+    func suggestsAWebsiteForANameToBeConfirmed(issuer: String, suggestion: String?) {
+        #expect(AutoFillWebsites.suggestion(issuer: issuer) == suggestion)
+    }
+
+    @Test(arguments: [
         ("https://www.GitHub.com/login", "github.com"),
         ("example.com.", "example.com"),
         (" login.example.co.uk ", "login.example.co.uk"),
         ("github", nil),
         ("git hub.com", nil),
+        ("co.uk", nil),
+        ("https://www.github.io/", nil),
+        ("alice.github.io", "alice.github.io"),
         ("", nil),
     ] as [(String, String?)])
     func normalizesTypedWebsites(text: String, website: String?) {
@@ -163,6 +187,19 @@ struct AutoFillAccountSyncTests {
         #expect(accounts.map(\.id) == ["github"])
         #expect(accounts.first?.websites == ["github.com"])
         #expect(accounts.first.map { OTPGenerator.code(for: $0.account, at: Date(timeIntervalSince1970: 59)) } == "996554")
+    }
+
+    @Test func aNameIsNotTurnedIntoAWebsite() async throws {
+        await update(sync(), with: [Self.code("mastodon", "otpauth://totp/Mastodon:alice?secret=JBSWY3DPEHPK3PXP&issuer=Mastodon")])
+        #expect(try storage.load()?.first?.websites == [])
+    }
+
+    @Test func aPublicSuffixChosenEarlierIsLeftOut() async throws {
+        let sync = sync()
+        await update(sync)
+        sync.setWebsites(["co.uk", "example.co.uk"], for: "github")
+        await sync.finishWriting()
+        #expect(try storage.load()?.first?.websites == ["example.co.uk"])
     }
 
     @Test func parsesTheAccountsOffTheMainThread() async {

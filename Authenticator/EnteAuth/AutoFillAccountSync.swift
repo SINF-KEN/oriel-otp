@@ -24,7 +24,8 @@ import Foundation
 /// the ones sent to the Apple Watch, each time the vault changes. HOTP accounts are left out: filling one in would
 /// have to move its counter on in the vault. The file is deleted when the app signs out of Ente.
 ///
-/// Each account is suggested on the websites guessed from its issuer, unless other websites were chosen for it. The
+/// Each account is suggested on the websites guessed from its issuer, unless other websites were chosen for it. Only
+/// an issuer that is a domain or a known service gives websites: one made up from a name could belong to anyone. The
 /// chosen ones are kept in an encrypted file, as they say where the accounts are used. They can't be read while the
 /// device is locked, and nothing is written over them until they have been.
 @Observable final class AutoFillAccountSync {
@@ -70,10 +71,11 @@ import Foundation
 
     // MARK: - Websites
 
-    /// The websites chosen for the account, or the ones guessed from its issuer.
+    /// The websites chosen for the account, or the ones guessed from its issuer. A public suffix chosen before they
+    /// were turned down is left out, as it would match every site under it.
     func websites(for id: String, issuer: String?) -> [String] {
         readWebsites()
-        return chosenWebsites[id] ?? AutoFillWebsites.guess(issuer: issuer)
+        return chosenWebsites[id]?.filter { !AutoFillWebsites.isPublicSuffix($0) } ?? AutoFillWebsites.guess(issuer: issuer)
     }
 
     /// Whether the websites were chosen rather than guessed.

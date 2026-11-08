@@ -115,6 +115,64 @@
       },
       "shouldTranslate" : false
     },
+    "Add %@" : {
+      "comment" : "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajouter %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@を追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridať %@"
+          }
+        }
+      }
+    },
+    "Add it only if it's where you sign in to this account. Codes aren't suggested on a website until you add it." : {
+      "comment" : "AutoFill websites footer below a website made up from the account's name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Füge sie nur hinzu, wenn du dich dort bei diesem Konto anmeldest. Codes werden auf einer Website erst vorgeschlagen, wenn du sie hinzufügst."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajoutez-le seulement si c’est là que vous vous connectez à ce compte. Les codes ne sont suggérés sur un site qu’une fois que vous l’avez ajouté."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントにサインインするWebサイトである場合にのみ追加してください。追加するまで、そのWebサイトでコードは提案されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridajte ju, len ak sa na nej prihlasujete do tohto účtu. Kódy sa na webovej stránke navrhujú až po jej pridaní."
+          }
+        }
+      }
+    },
     "%lld accounts in Ente Auth" : {
       "comment" : "Ente sync accounts header. The placeholder is the number of accounts.",
       "localizations" : {
