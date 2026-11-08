@@ -23,6 +23,7 @@ struct EnteAccountSection: View {
     @State private var account: EnteSavedAccount?
     @State private var isConfirmingSignOut = false
     @State private var isSigningOut = false
+    @State private var isMoving = false
 
     init(store: EnteSessionStore = EnteSessionStore()) {
         self.store = store
@@ -42,6 +43,15 @@ struct EnteAccountSection: View {
             } else {
                 Text(String(localized: "Not signed in", comment: "Ente settings without a saved account"))
                     .foregroundStyle(.secondary)
+            }
+            Button(String(localized: "Move to another server…", comment: "Ente settings button that opens the migration sheet")) {
+                isMoving = true
+            }
+            .disabled(isSigningOut)
+            .accessibilityIdentifier("ente.migrate")
+            // On the button: on the section each row would present it, and the sheets would close each other.
+            .sheet(isPresented: $isMoving, onDismiss: { account = store.savedAccount }) {
+                EnteMigrationView()
             }
         } header: {
             Text(verbatim: "Ente Auth")
