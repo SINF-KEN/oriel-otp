@@ -84,9 +84,9 @@ short of that in places, as in Apple's own apps; everything the app draws itself
   for at least 4.5:1. The accent itself stays light in dark mode, as the codes are drawn in it.
 - Every asset color has a high contrast variant, for light and dark mode.
 
-A selected row is highlighted in the accent color, so everything on it changes with it: the code and the account name
-are white, whatever the code's button would otherwise be drawn in, and the letter on the account icon keeps its color,
-as the icon stays light.
+A selected row is highlighted in the accent color, so everything on it changes with it: on iOS the code and the
+account name are in the background color, like other text on the accent color, and white on the Mac, whatever the code's
+button would otherwise be drawn in. The letter on the account icon keeps its color, as the icon doesn't change.
 
 With Button Shapes on, the code below the name gets the outline the code beside the name always has.
 
@@ -183,7 +183,13 @@ hand. See [screenshots.md](screenshots.md).
   that doesn't follow the text size. The navigation bar's buttons are left out of the Dynamic Type check: like the
   system's, they keep their size and show the Large Content Viewer instead.
 
-The same audits run on an iPad, whose details are beside the list. On the Mac, `testAccessibilityAudit` in
+The Dynamic Type audit steps the app through the text sizes, and rows are recycled as they grow and shrink. Right after
+scrolling a list it reports clipped text and text that doesn't scale with no element, on both an iPhone and an iPad, for
+rows that are fine; a second audit reports nothing. So the tests audit a screen before scrolling it.
+
+The same audits run on an iPad, whose details are beside the list. Its sidebar is glass, and in dark mode the audit fails
+some of its text level with what's in the details, which an iPhone doesn't. The test then measures the text in a
+screenshot, and it only passes if the lightest and darkest pixels have the contrast it needs. On the Mac, `testAccessibilityAudit` in
 `AuthenticatorUITests/MacScreenshotTests.swift` audits each layout of the main window at 100% and 200%.
 
 `AuthenticatorUITests/TapToCopyTests.swift` taps the code in a row, beside the name and below it at a larger text size,

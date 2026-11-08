@@ -57,7 +57,8 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
         self.rounds = rounds
         if method.hasSecret, let secret {
             var salt = Data(count: 16)
-            _ = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            let status = salt.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, 16, $0.baseAddress!) }
+            precondition(status == errSecSuccess, "No random bytes for the salt")
             self.salt = salt
             hash = Self.derive(secret, salt: salt, rounds: rounds)
         } else {
@@ -88,6 +89,13 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
     }
 }
 
+/// The wrong codes or passwords since the last right one.
+nonisolated struct AppLockAttempts: Codable, Sendable, Equatable {
+    var failures: Int
+    /// The system's uptime at the last wrong attempt, see `AppLock.deviceUptime()`.
+    var lastFailure: TimeInterval
+}
+
 /// Reading the lock failed because the keychain can't be read until the device is unlocked.
 nonisolated struct AppLockUnavailableError: Error {}
 
@@ -96,15 +104,22 @@ nonisolated protocol AppLockStorage: Sendable {
     /// Nil when the app isn't locked. Throws `AppLockUnavailableError` before the device was first unlocked.
     func load() throws -> AppLockConfiguration?
     func save(_ configuration: AppLockConfiguration?) throws
+    /// Nil when there are no wrong attempts, or they can't be read.
+    func loadAttempts() -> AppLockAttempts?
+    func saveAttempts(_ attempts: AppLockAttempts?) throws
 }
 
-/// The lock in the keychain: `WhenUnlockedThisDeviceOnly`, so it never leaves the device or comes back from a backup.
+/// The lock and its wrong attempts in the keychain: `WhenUnlockedThisDeviceOnly`, so they never leave the device or
+/// come back from a backup, and can't be changed from outside the app like its preferences can.
 nonisolated struct AppLockKeychain: AppLockStorage {
 
-    private var query: [String: Any] {
+    private static let configurationAccount = "configuration"
+    private static let attemptsAccount = "attempts"
+
+    private func query(account: String) -> [String: Any] {
         var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
                                     String(kSecAttrService): "AppLock",
-                                    String(kSecAttrAccount): "configuration"]
+                                    String(kSecAttrAccount): account]
         #if os(macOS)
         query[String(kSecUseDataProtectionKeychain)] = true
         #endif
@@ -112,7 +127,24 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     }
 
     func load() throws -> AppLockConfiguration? {
-        var query = query
+        try read(account: Self.configurationAccount).map { try JSONDecoder().decode(AppLockConfiguration.self, from: $0) }
+    }
+
+    func save(_ configuration: AppLockConfiguration?) throws {
+        try write(configuration.map { try JSONEncoder().encode($0) }, account: Self.configurationAccount)
+    }
+
+    func loadAttempts() -> AppLockAttempts? {
+        guard let data = try? read(account: Self.attemptsAccount) else { return nil }
+        return try? JSONDecoder().decode(AppLockAttempts.self, from: data)
+    }
+
+    func saveAttempts(_ attempts: AppLockAttempts?) throws {
+        try write(attempts.map { try JSONEncoder().encode($0) }, account: Self.attemptsAccount)
+    }
+
+    private func read(account: String) throws -> Data? {
+        var query = query(account: account)
         query[String(kSecReturnData)] = true
         query[String(kSecMatchLimit)] = kSecMatchLimitOne
         var result: AnyObject?
@@ -120,7 +152,7 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         switch status {
         case errSecSuccess:
             guard let data = result as? Data else { throw SecureStoreError.dataCastError }
-            return try JSONDecoder().decode(AppLockConfiguration.self, from: data)
+            return data
         case errSecItemNotFound:
             return nil
         case errSecInteractionNotAllowed:
@@ -130,14 +162,15 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         }
     }
 
-    /// Updates the lock in place, so a change that fails leaves the old lock rather than none.
-    func save(_ configuration: AppLockConfiguration?) throws {
-        guard let configuration else {
+    /// Updates the item in place, so a change that fails leaves the old lock rather than none.
+    private func write(_ data: Data?, account: String) throws {
+        let query = query(account: account)
+        guard let data else {
             let status = SecItemDelete(query as CFDictionary)
             guard status == errSecSuccess || status == errSecItemNotFound else { throw Self.error(status) }
             return
         }
-        let attributes: [String: Any] = [String(kSecValueData): try JSONEncoder().encode(configuration),
+        let attributes: [String: Any] = [String(kSecValueData): data,
                                          String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
         var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
@@ -151,6 +184,14 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     }
 }
 
+/// A Face ID, Touch ID or passcode check that already succeeded. Reading a protected item with it doesn't ask again,
+/// as long as the check satisfies the item's access control: the device passcode doesn't satisfy `biometryCurrentSet`.
+/// Keep it only as long as it's needed, as it reads protected items without the user knowing.
+nonisolated struct KeychainAuthentication: @unchecked Sendable {
+    // Only ever passed to the keychain, never changed after it was evaluated.
+    let context: LAContext
+}
+
 /// Locks the account list behind Face ID or Touch ID, a 4 or 6 digit code, or a password.
 ///
 /// The app locks when it starts and whenever it goes to the background, or on the Mac when the screen locks or the
@@ -158,18 +199,21 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 /// Face ID) is started: it waits in `whenUnlocked`.
 ///
 /// After 5 wrong codes or passwords, the next attempt has to wait 30 seconds, doubling with each wrong one up to an
-/// hour. There's no way around a forgotten code or password other than deleting the app, which forgets the lock: the
-/// accounts are on the YubiKey and in Ente Auth, not only in the app.
+/// hour. The wait follows the system's uptime, which can't be set like the clock, and starts over when the device
+/// restarts. There's no way around a forgotten code or password other than deleting the app: the accounts are on the
+/// YubiKey and in Ente Auth, not only in the app.
+///
+/// The keychain keeps the lock when the app is deleted, the app's preferences don't, which is how a lock left by an
+/// earlier installation shows. Preferences can be edited though, so they alone don't remove a lock: it's forgotten
+/// once the device owner confirms it with Face ID, Touch ID or the device passcode.
 @MainActor @Observable final class AppLock {
     static let shared = Bundle.main.bundleURL.pathExtension == "appex"
         // The AutoFill extension can't tell which installation of the app saved the lock, the app forgets an earlier
         // one's when it starts.
         ? AppLock(defaults: AppGroup.defaults, keepsSavedLock: true)
-        : AppLock(attempts: AppGroup.defaults)
+        : AppLock()
 
     private static let enabledKey = "AppLock.Enabled"
-    private static let failedAttemptsKey = "AppLock.FailedAttempts"
-    private static let lastFailureKey = "AppLock.LastFailure"
     private static let freeAttempts = 5
 
     /// The lock, nil when the app isn't locked or the lock can't be read yet.
@@ -182,60 +226,95 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     private(set) var retryDate: Date?
     /// Face ID or Touch ID is being asked for.
     private(set) var isAuthenticating = false
+    /// The Face ID or Touch ID that just unlocked the app, for what's waiting in `whenUnlocked` to read the keychain
+    /// without asking again. Only set while those actions run, so it can't approve anything later on.
+    @ObservationIgnored private(set) var unlockAuthentication: KeychainAuthentication?
 
     @ObservationIgnored private let storage: AppLockStorage
     @ObservationIgnored private let defaults: UserDefaults
-    /// Where the wrong attempts are counted, shared with the AutoFill extension so they count in both.
-    @ObservationIgnored private let attempts: UserDefaults
     @ObservationIgnored private let keepsSavedLock: Bool
     @ObservationIgnored private let now: () -> Date
-    @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> Bool
+    @ObservationIgnored private let uptime: () -> TimeInterval
+    @ObservationIgnored private let deviceOwnerIsAvailable: () -> Bool
+    @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> KeychainAuthentication?
     @ObservationIgnored private var pendingActions: [@MainActor () -> Void] = []
     @ObservationIgnored private var didAskForDeviceOwner = false
+    /// The saved lock is kept until the device owner confirms forgetting it, `configuration` is the device method
+    /// until then. See `holdUnconfirmedLock()`.
+    @ObservationIgnored private var isUnconfirmedLock = false
 
     var method: AppLockMethod { configuration?.method ?? .off }
 
-    /// `attempts` defaults to `defaults`. With `keepsSavedLock`, a lock in the keychain is used even if this
-    /// installation didn't save it.
+    /// With `keepsSavedLock`, a lock in the keychain is used even if this installation didn't save it.
     init(storage: AppLockStorage = AppLockKeychain(),
          defaults: UserDefaults = .standard,
-         attempts: UserDefaults? = nil,
          keepsSavedLock: Bool = false,
          now: @escaping () -> Date = Date.init,
-         authenticateDeviceOwner: @escaping @MainActor (String) async -> Bool = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
+         uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
+         deviceOwnerIsAvailable: @escaping () -> Bool = { AppLock.canUseDeviceOwner },
+         authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
         self.storage = storage
         self.defaults = defaults
-        self.attempts = attempts ?? defaults
         self.keepsSavedLock = keepsSavedLock
         self.now = now
+        self.uptime = uptime
+        self.deviceOwnerIsAvailable = deviceOwnerIsAvailable
         self.authenticateDeviceOwner = authenticateDeviceOwner
         isLocked = true
+        relock()
+    }
+
+    /// Reads the lock again and locks, if a lock is set. The AutoFill extension does this for every request, as its
+    /// process can outlive one and the lock can change in the app in between.
+    func relock() {
         reload()
         isLocked = isUnavailable || method != .off
+        didAskForDeviceOwner = false
+        pendingActions = []
         updateRetryDate()
     }
 
-    /// Reads the lock from the keychain. A lock left in the keychain by an earlier installation of the app, which the
-    /// keychain keeps when the app is deleted, is forgotten.
+    /// Reads the lock from the keychain.
     private func reload() {
         do {
-            var configuration = try storage.load()
-            if configuration != nil, !keepsSavedLock, !defaults.bool(forKey: Self.enabledKey) {
-                try? storage.save(nil)
-                configuration = nil
+            let saved = try storage.load()
+            if saved != nil, !keepsSavedLock, !defaults.bool(forKey: Self.enabledKey) {
+                // Left by an earlier installation of the app, or the preferences were changed.
+                holdUnconfirmedLock()
+            } else {
+                configuration = saved
+                isUnconfirmedLock = false
             }
-            self.configuration = configuration
             isUnavailable = false
         } catch is DecodingError {
-            // A lock that can't be decoded can't be unlocked, so it's forgotten rather than locking the app for good.
-            try? storage.save(nil)
-            configuration = nil
+            // A lock that can't be decoded can't be unlocked, so it mustn't lock the app for good.
+            holdUnconfirmedLock()
             isUnavailable = false
         } catch {
             // The device is locked, or the keychain failed. The app stays locked and reads it again when it's next
             // active, rather than opening without the lock.
             isUnavailable = true
         }
+    }
+
+    /// Asks for the device owner before a saved lock that can't be used is forgotten. A device without a passcode has
+    /// no owner to ask.
+    private func holdUnconfirmedLock() {
+        if deviceOwnerIsAvailable() {
+            configuration = AppLockConfiguration(method: .device)
+            isUnconfirmedLock = true
+        } else {
+            forgetSavedLock()
+        }
+    }
+
+    private func forgetSavedLock() {
+        try? storage.save(nil)
+        try? storage.saveAttempts(nil)
+        defaults.set(false, forKey: Self.enabledKey)
+        configuration = nil
+        isUnconfirmedLock = false
+        retryDate = nil
     }
 
     /// Locks the app, if a lock is set.
@@ -275,9 +354,11 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     func unlockWithDeviceOwner() async {
         guard isLocked, method == .device, !isAuthenticating else { return }
         isAuthenticating = true
-        let success = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
+        let authentication = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
         isAuthenticating = false
-        if success { unlock() }
+        guard let authentication else { return }
+        if isUnconfirmedLock { forgetSavedLock() }
+        unlock(authentication: authentication)
     }
 
     /// Unlocks if `secret` is the code or password. Returns false when it isn't, or it's too early to try again.
@@ -293,19 +374,18 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         updateRetryDate()
         guard retryDate == nil else { return false }
         if configuration.matches(secret) {
-            attempts.removeObject(forKey: Self.failedAttemptsKey)
-            attempts.removeObject(forKey: Self.lastFailureKey)
+            try? storage.saveAttempts(nil)
             return true
         }
-        attempts.set(attempts.integer(forKey: Self.failedAttemptsKey) + 1, forKey: Self.failedAttemptsKey)
-        attempts.set(now().timeIntervalSinceReferenceDate, forKey: Self.lastFailureKey)
+        let failures = (storage.loadAttempts()?.failures ?? 0) + 1
+        try? storage.saveAttempts(AppLockAttempts(failures: failures, lastFailure: uptime()))
         updateRetryDate()
         return false
     }
 
     /// Asks for Face ID, Touch ID or the device passcode before the lock is changed from or to the device method.
     func verifyDeviceOwner() async -> Bool {
-        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock"))
+        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
     }
 
     /// Changes the lock. `secret` is the new code or password, for the methods that have one.
@@ -319,9 +399,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
         }
         try storage.save(configuration)
         defaults.set(configuration != nil, forKey: Self.enabledKey)
-        attempts.removeObject(forKey: Self.failedAttemptsKey)
-        attempts.removeObject(forKey: Self.lastFailureKey)
+        try? storage.saveAttempts(nil)
         self.configuration = configuration
+        isUnconfirmedLock = false
         isUnavailable = false
         retryDate = nil
         if configuration == nil { unlock() }
@@ -329,27 +409,39 @@ nonisolated struct AppLockKeychain: AppLockStorage {
 
     /// Clears `retryDate` once it has passed, for the views counting down to it.
     func updateRetryDate() {
-        let failures = attempts.integer(forKey: Self.failedAttemptsKey)
-        guard failures >= Self.freeAttempts else {
+        guard var attempts = storage.loadAttempts(), attempts.failures >= Self.freeAttempts else {
             retryDate = nil
             return
         }
-        let delay = min(30 * pow(2, Double(failures - Self.freeAttempts)), 3600)
-        let lastFailure = Date(timeIntervalSinceReferenceDate: attempts.double(forKey: Self.lastFailureKey))
-        let retryDate = lastFailure.addingTimeInterval(delay)
-        self.retryDate = retryDate > now() ? retryDate : nil
+        let uptime = uptime()
+        if attempts.lastFailure > uptime {
+            // The device restarted, which says nothing about the time that passed: the wait starts over.
+            attempts.lastFailure = uptime
+            try? storage.saveAttempts(attempts)
+        }
+        let delay = min(30 * pow(2, Double(attempts.failures - Self.freeAttempts)), 3600)
+        let remaining = delay - (uptime - attempts.lastFailure)
+        retryDate = remaining > 0 ? now().addingTimeInterval(remaining) : nil
     }
 
-    private func unlock() {
+    private func unlock(authentication: KeychainAuthentication? = nil) {
         isLocked = false
         let actions = pendingActions
         pendingActions = []
+        unlockAuthentication = authentication
         actions.forEach { $0() }
+        unlockAuthentication = nil
     }
 
-    nonisolated static func evaluateDeviceOwner(reason: String) async -> Bool {
+    nonisolated static func evaluateDeviceOwner(reason: String) async -> KeychainAuthentication? {
         let context = LAContext()
-        return (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) ?? false
+        guard (try? await context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason)) == true else { return nil }
+        return KeychainAuthentication(context: context)
+    }
+
+    /// The time since the device started, including while it slept. Changing the clock doesn't affect it.
+    nonisolated static func deviceUptime() -> TimeInterval {
+        TimeInterval(clock_gettime_nsec_np(CLOCK_MONOTONIC_RAW)) / 1_000_000_000
     }
 
     /// Whether the device can check its owner, i.e. a passcode or password is set.

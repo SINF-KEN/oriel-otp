@@ -92,8 +92,7 @@ nonisolated struct EnteSRPClient {
         let u = BigUInt(Self.hash(paddedA, paddedB))
         guard !u.isZero else { throw EnteSRPError.invalidServerValue }
 
-        // x = H(salt | H(I | ":" | P))
-        let x = BigUInt(Self.hash(salt, Self.hash(identity, Data(":".utf8), password)))
+        let x = Self.x(identity: identity, password: password, salt: salt)
         let N = Self.N
         let gx = Self.g.power(x, modulus: N)
         let kgx = (Self.k * gx) % N
@@ -106,6 +105,16 @@ nonisolated struct EnteSRPClient {
         let K = Self.hash(paddedS)
         let serverProof = Self.hash(paddedA, clientProof, K)
         return (clientProof, serverProof)
+    }
+
+    /// The verifier of a new account, g^x, sent as `srpVerifier`. Signing in proves knowing the password against it.
+    static func verifier(identity: String, password: Data, salt: Data) -> Data {
+        g.power(x(identity: Data(identity.utf8), password: password, salt: salt), modulus: N).serialize()
+    }
+
+    // x = H(salt | H(I | ":" | P))
+    private static func x(identity: Data, password: Data, salt: Data) -> BigUInt {
+        BigUInt(hash(salt, hash(identity, Data(":".utf8), password)))
     }
 
     /// Verifies the server's `srpM2` in constant time.

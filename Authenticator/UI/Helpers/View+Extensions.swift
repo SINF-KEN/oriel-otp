@@ -113,7 +113,7 @@ struct ConfirmButton: View {
 }
 
 extension View {
-    // Lays the view out in the largest part of its frame that the fold and the camera housing leave clear.
+    // Lays the view out in the part of its frame that the fold and the camera housing leave clear, see `largestClearRect`.
     func avoidingReservedRegions() -> some View {
         self.modifier(ReservedRegionAvoidingModifier())
     }
@@ -125,8 +125,9 @@ struct ReservedRegionAvoidingModifier: ViewModifier {
         #if os(iOS)
         if #available(iOS 27.1, *) {
             GeometryReader { proxy in
-                let regions = proxy.reservedRegions(kind: .division) + proxy.reservedRegions(kind: .occlusion)
-                let clearRect = CGRect(origin: .zero, size: proxy.size).largestClearRect(avoiding: regions.map(\.frame))
+                let clearRect = CGRect(origin: .zero, size: proxy.size)
+                    .largestClearRect(avoiding: proxy.reservedRegions(kind: .occlusion).map(\.frame),
+                                      folds: proxy.reservedRegions(kind: .division).map(\.frame))
                 content.padding(EdgeInsets(top: clearRect.minY,
                                            leading: clearRect.minX,
                                            bottom: proxy.size.height - clearRect.maxY,
@@ -141,6 +142,83 @@ struct ReservedRegionAvoidingModifier: ViewModifier {
         #endif
     }
 }
+
+#if os(iOS)
+/// Gives its content the width of the split view's account column on a display with a fold, the inner display of an
+/// iPhone Duo, and nil on any other display.
+struct FoldedColumnWidthReader<Content: View>: View {
+
+    /// When the fold runs across both columns, leaving room for the details.
+    private let minimumWidth: CGFloat = 320
+
+    @ViewBuilder let content: (CGFloat?) -> Content
+
+    var body: some View {
+        if #available(iOS 27.1, *) {
+            GeometryReader { proxy in
+                // Also while it's flat, when the fold isn't active, so the layout doesn't change as the device bends.
+                content(proxy.reservedRegions(kind: .division, options: .includeInactive).first.map { fold in
+                    // Up to the fold when it runs between the columns. The split view adds the safe area to this.
+                    let isBetweenColumns = fold.frame.height > fold.frame.width
+                    return isBetweenColumns ? max(proxy.size.width - fold.frame.maxX, minimumWidth) : minimumWidth
+                })
+            }
+        } else {
+            content(nil)
+        }
+    }
+}
+
+extension EnvironmentValues {
+    /// Whether this is the account column beside the fold, see `FoldedColumnWidthReader`.
+    @Entry var isInFoldedColumn = false
+}
+
+/// Goes in the split view's account column. SwiftUI's split view has no setting for these, so they're set on the
+/// `UISplitViewController` it's made of.
+struct FoldedSplitViewAdapter: UIViewControllerRepresentable {
+
+    let isOnFold: Bool
+
+    func makeUIViewController(context: Context) -> Controller {
+        Controller()
+    }
+
+    func updateUIViewController(_ controller: Controller, context: Context) {
+        controller.isOnFold = isOnFold
+    }
+
+    final class Controller: UIViewController {
+
+        var isOnFold = false {
+            didSet { apply() }
+        }
+        private var appliedIsOnFold: Bool?
+
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            apply()
+        }
+
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            apply()
+        }
+
+        // Only when it changes, so the sidebar button can still hide the list.
+        private func apply() {
+            guard let splitViewController, appliedIsOnFold != isOnFold else { return }
+            appliedIsOnFold = isOnFold
+            // On the right of the fold, in reach of the right hand. The leading edge already is with right-to-left text.
+            let isLeftToRight = traitCollection.layoutDirection == .leftToRight
+            splitViewController.primaryEdge = isOnFold && isLeftToRight ? .trailing : .leading
+            // Both columns from the start, as a fold across them would otherwise leave the list hidden.
+            splitViewController.preferredSplitBehavior = isOnFold ? .tile : .automatic
+            splitViewController.preferredDisplayMode = isOnFold ? .oneBesideSecondary : .automatic
+        }
+    }
+}
+#endif
 
 // The filled and plain action buttons of the Yubico OTP screens, in glass on iOS 26 and later.
 extension View {

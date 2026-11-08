@@ -74,7 +74,8 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
 
 - **Menu bar extra** (`MenuBarAccountsView`): the pinned accounts, or all of them if none are pinned; a click copies
   the code. It connects to the YubiKey itself while the main window is closed. Settings can hide it, or show the app
-  only in the menu bar (no Dock icon, `NSApplication.ActivationPolicy.accessory`).
+  only in the menu bar (no Dock icon, `NSApplication.ActivationPolicy.accessory`). While the app is locked, the lock
+  screen replaces the accounts, and it connects to the YubiKey only after unlocking.
 - **QR codes without a camera** (`QRCodeReader`): Scan QR Code on Screen opens the system's window picker
   (`SCContentSharingPicker`) and takes one frame of the window picked, leaving out the app's own windows. This needs
   no Screen Recording permission, but only with an `SCStream`: `SCScreenshotManager` is refused the picker's filter

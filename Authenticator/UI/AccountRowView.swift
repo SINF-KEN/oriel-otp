@@ -57,10 +57,11 @@ struct AccountRowView<Accessory: View>: View {
     private let codeStyle = Font.TextStyle.body
     @ScaledSize(relativeTo: .subheadline) private var phoneMinimumNameWidth: CGFloat = 150
     @ScaledSize(relativeTo: .subheadline) private var sidebarMinimumNameWidth: CGFloat = 110
-    /// Less in an iPad's sidebar, whose width the system limits, so an 8 digit code fits beside the name like the others.
-    /// By the device, as a sidebar's size class is compact.
+    @Environment(\.isInFoldedColumn) private var isInFoldedColumn
+    /// Less in the sidebar of an iPad or an iPhone Duo, whose width is limited, so an 8 digit code fits beside the name
+    /// like the others. By the device, as a sidebar's size class is compact.
     private var minimumNameWidth: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .pad ? sidebarMinimumNameWidth : phoneMinimumNameWidth
+        UIDevice.current.userInterfaceIdiom == .pad || isInFoldedColumn ? sidebarMinimumNameWidth : phoneMinimumNameWidth
     }
     #endif
     @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3
@@ -86,12 +87,15 @@ struct AccountRowView<Accessory: View>: View {
             inlineRow
             headlineRow
         }
+        #if os(iOS)
+        .foregroundStyle(isSelected ? selectedColor : Color.primary)
+        #endif
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
         // code is copied with the row's Copy action.
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(account.accessibilityLabel)
-        .accessibilityValue(accessibilityValue)
+        .modifier(AccountCodeStateValue(account: account, showsLocation: showsLocation))
         #if os(iOS)
         // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
         .accessibilityHint(copyCode == nil ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
@@ -100,11 +104,11 @@ struct AccountRowView<Accessory: View>: View {
         .accessibilityInputLabels([account.title] + [account.subTitle.map { "\(account.title) \($0)" }].compactMap { $0 })
         // Stable for UI tests and agents, e.g. "account-row.GitHub:alice@example.com", see docs/accessibility.md.
         .accessibilityIdentifier("account-row.\(account.accountId)")
-        .onChange(of: account.state) { _, state in
+        .onChange(of: account.canCopyCode) { _, canCopyCode in
             // Not sure why we have to schedule this in the next runloop
             Task {
                 withAnimation {
-                    isDimmed = state == .expired || account.otp == nil
+                    isDimmed = !canCopyCode
                 }
             }
         }
@@ -122,7 +126,7 @@ struct AccountRowView<Accessory: View>: View {
             HStack {
                 Text(String(account.title.first ?? "?"))
                     .scaledFont(.body)
-                    // Not the row's, which turns white on a selected row, on an icon that stays light.
+                    // Not the row's, which changes on a selected row, on an icon that doesn't.
                     .foregroundStyle(Color(.label))
                     // Grows with the text, but not so much that it crowds the name out.
                     .frame(width: min(iconSize, 64), height: min(iconSize, 64))
@@ -130,33 +134,36 @@ struct AccountRowView<Accessory: View>: View {
                     .clipShape(.circle)
                     .padding(.trailing, 5)
                     .accessibilityHidden(true)
-                VStack(alignment: .leading) {
-                    HStack(spacing: 4) {
-                        Text(account.title.leftToRightIfAddress)
-                            .scaledFont(titleStyle) { $0.weight(.medium) }
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.9)
-                            .truncationMode(.tail)
-                        if showsLocation {
-                            AccountLocationIcon(account: account)
+                HStack {
+                    VStack(alignment: .leading) {
+                        HStack(spacing: 4) {
+                            Text(account.title.leftToRightIfAddress)
+                                .scaledFont(titleStyle) { $0.weight(.medium) }
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.9)
+                                .truncationMode(.tail)
+                            if showsLocation {
+                                AccountLocationIcon(account: account)
+                                    .scaledFont(subtitleStyle)
+                                    .foregroundStyle(secondaryStyle)
+                            }
+                        }
+                        account.subTitle.map {
+                            Text($0.leftToRightIfAddress)
                                 .scaledFont(subtitleStyle)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.9)
+                                .truncationMode(.tail)
                                 .foregroundStyle(secondaryStyle)
                         }
                     }
-                    account.subTitle.map {
-                        Text($0.leftToRightIfAddress)
-                            .scaledFont(subtitleStyle)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.9)
-                            .truncationMode(.tail)
-                            .foregroundStyle(secondaryStyle)
-                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    accessory
                 }
-                // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether
-                // the row fits on one line doesn't depend on how long the name is.
+                // Takes the room the code leaves, but asks for no more than the narrowest it may get, so whether the
+                // row fits on one line depends on neither how long the name is nor whether the accessory is showing.
                 .frame(minWidth: 0, idealWidth: minimumNameWidth, maxWidth: .infinity, alignment: .leading)
             }
-            accessory
             copyButton { codePill }
         }
     }
@@ -168,7 +175,7 @@ struct AccountRowView<Accessory: View>: View {
             // The list makes it taller to tap than it looks, at least the 44 points Apple asks for (TapToCopyTests).
             Button(action: copyCode) { code() }
                 .buttonStyle(.borderless)
-                .tint(isSelected ? Color.white : nil)
+                .tint(isSelected ? selectedColor : nil)
                 #if os(iOS)
                 // For a pointer on an iPad.
                 .hoverEffect(.highlight)
@@ -200,7 +207,7 @@ struct AccountRowView<Accessory: View>: View {
             ZStack(alignment: .leading) {
                 Capsule()
                     .fill(.quaternary)
-                BarProgressView(progress: remaining, color: pillColor, animate: animate)
+                CountdownBar(account: account, color: pillColor, animate: animate)
             }
             .frame(height: barHeight)
             // In the tint, like the code in its button above.
@@ -228,7 +235,7 @@ struct AccountRowView<Accessory: View>: View {
             if isCopied {
                 copiedSymbol
                     .imageScale(.small)
-            } else if case .countingdown = account.state {} else {
+            } else if !account.isCountingDown {
                 Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
                     .imageScale(.small)
                     .accessibilityHidden(true)
@@ -249,9 +256,14 @@ struct AccountRowView<Accessory: View>: View {
         .opacity(isDimmed ? dimmedOpacity : 1)
     }
 
-    /// The part of the code's validity that's left, or none while there's no code.
-    private var remaining: Double {
-        if case .countingdown(let remaining) = account.state { remaining } else { 0 }
+    /// What's drawn on a selected row. On iOS the highlight is the accent color, so the background color, like all text on
+    /// it: white would be unreadable on the light pink of dark mode.
+    private var selectedColor: Color {
+        #if os(iOS)
+        Color(.systemBackground)
+        #else
+        Color.white
+        #endif
     }
 
     // Hierarchical, like the code, so it stays legible on a selected row. The secondary style doesn't get darker with
@@ -261,26 +273,19 @@ struct AccountRowView<Accessory: View>: View {
         colorSchemeContrast == .increased || isSelected ? .primary : .secondary
     }
 
-    private var accessibilityValue: String {
-        showsLocation ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription : account.accessibilityCodeState
-    }
-
     private var codePill: some View {
         HStack {
             Group {
-                switch(account.state) {
-                case .requiresCalculation, .expired:
+                if account.isCountingDown {
+                    CountdownPie(account: account, color: pillColor, animate: animate)
+                        .frame(width: statusSize, height: statusSize)
+                        .padding(1)
+                        .accessibilityHidden(true)
+                } else {
                     Image(systemName: account.requiresTouch ? "hand.tap.fill" : "arrow.clockwise.circle.fill")
                         .font(.system(size: account.requiresTouch ? statusSize * 18 / 22 : statusSize))
                         // In the code's color, as the pill is dimmed while it shows.
                         .foregroundStyle(HierarchicalShapeStyle.primary)
-                        .frame(width: statusSize, height: statusSize)
-                        .padding(1)
-                        .accessibilityHidden(true)
-                case .countingdown(let remaining):
-                    PieProgressView(progress: remaining,
-                                    color: pillColor,
-                                    animate: animate)
                         .frame(width: statusSize, height: statusSize)
                         .padding(1)
                         .accessibilityHidden(true)
@@ -325,10 +330,11 @@ struct AccountRowView<Accessory: View>: View {
                     .padding(.top, 3.5)
                     .padding(.bottom, -3.5)
             }
-            Text("888 888") // reserves the code width so the pill doesn't resize
-                .foregroundStyle(.clear)
+            // Reserves the code's width so the pill doesn't resize. Hidden rather than clear, which the accessibility
+            // audit would measure as text without contrast.
+            Text("888 888")
                 .padding(.trailing, 4)
-                .accessibilityHidden(true)
+                .hidden()
         }
     }
 
@@ -343,6 +349,40 @@ struct AccountRowView<Accessory: View>: View {
     // Not dimmed at all with Increase Contrast; the symbol before the code still says it's expired.
     private var dimmedOpacity: Double {
         colorSchemeContrast == .increased ? 1 : 0.7
+    }
+}
+
+// What changes every second is read in these views of its own, so a row isn't calculated again with both its layouts.
+
+/// The time left as a pie, for the code's pill.
+private struct CountdownPie: View {
+    let account: Account
+    let color: HierarchicalShapeStyle
+    let animate: Bool
+
+    var body: some View {
+        PieProgressView(progress: account.remaining, color: color, animate: animate)
+    }
+}
+
+/// The time left as a bar, under the code with larger text.
+private struct CountdownBar: View {
+    let account: Account
+    let color: HierarchicalShapeStyle
+    let animate: Bool
+
+    var body: some View {
+        BarProgressView(progress: account.remaining, color: color, animate: animate)
+    }
+}
+
+/// VoiceOver's value for a row, with the time left.
+private struct AccountCodeStateValue: ViewModifier {
+    let account: Account
+    let showsLocation: Bool
+
+    func body(content: Content) -> some View {
+        content.accessibilityValue(showsLocation ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription : account.accessibilityCodeState)
     }
 }
 

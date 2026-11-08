@@ -44,7 +44,10 @@ struct AutoFillWebsitesView: View {
             Form {
                 Section {
                     ForEach($websites) { $website in
-                        TextField(String(localized: "example.com", comment: "AutoFill website field placeholder"), text: $website.text)
+                        // Boxed on iOS too: with no placeholder, a new row would otherwise look like nothing was added.
+                        TextField(String(localized: "Website", comment: "AutoFill website field, for VoiceOver"), text: $website.text, prompt: Text(verbatim: ""))
+                            .formRowTextBox()
+                            .textFieldStyle(.roundedBorder)
                             .textInputAutocapitalization(.never)
                             .keyboardType(.URL)
                             .textContentType(.URL)

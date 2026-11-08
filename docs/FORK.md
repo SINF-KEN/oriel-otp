@@ -62,7 +62,7 @@ Put new features and fixes on `main` or a feature branch, never on `fork/oriel-o
   white, all at the same perceived lightness so none stands out. Every pair keeps at least 7.9:1 contrast.
 - About: terms, privacy policy, user guide and support point to this repository.
 - Artwork: the YubiKey photos and drawings, the tutorial images and the key symbol are replaced by the app's own
-  drawings, made by `tools/generate_artwork.py`. Yubico's release notes are removed and the version starts at 1.0.
+  drawings. Yubico's release notes are removed and the version starts at 1.0.
 
 ## What stays, and why
 

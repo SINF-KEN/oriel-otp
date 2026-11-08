@@ -40,7 +40,7 @@ nonisolated struct EnteSavedAccount: Sendable, Equatable {
 nonisolated protocol EnteSessionKeychain: Sendable {
     func hasValue(for userAccount: String) -> Bool
     func setValue(_ value: Data, useAuthentication: Bool, for userAccount: String) throws
-    func getValue(for userAccount: String) async throws -> Data
+    func getValue(for userAccount: String, authentication: KeychainAuthentication?) async throws -> Data
     func removeValue(for userAccount: String) throws
 }
 
@@ -121,9 +121,9 @@ struct EnteSessionStore {
     /// Returns the token and the authenticator key after asking for Face ID, Touch ID or the Mac's password.
     /// Throws `EnteAuthenticatorSyncError.signedOut` when there's no session to unlock, e.g. because Face ID or
     /// Touch ID changed since it was saved. A session saved by an earlier version is saved again with the current
-    /// access control.
-    func unlock() async throws -> EnteSavedSession {
-        let session = try await read()
+    /// access control. With `authentication`, e.g. the Face ID that just unlocked the app, nothing is asked for again.
+    func unlock(authentication: KeychainAuthentication? = nil) async throws -> EnteSavedSession {
+        let session = try await read(authentication: authentication)
         if defaults.integer(forKey: Self.versionKey) < Self.version {
             // If this fails the old item is kept, or the password is asked for on the next launch.
             try? save(session)
@@ -131,10 +131,10 @@ struct EnteSessionStore {
         return session
     }
 
-    private func read() async throws -> EnteSavedSession {
+    private func read(authentication: KeychainAuthentication? = nil) async throws -> EnteSavedSession {
         let data: Data
         do {
-            data = try await keychain.getValue(for: Self.account)
+            data = try await keychain.getValue(for: Self.account, authentication: authentication)
         } catch SecureStoreError.itemNotFound {
             throw EnteAuthenticatorSyncError.signedOut
         }
@@ -158,12 +158,12 @@ struct EnteSessionStore {
     /// unlocked first so the session can be ended; if that's cancelled the account is still forgotten here. Returns
     /// once nothing is left on the device, without waiting for the server, which only ever sees the old token.
     /// The copy of the accounts in the vault is deleted too, with changes that weren't uploaded yet.
-    @MainActor func signOut(watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) async {
+    @MainActor func signOut(watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared, session: URLSession = .ente) async {
         let saved = savedAccount?.hasSession == true ? try? await read() : nil
         remove()
         cloud.remove()
         watch.disable()
-        guard let saved, let api = try? EnteAPIClient(server: saved.server) else { return }
+        guard let saved, let api = try? EnteAPIClient(server: saved.server, session: session) else { return }
         Task { try? await api.logout(token: saved.token) }
     }
 }
