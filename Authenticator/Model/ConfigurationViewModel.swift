@@ -21,12 +21,26 @@ import YubiKit
 
 @Observable class ConfigurationViewModel {
 
+    /// How full the YubiKey's OATH application is.
+    struct OATHStorage: Equatable {
+        /// The accounts on the YubiKey, nil while it's locked with a password that isn't saved.
+        let used: Int?
+        let capacity: Int
+
+        var free: Int? { used.map { max(capacity - $0, 0) } }
+    }
+
     var deviceInfo: DeviceInfo? {
         didSet {
             resetDeviceInfoTask?.cancel()
             resetDeviceInfoTask = nil
+            if deviceInfo == nil {
+                oathStorage = nil
+            }
         }
     }
+    /// Nil until it's been read, or when the YubiKey's OATH application is turned off.
+    var oathStorage: OATHStorage?
 
     @ObservationIgnored var resetDeviceInfoTask: Task<Void, Never>?
     @ObservationIgnored private var wiredConnectionsTask: Task<Void, Never>?
@@ -47,7 +61,9 @@ import YubiKit
                 }
                 Logger.connection.debug("ConfigurationViewModel: got wired connection")
                 do {
-                    self.deviceInfo = try await connection.managementSession().getDeviceInfo()
+                    let deviceInfo = try await connection.managementSession().getDeviceInfo()
+                    self.deviceInfo = deviceInfo
+                    self.oathStorage = await Self.oathStorage(connection: connection, deviceInfo: deviceInfo)
                 } catch {
                     Logger.connection.error("ConfigurationviewModel: got error: \(error)")
                 }
@@ -68,7 +84,9 @@ import YubiKit
         Task {
             do {
                 let connection = try await ConnectionManager.shared.anyConnection()
-                self.deviceInfo = try await connection.managementSession().getDeviceInfo()
+                let deviceInfo = try await connection.managementSession().getDeviceInfo()
+                self.deviceInfo = deviceInfo
+                self.oathStorage = await Self.oathStorage(connection: connection, deviceInfo: deviceInfo)
                 ConnectionManager.shared.closeNFC(message: String(localized: "Configuration read", comment: "NFC connection stopped message."))
             } catch where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
@@ -76,6 +94,30 @@ import YubiKit
                 Logger.connection.error("ConfigurationviewModel: got error: \(error)")
                 ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)
             }
+        }
+    }
+
+    /// Counts the accounts on the YubiKey. A YubiKey locked with a password is unlocked with the saved one, unless it
+    /// was saved behind Face ID or Touch ID, which isn't asked for here.
+    private static func oathStorage(connection: SmartCardConnection, deviceInfo: DeviceInfo) async -> OATHStorage? {
+        do {
+            let deviceId = try? await connection.legacyOATHDeviceId()
+            let session = try await connection.oathSession(deviceInfo: deviceInfo)
+            let capacity = OATHSession.credentialCapacity(version: await session.version)
+            do {
+                return OATHStorage(used: try await session.listCredentials().count, capacity: capacity)
+            } catch where error.isOATHAuthenticationRequired {
+                let preferences = PasswordPreferences()
+                guard let deviceId, preferences.useSavedPassword(keyIdentifier: deviceId),
+                      let accessKey: Data = try? await SecureStore(secureStoreQueryable: PasswordQueryable(service: "OATH")).getValue(for: deviceId),
+                      (try? await session.unlock(accessKey: accessKey)) != nil else {
+                    return OATHStorage(used: nil, capacity: capacity)
+                }
+                return OATHStorage(used: try await session.listCredentials().count, capacity: capacity)
+            }
+        } catch {
+            Logger.connection.error("ConfigurationViewModel: couldn't read the OATH storage: \(error)")
+            return nil
         }
     }
 
