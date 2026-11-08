@@ -65,7 +65,7 @@ nonisolated enum EnteCodeParser {
             if components.host?.lowercased() == "steam" {
                 // A Steam account is a TOTP account that the app recognizes by its issuer and shows as 5 characters.
                 components.host = "totp"
-                components.queryItems = components.queryItems?.filter { $0.name != "digits" }
+                components.queryItems = components.queryItems?.filter { $0.name.lowercased() != "digits" }
                 guard let url = components.url else { throw CredentialTemplateError.type }
                 let parsed = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
                 template = try YubiKitOATHSession.CredentialTemplate(type: parsed.type, algorithm: parsed.algorithm, secret: parsed.secret,
@@ -100,7 +100,7 @@ enum EnteCodeExporter {
         case .hotp: components.host = "hotp"
         }
         let issuer = template.issuer.flatMap { $0.isEmpty ? nil : $0 }
-        components.path = "/" + [issuer, template.name].compactMap { $0 }.joined(separator: ":")
+        components.path = OTPAuthURLParser.labelPath(issuer: issuer, accountName: template.name)
 
         let algorithm: String
         switch template.algorithm {
@@ -115,7 +115,10 @@ enum EnteCodeExporter {
         items.append(URLQueryItem(name: "algorithm", value: algorithm))
         items.append(URLQueryItem(name: "digits", value: String(isSteam ? 5 : template.digits)))
         switch template.type {
-        case .totp(let period): items.append(URLQueryItem(name: "period", value: String(Int(period))))
+        case .totp(let period):
+            // A template can be made with any period, and converting one that isn't a whole Int traps.
+            guard let period = Int(exactly: period) else { return nil }
+            items.append(URLQueryItem(name: "period", value: String(period)))
         case .hotp(let counter): items.append(URLQueryItem(name: "counter", value: String(counter)))
         }
         components.queryItems = items

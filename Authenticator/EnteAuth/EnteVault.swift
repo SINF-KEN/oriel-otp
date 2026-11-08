@@ -213,29 +213,29 @@ nonisolated struct EnteEntryEditor {
     /// Changes the label and the `issuer` parameter, like Ente Auth's edit screen does.
     mutating func rename(issuer: String?, accountName: String) {
         let issuer = issuer.flatMap { $0.isEmpty ? nil : $0 }
-        components.path = "/" + [issuer, accountName].compactMap { $0 }.joined(separator: ":")
+        components.path = OTPAuthURLParser.labelPath(issuer: issuer, accountName: accountName)
         Self.set("issuer", to: issuer, in: &components)
     }
 
+    /// The value of a parameter, whatever the case of its name, like `OTPAuthURLParser` reads it.
     private static func value(of name: String, in components: URLComponents) -> String? {
-        components.queryItems?.first { $0.name == name }?.value
+        components.queryItems?.first { $0.name.lowercased() == name.lowercased() }?.value
     }
 
-    /// Sets a parameter, or removes it when the value is nil. The other parameters are kept as they are encoded.
-    /// '+' is encoded too, as Ente's apps read it as a space.
+    /// Sets a parameter, or removes it when the value is nil. It replaces the parameter in every case of its name,
+    /// so the value set is the one read back. The other parameters are kept as they are encoded. '+' is encoded too,
+    /// as Ente's apps read it as a space.
     private static func set(_ name: String, to value: String?, in components: inout URLComponents) {
         var items = components.percentEncodedQueryItems ?? []
         let encoded = value.map {
             $0.addingPercentEncoding(withAllowedCharacters: queryValueAllowed) ?? $0
         }
-        if let index = items.firstIndex(where: { $0.name == name }) {
-            if let encoded {
-                items[index].value = encoded
-            } else {
-                items.remove(at: index)
-            }
-        } else if let encoded {
-            items.append(URLQueryItem(name: name, value: encoded))
+        let isNamed = { (item: URLQueryItem) in item.name.lowercased() == name.lowercased() }
+        // In the place of the first one, which no parameter before it is removed from.
+        let index = items.firstIndex(where: isNamed) ?? items.endIndex
+        items.removeAll(where: isNamed)
+        if let encoded {
+            items.insert(URLQueryItem(name: name, value: encoded), at: index)
         }
         components.percentEncodedQueryItems = items.isEmpty ? nil : items
     }
@@ -272,9 +272,8 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
         let entry = EnteEntry(rawData: rawData)
         guard let components = entry.components, !entry.isTrashed else { return nil }
         if components.host?.lowercased() == "hotp" {
-            let items = Dictionary(components.queryItems?.map { ($0.name.lowercased(), $0.value ?? "") } ?? [],
-                                   uniquingKeysWith: { first, _ in first })
-            guard let secret = items["secret"].flatMap(OTPAuthURLParser.base32Decode), !secret.isEmpty else { return nil }
+            guard let items = OTPAuthURLParser.parameters(of: components),
+                  let secret = items["secret"].flatMap(OTPAuthURLParser.base32Decode), !secret.isEmpty else { return nil }
             let algorithm: OTPAccount.Algorithm
             switch items["algorithm"]?.uppercased() ?? "SHA1" {
             case "SHA1", "": algorithm = .sha1
@@ -284,10 +283,12 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
             }
             let digits = items["digits"].flatMap { Int($0) } ?? 6
             guard (1...10).contains(digits) else { return nil }
+            // The counter is moved on once its code has been shown, which the largest one can't be.
+            let counter = items["counter"].flatMap { UInt64($0) } ?? 0
+            guard counter < .max else { return nil }
             let (issuer, accountName) = OTPAuthURLParser.label(of: components)
             self.init(issuer: issuer, accountName: accountName, kind: .hotp, secret: secret, algorithm: algorithm, digits: digits,
-                      period: 0, counter: items["counter"].flatMap { UInt64($0) } ?? 0, isPinned: entry.isPinned, tags: entry.tags,
-                      iconID: entry.iconID)
+                      period: 0, counter: counter, isPinned: entry.isPinned, tags: entry.tags, iconID: entry.iconID)
         } else {
             guard let account = OTPAuthURLParser.account(id: "", components: components, isPinned: entry.isPinned) else { return nil }
             self.init(issuer: account.issuer, accountName: account.accountName, kind: account.kind == .steam ? .steam : .totp,

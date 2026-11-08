@@ -77,15 +77,65 @@ nonisolated struct EnteEntry: Sendable, Equatable {
 /// Reads time-based accounts from otpauth URLs.
 nonisolated enum OTPAuthURLParser {
 
-    /// The issuer and account name from the label, falling back to the `issuer` parameter.
+    /// The periods accepted, in seconds. Services use 30 or 60 seconds. A day is far longer than any of them uses,
+    /// and keeps the period within the range of every integer type it is converted to, where a larger one crashed.
+    static let periods = 1...86_400
+
+    /// The parameters that decide the account. A URL that gives one of them twice is rejected, rather than having
+    /// each reader pick one of the values.
+    static let uniqueParameters: Set = ["secret", "issuer", "counter", "period", "digits", "algorithm"]
+
+    /// The query parameters by lower-cased name, with an empty value for a name without one. Returns nil when a
+    /// parameter in `uniqueParameters` appears more than once in any case. Every reader of otpauth URLs goes through
+    /// this so they all see the same values.
+    static func parameters(of components: URLComponents) -> [String: String]? {
+        var parameters = [String: String]()
+        for item in components.queryItems ?? [] {
+            let name = item.name.lowercased()
+            guard parameters[name] == nil else {
+                if uniqueParameters.contains(name) { return nil }
+                continue
+            }
+            parameters[name] = item.value ?? ""
+        }
+        return parameters
+    }
+
+    /// The issuer and account name from the label, falling back to the `issuer` parameter. Both are cleaned with
+    /// `cleanedName(_:)`, and an empty issuer is nil.
     static func label(of components: URLComponents) -> (issuer: String?, accountName: String) {
         var name = String(components.path.dropFirst())
-        var issuer = components.queryItems?.first { $0.name == "issuer" }?.value
+        var issuer = components.queryItems?.first { $0.name.lowercased() == "issuer" }?.value
         if let colon = name.firstIndex(of: ":") {
             issuer = String(name[..<colon])
-            name = String(name[name.index(after: colon)...]).trimmingCharacters(in: .whitespaces)
+            name = String(name[name.index(after: colon)...])
         }
-        return (issuer, name)
+        let cleanedIssuer = issuer.map(cleanedName)
+        return (cleanedIssuer?.isEmpty == false ? cleanedIssuer : nil, cleanedName(name))
+    }
+
+    /// The name without control characters, line breaks and invisible formatting characters such as direction
+    /// overrides and zero-width spaces, and without spaces around it. These would let an account look like another
+    /// one, or show its name backwards, while being a different account.
+    static func cleanedName(_ name: String) -> String {
+        let scalars = name.unicodeScalars.filter { scalar in
+            switch scalar.properties.generalCategory {
+            case .control, .format, .lineSeparator, .paragraphSeparator: return false
+            default: return true
+            }
+        }
+        return String(String.UnicodeScalarView(scalars)).trimmingCharacters(in: .whitespaces)
+    }
+
+    /// The path of a label for the issuer and account name, which reads back as the same issuer and account name. An
+    /// account name containing a colon gets an empty issuer before it, so the part before its colon isn't read as
+    /// the issuer.
+    static func labelPath(issuer: String?, accountName: String) -> String {
+        let issuer = issuer.flatMap { $0.isEmpty ? nil : $0 }
+        if issuer == nil && accountName.contains(":") {
+            return "/:" + accountName
+        }
+        return "/" + [issuer, accountName].compactMap { $0 }.joined(separator: ":")
     }
 
     /// Returns nil for counter based (HOTP) accounts and URLs that can't be read.
@@ -96,10 +146,8 @@ nonisolated enum OTPAuthURLParser {
         case "steam": kind = .steam
         default: return nil
         }
-        let items = Dictionary(
-            components.queryItems?.map { ($0.name.lowercased(), $0.value ?? "") } ?? [],
-            uniquingKeysWith: { first, _ in first })
-        guard let secret = items["secret"].flatMap(base32Decode), !secret.isEmpty else { return nil }
+        guard let items = parameters(of: components),
+              let secret = items["secret"].flatMap(base32Decode), !secret.isEmpty else { return nil }
 
         let algorithm: OTPAccount.Algorithm
         switch items["algorithm"]?.uppercased() ?? "SHA1" {
@@ -110,7 +158,7 @@ nonisolated enum OTPAuthURLParser {
         }
         let digits = kind == .steam ? 5 : (items["digits"].flatMap { Int($0) } ?? 6)
         let period = items["period"].flatMap { Int($0) } ?? 30
-        guard (1...10).contains(digits), period > 0 else { return nil }
+        guard (1...10).contains(digits), periods.contains(period) else { return nil }
 
         var (issuer, accountName) = label(of: components)
         if kind == .steam {
@@ -126,12 +174,14 @@ nonisolated enum OTPAuthURLParser {
         var bytes = [UInt8]()
         var buffer: UInt32 = 0
         var bits = 0
-        for character in string.uppercased() where !" -=".contains(character) {
-            guard let ascii = character.asciiValue else { return nil }
+        // Checked one scalar at a time before changing the case: upper-casing turns some other letters into ASCII
+        // ones, e.g. ß into SS, and a letter followed by a combining mark is a single character.
+        for scalar in string.unicodeScalars where !" -=".unicodeScalars.contains(scalar) {
             let value: UInt32
-            switch ascii {
-            case 65...90: value = UInt32(ascii - 65)
-            case 50...55: value = UInt32(ascii - 50 + 26)
+            switch scalar {
+            case "A"..."Z": value = scalar.value - 65
+            case "a"..."z": value = scalar.value - 97
+            case "2"..."7": value = scalar.value - 50 + 26
             default: return nil
             }
             buffer = (buffer << 5) | value
