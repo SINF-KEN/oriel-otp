@@ -208,6 +208,21 @@ nonisolated struct EnteAPIClient: Sendable {
         return srpM2
     }
 
+    // MARK: Deleting an account
+
+    /// Asks for the challenge that proves the account's keys are at hand. Ente's server seals it to the account's
+    /// public key, so only the secret key opens it.
+    func deleteChallenge(token: String) async throws -> (allowDelete: Bool, encryptedChallenge: Data?) {
+        struct Response: Decodable { let allowDelete: Bool; let encryptedChallenge: String? }
+        let response: Response = try await send("GET", "/users/delete-challenge", token: token)
+        return (response.allowDelete, response.encryptedChallenge.flatMap { Data(enteBase64: $0) })
+    }
+
+    /// Deletes the account and everything in it, for good, with the opened challenge.
+    func deleteAccount(token: String, challenge: String) async throws {
+        let _: Empty = try await send("DELETE", "/users/delete", token: token, body: ["challenge": challenge])
+    }
+
     // MARK: Signing in
 
     func verifyEmail(email: String, code: String) async throws -> EnteAuthResponse {

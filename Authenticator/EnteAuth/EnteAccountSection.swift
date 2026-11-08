@@ -24,6 +24,7 @@ struct EnteAccountSection: View {
     @State private var isConfirmingSignOut = false
     @State private var isSigningOut = false
     @State private var isMoving = false
+    @State private var isDeletingAccount = false
 
     init(store: EnteSessionStore = EnteSessionStore()) {
         self.store = store
@@ -40,6 +41,18 @@ struct EnteAccountSection: View {
                     isConfirmingSignOut = true
                 }
                 .disabled(isSigningOut)
+                // Accounts can be created in the app only on self-hosted servers, so only those can be deleted here.
+                if EnteAPIClient.allowsAccountCreation(on: account.server) {
+                    Button(String(localized: "Delete account…", comment: "Ente settings button that opens account deletion"), role: .destructive) {
+                        isDeletingAccount = true
+                    }
+                    .disabled(isSigningOut)
+                    .accessibilityIdentifier("ente.delete-account")
+                    // On the button: on the section each row would present it, and the sheets would close each other.
+                    .sheet(isPresented: $isDeletingAccount, onDismiss: { self.account = store.savedAccount }) {
+                        EnteAccountDeletionView(server: account.server, email: account.email)
+                    }
+                }
             } else {
                 Text(String(localized: "Not signed in", comment: "Ente settings without a saved account"))
                     .foregroundStyle(.secondary)
