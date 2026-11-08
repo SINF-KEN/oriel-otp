@@ -153,6 +153,15 @@ struct EnteCryptoTests {
         }
     }
 
+    @Test func wipingZeroesTheBytes() {
+        var bytes: [UInt8] = [1, 2, 3]
+        EnteCrypto.wipe(&bytes)
+        #expect(bytes == [0, 0, 0])
+        var key = EnteCrypto.randomBytes(32)
+        key.wipe()
+        #expect(key == Data(count: 32))
+    }
+
     @Test func base64Variants() {
         let data = Data([0xfb, 0xff, 0xfe, 0x01])
         #expect(data.enteURLSafeBase64 == "-__-AQ==")

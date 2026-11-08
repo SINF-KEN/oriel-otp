@@ -51,8 +51,11 @@ nonisolated enum EnteCrypto {
         guard salt.count == saltLength else { throw EnteCryptoError.invalidLength }
         guard isAllowed(opsLimit: opsLimit, memLimit: memLimit) else { throw EnteCryptoError.invalidKeyLimits }
         var key = [UInt8](repeating: 0, count: keyLength)
-        let password = Array(password.utf8CString.dropLast())
-        defer { sodium_memzero(&key, key.count) }
+        var password = Array(password.utf8)
+        defer {
+            wipe(&key)
+            wipe(&password)
+        }
         guard crypto_pwhash(&key, UInt64(keyLength), password, UInt64(password.count), [UInt8](salt),
                             opsLimit, Int(memLimit), crypto_pwhash_ALG_ARGON2ID13) == 0 else {
             throw EnteCryptoError.keyDerivationFailed
@@ -133,9 +136,13 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         guard keyEncryptionKey.count == Int(crypto_kdf_keybytes()) else { throw EnteCryptoError.invalidLength }
         var subkey = [UInt8](repeating: 0, count: 32)
-        defer { sodium_memzero(&subkey, subkey.count) }
+        var keyEncryptionKey = [UInt8](keyEncryptionKey)
+        defer {
+            wipe(&subkey)
+            wipe(&keyEncryptionKey)
+        }
         let context = Array("loginctx".utf8CString)
-        guard crypto_kdf_derive_from_key(&subkey, subkey.count, 1, context, [UInt8](keyEncryptionKey)) == 0 else {
+        guard crypto_kdf_derive_from_key(&subkey, subkey.count, 1, context, keyEncryptionKey) == 0 else {
             throw EnteCryptoError.keyDerivationFailed
         }
         return Data(subkey.prefix(16))
@@ -148,7 +155,12 @@ nonisolated enum EnteCrypto {
               nonce.count == Int(crypto_secretbox_noncebytes()),
               key.count == keyLength else { throw EnteCryptoError.invalidLength }
         var message = [UInt8](repeating: 0, count: cipherText.count - macLength)
-        guard crypto_secretbox_open_easy(&message, [UInt8](cipherText), UInt64(cipherText.count), [UInt8](nonce), [UInt8](key)) == 0 else {
+        var key = [UInt8](key)
+        defer {
+            wipe(&message)
+            wipe(&key)
+        }
+        guard crypto_secretbox_open_easy(&message, [UInt8](cipherText), UInt64(cipherText.count), [UInt8](nonce), key) == 0 else {
             throw EnteCryptoError.decryptionFailed
         }
         return Data(message)
@@ -160,7 +172,13 @@ nonisolated enum EnteCrypto {
         guard key.count == keyLength else { throw EnteCryptoError.invalidLength }
         let nonce = randomBytes(Int(crypto_secretbox_noncebytes()))
         var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_secretbox_macbytes()))
-        guard crypto_secretbox_easy(&cipherText, [UInt8](message), UInt64(message.count), [UInt8](nonce), [UInt8](key)) == 0 else {
+        var message = [UInt8](message)
+        var key = [UInt8](key)
+        defer {
+            wipe(&message)
+            wipe(&key)
+        }
+        guard crypto_secretbox_easy(&cipherText, message, UInt64(message.count), [UInt8](nonce), key) == 0 else {
             throw EnteCryptoError.encryptionFailed
         }
         return (nonce, Data(cipherText))
@@ -171,7 +189,9 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         guard secretKey.count == Int(crypto_box_secretkeybytes()) else { throw EnteCryptoError.invalidLength }
         var publicKey = [UInt8](repeating: 0, count: Int(crypto_box_publickeybytes()))
-        guard crypto_scalarmult_base(&publicKey, [UInt8](secretKey)) == 0 else { throw EnteCryptoError.keyDerivationFailed }
+        var secretKey = [UInt8](secretKey)
+        defer { wipe(&secretKey) }
+        guard crypto_scalarmult_base(&publicKey, secretKey) == 0 else { throw EnteCryptoError.keyDerivationFailed }
         return Data(publicKey)
     }
 
@@ -182,7 +202,12 @@ nonisolated enum EnteCrypto {
               publicKey.count == Int(crypto_box_publickeybytes()),
               secretKey.count == Int(crypto_box_secretkeybytes()) else { throw EnteCryptoError.invalidLength }
         var message = [UInt8](repeating: 0, count: cipherText.count - sealLength)
-        guard crypto_box_seal_open(&message, [UInt8](cipherText), UInt64(cipherText.count), [UInt8](publicKey), [UInt8](secretKey)) == 0 else {
+        var secretKey = [UInt8](secretKey)
+        defer {
+            wipe(&message)
+            wipe(&secretKey)
+        }
+        guard crypto_box_seal_open(&message, [UInt8](cipherText), UInt64(cipherText.count), [UInt8](publicKey), secretKey) == 0 else {
             throw EnteCryptoError.decryptionFailed
         }
         return Data(message)
@@ -192,7 +217,9 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         guard publicKey.count == Int(crypto_box_publickeybytes()) else { throw EnteCryptoError.invalidLength }
         var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_box_sealbytes()))
-        guard crypto_box_seal(&cipherText, [UInt8](message), UInt64(message.count), [UInt8](publicKey)) == 0 else {
+        var message = [UInt8](message)
+        defer { wipe(&message) }
+        guard crypto_box_seal(&cipherText, message, UInt64(message.count), [UInt8](publicKey)) == 0 else {
             throw EnteCryptoError.encryptionFailed
         }
         return Data(cipherText)
@@ -202,6 +229,7 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         var publicKey = [UInt8](repeating: 0, count: Int(crypto_box_publickeybytes()))
         var secretKey = [UInt8](repeating: 0, count: Int(crypto_box_secretkeybytes()))
+        defer { wipe(&secretKey) }
         guard crypto_box_keypair(&publicKey, &secretKey) == 0 else { throw EnteCryptoError.keyDerivationFailed }
         return (Data(publicKey), Data(secretKey))
     }
@@ -215,10 +243,16 @@ nonisolated enum EnteCrypto {
               header.count == Int(crypto_secretstream_xchacha20poly1305_headerbytes()),
               key.count == Int(crypto_secretstream_xchacha20poly1305_keybytes()) else { throw EnteCryptoError.invalidLength }
         var state = crypto_secretstream_xchacha20poly1305_state()
-        guard crypto_secretstream_xchacha20poly1305_init_pull(&state, [UInt8](header), [UInt8](key)) == 0 else {
+        var key = [UInt8](key)
+        var message = [UInt8](repeating: 0, count: cipherText.count - additionalLength)
+        defer {
+            wipe(&key)
+            wipe(&message)
+            sodium_memzero(&state, MemoryLayout.size(ofValue: state))
+        }
+        guard crypto_secretstream_xchacha20poly1305_init_pull(&state, [UInt8](header), key) == 0 else {
             throw EnteCryptoError.decryptionFailed
         }
-        var message = [UInt8](repeating: 0, count: cipherText.count - additionalLength)
         var messageLength: UInt64 = 0
         var tag: UInt8 = 0
         guard crypto_secretstream_xchacha20poly1305_pull(&state, &message, &messageLength, &tag,
@@ -235,26 +269,54 @@ nonisolated enum EnteCrypto {
         guard key.count == Int(crypto_secretstream_xchacha20poly1305_keybytes()) else { throw EnteCryptoError.invalidLength }
         var state = crypto_secretstream_xchacha20poly1305_state()
         var header = [UInt8](repeating: 0, count: Int(crypto_secretstream_xchacha20poly1305_headerbytes()))
-        guard crypto_secretstream_xchacha20poly1305_init_push(&state, &header, [UInt8](key)) == 0 else {
+        var key = [UInt8](key)
+        var message = [UInt8](message)
+        defer {
+            wipe(&key)
+            wipe(&message)
+            sodium_memzero(&state, MemoryLayout.size(ofValue: state))
+        }
+        guard crypto_secretstream_xchacha20poly1305_init_push(&state, &header, key) == 0 else {
             throw EnteCryptoError.encryptionFailed
         }
         var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_secretstream_xchacha20poly1305_abytes()))
-        guard crypto_secretstream_xchacha20poly1305_push(&state, &cipherText, nil, [UInt8](message), UInt64(message.count),
+        guard crypto_secretstream_xchacha20poly1305_push(&state, &cipherText, nil, message, UInt64(message.count),
                                                          nil, 0, UInt8(crypto_secretstream_xchacha20poly1305_TAG_FINAL)) == 0 else {
             throw EnteCryptoError.encryptionFailed
         }
         return (Data(header), Data(cipherText))
     }
 
+    /// Zeroes bytes copied out of a key or a plain text for libsodium once they're no longer needed, so they don't stay
+    /// behind in freed memory.
+    static func wipe(_ bytes: inout [UInt8]) {
+        bytes.withUnsafeMutableBytes { buffer in
+            if let address = buffer.baseAddress {
+                sodium_memzero(address, buffer.count)
+            }
+        }
+    }
+
     static func randomBytes(_ count: Int) -> Data {
         _ = isInitialized
         var bytes = [UInt8](repeating: 0, count: count)
+        defer { wipe(&bytes) }
         randombytes_buf(&bytes, count)
         return Data(bytes)
     }
 }
 
 nonisolated extension Data {
+
+    /// Zeroes a key once it's no longer needed. Data shares its bytes between copies and copies them before a change,
+    /// so this only reaches the bytes when this value is the only one holding them, as with a key made in the same scope.
+    mutating func wipe() {
+        withUnsafeMutableBytes { buffer in
+            if let address = buffer.baseAddress {
+                sodium_memzero(address, buffer.count)
+            }
+        }
+    }
 
     /// Ente sends most binary values as standard Base64 and the auth token as URL-safe Base64.
     init?(enteBase64 string: String) {
