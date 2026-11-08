@@ -63,6 +63,11 @@ struct EnteCryptoTests {
         (2, 2048 * mebibyte),
         (.max, 8 * mebibyte),
         (1 << 40, 1024 * mebibyte),
+        // More work than libsodium's sensitive limits, which took up to a minute and a half on a Mac.
+        (16, 1024 * mebibyte),
+        (5, 1024 * mebibyte),
+        (32, 256 * mebibyte),
+        (128, 64 * mebibyte),
     ]
 
     @Test(arguments: limitsTooHigh) func limitsFromTheServerThatAreTooHighFail(opsLimit: UInt64, memLimit: UInt64) {
@@ -76,7 +81,9 @@ struct EnteCryptoTests {
         (4, 1024 * mebibyte),
         (3, 256 * mebibyte),
         (2, 64 * mebibyte),
+        (8, 512 * mebibyte),
         (16, 256 * mebibyte),
+        (32, 128 * mebibyte),
         (64, 64 * mebibyte),
     ]
 
