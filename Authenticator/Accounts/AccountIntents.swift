@@ -158,7 +158,12 @@ struct AccountQuery: EntityStringQuery {
 /// Copies an account's code, without opening the app unless it has to be unlocked.
 struct CopyCodeIntent: AppIntent {
     static let title = LocalizedStringResource("Copy Code", comment: "Shortcuts action")
-    static let description = IntentDescription(LocalizedStringResource("Copies the code of an account to the clipboard. On a Mac, accounts on a YubiKey work while it's plugged in.", comment: "Shortcuts action description"))
+    // App Store Connect turns down an intent description that names the platform (ITMS-90626), so each one has its own.
+    #if os(macOS)
+    static let description = IntentDescription(LocalizedStringResource("Copies the code of an account to the clipboard. Accounts on a YubiKey work while it's plugged in.", comment: "Shortcuts action description"))
+    #else
+    static let description = IntentDescription(LocalizedStringResource("Copies the code of an account to the clipboard.", comment: "Shortcuts action description"))
+    #endif
 
     @Parameter(title: LocalizedStringResource("Account", comment: "Shortcuts parameter"))
     var account: AccountEntity
