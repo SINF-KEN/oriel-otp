@@ -25,6 +25,7 @@ struct EnteSyncView: View {
     @State private var model: EnteSyncViewModel
     @FocusState private var focusedField: Field?
     @State private var isCreatingAccount = false
+    @State private var isDeletingAccount = false
 
     /// Whether a YubiKey can be reached, over NFC or because one is plugged in.
     let canAddToYubiKey: Bool
@@ -170,6 +171,13 @@ struct EnteSyncView: View {
                     // On the button: on the section each row would present it, and the sheets would close each other.
                     .sheet(isPresented: $isCreatingAccount) {
                         EnteSignUpView(server: server, email: model.email) { model.email = $0 }
+                    }
+                    Button(String(localized: "Delete an account on this server", comment: "Ente button that opens account deletion on a self-hosted server"), role: .destructive) {
+                        isDeletingAccount = true
+                    }
+                    .accessibilityIdentifier("ente.delete-account")
+                    .sheet(isPresented: $isDeletingAccount) {
+                        EnteAccountDeletionView(server: server, email: model.email)
                     }
                 }
             }
