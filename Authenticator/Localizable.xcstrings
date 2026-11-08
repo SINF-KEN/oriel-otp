@@ -216,6 +216,35 @@
         }
       }
     },
+    "%lld free" : {
+      "comment" : "YubiKey OATH storage, for VoiceOver. The placeholder is the number of accounts that still fit.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld frei"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld libres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "空き%lld件"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Voľné: %lld"
+          }
+        }
+      }
+    },
     "%lld of %lld digits entered" : {
       "comment" : "App lock code dots for VoiceOver",
       "localizations" : {
@@ -514,6 +543,35 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "%lld of %lld used" : {
+      "comment" : "YubiKey OATH storage. The placeholders are the number of accounts and how many fit.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$lld von %2$lld belegt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%1$lld sur %2$lld utilisés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%2$lld件中%1$lld件を使用"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Použité: %1$lld z %2$lld"
           }
         }
       }
@@ -7418,6 +7476,35 @@
         }
       }
     },
+    "Locked with a password" : {
+      "comment" : "YubiKey OATH storage of a YubiKey whose password isn't saved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mit Passwort geschützt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Protégée par un mot de passe"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "パスワードでロックされています"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zamknutý heslom"
+          }
+        }
+      }
+    },
     "Mac password" : {
       "comment" : "App lock method on a Mac without Touch ID",
       "localizations" : {
@@ -11362,6 +11449,107 @@
         }
       }
     },
+    "Room for %lld more accounts." : {
+      "comment" : "YubiKey OATH storage. The placeholder is the number of accounts that still fit.",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Platz für %lld weiteres Konto."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Platz für %lld weitere Konten."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Room for %lld more account."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Room for %lld more accounts."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Place pour %lld compte de plus."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Place pour %lld comptes de plus."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "あと%lld件のアカウントを追加できます。"
+                }
+              }
+            }
+          }
+        },
+        "sk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalší účet."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalšie účty."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalšieho účtu."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "needs_review",
+                  "value" : "Miesto pre %lld ďalších účtov."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Save" : {
       "comment" : "Save button",
       "localizations" : {
@@ -14075,6 +14263,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "YubiKey je plný. Ak chcete uvoľniť miesto, vymažte z neho účty."
+          }
+        }
+      }
+    },
+    "The YubiKey is full. Delete an account to add another." : {
+      "comment" : "YubiKey OATH storage when full",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der YubiKey ist voll. Löschen Sie ein Konto, um ein weiteres hinzuzufügen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La YubiKey est pleine. Supprimez un compte pour en ajouter un autre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKeyがいっぱいです。別のアカウントを追加するには、アカウントを削除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey je plný. Ak chcete pridať ďalší účet, odstráňte niektorý."
           }
         }
       }
