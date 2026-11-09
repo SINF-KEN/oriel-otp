@@ -30,6 +30,27 @@ nonisolated enum AppGroup {
     }
 }
 
+/// The keychain access group the app shares with the AutoFill extension. The app's other items go to its own group,
+/// listed first in its entitlements, which the extension can't read. The items the extension needs, the key of the
+/// AutoFill file and the app lock, are added to this group explicitly.
+nonisolated enum SharedKeychain {
+    static let accessGroupKey = "OrielOTPSharedKeychainGroup"
+
+    /// Nil in a build without a team, where there are no access groups.
+    static let accessGroup: String? = {
+        guard let group = Bundle.main.object(forInfoDictionaryKey: accessGroupKey) as? String,
+              let team = group.split(separator: ".").first, team.count == 10, !group.contains("$(") else { return nil }
+        return group
+    }()
+
+    /// Puts an item that is added with `query` in the shared group.
+    static func addAccessGroup(to query: inout [String: Any]) {
+        if let accessGroup {
+            query[String(kSecAttrAccessGroup)] = accessGroup
+        }
+    }
+}
+
 /// An account whose codes AutoFill can fill in, with the websites they are suggested on.
 nonisolated struct AutoFillAccount: Codable, Sendable, Hashable, Identifiable {
     let account: OTPAccount
@@ -118,8 +139,8 @@ nonisolated struct AutoFillFile: AutoFillStorage {
     }
 }
 
-/// The key of the AutoFill file in the keychain group the app shares with the extension: `WhenUnlockedThisDeviceOnly`,
-/// so it never leaves the device.
+/// The key of the AutoFill file in the keychain group the app shares with the extension, see `SharedKeychain`:
+/// `WhenUnlockedThisDeviceOnly`, so it never leaves the device.
 nonisolated struct AutoFillKeychainKey: Sendable {
 
     private var query: [String: Any] {
@@ -156,6 +177,7 @@ nonisolated struct AutoFillKeychainKey: Sendable {
         var query = query
         query[String(kSecValueData)] = key.withUnsafeBytes { Data($0) }
         query[String(kSecAttrAccessible)] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        SharedKeychain.addAccessGroup(to: &query)
         SecItemDelete(self.query as CFDictionary)
         let status = SecItemAdd(query as CFDictionary, nil)
         guard status == errSecSuccess else { throw Self.error(status) }
