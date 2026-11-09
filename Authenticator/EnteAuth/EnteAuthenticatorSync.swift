@@ -225,23 +225,45 @@ nonisolated enum EnteAuthenticatorSync {
 
     /// Pages through the diff from `sinceTime` and keeps the latest version of each entity that changed, deleted
     /// ones included. Returns them with the time to ask from next time, which is `sinceTime` if nothing changed.
+    ///
+    /// Ente's server returns the entities changed after `sinceTime`, oldest first, up to `limit`, and a self-hosted
+    /// server may return fewer than asked for. So paging only stops on an empty page. Entities changed at the same
+    /// time can straddle two pages, so after a page with something new it asks again from just before the page's
+    /// latest time and drops the versions it already has. Each request either moves `sinceTime` forward or brings
+    /// something new, so it can't loop forever.
     static func changes(api: EnteAPIClient, token: String, since sinceTime: Int64) async throws -> (entities: [EnteAuthenticatorEntity], latest: Int64) {
         var latest = [String: EnteAuthenticatorEntity]()
         var sinceTime = sinceTime
+        var largestPage = 0
+        // Set after a page made only of entities changed at one time, all seen before, and as large as the largest
+        // page: the server may have more entities changed at that time than fit a page. If more entities follow,
+        // some of those may be missing, and asking again can't get them.
+        var fullPageAtOneTime = false
         while true {
-            let page = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: pageSize) }
-            for entity in page where entity.updatedAt >= latest[entity.id]?.updatedAt ?? .min {
+            let response = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: pageSize) }
+            // Ignores anything at or before `sinceTime`, so every page that is kept moves forward.
+            let page = response.filter { $0.updatedAt > sinceTime }
+            guard let maxUpdatedAt = page.map(\.updatedAt).max() else { break }
+            // Stops rather than leave out entities it can't get.
+            if fullPageAtOneTime { throw EnteAPIError.invalidResponse }
+            largestPage = max(largestPage, page.count)
+            var foundNew = false
+            for entity in page where entity.updatedAt > latest[entity.id]?.updatedAt ?? .min {
                 latest[entity.id] = entity
+                foundNew = true
             }
-            let maxUpdatedAt = page.map(\.updatedAt).max() ?? sinceTime
-            // Stop on a short page, and if the server doesn't move forward so a misbehaving server can't loop forever.
-            guard page.count == pageSize, maxUpdatedAt > sinceTime else {
-                sinceTime = max(sinceTime, maxUpdatedAt)
-                break
+            if foundNew {
+                // Asks again from just before the latest time, for entities changed then that didn't fit this page.
+                sinceTime = maxUpdatedAt - 1
+                fullPageAtOneTime = false
+            } else {
+                if page.allSatisfy({ $0.updatedAt == maxUpdatedAt }) && page.count == largestPage {
+                    fullPageAtOneTime = true
+                }
+                sinceTime = maxUpdatedAt
             }
-            sinceTime = maxUpdatedAt
         }
-        return (Array(latest.values), sinceTime)
+        return (Array(latest.values), max(sinceTime, latest.values.map(\.updatedAt).max() ?? sinceTime))
     }
 
     static func signedIn<T>(_ operation: () async throws -> T) async throws -> T {

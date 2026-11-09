@@ -211,7 +211,7 @@ struct EnteAuthenticatorSyncTests {
             #expect(request.value(forHTTPHeaderField: "X-Client-Package") == "io.ente.auth.orielotp")
             #expect(request.value(forHTTPHeaderField: "X-Auth-Token") == "the-token")
         }
-        let diffRequest = try #require(EnteMockURLProtocol.requests.last?.url)
+        let diffRequest = try #require(EnteMockURLProtocol.requests.first { $0.url?.path == "/authenticator/entity/diff" }?.url)
         #expect(diffRequest.query?.contains("sinceTime=0") == true)
     }
 
@@ -366,6 +366,72 @@ struct EnteAuthenticatorSyncTests {
         let unchanged = try await EnteAuthenticatorSync.changes(api: try EnteMockURLProtocol.makeAPI(), token: "t", since: 7)
         #expect(unchanged.entities.isEmpty)
         #expect(unchanged.latest == 7)
+    }
+
+    /// Serves `rows` like Ente's server: those changed after `sinceTime`, oldest first, at most `cap` of them
+    /// whatever `limit` asks for. Rows changed at the same time keep their order.
+    private nonisolated static func serveDiff(_ rows: [[String: Any]], cap: Int) {
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.handler = { request in
+            let query = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems ?? []
+            let sinceTime = query.first { $0.name == "sinceTime" }?.value.flatMap(Int64.init) ?? 0
+            let limit = query.first { $0.name == "limit" }?.value.flatMap(Int.init) ?? 500
+            let diff = rows.filter { $0["updatedAt"] as! Int64 > sinceTime }
+                .enumerated().sorted { ($0.element["updatedAt"] as! Int64, $0.offset) < ($1.element["updatedAt"] as! Int64, $1.offset) }
+                .map(\.element)
+            return (200, try! JSONSerialization.data(withJSONObject: ["diff": Array(diff.prefix(min(limit, cap)))]))
+        }
+    }
+
+    @Test func pagesThroughAServerThatReturnsFewerThanAskedFor() async throws {
+        let key = EnteCrypto.randomBytes(32)
+        let rows = try (1...7).map { try entity("e\($0)", "otpauth://totp/E:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: Int64($0)) }
+            + [try entity("e3", nil, key: key, updatedAt: 8, isDeleted: true)]
+        Self.serveDiff(rows, cap: 2)
+        let entities = try await EnteAuthenticatorSync.allEntities(api: try EnteMockURLProtocol.makeAPI(), token: "t")
+        #expect(Set(entities.map(\.id)) == ["e1", "e2", "e4", "e5", "e6", "e7"])
+        let changes = try await EnteAuthenticatorSync.changes(api: try EnteMockURLProtocol.makeAPI(), token: "t", since: 0)
+        #expect(changes.latest == 8)
+        #expect(changes.entities.count == 7)
+    }
+
+    @Test func keepsEntitiesChangedAtTheSameTimeAcrossAPageBoundary() async throws {
+        let key = EnteCrypto.randomBytes(32)
+        // With pages of 3, the first page ends in the middle of the entities changed at time 3.
+        let rows = [
+            try entity("a", "otpauth://totp/A:a?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 1),
+            try entity("b", "otpauth://totp/B:b?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 2),
+            try entity("c", "otpauth://totp/C:c?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 3),
+            try entity("d", "otpauth://totp/D:d?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 3),
+            try entity("e", "otpauth://totp/E:e?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 4),
+        ]
+        Self.serveDiff(rows, cap: 3)
+        let changes = try await EnteAuthenticatorSync.changes(api: try EnteMockURLProtocol.makeAPI(), token: "t", since: 0)
+        #expect(changes.entities.map(\.id).sorted() == ["a", "b", "c", "d", "e"])
+        #expect(changes.latest == 4)
+    }
+
+    @Test func stopsWhenMoreEntitiesChangedAtOneTimeThanFitAPage() async throws {
+        let key = EnteCrypto.randomBytes(32)
+        // Three entities changed at time 2 but the server returns two at a time: "c" can't be reached.
+        let rows = try ["a", "b", "c"].map { try entity($0, "otpauth://totp/X:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 2) }
+            + [try entity("d", "otpauth://totp/D:d?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 3)]
+        Self.serveDiff(rows, cap: 2)
+        await #expect(throws: EnteAPIError.invalidResponse) {
+            try await EnteAuthenticatorSync.allEntities(api: try EnteMockURLProtocol.makeAPI(), token: "t")
+        }
+        #expect(EnteMockURLProtocol.requests.count < 10)
+    }
+
+    @Test func stopsOnAServerThatIgnoresSinceTime() async throws {
+        let key = EnteCrypto.randomBytes(32)
+        let rows = try (1...3).map { try entity("e\($0)", "otpauth://totp/E:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: Int64($0)) }
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.handler = { _ in (200, try! JSONSerialization.data(withJSONObject: ["diff": rows])) }
+        let changes = try await EnteAuthenticatorSync.changes(api: try EnteMockURLProtocol.makeAPI(), token: "t", since: 0)
+        #expect(changes.entities.count == 3)
+        #expect(changes.latest == 3)
+        #expect(EnteMockURLProtocol.requests.count < 10)
     }
 
     @Test func rejectsInsecureServers() {
