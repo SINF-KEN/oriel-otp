@@ -159,8 +159,8 @@ nonisolated private final class RequestLog: URLProtocol, @unchecked Sendable {
         }
 
         func wait(for path: String) async throws {
-            // Signing in can take most of a minute on CI.
-            let deadline = ContinuousClock.now + .seconds(120)
+            // Signing in can take most of a minute on CI, and several minutes in an unoptimised build.
+            let deadline = ContinuousClock.now + .seconds(600)
             while !contains(path) {
                 guard ContinuousClock.now < deadline else { throw URLError(.timedOut) }
                 try await Task.sleep(for: .milliseconds(5))
