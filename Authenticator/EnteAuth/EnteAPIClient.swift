@@ -379,9 +379,12 @@ extension URLSession {
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         // URLProtocol.registerClass only reaches the shared session. It only answers for its own hosts.
         configuration.protocolClasses = [FakeEnteServer.self] + (configuration.protocolClasses ?? [])
-        // Tests must never reach a real server, so there every other request fails.
+        // Tests must never reach a real server, so there every other request fails. Signing in with 4096-bit SRP takes
+        // the fake server longer than the default 60 second timeout in an unoptimised build, and it answers locally.
         if UnstubbedRequestFailure.isTesting {
             configuration.protocolClasses = [FakeEnteServer.self, UnstubbedRequestFailure.self]
+            configuration.timeoutIntervalForRequest = 3600
+            configuration.timeoutIntervalForResource = 3600
         }
         #endif
         return URLSession(configuration: configuration, delegate: EnteRedirectGuard(), delegateQueue: nil)

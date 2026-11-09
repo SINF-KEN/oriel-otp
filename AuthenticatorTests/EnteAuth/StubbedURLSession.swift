@@ -42,9 +42,14 @@ extension URLSession {
 
     /// A session for tests, which keeps nothing on disk. The stubs answer in their order, and any request none of them
     /// takes fails without reaching the network.
+    ///
+    /// Signing in with 4096-bit SRP takes the fake server longer than URLSession's default 60 second timeout in an
+    /// unoptimised build. The stubs answer locally, so a long timeout costs nothing.
     nonisolated static func stubbed(_ protocols: [AnyClass]) -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = protocols + [UnexpectedRequestFailure.self]
+        configuration.timeoutIntervalForRequest = 3600
+        configuration.timeoutIntervalForResource = 3600
         return URLSession(configuration: configuration)
     }
 }
