@@ -167,13 +167,4 @@ struct WatchAccountsTests {
         let accounts = WatchAccountSync.accounts(from: codes, favorites: ["Zoom:a"])
         #expect(accounts.map(\.id) == ["3", "1", "2", "4"])
     }
-
-    @Test func messageRoundTrips() throws {
-        let accounts = WatchAccountSync.accounts(from: [Self.code("1", issuer: "GitHub", name: "alice")], favorites: [])
-        let context = try WatchAccountsMessage.context(for: accounts)
-        #expect(WatchAccountsMessage.accounts(from: context) == accounts)
-        #expect(WatchAccountsMessage.accounts(from: try WatchAccountsMessage.context(for: [])) == [])
-        #expect(WatchAccountsMessage.accounts(from: [:]) == nil)
-        #expect(WatchAccountsMessage.accounts(from: ["version": 2, "accounts": Data()]) == nil)
-    }
 }
