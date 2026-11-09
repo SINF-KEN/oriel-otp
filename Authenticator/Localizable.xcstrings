@@ -13053,6 +13053,35 @@
         }
       }
     },
+    "Some changes made on this device haven't been synced with Ente Auth yet. Sign in to the same account with Stay signed in on to sync them, or sign out in Settings to discard them." : {
+      "comment" : "Ente sign in error when signing in would replace changes that weren't uploaded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Änderungen auf diesem Gerät wurden noch nicht mit Ente Auth synchronisiert. Melde dich mit „Angemeldet bleiben“ beim selben Konto an, um sie zu synchronisieren, oder melde dich in den Einstellungen ab, um sie zu verwerfen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certaines modifications faites sur cet appareil n’ont pas encore été synchronisées avec Ente Auth. Connectez-vous au même compte avec « Rester connecté » activé pour les synchroniser, ou déconnectez-vous dans les Réglages pour les abandonner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスで行った一部の変更はまだEnte Authと同期されていません。同期するには「サインインしたままにする」をオンにして同じアカウントにサインインしてください。変更を破棄する場合は、設定でサインアウトしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektoré zmeny urobené na tomto zariadení ešte neboli synchronizované s Ente Auth. Ak ich chcete synchronizovať, prihláste sa do rovnakého účtu so zapnutým „Zostať prihlásený“, alebo sa odhláste v Nastaveniach, ak ich chcete zahodiť."
+          }
+        }
+      }
+    },
     "Something went wrong" : {
       "localizations" : {
         "de" : {

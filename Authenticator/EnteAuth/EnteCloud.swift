@@ -30,7 +30,7 @@ import YubiKit
 /// list is pulled down, after each change made here and when the network comes back with changes waiting.
 @Observable final class EnteCloud {
 
-    static let shared = EnteCloud(autoFill: .shared)
+    static let shared = EnteCloud(autoFill: .shared, device: .shared)
 
     enum AddResult: Equatable {
         case added
@@ -59,6 +59,9 @@ import YubiKit
     @ObservationIgnored private let watch: WatchAccountSync
     /// Nil in the tests, which mustn't change the accounts AutoFill uses.
     @ObservationIgnored private let autoFill: AutoFillAccountSync?
+    /// Where accounts added here that never reached Ente are kept when the vault is discarded. Nil in the tests that
+    /// keep no accounts on the device.
+    @ObservationIgnored private let device: DeviceAccounts?
     @ObservationIgnored private var session: EnteSavedSession?
     @ObservationIgnored private var didAskToUnlock = false
     @ObservationIgnored private var unlockTask: Task<EnteSavedSession?, Never>?
@@ -67,55 +70,80 @@ import YubiKit
     /// Changes when the vault is replaced, so a sync that was under way when it was doesn't write into the new one.
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var pathMonitor: NWPathMonitor?
-    /// The vault file couldn't be read when the app started because the device was locked.
+    /// The vault file couldn't be read because the device was locked, or the accounts only it has couldn't be kept on
+    /// the device before discarding it. Nothing is written over the file until it is read again.
     @ObservationIgnored private var isVaultLocked = false
 
     init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
-         watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil) {
+         watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil, device: DeviceAccounts? = nil) {
         self.store = store
         self.storage = storage
         self.urlSession = session
         self.watch = watch
         self.autoFill = autoFill
+        self.device = device
         loadVault()
         if !isVaultLocked {
             updateAutoFill()
         }
     }
 
-    /// Reads the vault of the saved account. If the device is locked, e.g. when the app was launched in the
-    /// background, it is read once the app comes to the foreground, and nothing is written over it until then.
-    private func loadVault() {
-        let saved = store.savedAccount
+    /// Reads the vault of the saved account, or of `session` if one is being used. If the device is locked, e.g. when
+    /// the app was launched in the background, it is read once the app comes to the foreground, and nothing is written
+    /// over it until then. The saved account can't always be read then either, so that doesn't say there is no vault.
+    private func loadVault(for session: EnteSavedSession? = nil) {
+        let saved: (email: String, server: URL)? = session.map { ($0.email, $0.server) } ?? store.savedAccount.map { ($0.email, $0.server) }
         let vault: EnteVault?
         do {
             vault = try storage.load()
         } catch EnteVaultError.unavailable {
-            isVaultLocked = saved != nil
+            isVaultLocked = true
             return
         } catch {
             vault = nil
         }
         isVaultLocked = false
+        if let vault, saved.map({ vault.belongs(email: $0.email, server: $0.server) }) != true {
+            // Signed out while the vault was kept, or the vault of another account. It is discarded once the accounts
+            // only it has are on the device.
+            guard keepAccountsNeverUploaded(of: vault) else {
+                isVaultLocked = true
+                return
+            }
+            if saved == nil {
+                storage.remove()
+            }
+        }
         if let saved {
-            if let vault, vault.email.lowercased() == saved.email.lowercased(), vault.server == saved.server {
+            if let vault, vault.belongs(email: saved.email, server: saved.server) {
                 self.vault = vault
             } else {
                 // The first sync fills it. Also when the file couldn't be read, e.g. because the device was restored.
                 self.vault = EnteVault(email: saved.email, server: saved.server)
             }
-        } else if vault != nil {
-            // Signed out while the vault was kept by an earlier version.
-            storage.remove()
         }
     }
 
     /// Reads the vault if it couldn't be read before because the device was locked.
-    private func loadVaultIfLocked() {
+    private func loadVaultIfLocked(for session: EnteSavedSession? = nil) {
         guard isVaultLocked else { return }
-        loadVault()
+        loadVault(for: session)
         if vault != nil {
             changed()
+        }
+    }
+
+    /// Puts the accounts added here that never reached Ente on this device, as the vault about to be discarded is
+    /// their only copy. Returns false if they couldn't be saved there, so the vault must be kept.
+    private func keepAccountsNeverUploaded(of vault: EnteVault) -> Bool {
+        let accounts = vault.accountsNeverUploaded
+        guard !accounts.isEmpty, let device else { return true }
+        device.loadIfLocked()
+        do {
+            try device.keep(rawData: accounts)
+            return true
+        } catch {
+            return false
         }
     }
 
@@ -151,10 +179,12 @@ import YubiKit
 
     /// Uses a session that was just saved or unlocked, e.g. in the sync sheet. A vault of another account is replaced.
     func use(_ session: EnteSavedSession) {
-        loadVaultIfLocked()
+        loadVaultIfLocked(for: session)
         self.session = session
         didAskToUnlock = true
-        if vault?.belongs(to: session) != true {
+        if isVaultLocked {
+            // Read on the next sync, rather than written over now.
+        } else if vault?.belongs(to: session) != true {
             replaceVault(with: EnteVault(email: session.email, server: session.server))
         } else {
             // A sync that changes nothing doesn't send them, and they may have changed while the session was locked.
@@ -163,12 +193,14 @@ import YubiKit
         startMonitoringNetwork()
     }
 
-    /// Deletes the vault, for when the Ente account is signed out or not kept.
+    /// Deletes the vault, for when the Ente account is signed out or not kept. Accounts added here that never reached
+    /// Ente are kept on this device; if they can't be, the file is kept until they can.
     func remove() {
         session = nil
-        isVaultLocked = false
         guard vault != nil else {
-            storage.remove()
+            if !isVaultLocked {
+                storage.remove()
+            }
             autoFill?.remove()
             return
         }
@@ -177,6 +209,13 @@ import YubiKit
 
     private func replaceVault(with vault: EnteVault?) {
         generation += 1
+        if let old = self.vault, !keepAccountsNeverUploaded(of: old) {
+            // The file is kept and read again, and replaced once those accounts are on the device.
+            self.vault = nil
+            isVaultLocked = true
+            changed()
+            return
+        }
         self.vault = vault
         if let vault {
             try? storage.save(vault)
@@ -196,7 +235,7 @@ import YubiKit
             do {
                 return try await store.unlock(authentication: authentication)
             } catch EnteAuthenticatorSyncError.signedOut {
-                sessionRejected()
+                sessionRejected(token: nil)
                 return nil
             } catch {
                 // Cancelled, or the device is locked. The changes wait for the next sync.
@@ -213,8 +252,12 @@ import YubiKit
     }
 
     /// The server rejected the session or it can't be read any more. The vault is kept, so the codes still work, and
-    /// its changes are uploaded once the password has been entered again.
-    private func sessionRejected(showsError: Bool = true) {
+    /// its changes are uploaded once the password has been entered again. A rejected `token` that isn't the one in use
+    /// any more, e.g. because the person signed in again while a sync was under way, says nothing about the new one.
+    private func sessionRejected(token: String?, showsError: Bool = true) {
+        if let token {
+            guard session?.token == token else { return }
+        }
         session = nil
         store.forgetSession()
         watch.disable()
@@ -240,7 +283,7 @@ import YubiKit
         do {
             try await enqueueSync(session).value
         } catch EnteAuthenticatorSyncError.signedOut {
-            sessionRejected()
+            sessionRejected(token: session.token)
         } catch is CancellationError {
         } catch {
             if reportsErrors {
@@ -255,7 +298,7 @@ import YubiKit
         do {
             try await enqueueSync(session).value
         } catch EnteAuthenticatorSyncError.signedOut {
-            sessionRejected(showsError: false)
+            sessionRejected(token: session.token, showsError: false)
             throw EnteAuthenticatorSyncError.signedOut
         }
     }
@@ -284,17 +327,20 @@ import YubiKit
         let changes = try await EnteAuthenticatorSync.changes(api: api, token: session.token, since: vault.lastSyncTime)
         let pulled = await Self.decrypt(changes.entities, authenticatorKey: session.authenticatorKey)
         guard generation == self.generation else { throw CancellationError() }
-        update { $0.merge(pulled, latest: changes.latest) }
+        try update { $0.merge(pulled, latest: changes.latest) }
 
         for id in self.vault?.items.filter(\.isPending).map(\.id) ?? [] {
             guard generation == self.generation else { throw CancellationError() }
             guard let item = self.vault?.items.first(where: { $0.id == id }), item.isPending, let rawData = item.rawData else { continue }
             if item.entityID == nil && item.isTrashed {
-                // Deleted before it was ever uploaded.
-                update { $0.remove(id) }
+                // Deleted before it was ever uploaded: the pull would have found it if its upload had reached Ente.
+                try update { $0.remove(id) }
                 continue
             }
             let encrypted = try EnteAuthenticatorSync.encrypt(rawData, authenticatorKey: session.authenticatorKey)
+            // Recorded before it is sent, so if the answer is lost the upload is recognized as this device's own when
+            // it comes back in the diff, rather than taken for another device's change.
+            try update { $0.markUploading(id, rawData: rawData) }
             if let entityID = item.entityID {
                 do {
                     try await EnteAuthenticatorSync.signedIn {
@@ -304,18 +350,18 @@ import YubiKit
                 } catch EnteAPIError.http(statusCode: 404) {
                     // Deleted on another device since the pull. Deleting wins over the change made here.
                     guard generation == self.generation else { throw CancellationError() }
-                    update { $0.remove(id) }
+                    try update { $0.remove(id) }
                     continue
                 }
                 guard generation == self.generation else { throw CancellationError() }
-                update { $0.markUploaded(id, rawData: rawData, created: nil) }
+                try update { $0.markUploaded(id, rawData: rawData, created: nil) }
             } else {
                 let created = try await EnteAuthenticatorSync.signedIn {
                     try await api.createAuthenticatorEntity(token: session.token, encryptedData: encrypted.encryptedData,
                                                             header: encrypted.header)
                 }
                 guard generation == self.generation else { throw CancellationError() }
-                update { $0.markUploaded(id, rawData: rawData, created: created) }
+                try update { $0.markUploaded(id, rawData: rawData, created: created) }
             }
         }
     }
@@ -325,14 +371,15 @@ import YubiKit
         entities.map { ($0, EnteAuthenticatorSync.decrypt($0, authenticatorKey: authenticatorKey)) }
     }
 
-    /// Changes the vault and saves it. Every change goes through here.
-    private func update(_ change: (inout EnteVault) -> Void) {
+    /// Changes the vault and saves it. Every change goes through here, and is undone if it can't be saved: a change
+    /// that is only in memory would be gone at the next launch, e.g. an account moved here from the device.
+    private func update(_ change: (inout EnteVault) -> Void) throws {
         guard var vault else { return }
         let before = vault
         change(&vault)
         guard vault != before else { return }
+        try storage.save(vault)
         self.vault = vault
-        try? storage.save(vault)
         changed()
     }
 
@@ -377,7 +424,7 @@ import YubiKit
         let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
                                                 period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
         guard !codes.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
-        return insert(rawData: String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self))
+        return try insert(rawData: String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self))
     }
 
     /// Adds an account kept on this device and uploads it, with its pin and HOTP counter, unless the vault has one
@@ -388,29 +435,30 @@ import YubiKit
            codes.contains(where: { $0.credentialId == credentialId }) {
             return .alreadyPresent
         }
-        return insert(rawData: rawData)
+        return try insert(rawData: rawData)
     }
 
-    private func insert(rawData: String) -> AddResult {
-        update { _ = $0.add(rawData: rawData) }
+    private func insert(rawData: String) throws -> AddResult {
+        try update { _ = $0.add(rawData: rawData) }
         syncChanges()
         return .added
     }
 
-    func rename(_ id: String, issuer: String, accountName: String) {
+    func rename(_ id: String, issuer: String, accountName: String) throws {
         guard let code = code(of: id), (code.issuer ?? "", code.accountName) != (issuer, accountName) else { return }
-        edit(id) { $0.rename(issuer: issuer, accountName: accountName) }
+        try edit(id) { $0.rename(issuer: issuer, accountName: accountName) }
     }
 
+    /// A pin that can't be saved is simply gone at the next launch, so it isn't reported.
     func setPinned(_ id: String, _ isPinned: Bool) {
         guard let code = code(of: id), code.isPinned != isPinned else { return }
-        edit(id) { $0.isPinned = isPinned }
+        try? edit(id) { $0.isPinned = isPinned }
     }
 
     /// Files the account under the tags, which Ente Auth shows too.
-    func setTags(_ id: String, _ tags: [String]) {
+    func setTags(_ id: String, _ tags: [String]) throws {
         guard let code = code(of: id), code.tags != EnteEntry.cleaned(tags) else { return }
-        edit(id) { $0.tags = tags }
+        try edit(id) { $0.tags = tags }
     }
 
     /// The credential to put the account on a YubiKey with, nil if a YubiKey can't store it.
@@ -424,20 +472,27 @@ import YubiKit
 
     /// Moves the account to Ente's trash, like deleting it in Ente Auth does. Ente Auth can restore it or delete it
     /// for good.
-    func delete(_ id: String) {
-        edit(id) { $0.isTrashed = true }
+    func delete(_ id: String) throws {
+        try edit(id) { $0.isTrashed = true }
     }
 
-    /// Returns the next HOTP code and moves the counter on, on all devices.
+    /// Returns the next HOTP code and moves the counter on, on all devices. Nil if the counter can't be moved on or
+    /// saved, as the code would be given out again.
     func nextHOTPCode(_ id: String) -> String? {
         guard let code = code(of: id), code.kind == .hotp else { return nil }
-        edit(id) { $0.counter = code.counter + 1 }
+        let (next, overflow) = code.counter.addingReportingOverflow(1)
+        guard !overflow else { return nil }
+        do {
+            try edit(id) { $0.counter = next }
+        } catch {
+            return nil
+        }
         return code.hotpCode()
     }
 
-    private func edit(_ id: String, _ change: (inout EnteEntryEditor) -> Void) {
+    private func edit(_ id: String, _ change: (inout EnteEntryEditor) -> Void) throws {
         var didChange = false
-        update { didChange = $0.edit(id, change) }
+        try update { didChange = $0.edit(id, change) }
         if didChange {
             syncChanges()
         }

@@ -364,7 +364,7 @@ struct EnteVaultTests {
         #expect(model.accounts.map(\.title) == ["Apple", "Mango", "Zebra"])
 
         let apple = try #require(model.accounts.first)
-        cloud.delete(try #require(apple.location.enteID))
+        try cloud.delete(try #require(apple.location.enteID))
         #expect(model.accounts.map(\.title) == ["Mango", "Zebra"])
     }
 
@@ -419,7 +419,7 @@ struct EnteVaultTests {
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"])
         let id = try #require(cloud.accounts.first).id
         cloud.setPinned(id, false)
-        cloud.rename(id, issuer: "GitHub", accountName: "alice")
+        try cloud.rename(id, issuer: "GitHub", accountName: "alice")
         #expect(!cloud.hasPendingChanges)
     }
 
@@ -594,14 +594,14 @@ struct EnteCloudSyncTests {
         try await other.update(gitHub, "otpauth://totp/GitHub:bob?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
         await cloud.sync()
         #expect(cloud.accounts.first { $0.code.issuer == "GitHub" }?.code.accountName == "bob")
-        cloud.rename(try id(of: "GitHub", in: cloud), issuer: "GitHub", accountName: "carol")
+        try cloud.rename(try id(of: "GitHub", in: cloud), issuer: "GitHub", accountName: "carol")
         await cloud.sync()
         entities = try await other.entities()
         #expect(EnteCodeParser.parse(id: "", rawData: entities[gitHub] ?? "")?.accountName == "carol")
 
         // Deleted here: moved to Ente's trash, like Ente Auth does.
         let gitLab = try #require(cloud.vault?.items.first { EnteCloudCode(rawData: $0.rawData ?? "")?.issuer == "GitLab" }?.entityID)
-        cloud.delete(try id(of: "GitLab", in: cloud))
+        try cloud.delete(try id(of: "GitLab", in: cloud))
         await cloud.sync()
         entities = try await other.entities()
         #expect(EnteEntry(rawData: entities[gitLab] ?? "").isTrashed)
@@ -646,7 +646,7 @@ struct EnteCloudSyncTests {
 
         // Renamed here while offline, and on the other device before this one synced again.
         let offline = cloud(session: OfflineURLProtocol.session)
-        offline.rename(try self.id(of: "GitHub", in: offline), issuer: "GitHub", accountName: "here")
+        try offline.rename(try self.id(of: "GitHub", in: offline), issuer: "GitHub", accountName: "here")
         await offline.sync()
         try await other.update(id, "otpauth://totp/GitHub:there?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
 
