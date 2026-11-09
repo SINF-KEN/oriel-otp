@@ -147,7 +147,8 @@ nonisolated enum OTPAuthURLParser {
         default: return nil
         }
         guard let items = parameters(of: components),
-              let secret = items["secret"].flatMap(base32Decode), !secret.isEmpty else { return nil }
+            let secret = items["secret"].flatMap(base32Decode), !secret.isEmpty
+        else { return nil }
 
         let algorithm: OTPAccount.Algorithm
         switch items["algorithm"]?.uppercased() ?? "SHA1" {
