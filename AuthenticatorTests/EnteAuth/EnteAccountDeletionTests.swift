@@ -25,9 +25,7 @@ import Testing
 @MainActor struct EnteAccountDeletionTests {
 
     private let session: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        return URLSession(configuration: configuration)
+        return URLSession.stubbed([FakeEnteServer.self])
     }()
     private let defaults = makeTestDefaults()
     private let keychain = InMemoryKeychain()
