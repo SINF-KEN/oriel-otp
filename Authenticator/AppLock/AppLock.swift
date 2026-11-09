@@ -198,7 +198,10 @@ nonisolated struct AppLockKeychain: AppLockStorage {
                                          String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
         var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
-            status = SecItemAdd(query.merging(attributes) { _, new in new } as CFDictionary, nil)
+            // In the group shared with the AutoFill extension, which locks with it too.
+            var item = query.merging(attributes) { _, new in new }
+            SharedKeychain.addAccessGroup(to: &item)
+            status = SecItemAdd(item as CFDictionary, nil)
         }
         guard status == errSecSuccess else { throw Self.error(status) }
     }
