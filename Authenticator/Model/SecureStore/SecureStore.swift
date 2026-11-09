@@ -42,32 +42,18 @@ nonisolated final class SecureStore: Sendable {
         self.secureStoreQueryable = secureStoreQueryable
     }
     
+    /// Deletes the item and adds it again: updating an item keeps the protection it was added with, so a value saved
+    /// with authentication over one saved without it would stay readable without it.
     public func setValue(_ value: Data, useAuthentication: Bool, for userAccount: String) throws {
+        let protection = try secureStoreQueryable.protection(useAuthentication: useAuthentication)
+        try removeValue(for: userAccount)
+
         var query = secureStoreQueryable.setUpQuery(useAuthentication: useAuthentication)
+        query.merge(protection) { _, new in new }
         query[String(kSecAttrAccount)] = userAccount
-        
-        var status = SecItemCopyMatching(query as CFDictionary, nil)
-        
-        switch status {
-        case errSecSuccess:
-            var attributesToUpdate: [String: Any] = [:]
-            attributesToUpdate[String(kSecValueData)] = value
-            
-            status = SecItemUpdate(query as CFDictionary, attributesToUpdate as CFDictionary)
-            
-            if status != errSecSuccess {
-                throw error(from: status)
-            }
-            
-        case errSecItemNotFound:
-            query[String(kSecValueData)] = value
-            
-            status = SecItemAdd(query as CFDictionary, nil)
-            if status != errSecSuccess {
-                throw error(from: status)
-            }
-            
-        default:
+        query[String(kSecValueData)] = value
+        let status = SecItemAdd(query as CFDictionary, nil)
+        if status != errSecSuccess {
             throw error(from: status)
         }
     }
@@ -76,34 +62,7 @@ nonisolated final class SecureStore: Sendable {
         guard let encodedPassword = value.data(using: .utf8) else {
             throw SecureStoreError.string2DataConversionError
         }
-        
-        var query = secureStoreQueryable.setUpQuery(useAuthentication: useAuthentication)
-        query[String(kSecAttrAccount)] = userAccount
-        
-        var status = SecItemCopyMatching(query as CFDictionary, nil)
-        
-        switch status {
-        case errSecSuccess:
-            var attributesToUpdate: [String: Any] = [:]
-            attributesToUpdate[String(kSecValueData)] = encodedPassword
-            
-            status = SecItemUpdate(query as CFDictionary, attributesToUpdate as CFDictionary)
-            
-            if status != errSecSuccess {
-                throw error(from: status)
-            }
-            
-        case errSecItemNotFound:
-            query[String(kSecValueData)] = encodedPassword
-            
-            status = SecItemAdd(query as CFDictionary, nil)
-            if status != errSecSuccess {
-                throw error(from: status)
-            }
-            
-        default:
-            throw error(from: status)
-        }
+        try setValue(encodedPassword, useAuthentication: useAuthentication, for: userAccount)
     }
     
     /* getValue is asynchronous to avoid main thread blocking while scanning NFC and
@@ -155,7 +114,14 @@ nonisolated final class SecureStore: Sendable {
         switch status {
         case errSecSuccess:
             let queriedItem = queryResult as? [String: Any]
-            return queriedItem?[String(kSecValueData)] as? Data
+            let data = queriedItem?[String(kSecValueData)] as? Data
+            if let data, !useAuthentication, let accessible = queriedItem?[String(kSecAttrAccessible)] as? String,
+               Self.leavesTheDevice.contains(accessible) {
+                // Saved by an earlier version, which let it go into backups and onto other devices. If adding it
+                // again fails, it is tried again on the next read.
+                try? setValue(data, useAuthentication: false, for: userAccount)
+            }
+            return data
         case errSecItemNotFound:
             throw SecureStoreError.itemNotFound
         default:
@@ -163,6 +129,10 @@ nonisolated final class SecureStore: Sendable {
         }
     }
     
+    /// The protection of items that can go into backups and onto other devices.
+    private static let leavesTheDevice: Set<String> = [kSecAttrAccessibleWhenUnlocked as String,
+                                                       kSecAttrAccessibleAfterFirstUnlock as String]
+
     public func hasValue(for userAccount: String) -> Bool {
         let status = self.getStatus(for: userAccount)
         switch status {

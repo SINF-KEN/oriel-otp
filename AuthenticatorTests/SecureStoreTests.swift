@@ -85,4 +85,45 @@ final class SecureStoreTests {
         #expect(password == nil)
         #expect(password2 == nil)
     }
+
+    /// The protection of the item, e.g. `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
+    private func accessible(_ userAccount: String) -> String? {
+        var query = PasswordQueryable(service: "someService").setUpQuery(useAuthentication: false)
+        query[String(kSecAttrAccount)] = userAccount
+        query[String(kSecReturnAttributes)] = true
+        query[String(kSecMatchLimit)] = kSecMatchLimitOne
+        var result: AnyObject?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else { return nil }
+        return (result as? [String: Any])?[String(kSecAttrAccessible)] as? String
+    }
+
+    @Test func keepsValuesOnThisDeviceOnly() throws {
+        try secureStoreWithGenericPwd.setValue("pwd_1234", useAuthentication: false, for: "genericPassword")
+        #expect(accessible("genericPassword") == kSecAttrAccessibleWhenUnlockedThisDeviceOnly as String)
+    }
+
+    // Earlier versions left out the protection, so the default let them go into backups and onto other devices.
+    @Test func movesAValueSavedByAnEarlierVersionToThisDevice() async throws {
+        var item = PasswordQueryable(service: "someService").setUpQuery(useAuthentication: false)
+        item[String(kSecAttrAccount)] = "earlier"
+        item[String(kSecValueData)] = Data("pwd_1234".utf8)
+        item[String(kSecAttrAccessible)] = kSecAttrAccessibleWhenUnlocked
+        #expect(SecItemAdd(item as CFDictionary, nil) == errSecSuccess)
+
+        #expect(await getPassword(for: "earlier") == "pwd_1234")
+        #expect(accessible("earlier") == kSecAttrAccessibleWhenUnlockedThisDeviceOnly as String)
+        #expect(await getPassword(for: "earlier") == "pwd_1234")
+    }
+
+    // Updating an item keeps its protection, so a new value has to replace the item.
+    @Test func replacingAValueReplacesItsProtection() throws {
+        var item = PasswordQueryable(service: "someService").setUpQuery(useAuthentication: false)
+        item[String(kSecAttrAccount)] = "earlier"
+        item[String(kSecValueData)] = Data("pwd_1234".utf8)
+        item[String(kSecAttrAccessible)] = kSecAttrAccessibleAfterFirstUnlock
+        #expect(SecItemAdd(item as CFDictionary, nil) == errSecSuccess)
+
+        try secureStoreWithGenericPwd.setValue("pwd_5678", useAuthentication: false, for: "earlier")
+        #expect(accessible("earlier") == kSecAttrAccessibleWhenUnlockedThisDeviceOnly as String)
+    }
 }

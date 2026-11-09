@@ -26,6 +26,7 @@ struct EnteSyncView: View {
     @FocusState private var focusedField: Field?
     @State private var isCreatingAccount = false
     @State private var isDeletingAccount = false
+    @State private var isConfirmingSignOut = false
 
     /// Whether a YubiKey can be reached, over NFC or because one is plugged in.
     let canAddToYubiKey: Bool
@@ -84,6 +85,16 @@ struct EnteSyncView: View {
                 }
             }
             .errorAlert(error: $model.error)
+            // Like the one in Settings: signing out deletes the copy of the accounts, with changes not synced yet.
+            .confirmationDialog(String(localized: "Sign out of Ente?", comment: "Ente sign out confirmation"), isPresented: $isConfirmingSignOut) {
+                Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
+            } message: {
+                if model.hasPendingChanges {
+                    Text(String(localized: "The session, the key and the copy of your accounts are deleted from this device. Some changes made here haven't been synced with Ente Auth yet and will be lost.", comment: "Ente sign out confirmation message with changes that weren't uploaded"))
+                } else {
+                    Text(String(localized: "The session, the key and the copy of your accounts are deleted from this device. Your accounts stay in Ente Auth.", comment: "Ente sign out confirmation message"))
+                }
+            }
         }
         .onDisappear {
             model.close()
@@ -205,7 +216,7 @@ struct EnteSyncView: View {
         Section {
             LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: email)
             Button(String(localized: "Sync accounts", comment: "Ente saved session sync button")) { model.useSavedSession() }
-            Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
+            Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { isConfirmingSignOut = true }
         } header: {
             Text(String(localized: "Signed in to Ente Auth", comment: "Ente saved session header"))
         } footer: {
@@ -344,7 +355,7 @@ struct EnteSyncView: View {
             if let email = model.signedInEmail {
                 LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: email)
             }
-            Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
+            Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { isConfirmingSignOut = true }
         }
         if model.isSessionSaved {
             watchSection

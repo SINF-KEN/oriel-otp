@@ -25,9 +25,7 @@ import Testing
 struct EnteFakeServerLoginTests {
 
     private func start(_ email: String, password: String = FakeEnteServer.password) async throws -> (EnteLoginFlow, EnteLoginStep) {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        let api = try EnteAPIClient(server: FakeEnteServer.server, session: URLSession(configuration: configuration))
+        let api = try EnteAPIClient(server: FakeEnteServer.server, session: URLSession.stubbed([FakeEnteServer.self]))
         return try await EnteLoginFlow.start(api: api, email: email, password: password)
     }
 

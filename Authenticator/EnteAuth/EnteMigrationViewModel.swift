@@ -131,6 +131,12 @@ import Foundation
             }
             guard account.hasSession else { throw EnteMigrationError.sessionEnded }
             let saved = try await self.store.unlock()
+            // The server in the preferences said which session to use; the token is only ever sent to the server
+            // the session was saved for.
+            guard EnteAPIClient.isSameServer(saved.server, from) else {
+                self.phase = .signIn(.source)
+                return
+            }
             self.cloud.use(saved)
             self.source = SignedInAccount(api: sourceAPI, email: saved.email, token: saved.token,
                                           authenticatorKey: saved.authenticatorKey, isSaved: true)

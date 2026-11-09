@@ -39,7 +39,10 @@ import LocalAuthentication
 nonisolated let APP_ID = ""
 
 nonisolated protocol SecureStoreQueryable: Sendable {
+    /// Finds the items, whatever their protection.
     func setUpQuery(useAuthentication: Bool) -> [String: Any]
+    /// The protection of an item when it is added. Throws rather than leaving out access control it can't create.
+    func protection(useAuthentication: Bool) throws -> [String: Any]
 }
 
 /*! Provides simple query to KeyChain specifically for password type of information
@@ -78,10 +81,6 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
         }
 
         if useAuthentication {
-            query[String(kSecAttrAccessControl)] = SecAccessControlCreateWithFlags(nil, // use the default allocator
-                                                                                   kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                                                                   accessControl,
-                                                                                   nil) // ignore any error
             let context = LAContext()
             // Number of seconds to wait between a device unlock with biometric and another biometric authentication request.
             // So, if the user opens our app within 10 seconds of unlocking the device, we not prompting the user for FaceID/TouchID again.
@@ -91,5 +90,23 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
         }
 #endif
         return query
+    }
+
+    func protection(useAuthentication: Bool) throws -> [String: Any] {
+#if !targetEnvironment(simulator)
+        if useAuthentication {
+            var error: Unmanaged<CFError>?
+            guard let accessControl = SecAccessControlCreateWithFlags(nil, // use the default allocator
+                                                                      kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+                                                                      accessControl,
+                                                                      &error) else {
+                let message = error.map { CFErrorCopyDescription($0.takeRetainedValue()) as String }
+                throw SecureStoreError.unhandledError(message: message ?? "No access control")
+            }
+            return [String(kSecAttrAccessControl): accessControl]
+        }
+#endif
+        // Never in backups or on another device, and gone with the app.
+        return [String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
     }
 }

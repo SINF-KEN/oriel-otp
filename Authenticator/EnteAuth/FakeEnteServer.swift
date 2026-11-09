@@ -93,6 +93,31 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     override func stopLoading() {}
 }
 
+/// Fails every request that reaches it. While tests run, `URLSession.ente` puts it after the fake server, so a test can
+/// never reach a real server, even if a check that should have stopped the request breaks.
+nonisolated final class UnstubbedRequestFailure: URLProtocol, @unchecked Sendable {
+
+    /// Whether the app runs as the host of the unit tests.
+    static let isTesting = NSClassFromString("XCTestCase") != nil
+
+    static let errorDomain = "OrielOTP.UnstubbedRequest"
+
+    override class func canInit(with request: URLRequest) -> Bool {
+        true
+    }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        client?.urlProtocol(self, didFailWithError: NSError(domain: Self.errorDomain, code: 1, userInfo: [
+            NSLocalizedDescriptionKey: "No stub answers \(request.url?.absoluteString ?? "")"]))
+    }
+
+    override func stopLoading() {}
+}
+
 /// An account on the demo server and its state.
 nonisolated private final class FakeEnteAccount: @unchecked Sendable {
 

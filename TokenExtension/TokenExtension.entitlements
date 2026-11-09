@@ -6,9 +6,5 @@
 	<array>
 		<string>group.io.github.sinf-ken.OrielOTP</string>
 	</array>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)io.github.sinf-ken.OrielOTP</string>
-	</array>
 </dict>
 </plist>

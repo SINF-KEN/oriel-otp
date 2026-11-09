@@ -75,9 +75,7 @@ struct EnteMigrationPlanTests {
     }
 
     private let session: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        return URLSession(configuration: configuration)
+        return URLSession.stubbed([FakeEnteServer.self])
     }()
 
     private func fixture(saved: EnteSavedSession? = nil, canSave: Bool = true) throws -> Fixture {
@@ -287,6 +285,33 @@ struct EnteMigrationPlanTests {
         #expect(fixture.model.error?.localizedDescription == EnteMigrationError.noAccounts.errorDescription)
     }
 
+    @Test func aSessionSavedForAnotherServerIsNotSentToTheOldServer() async throws {
+        // The preferences say the saved account is on the old server, but the session in the keychain is for another.
+        let defaults = makeTestDefaults()
+        let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
+        let elsewhere = EnteSavedSession(server: URL(string: "https://elsewhere.test")!, email: Self.email,
+                                         token: "the-saved-token", authenticatorKey: EnteCrypto.randomBytes(32))
+        try store.save(elsewhere)
+        let source = URL(string: "https://old.test")!
+        defaults.set(source.absoluteString, forKey: "EnteAuth.SavedSessionServer")
+        #expect(store.savedAccount?.server == source)
+
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [RecordingURLProtocol.self]
+        let session = URLSession(configuration: configuration)
+        RecordingURLProtocol.reset()
+        let cloud = EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: WatchAccountSync(defaults: defaults))
+        let model = EnteMigrationViewModel(store: store, defaults: defaults, session: session, cloud: cloud)
+        model.from = source.absoluteString
+        model.to = "https://new.test"
+        model.start()
+        try await finish(model)
+
+        #expect(model.phase == .signIn(.source))
+        #expect(model.sourceEmail == nil)
+        #expect(!RecordingURLProtocol.requests.contains { $0.value(forHTTPHeaderField: "X-Auth-Token") == elsewhere.token })
+    }
+
     @Test func anEndedSessionAsksToSignInAgainFirst() async throws {
         let saved = try await seed(FakeEnteServer.newAccountServer(), with: Self.accounts)
         let fixture = try fixture(saved: saved)
@@ -309,6 +334,27 @@ struct EnteMigrationPlanTests {
         #expect(fixture.store.savedAccount?.server == source)
         #expect(fixture.store.savedAccount?.hasSession == true)
     }
+}
+
+
+/// Records the requests and answers each with a 404.
+nonisolated private final class RecordingURLProtocol: URLProtocol, @unchecked Sendable {
+    private static let lock = NSLock()
+    nonisolated(unsafe) private static var recorded: [URLRequest] = []
+
+    static var requests: [URLRequest] { lock.withLock { recorded } }
+    static func reset() { lock.withLock { recorded = [] } }
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+    override func startLoading() {
+        Self.lock.withLock { Self.recorded.append(request) }
+        let response = HTTPURLResponse(url: request.url!, statusCode: 404, httpVersion: nil, headerFields: nil)!
+        client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+        client?.urlProtocol(self, didLoad: Data("{}".utf8))
+        client?.urlProtocolDidFinishLoading(self)
+    }
+    override func stopLoading() {}
 }
 
 #endif
