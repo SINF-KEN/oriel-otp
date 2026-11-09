@@ -29,7 +29,8 @@ nonisolated struct EnteVaultItem: Codable, Sendable, Equatable, Identifiable {
     var serverUpdatedAt: Int64
     /// Changed here and not uploaded yet.
     var isPending: Bool
-    /// The data of the last update uploaded, so it is recognized when it comes back in the diff.
+    /// The data of the last upload, recorded before it is sent, so it is recognized when it comes back in the diff, also
+    /// when the server's answer was lost.
     var uploadedRawData: String?
 
     var isTrashed: Bool {
@@ -43,7 +44,8 @@ nonisolated struct EnteVaultItem: Codable, Sendable, Equatable, Identifiable {
 /// Conflicts are settled per entity, by the server's `updatedAt`: a pulled version replaces the item unless the item
 /// has a pending change based on that same version or a later one. So a change made here is uploaded unless another
 /// device changed the entity since this device last saw it, in which case the other device's version wins and the
-/// change made here is dropped. An entity deleted on the server is deleted here, pending change or not.
+/// change made here is dropped. An entity deleted on the server is deleted here, pending change or not. A HOTP counter
+/// never moves back, as the codes before it have been shown: the higher of the two counters is kept.
 nonisolated struct EnteVault: Codable, Sendable, Equatable {
     let email: String
     let server: URL
@@ -57,7 +59,17 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
     }
 
     func belongs(to session: EnteSavedSession) -> Bool {
-        email.lowercased() == session.email.lowercased() && server == session.server
+        belongs(email: session.email, server: session.server)
+    }
+
+    /// The same server can be written in more than one way, e.g. with a trailing slash.
+    func belongs(email: String, server: URL) -> Bool {
+        self.email.lowercased() == email.lowercased() && EnteAPIClient.isSameServer(self.server, server)
+    }
+
+    /// The accounts added here that never reached Ente, which the vault is the only copy of.
+    var accountsNeverUploaded: [String] {
+        items.filter { $0.entityID == nil && !$0.isTrashed }.compactMap(\.rawData)
     }
 
     var hasPendingChanges: Bool {
@@ -69,8 +81,10 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
         // By id too, as they come from a dictionary: new accounts are listed in the same order on every device.
         for (entity, rawData) in pulled.sorted(by: { ($0.entity.updatedAt, $0.entity.id) < ($1.entity.updatedAt, $1.entity.id) }) {
             let index = items.firstIndex { $0.entityID == entity.id }
-                // An item whose upload reached the server although its answer didn't.
-                ?? items.firstIndex { $0.entityID == nil && $0.rawData != nil && $0.rawData == rawData && !entity.isDeleted }
+                // An item whose upload reached the server although its answer didn't, maybe changed since.
+                ?? items.firstIndex { item in
+                    item.entityID == nil && rawData != nil && !entity.isDeleted && (item.uploadedRawData == rawData || item.rawData == rawData)
+                }
             guard !entity.isDeleted else {
                 if let index { items.remove(at: index) }
                 continue
@@ -81,18 +95,23 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
                 continue
             }
             var item = items[index]
+            // A version that can't be decrypted, e.g. written with another key, mustn't erase the copy that can.
+            guard let rawData else { continue }
             if item.entityID == nil {
                 item.entityID = entity.id
                 item.serverUpdatedAt = entity.updatedAt
-                item.isPending = false
+                item.isPending = item.rawData != rawData
+                item.uploadedRawData = nil
             } else if let uploaded = item.uploadedRawData, uploaded == rawData {
                 // This device's own update. Changes made since it was uploaded stay pending.
                 item.serverUpdatedAt = entity.updatedAt
                 item.uploadedRawData = nil
             } else if !item.isPending || entity.updatedAt > item.serverUpdatedAt {
-                item.rawData = rawData
+                let merged = Self.keepingHigherCounter(of: item.rawData, in: rawData)
+                item.rawData = merged
                 item.serverUpdatedAt = entity.updatedAt
-                item.isPending = false
+                // A counter that moved further here is uploaded again.
+                item.isPending = merged != rawData
                 item.uploadedRawData = nil
             }
             items[index] = item
@@ -119,12 +138,20 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
         return true
     }
 
+    /// Records that `rawData` is about to be uploaded for the item, so it is recognized in the diff even if the
+    /// server's answer is lost.
+    mutating func markUploading(_ id: String, rawData: String) {
+        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
+        items[index].uploadedRawData = rawData
+    }
+
     /// Records that `rawData` was uploaded for the item, as a new entity if `created` is set.
     mutating func markUploaded(_ id: String, rawData: String, created: EnteAuthenticatorEntity?) {
         guard let index = items.firstIndex(where: { $0.id == id }) else { return }
         if let created {
             items[index].entityID = created.id
             items[index].serverUpdatedAt = created.updatedAt
+            items[index].uploadedRawData = nil
         } else {
             items[index].uploadedRawData = rawData
         }
@@ -136,6 +163,15 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
 
     mutating func remove(_ id: String) {
         items.removeAll { $0.id == id }
+    }
+
+    /// The pulled data, with the local HOTP counter if that one is further on. Codes up to the local counter have been
+    /// shown here, so going back would show them again.
+    private static func keepingHigherCounter(of local: String?, in pulled: String) -> String {
+        guard let local, let localCounter = EnteEntryEditor(rawData: local)?.counter,
+              var editor = EnteEntryEditor(rawData: pulled), localCounter > editor.counter ?? 0 else { return pulled }
+        editor.counter = localCounter
+        return editor.rawData ?? pulled
     }
 }
 
