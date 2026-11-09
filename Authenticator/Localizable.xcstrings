@@ -115,6 +115,93 @@
       },
       "shouldTranslate" : false
     },
+    "Add %@" : {
+      "comment" : "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajouter %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@を追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridať %@"
+          }
+        }
+      }
+    },
+    "Add it only if it's where you sign in to this account. Codes aren't suggested on a website until you add it." : {
+      "comment" : "AutoFill websites footer below a website made up from the account's name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Füge sie nur hinzu, wenn du dich dort bei diesem Konto anmeldest. Codes werden auf einer Website erst vorgeschlagen, wenn du sie hinzufügst."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajoutez-le seulement si c’est là que vous vous connectez à ce compte. Les codes ne sont suggérés sur un site qu’une fois que vous l’avez ajouté."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントにサインインするWebサイトである場合にのみ追加してください。追加するまで、そのWebサイトでコードは提案されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridajte ju, len ak sa na nej prihlasujete do tohto účtu. Kódy sa na webovej stránke navrhujú až po jej pridaní."
+          }
+        }
+      }
+    },
+    "Ente recovery key" : {
+      "comment" : "Ente recovery key file name and share title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente-Wiederherstellungsschlüssel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Clé de récupération Ente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enteリカバリキー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kľúč na obnovenie Ente"
+          }
+        }
+      }
+    },
     "%lld accounts in Ente Auth" : {
       "comment" : "Ente sync accounts header. The placeholder is the number of accounts.",
       "localizations" : {
@@ -4343,35 +4430,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopírovať kód"
-          }
-        }
-      }
-    },
-    "Copy recovery key" : {
-      "comment" : "Ente account creation button",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wiederherstellungsschlüssel kopieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Copier la clé de récupération"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "リカバリキーをコピー"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kopírovať kľúč na obnovenie"
           }
         }
       }
@@ -11868,6 +11926,35 @@
         }
       }
     },
+    "Save recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enregistrer la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uložiť kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "Save the account in Ente Auth and delete it from this device" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -12531,6 +12618,35 @@
         }
       }
     },
+    "Share recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel teilen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Partager la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを共有"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zdieľať kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "Show accounts in Spotlight" : {
       "comment" : "Privacy setting",
       "localizations" : {
@@ -13049,6 +13165,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Niektoré účty sa nedostali na nový server. Nič sa neprepolo a vaše účty sú stále na starom serveri. Skúste to znova."
+          }
+        }
+      }
+    },
+    "Some changes made on this device haven't been synced with Ente Auth yet. Sign in to the same account with Stay signed in on to sync them, or sign out in Settings to discard them." : {
+      "comment" : "Ente sign in error when signing in would replace changes that weren't uploaded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Änderungen auf diesem Gerät wurden noch nicht mit Ente Auth synchronisiert. Melde dich mit „Angemeldet bleiben“ beim selben Konto an, um sie zu synchronisieren, oder melde dich in den Einstellungen ab, um sie zu verwerfen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certaines modifications faites sur cet appareil n’ont pas encore été synchronisées avec Ente Auth. Connectez-vous au même compte avec « Rester connecté » activé pour les synchroniser, ou déconnectez-vous dans les Réglages pour les abandonner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスで行った一部の変更はまだEnte Authと同期されていません。同期するには「サインインしたままにする」をオンにして同じアカウントにサインインしてください。変更を破棄する場合は、設定でサインアウトしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektoré zmeny urobené na tomto zariadení ešte neboli synchronizované s Ente Auth. Ak ich chcete synchronizovať, prihláste sa do rovnakého účtu so zapnutým „Zostať prihlásený“, alebo sa odhláste v Nastaveniach, ak ich chcete zahodiť."
           }
         }
       }
@@ -14240,6 +14385,35 @@
         }
       }
     },
+    "The link gives the same setting more than once." : {
+      "comment" : "Error for an otpauth link that repeats a parameter, e.g. the secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Link enthält dieselbe Einstellung mehrmals."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le lien indique le même réglage plusieurs fois."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリンクには同じ設定が複数回含まれています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odkaz obsahuje rovnaké nastavenie viackrát."
+          }
+        }
+      }
+    },
     "The OATH application is disabled or not supported on this YubiKey." : {
       "comment" : "OATH disabled error message",
       "localizations" : {
@@ -15276,6 +15450,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tieto certifikáty boli pridané na tento %@ a môžu ich používať iné aplikácie."
+          }
+        }
+      }
+    },
+    "This code is too easy to guess. Choose another code." : {
+      "comment" : "App lock change prompt after a code such as 1234 or 1111",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieser Code ist zu leicht zu erraten. Wähle einen anderen Code."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce code est trop facile à deviner. Choisissez-en un autre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このコードは簡単に推測されます。別のコードを設定してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento kód sa dá príliš ľahko uhádnuť. Zvoľte iný kód."
           }
         }
       }

@@ -15,84 +15,112 @@
  */
 
 import Foundation
-import Security
 import WatchConnectivity
 
 /// The Ente Auth accounts sent by the iPhone, kept in the watch's keychain so codes work without the iPhone.
+///
+/// The iPhone sends them sealed in the application context. The key comes in a message: the iPhone sends it when it
+/// makes a new one, and this asks for it when a context can't be opened, again whenever the iPhone becomes reachable
+/// or the app becomes active, until it gets it. Until then the accounts saved before stay.
 @Observable final class WatchAccountStore: NSObject {
 
     private(set) var accounts: [OTPAccount]
 
-    @ObservationIgnored private let keychain: AccountKeychain
+    @ObservationIgnored private let receiver: WatchAccountReceiver?
+    /// The latest context couldn't be opened without the key.
+    @ObservationIgnored private var needsKey = false
+    @ObservationIgnored private var isRequestingKey = false
 
-    init(keychain: AccountKeychain = AccountKeychain()) {
-        self.keychain = keychain
-        self.accounts = (DemoMode.isEnabled ? DemoMode.accounts : keychain.load()).sorted(by: OTPAccount.listOrder)
+    override init() {
+        if DemoMode.isEnabled {
+            receiver = nil
+            accounts = DemoMode.accounts.sorted(by: OTPAccount.listOrder)
+        } else {
+            let receiver = WatchAccountReceiver()
+            self.receiver = receiver
+            accounts = receiver.accounts
+        }
         super.init()
     }
 
     func activate() {
-        guard !DemoMode.isEnabled, WCSession.isSupported(), WCSession.default.delegate == nil else { return }
+        guard receiver != nil, WCSession.isSupported(), WCSession.default.delegate == nil else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
     }
 
-    /// Replaces the accounts. An empty list deletes everything.
-    func replace(with accounts: [OTPAccount]) {
-        // Saving fails while the watch is locked. The iPhone's latest list is applied again on the next launch.
-        keychain.save(accounts)
-        self.accounts = accounts.sorted(by: OTPAccount.listOrder)
+    /// Called when the app becomes active: saves what couldn't be saved while the watch was locked, and applies the
+    /// latest context again, e.g. one that couldn't be opened then.
+    func refresh() {
+        guard let receiver else { return }
+        receiver.retry()
+        accounts = receiver.accounts
+        applyLatestContext()
+    }
+
+    private func applyLatestContext() {
+        guard receiver != nil, WCSession.isSupported(), WCSession.default.activationState == .activated else { return }
+        apply(WCSession.default.receivedApplicationContext)
+    }
+
+    private func apply(_ context: [String: Any]) {
+        guard let receiver else { return }
+        needsKey = receiver.apply(context) == .needsKey
+        accounts = receiver.accounts
+        if needsKey { requestKey() }
+    }
+
+    /// Doesn't ask again if the key doesn't open the context: the iPhone may have a newer one, which comes with the
+    /// next context.
+    private func receive(_ key: WatchSyncKey) {
+        guard let receiver else { return }
+        let session = WCSession.default
+        needsKey =
+            receiver.receive(key, context: session.activationState == .activated ? session.receivedApplicationContext : [:]) == .needsKey
+        accounts = receiver.accounts
+    }
+
+    private func requestKey() {
+        let session = WCSession.default
+        guard !isRequestingKey, session.activationState == .activated, session.isReachable else { return }
+        isRequestingKey = true
+        session.sendMessage(
+            WatchAccountsMessage.keyRequest,
+            replyHandler: { @Sendable reply in
+                let key = WatchAccountsMessage.key(from: reply)
+                Task { @MainActor in
+                    self.isRequestingKey = false
+                    if let key { self.receive(key) }
+                }
+            },
+            errorHandler: { @Sendable _ in
+                Task { @MainActor in self.isRequestingKey = false }
+            })
     }
 }
 
 extension WatchAccountStore: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        guard let accounts = WatchAccountsMessage.accounts(from: session.receivedApplicationContext) else { return }
-        Task { @MainActor in self.replace(with: accounts) }
+        Task { @MainActor in self.applyLatestContext() }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        guard let accounts = WatchAccountsMessage.accounts(from: applicationContext) else { return }
-        Task { @MainActor in self.replace(with: accounts) }
-    }
-}
-
-/// One keychain item holding all accounts. Only readable while the watch is unlocked, and never synced to iCloud.
-nonisolated struct AccountKeychain: Sendable {
-
-    private let service: String
-    private let account = "accounts"
-
-    init(service: String = "OrielOTP.WatchAccounts") {
-        self.service = service
+        // Property list values only, never changed after this.
+        nonisolated(unsafe) let context = applicationContext
+        Task { @MainActor in self.apply(context) }
     }
 
-    func load() -> [OTPAccount] {
-        var query = baseQuery
-        query[kSecReturnData as String] = true
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess, let data = result as? Data else { return [] }
-        return (try? JSONDecoder().decode([OTPAccount].self, from: data)) ?? []
+    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
+        guard session.isReachable else { return }
+        Task { @MainActor in
+            if self.needsKey { self.requestKey() }
+        }
     }
 
-    @discardableResult func save(_ accounts: [OTPAccount]) -> Bool {
-        SecItemDelete(baseQuery as CFDictionary)
-        guard !accounts.isEmpty else { return true }
-        guard let data = try? JSONEncoder().encode(accounts) else { return false }
-        var item = baseQuery
-        item[kSecValueData as String] = data
-        item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
-    }
-
-    private var baseQuery: [String: Any] {
-        [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecAttrSynchronizable as String: false
-        ]
+    /// The iPhone sends a new key as soon as it makes it.
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        guard let key = WatchAccountsMessage.key(from: message) else { return }
+        Task { @MainActor in self.receive(key) }
     }
 }

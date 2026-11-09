@@ -37,6 +37,14 @@ final class MemoryDeviceStorage: DeviceAccountStorage, @unchecked Sendable {
         saveCount += 1
         self.items = items
     }
+
+    /// What was set aside, like the file moved out of the way.
+    var setAsideItems: [DeviceAccountItem]??
+
+    func setAside() throws {
+        setAsideItems = .some(items)
+        items = nil
+    }
 }
 
 private final class MemoryKey: EnteVaultKeychain, @unchecked Sendable {

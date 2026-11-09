@@ -177,6 +177,39 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(restarted.retryDate == nil)
     }
 
+    // With the wait stopping at an hour, every 4-digit code could be tried in about 14 months.
+    @Test func theWaitKeepsGrowingPastAnHourUpToADay() throws {
+        let now = Date(timeIntervalSinceReferenceDate: 800_000_000)
+        var uptime: TimeInterval = 1000
+        let lock = makeLock(now: { now }, uptime: { uptime })
+        try lock.setMethod(.code4, secret: "1234")
+        lock.lock()
+        var waits: [TimeInterval] = []
+        for _ in 0..<20 {
+            #expect(!lock.unlock(with: "0000"))
+            let wait = lock.retryDate.map { $0.timeIntervalSince(now) } ?? 0
+            waits.append(wait)
+            uptime += wait + 1
+        }
+        #expect(waits[4] == 30)
+        #expect(waits[11] == 30 * 128)
+        #expect(waits[16] == 24 * 3600)
+        #expect(waits[19] == 24 * 3600)
+        // The owner can still get in once the wait is over.
+        #expect(lock.unlock(with: "1234"))
+    }
+
+    @Test(arguments: ["0000", "1111", "999999", "1234", "4321", "123456", "654321", "7890", "0987", "1212", "6969", "123123",
+                      "121212", "2580", "1004", "147258"])
+    func easyCodesAreTurnedDown(code: String) {
+        #expect(AppLockConfiguration.isEasyToGuess(code: code))
+    }
+
+    @Test(arguments: ["2749", "8316", "502817", "1357", "135790", "120034"])
+    func otherCodesAreAccepted(code: String) {
+        #expect(!AppLockConfiguration.isEasyToGuess(code: code))
+    }
+
     @Test func movingTheClockForwardDoesNotShortenTheWait() throws {
         var now = Date(timeIntervalSinceReferenceDate: 800_000_000)
         let lock = makeLock(now: { now })

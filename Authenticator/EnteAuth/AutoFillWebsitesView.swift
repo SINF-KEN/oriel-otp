@@ -61,6 +61,17 @@ struct AutoFillWebsitesView: View {
                 } footer: {
                     Text(String(localized: "AutoFill suggests this account's code on these websites and their subdomains. Without a website, choose the code from the list of codes instead.", comment: "AutoFill websites footer"))
                 }
+                if let suggestion = AutoFillWebsites.suggestion(issuer: issuer),
+                   !websites.contains(where: { AutoFillWebsites.normalized($0.text) == suggestion }) {
+                    // Made up from the account's name, so it is only used once the user adds it.
+                    Section {
+                        Button(String(localized: "Add \(suggestion)", comment: "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com.")) {
+                            websites.append(Website(text: suggestion))
+                        }
+                    } footer: {
+                        Text(String(localized: "Add it only if it's where you sign in to this account. Codes aren't suggested on a website until you add it.", comment: "AutoFill websites footer below a website made up from the account's name"))
+                    }
+                }
                 if autoFill.hasChosenWebsites(for: id) {
                     let guessed = AutoFillWebsites.guess(issuer: issuer)
                     Section {

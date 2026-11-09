@@ -141,7 +141,12 @@ import YubiKit
         guard tags != account.tags else { return }
         switch account.location {
         case .ente(let id):
-            cloud.setTags(id, tags)
+            do {
+                try cloud.setTags(id, tags)
+            } catch {
+                sessionError = error
+                return
+            }
         case .device(let id):
             do {
                 try device.setTags(id, tags)
@@ -324,7 +329,9 @@ import YubiKit
         account.isOnDevice && cloud.isEnabled
     }
 
-    /// Puts an account on this device in Ente Auth, and deletes it here once it is in the vault.
+    /// Puts an account on this device in Ente Auth, and deletes it here once it is saved in the vault. Until it has
+    /// been uploaded the vault is its only copy, so if the vault is discarded before then, e.g. by signing out, the
+    /// account is put back on this device (see `EnteCloud`).
     func moveToEnte(_ account: Account) throws -> MoveToEnteResult {
         guard case .device(let id) = account.location, let rawData = device.rawData(of: id) else { return .alreadyInEnte }
         guard try cloud.add(rawData: rawData) == .added else { return .alreadyInEnte }
@@ -389,7 +396,12 @@ import YubiKit
     private func removeAfterMove(_ account: Account) {
         switch account.location {
         case .yubiKey: break
-        case .ente(let id): cloud.delete(id)
+        case .ente(let id):
+            do {
+                try cloud.delete(id)
+            } catch {
+                sessionError = error
+            }
         case .device(let id):
             do {
                 try device.delete(id)
@@ -712,8 +724,12 @@ import YubiKit
 
     func renameAccount(_ account: Account, issuer: String, accountName: String, completion: @escaping () -> Void) {
         if case .ente(let id) = account.location {
-            cloud.rename(id, issuer: issuer, accountName: accountName)
-            completion()
+            do {
+                try cloud.rename(id, issuer: issuer, accountName: accountName)
+                completion()
+            } catch {
+                sessionError = error
+            }
             return
         }
         if case .device(let id) = account.location {
@@ -754,8 +770,12 @@ import YubiKit
     /// Deletes the account from the YubiKey or this device, or moves an Ente Auth account to Ente's trash.
     func deleteAccount(_ account: Account, completion: @escaping () -> Void) {
         if case .ente(let id) = account.location {
-            cloud.delete(id)
-            completion()
+            do {
+                try cloud.delete(id)
+                completion()
+            } catch {
+                sessionError = error
+            }
             return
         }
         if case .device(let id) = account.location {

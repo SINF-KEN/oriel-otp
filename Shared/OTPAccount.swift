@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import CryptoKit
 import Foundation
 
 /// A time-based account whose codes are calculated on the device, used by the Apple Watch app.
@@ -60,21 +61,88 @@ nonisolated struct OTPAccount: Codable, Sendable, Hashable, Identifiable {
     }
 }
 
-/// What the iPhone sends to the watch in the application context.
+/// What the iPhone sends to the watch.
+///
+/// The application context, which the system keeps on disk on both devices, carries the accounts sealed with a
+/// `WatchSyncKey`, or only a mark that there are none. The key travels in `sendMessage`, which isn't kept: the iPhone
+/// sends it when it makes a new one, and the watch asks for it when it has a context it can't open.
 nonisolated enum WatchAccountsMessage {
 
-    static let accountsKey = "accounts"
-    static let version = 1
+    /// Version 1 put the accounts in the context unencrypted. Only the iPhone reads it, once, to replace it.
+    static let version = 2
     static let versionKey = "version"
+    static let keyIDKey = "keyID"
+    static let sealedKey = "sealed"
+    static let clearedKey = "cleared"
+    static let keyRequestKey = "requestKey"
+    static let keyKey = "key"
 
-    /// An empty list tells the watch to delete everything.
-    static func context(for accounts: [OTPAccount]) throws -> [String: Any] {
-        [versionKey: version, accountsKey: try JSONEncoder().encode(accounts)]
+    private static let legacyVersion = 1
+    private static let legacyAccountsKey = "accounts"
+
+    enum Content: Equatable {
+        case accounts([OTPAccount])
+        /// There are no accounts, delete them.
+        case cleared
+        /// Sealed with a key the watch doesn't have, the one with this ID.
+        case needsKey(id: String)
+        /// An old, unknown or damaged context.
+        case unreadable
     }
 
-    /// Returns nil for a context this version doesn't understand.
-    static func accounts(from context: [String: Any]) -> [OTPAccount]? {
-        guard context[versionKey] as? Int == version, let data = context[accountsKey] as? Data else { return nil }
+    /// An empty list tells the watch to delete everything, and needs no key.
+    static func context(for accounts: [OTPAccount], key: WatchSyncKey) throws -> [String: Any] {
+        guard !accounts.isEmpty else { return clearedContext }
+        let sealed = try ChaChaPoly.seal(
+            try JSONEncoder().encode(accounts), using: key.symmetricKey,
+            authenticating: associatedData(keyID: key.id))
+        return [versionKey: version, keyIDKey: key.id, sealedKey: sealed.combined]
+    }
+
+    static var clearedContext: [String: Any] {
+        [versionKey: version, clearedKey: true]
+    }
+
+    static func content(of context: [String: Any], key: WatchSyncKey?) -> Content {
+        guard context[versionKey] as? Int == version else { return .unreadable }
+        if context[clearedKey] as? Bool == true { return .cleared }
+        guard let keyID = context[keyIDKey] as? String, let sealed = context[sealedKey] as? Data else { return .unreadable }
+        guard let key, key.id == keyID else { return .needsKey(id: keyID) }
+        guard let box = try? ChaChaPoly.SealedBox(combined: sealed),
+            let data = try? ChaChaPoly.open(box, using: key.symmetricKey, authenticating: associatedData(keyID: keyID)),
+            let accounts = try? JSONDecoder().decode([OTPAccount].self, from: data)
+        else { return .unreadable }
+        return .accounts(accounts)
+    }
+
+    /// Whether the context is in the current format, so nothing needs replacing. An empty context was never sent.
+    static func isCurrent(_ context: [String: Any]) -> Bool {
+        context.isEmpty || context[versionKey] as? Int == version
+    }
+
+    /// The unencrypted accounts of a version 1 context, read by the iPhone only to replace it with a sealed one.
+    static func legacyAccounts(from context: [String: Any]) -> [OTPAccount]? {
+        guard context[versionKey] as? Int == legacyVersion, let data = context[legacyAccountsKey] as? Data else { return nil }
         return try? JSONDecoder().decode([OTPAccount].self, from: data)
+    }
+
+    static var keyRequest: [String: Any] {
+        [versionKey: version, keyRequestKey: true]
+    }
+
+    static func isKeyRequest(_ message: [String: Any]) -> Bool {
+        message[keyRequestKey] as? Bool == true
+    }
+
+    static func keyMessage(_ key: WatchSyncKey) -> [String: Any] {
+        [versionKey: version, keyKey: key.data]
+    }
+
+    static func key(from message: [String: Any]) -> WatchSyncKey? {
+        (message[keyKey] as? Data).flatMap(WatchSyncKey.init(data:))
+    }
+
+    private static func associatedData(keyID: String) -> Data {
+        Data("OrielOTP.WatchAccounts.v\(version).\(keyID)".utf8)
     }
 }

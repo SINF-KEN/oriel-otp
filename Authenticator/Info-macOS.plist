@@ -46,5 +46,7 @@
 	<string>Copyright © 2026 Kenzi Voyer</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Connect to a self-hosted Ente server on your local network, if you use one.</string>
+	<key>OrielOTPSharedKeychainGroup</key>
+	<string>$(AppIdentifierPrefix)io.github.sinf-ken.OrielOTP</string>
 </dict>
 </plist>

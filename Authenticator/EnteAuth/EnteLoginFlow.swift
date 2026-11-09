@@ -264,10 +264,11 @@ final class EnteLoginFlow {
 
         let token: String
         if let encryptedToken = response.encryptedToken.flatMap({ Data(enteBase64: $0) }) {
-            guard let tokenBytes = try? EnteCrypto.sealedBoxOpen(encryptedToken, publicKey: publicKey, secretKey: secretKey) else {
+            guard var tokenBytes = try? EnteCrypto.sealedBoxOpen(encryptedToken, publicKey: publicKey, secretKey: secretKey) else {
                 throw EnteLoginError.invalidAccountData
             }
             token = tokenBytes.enteURLSafeBase64
+            tokenBytes.wipe()
         } else if let plainToken = response.token, !plainToken.isEmpty {
             token = plainToken
         } else {

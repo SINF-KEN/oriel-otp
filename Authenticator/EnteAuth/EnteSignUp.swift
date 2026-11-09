@@ -64,29 +64,40 @@ enum EnteSignUp {
 
     /// Makes the keys of a new account. This takes a few seconds and a lot of memory.
     @concurrent nonisolated static func generateKeys(password: String) async throws -> EnteNewAccountKeys {
-        let masterKey = EnteCrypto.randomBytes(EnteCrypto.keyLength)
-        let recoveryKey = EnteCrypto.randomBytes(EnteCrypto.keyLength)
-        let derived = try EnteCrypto.deriveNewKeyEncryptionKey(password: password)
-        let (publicKey, secretKey) = try EnteCrypto.generateKeyPair()
+        var masterKey = EnteCrypto.randomBytes(EnteCrypto.keyLength)
+        var recoveryKey = EnteCrypto.randomBytes(EnteCrypto.keyLength)
+        var keyEncryptionKey: Data
+        let kekSalt: Data, opsLimit: UInt64, memLimit: UInt64
+        (keyEncryptionKey, kekSalt, opsLimit, memLimit) = try EnteCrypto.deriveNewKeyEncryptionKey(password: password)
+        let publicKey: Data
+        var secretKey: Data
+        (publicKey, secretKey) = try EnteCrypto.generateKeyPair()
+        // Only the encrypted keys leave this function, and the login key, which SRP needs.
+        defer {
+            masterKey.wipe()
+            recoveryKey.wipe()
+            keyEncryptionKey.wipe()
+            secretKey.wipe()
+        }
 
-        let encryptedKey = try EnteCrypto.secretBox(masterKey, key: derived.key)
+        let encryptedKey = try EnteCrypto.secretBox(masterKey, key: keyEncryptionKey)
         let encryptedSecretKey = try EnteCrypto.secretBox(secretKey, key: masterKey)
         let masterWithRecovery = try EnteCrypto.secretBox(masterKey, key: recoveryKey)
         let recoveryWithMaster = try EnteCrypto.secretBox(recoveryKey, key: masterKey)
 
         let srpUserID = UUID().uuidString.lowercased()
         let srpSalt = EnteCrypto.randomBytes(16)
-        let loginKey = try EnteCrypto.deriveLoginKey(keyEncryptionKey: derived.key)
+        let loginKey = try EnteCrypto.deriveLoginKey(keyEncryptionKey: keyEncryptionKey)
         return EnteNewAccountKeys(
             attributes: EnteNewKeyAttributes(
-                kekSalt: derived.salt.base64EncodedString(),
+                kekSalt: kekSalt.base64EncodedString(),
                 encryptedKey: encryptedKey.cipherText.base64EncodedString(),
                 keyDecryptionNonce: encryptedKey.nonce.base64EncodedString(),
                 publicKey: publicKey.base64EncodedString(),
                 encryptedSecretKey: encryptedSecretKey.cipherText.base64EncodedString(),
                 secretKeyDecryptionNonce: encryptedSecretKey.nonce.base64EncodedString(),
-                memLimit: derived.memLimit,
-                opsLimit: derived.opsLimit,
+                memLimit: memLimit,
+                opsLimit: opsLimit,
                 masterKeyEncryptedWithRecoveryKey: masterWithRecovery.cipherText.base64EncodedString(),
                 masterKeyDecryptionNonce: masterWithRecovery.nonce.base64EncodedString(),
                 recoveryKeyEncryptedWithMasterKey: recoveryWithMaster.cipherText.base64EncodedString(),

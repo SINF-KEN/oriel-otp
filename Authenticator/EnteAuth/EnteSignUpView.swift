@@ -15,12 +15,14 @@
  */
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Creates an account on a self-hosted server. Ente's own servers don't offer this.
 struct EnteSignUpView: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var model: EnteSignUpViewModel
+    @State private var isExportingRecoveryKey = false
 
     /// Called with the email of the new account, to sign in with.
     let onCreated: (String) -> Void
@@ -147,9 +149,14 @@ struct EnteSignUpView: View {
                 .environment(\.layoutDirection, .leftToRight)
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("ente.sign-up.recovery-key")
-                Button(String(localized: "Copy recovery key", comment: "Ente account creation button")) {
-                    Platform.copy(recoveryKey)
+                // Not copied: every app can read the clipboard, and on iOS it can reach the user's other devices.
+                Button(String(localized: "Save recovery key", comment: "Ente account creation button")) {
+                    isExportingRecoveryKey = true
                 }
+                .fileExporter(isPresented: $isExportingRecoveryKey, item: recoveryKey, contentTypes: [.utf8PlainText],
+                              defaultFilename: String(localized: "Ente recovery key", comment: "Ente recovery key file name and share title")) { _ in }
+                ShareLink(String(localized: "Share recovery key", comment: "Ente account creation button"), item: recoveryKey,
+                          preview: SharePreview(String(localized: "Ente recovery key", comment: "Ente recovery key file name and share title")))
             } header: {
                 Text(String(localized: "Your recovery key", comment: "Ente account creation header"))
             } footer: {
