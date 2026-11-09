@@ -75,9 +75,7 @@ struct EnteMigrationPlanTests {
     }
 
     private let session: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        return URLSession(configuration: configuration)
+        return URLSession.stubbed([FakeEnteServer.self])
     }()
 
     private func fixture(saved: EnteSavedSession? = nil, canSave: Bool = true) throws -> Fixture {

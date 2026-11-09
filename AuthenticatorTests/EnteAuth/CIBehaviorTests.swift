@@ -45,9 +45,7 @@ nonisolated final class EnteLoginURLProtocol: URLProtocol, @unchecked Sendable {
     }
 
     static func makeAPI() throws -> EnteAPIClient {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [EnteLoginURLProtocol.self]
-        return try EnteAPIClient(server: URL(string: "https://ente.test")!, session: URLSession(configuration: configuration))
+        return try EnteAPIClient(server: URL(string: "https://ente.test")!, session: URLSession.stubbed([EnteLoginURLProtocol.self]))
     }
 }
 

@@ -72,9 +72,7 @@ struct EnteAccountCreationRulesTests {
 
     /// Each request that creates an account fails before it's sent: a request that was sent would fail differently.
     @Test func noRequestReachesEntesServers() async throws {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        let api = try EnteAPIClient(session: URLSession(configuration: configuration))
+        let api = try EnteAPIClient(session: URLSession.stubbed([FakeEnteServer.self]))
         await #expect(throws: EnteSignUpError.notAllowedOnEnte) {
             try await api.sendSignUpCode(email: "alice@example.com")
         }
@@ -134,9 +132,7 @@ struct EnteAccountCreationRulesTests {
     private static let password = "correct horse"
 
     private let session: URLSession = {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        return URLSession(configuration: configuration)
+        return URLSession.stubbed([FakeEnteServer.self])
     }()
 
     private func finish(_ model: EnteSignUpViewModel) async throws {

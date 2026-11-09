@@ -73,9 +73,7 @@ nonisolated final class OfflineURLProtocol: URLProtocol, @unchecked Sendable {
     override func stopLoading() {}
 
     static var session: URLSession {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [OfflineURLProtocol.self]
-        return URLSession(configuration: configuration)
+        URLSession.stubbed([OfflineURLProtocol.self])
     }
 }
 
@@ -540,9 +538,7 @@ struct EnteCloudSyncTests {
     let online: URLSession
 
     init() {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [FakeEnteServer.self]
-        online = URLSession(configuration: configuration)
+        online = URLSession.stubbed([FakeEnteServer.self])
     }
 
     private var store: EnteSessionStore {
