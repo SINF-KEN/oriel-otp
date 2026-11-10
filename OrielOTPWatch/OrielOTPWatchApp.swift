@@ -20,12 +20,16 @@ import SwiftUI
 struct OrielOTPWatchApp: App {
 
     @State private var store = WatchAccountStore()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
             AccountListView()
                 .environment(store)
                 .task { store.activate() }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { store.refresh() }
+                }
         }
     }
 }

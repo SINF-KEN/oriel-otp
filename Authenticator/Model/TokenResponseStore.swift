@@ -38,20 +38,34 @@ nonisolated struct TokenResponseStore: Sendable {
         directoryURL = containerURL.appendingPathComponent(Self.directoryName, isDirectory: true)
     }
 
-    func write(_ data: Data, for kind: TokenResponseKind) throws {
-        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
-        try data.write(to: fileURL(for: kind), options: [.atomic, .completeFileProtection])
+    /// The key in a request's notification under which the extension names it. The answer is filed under that name,
+    /// so an answer the app finishes late, for a request the extension gave up on, is never taken for the next one's,
+    /// which may come from another app.
+    static let requestIDKey = "requestID"
+
+    /// A new name for a request.
+    static func newRequestID() -> String {
+        UUID().uuidString
     }
 
-    func read(_ kind: TokenResponseKind) -> Data? {
-        try? Data(contentsOf: fileURL(for: kind))
+    func write(_ data: Data, for kind: TokenResponseKind, requestID: String) throws {
+        let url = try fileURL(for: kind, requestID: requestID)
+        try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        try data.write(to: url, options: [.atomic, .completeFileProtection])
+    }
+
+    func read(_ kind: TokenResponseKind, requestID: String) -> Data? {
+        guard let url = try? fileURL(for: kind, requestID: requestID) else { return nil }
+        return try? Data(contentsOf: url)
     }
 
     func removeAll() throws {
         try FileManager.default.removeItem(at: directoryURL)
     }
 
-    private func fileURL(for kind: TokenResponseKind) -> URL {
-        directoryURL.appendingPathComponent(kind.rawValue)
+    /// Only a UUID names a request, so the name can't reach outside the directory.
+    private func fileURL(for kind: TokenResponseKind, requestID: String) throws -> URL {
+        guard let id = UUID(uuidString: requestID) else { throw CocoaError(.fileWriteInvalidFileName) }
+        return directoryURL.appendingPathComponent("\(kind.rawValue)-\(id.uuidString)")
     }
 }

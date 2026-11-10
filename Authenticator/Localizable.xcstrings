@@ -115,6 +115,93 @@
       },
       "shouldTranslate" : false
     },
+    "Add %@" : {
+      "comment" : "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ hinzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajouter %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@を追加"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridať %@"
+          }
+        }
+      }
+    },
+    "Add it only if it's where you sign in to this account. Codes aren't suggested on a website until you add it." : {
+      "comment" : "AutoFill websites footer below a website made up from the account's name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Füge sie nur hinzu, wenn du dich dort bei diesem Konto anmeldest. Codes werden auf einer Website erst vorgeschlagen, wenn du sie hinzufügst."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ajoutez-le seulement si c’est là que vous vous connectez à ce compte. Les codes ne sont suggérés sur un site qu’une fois que vous l’avez ajouté."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントにサインインするWebサイトである場合にのみ追加してください。追加するまで、そのWebサイトでコードは提案されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pridajte ju, len ak sa na nej prihlasujete do tohto účtu. Kódy sa na webovej stránke navrhujú až po jej pridaní."
+          }
+        }
+      }
+    },
+    "Ente recovery key" : {
+      "comment" : "Ente recovery key file name and share title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente-Wiederherstellungsschlüssel"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Clé de récupération Ente"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enteリカバリキー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kľúč na obnovenie Ente"
+          }
+        }
+      }
+    },
     "%lld accounts in Ente Auth" : {
       "comment" : "Ente sync accounts header. The placeholder is the number of accounts.",
       "localizations" : {
@@ -1354,6 +1441,35 @@
         }
       }
     },
+    "Account on %@" : {
+      "comment" : "Ente account deletion header. The placeholder is the server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto auf %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Compte sur %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のアカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet na %@"
+          }
+        }
+      }
+    },
     "Account renamed" : {
       "comment" : "OATH NFC account renamed",
       "localizations" : {
@@ -1495,6 +1611,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Skopírované účty"
+          }
+        }
+      }
+    },
+    "Accounts on Ente's servers are deleted from Ente's apps or website." : {
+      "comment" : "Ente account deletion error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten auf den Servern von Ente werden in den Apps oder auf der Website von Ente gelöscht."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les comptes sur les serveurs d’Ente se suppriment depuis les apps ou le site web d’Ente."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enteのサーバ上のアカウントは、Enteのアプリまたはウェブサイトから削除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účty na serveroch Ente sa odstraňujú v aplikáciách alebo na webovej stránke Ente."
           }
         }
       }
@@ -4173,31 +4318,60 @@
         }
       }
     },
-    "Copies the code of an account to the clipboard. On a Mac, accounts on a YubiKey work while it's plugged in." : {
+    "Copies the code of an account to the clipboard." : {
       "comment" : "Shortcuts action description",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kopiert den Code eines Kontos in die Zwischenablage. Auf einem Mac funktionieren Konten auf einem YubiKey, solange er angeschlossen ist."
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Copie le code d’un compte dans le presse-papiers. Sur un Mac, les comptes d’une YubiKey fonctionnent tant qu’elle est branchée."
+            "value" : "Copie le code d’un compte dans le presse-papiers."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "アカウントのコードをクリップボードにコピーします。Macでは、YubiKeyが接続されている間はYubiKey上のアカウントも使用できます。"
+            "value" : "アカウントのコードをクリップボードにコピーします。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Skopíruje kód účtu do schránky. Na Macu fungujú účty na YubiKey, kým je pripojený."
+            "value" : "Skopíruje kód účtu do schránky."
+          }
+        }
+      }
+    },
+    "Copies the code of an account to the clipboard. Accounts on a YubiKey work while it's plugged in." : {
+      "comment" : "Shortcuts action description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopiert den Code eines Kontos in die Zwischenablage. Konten auf einem YubiKey funktionieren, solange er angeschlossen ist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie le code d’un compte dans le presse-papiers. Les comptes d’une YubiKey fonctionnent tant qu’elle est branchée."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントのコードをクリップボードにコピーします。YubiKeyが接続されている間はYubiKey上のアカウントも使用できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopíruje kód účtu do schránky. Účty na YubiKey fungujú, kým je pripojený."
           }
         }
       }
@@ -4256,35 +4430,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kopírovať kód"
-          }
-        }
-      }
-    },
-    "Copy recovery key" : {
-      "comment" : "Ente account creation button",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Wiederherstellungsschlüssel kopieren"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Copier la clé de récupération"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "リカバリキーをコピー"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Kopírovať kľúč na obnovenie"
           }
         }
       }
@@ -4939,6 +5084,35 @@
         }
       }
     },
+    "Delete account" : {
+      "comment" : "Ente account deletion button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Supprimer le compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを削除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstrániť účet"
+          }
+        }
+      }
+    },
     "Delete Accounts…" : {
       "comment" : "Mac Account menu",
       "localizations" : {
@@ -4992,6 +5166,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vymazať účet?"
+          }
+        }
+      }
+    },
+    "Delete account…" : {
+      "comment" : "Ente settings button that opens account deletion",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto löschen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Supprimer le compte…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを削除…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstrániť účet…"
+          }
+        }
+      }
+    },
+    "Delete an account on this server" : {
+      "comment" : "Ente button that opens account deletion on a self-hosted server",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto auf diesem Server löschen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Supprimer un compte sur ce serveur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このサーバのアカウントを削除"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstrániť účet na tomto serveri"
           }
         }
       }
@@ -5054,6 +5286,35 @@
         }
       }
     },
+    "Delete your account on %@?" : {
+      "comment" : "Ente account deletion confirmation. The placeholder is the server.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ihr Konto auf %@ löschen?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Supprimer votre compte sur %@ ?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のアカウントを削除しますか？"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstrániť váš účet na %@?"
+          }
+        }
+      }
+    },
     "Delete…" : {
       "comment" : "Mac Account menu",
       "localizations" : {
@@ -5079,6 +5340,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odstrániť…"
+          }
+        }
+      }
+    },
+    "Deleting the account removes it and all its Ente Auth accounts from your server. Enter its password to confirm it's yours. Your password never leaves this device." : {
+      "comment" : "Ente account deletion footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Beim Löschen des Kontos werden es und alle seine Ente Auth-Konten von Ihrem Server entfernt. Geben Sie sein Passwort ein, um zu bestätigen, dass es Ihnen gehört. Ihr Passwort verlässt dieses Gerät nie."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La suppression du compte le retire de votre serveur avec tous ses comptes Ente Auth. Saisissez son mot de passe pour confirmer qu’il vous appartient. Votre mot de passe ne quitte jamais cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを削除すると、そのアカウントとすべてのEnte Authアカウントがサーバから削除されます。ご自身のアカウントであることを確認するため、パスワードを入力してください。パスワードがこのデバイスの外に送信されることはありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odstránením účtu sa z vášho servera odstráni účet aj všetky jeho účty Ente Auth. Zadajte jeho heslo na potvrdenie, že je váš. Vaše heslo nikdy neopustí toto zariadenie."
           }
         }
       }
@@ -11750,6 +12040,35 @@
         }
       }
     },
+    "Save recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enregistrer la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uložiť kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "Save the account in Ente Auth and delete it from this device" : {
       "comment" : "Toolbar help",
       "localizations" : {
@@ -12413,6 +12732,35 @@
         }
       }
     },
+    "Share recovery key" : {
+      "comment" : "Ente account creation button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Wiederherstellungsschlüssel teilen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Partager la clé de récupération"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "リカバリキーを共有"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zdieľať kľúč na obnovenie"
+          }
+        }
+      }
+    },
     "Show accounts in Spotlight" : {
       "comment" : "Privacy setting",
       "localizations" : {
@@ -12931,6 +13279,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Niektoré účty sa nedostali na nový server. Nič sa neprepolo a vaše účty sú stále na starom serveri. Skúste to znova."
+          }
+        }
+      }
+    },
+    "Some changes made on this device haven't been synced with Ente Auth yet. Sign in to the same account with Stay signed in on to sync them, or sign out in Settings to discard them." : {
+      "comment" : "Ente sign in error when signing in would replace changes that weren't uploaded",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Änderungen auf diesem Gerät wurden noch nicht mit Ente Auth synchronisiert. Melde dich mit „Angemeldet bleiben“ beim selben Konto an, um sie zu synchronisieren, oder melde dich in den Einstellungen ab, um sie zu verwerfen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certaines modifications faites sur cet appareil n’ont pas encore été synchronisées avec Ente Auth. Connectez-vous au même compte avec « Rester connecté » activé pour les synchroniser, ou déconnectez-vous dans les Réglages pour les abandonner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスで行った一部の変更はまだEnte Authと同期されていません。同期するには「サインインしたままにする」をオンにして同じアカウントにサインインしてください。変更を破棄する場合は、設定でサインアウトしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niektoré zmeny urobené na tomto zariadení ešte neboli synchronizované s Ente Auth. Ak ich chcete synchronizovať, prihláste sa do rovnakého účtu so zapnutým „Zostať prihlásený“, alebo sa odhláste v Nastaveniach, ak ich chcete zahodiť."
           }
         }
       }
@@ -13860,6 +14237,64 @@
         }
       }
     },
+    "The account and every Ente Auth account in it are deleted from the server for good. This can't be undone." : {
+      "comment" : "Ente account deletion confirmation message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Konto und alle Ente Auth-Konten darin werden endgültig vom Server gelöscht. Dies kann nicht rückgängig gemacht werden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le compte et tous ses comptes Ente Auth sont définitivement supprimés du serveur. Cette action est irréversible."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントと、その中のすべてのEnte Authアカウントがサーバから完全に削除されます。この操作は取り消せません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet a všetky účty Ente Auth v ňom sa natrvalo odstránia zo servera. Túto akciu nie je možné vrátiť späť."
+          }
+        }
+      }
+    },
+    "The account and its data were deleted from your server. Codes on your YubiKey aren't affected." : {
+      "comment" : "Ente account deletion finished footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Konto und seine Daten wurden von Ihrem Server gelöscht. Codes auf Ihrem YubiKey sind davon nicht betroffen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le compte et ses données ont été supprimés de votre serveur. Les codes de votre YubiKey ne sont pas concernés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントとそのデータがサーバから削除されました。YubiKey上のコードには影響しません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet a jeho údaje boli odstránené z vášho servera. Kódy na vašom YubiKey nie sú ovplyvnené."
+          }
+        }
+      }
+    },
     "The account is kept only on this device and isn't in its backups. Keep the service's recovery codes, as you'd lose the account with the device." : {
       "comment" : "Add account footer when adding to this device",
       "localizations" : {
@@ -14092,6 +14527,35 @@
         }
       }
     },
+    "The link gives the same setting more than once." : {
+      "comment" : "Error for an otpauth link that repeats a parameter, e.g. the secret",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Link enthält dieselbe Einstellung mehrmals."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le lien indique le même réglage plusieurs fois."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このリンクには同じ設定が複数回含まれています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odkaz obsahuje rovnaké nastavenie viackrát."
+          }
+        }
+      }
+    },
     "The OATH application is disabled or not supported on this YubiKey." : {
       "comment" : "OATH disabled error message",
       "localizations" : {
@@ -14290,6 +14754,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN kód je zablokovaný. Pred použitím certifikátov ho odblokujte kódom PUK."
+          }
+        }
+      }
+    },
+    "The server didn't allow deleting this account. Ask the person who runs it to delete it." : {
+      "comment" : "Ente account deletion error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der Server hat das Löschen dieses Kontos nicht erlaubt. Bitten Sie die Person, die ihn betreibt, es zu löschen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le serveur n’a pas autorisé la suppression de ce compte. Demandez à la personne qui le gère de le supprimer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "サーバがこのアカウントの削除を許可しませんでした。サーバの管理者に削除を依頼してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Server nepovolil odstránenie tohto účtu. Požiadajte osobu, ktorá ho spravuje, aby ho odstránila."
           }
         }
       }
@@ -15128,6 +15621,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tieto certifikáty boli pridané na tento %@ a môžu ich používať iné aplikácie."
+          }
+        }
+      }
+    },
+    "This code is too easy to guess. Choose another code." : {
+      "comment" : "App lock change prompt after a code such as 1234 or 1111",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieser Code ist zu leicht zu erraten. Wähle einen anderen Code."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce code est trop facile à deviner. Choisissez-en un autre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このコードは簡単に推測されます。別のコードを設定してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento kód sa dá príliš ľahko uhádnuť. Zvoľte iný kód."
           }
         }
       }

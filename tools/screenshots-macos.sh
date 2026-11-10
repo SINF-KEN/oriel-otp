@@ -10,6 +10,9 @@
 # profile; the screenshots don't use them. The entitlements apply to every target, the UI test runner included, which
 # launchd won't start with any of them. The first run may ask to allow UI automation.
 #
+# The test builds the Debug configuration, whose Mac bundle ID is io.github.sinf-ken.OrielOTP.debug, so the app gets
+# its own sandbox container and preferences and leaves an installed Oriel OTP's data alone.
+#
 # Usage: tools/screenshots-macos.sh
 #   SOURCE_PACKAGES_DIR  already resolved Swift packages to build with, e.g. from CI's cache (default: resolve anew)
 #   RESULT_BUNDLE_PATH  where to keep the test's result bundle, e.g. to look at a failure (default: not kept)

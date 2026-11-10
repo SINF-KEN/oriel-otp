@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import Clibsodium
 import Foundation
 import Testing
 
@@ -62,6 +63,11 @@ struct EnteCryptoTests {
         (2, 2048 * mebibyte),
         (.max, 8 * mebibyte),
         (1 << 40, 1024 * mebibyte),
+        // More work than libsodium's sensitive limits, which took up to a minute and a half on a Mac.
+        (16, 1024 * mebibyte),
+        (5, 1024 * mebibyte),
+        (32, 256 * mebibyte),
+        (128, 64 * mebibyte),
     ]
 
     @Test(arguments: limitsTooHigh) func limitsFromTheServerThatAreTooHighFail(opsLimit: UInt64, memLimit: UInt64) {
@@ -75,12 +81,28 @@ struct EnteCryptoTests {
         (4, 1024 * mebibyte),
         (3, 256 * mebibyte),
         (2, 64 * mebibyte),
+        (8, 512 * mebibyte),
         (16, 256 * mebibyte),
+        (32, 128 * mebibyte),
         (64, 64 * mebibyte),
     ]
 
     @Test(arguments: realLimits) func limitsAccountsReallyHaveAreAllowed(opsLimit: UInt64, memLimit: UInt64) {
         #expect(EnteCrypto.isAllowed(opsLimit: opsLimit, memLimit: memLimit))
+    }
+
+    /// New accounts start from libsodium's sensitive limits, like Ente's apps, and fall back with the same work.
+    @Test func newAccountLimitsStartFromTheSensitiveOnes() {
+        let mebibyte = Self.mebibyte
+        let all = EnteCrypto.newKeyLimits(availableMemory: nil)
+        #expect(all.map(\.opsLimit) == [4, 8, 16, 32])
+        #expect(all.map(\.memLimit) == [1024 * mebibyte, 512 * mebibyte, 256 * mebibyte, 128 * mebibyte])
+        for limit in all {
+            #expect(EnteCrypto.isAllowed(opsLimit: limit.opsLimit, memLimit: limit.memLimit))
+        }
+        // Limits that would leave too little memory are skipped, but the last one is always tried.
+        #expect(EnteCrypto.newKeyLimits(availableMemory: 900 * mebibyte).map(\.memLimit) == [512 * mebibyte, 256 * mebibyte, 128 * mebibyte])
+        #expect(EnteCrypto.newKeyLimits(availableMemory: 100 * mebibyte).map(\.memLimit) == [128 * mebibyte])
     }
 
     @Test func secretBoxRoundTrip() throws {
@@ -114,6 +136,30 @@ struct EnteCryptoTests {
         #expect(throws: EnteCryptoError.decryptionFailed) {
             try EnteCrypto.secretStreamDecrypt(tampered, header: header, key: key)
         }
+    }
+
+    /// Ente stores each entity as a single final message. One that isn't final is the start of a longer stream.
+    @Test func secretStreamMessageThatIsNotFinalIsRefused() throws {
+        let key = [UInt8](EnteCrypto.randomBytes(32))
+        let message = [UInt8]("\"otpauth://totp/Example:alice?secret=JBSWY3DPEHPK3PXP\"".utf8)
+        var state = crypto_secretstream_xchacha20poly1305_state()
+        var header = [UInt8](repeating: 0, count: Int(crypto_secretstream_xchacha20poly1305_headerbytes()))
+        #expect(crypto_secretstream_xchacha20poly1305_init_push(&state, &header, key) == 0)
+        var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_secretstream_xchacha20poly1305_abytes()))
+        #expect(crypto_secretstream_xchacha20poly1305_push(&state, &cipherText, nil, message, UInt64(message.count), nil, 0,
+                                                           UInt8(crypto_secretstream_xchacha20poly1305_TAG_MESSAGE)) == 0)
+        #expect(throws: EnteCryptoError.decryptionFailed) {
+            try EnteCrypto.secretStreamDecrypt(Data(cipherText), header: Data(header), key: Data(key))
+        }
+    }
+
+    @Test func wipingZeroesTheBytes() {
+        var bytes: [UInt8] = [1, 2, 3]
+        EnteCrypto.wipe(&bytes)
+        #expect(bytes == [0, 0, 0])
+        var key = EnteCrypto.randomBytes(32)
+        key.wipe()
+        #expect(key == Data(count: 32))
     }
 
     @Test func base64Variants() {

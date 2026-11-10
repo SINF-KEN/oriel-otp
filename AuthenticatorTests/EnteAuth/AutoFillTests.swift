@@ -32,6 +32,14 @@ struct AutoFillWebsitesTests {
         ("ミクシィ", []),
         ("X", ["x.com", "twitter.com"]),
         ("", []),
+        // A name only: its `.com` could belong to anyone, so it's never used without asking.
+        ("Mastodon", []),
+        ("My Bank", []),
+        ("Home Assistant", []),
+        // Anyone can register a site under these.
+        ("github.io", []),
+        ("co.uk", []),
+        ("alice.github.io", ["alice.github.io"]),
     ])
     func guessesTheWebsiteFromTheIssuer(issuer: String, websites: [String]) {
         #expect(AutoFillWebsites.guess(issuer: issuer) == websites)
@@ -42,11 +50,27 @@ struct AutoFillWebsitesTests {
     }
 
     @Test(arguments: [
+        ("Mastodon", "mastodon.com"),
+        ("Home Assistant", "homeassistant.com"),
+        ("GitHub", nil),
+        ("accounts.google.com", nil),
+        ("github.io", nil),
+        ("ミクシィ", nil),
+        ("A", nil),
+    ] as [(String, String?)])
+    func suggestsAWebsiteForANameToBeConfirmed(issuer: String, suggestion: String?) {
+        #expect(AutoFillWebsites.suggestion(issuer: issuer) == suggestion)
+    }
+
+    @Test(arguments: [
         ("https://www.GitHub.com/login", "github.com"),
         ("example.com.", "example.com"),
         (" login.example.co.uk ", "login.example.co.uk"),
         ("github", nil),
         ("git hub.com", nil),
+        ("co.uk", nil),
+        ("https://www.github.io/", nil),
+        ("alice.github.io", "alice.github.io"),
         ("", nil),
     ] as [(String, String?)])
     func normalizesTypedWebsites(text: String, website: String?) {
@@ -123,6 +147,16 @@ nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sen
     }
 }
 
+/// Whether AutoFill from Oriel OTP is on in Settings.
+private nonisolated final class ProviderState: @unchecked Sendable {
+    private let lock = NSLock()
+    private var enabled = true
+    var isEnabled: Bool {
+        get { lock.withLock { enabled } }
+        set { lock.withLock { enabled = newValue } }
+    }
+}
+
 /// Runs a value's reads and tells where they ran.
 private nonisolated final class Recorder: @unchecked Sendable {
     private let lock = NSLock()
@@ -138,9 +172,12 @@ struct AutoFillAccountSyncTests {
     private let defaults = UserDefaults(suiteName: "AutoFillAccountSyncTests-\(UUID().uuidString)")!
     private let websitesURL = URL.temporaryDirectory.appending(components: "AutoFillAccountSyncTests-\(UUID().uuidString)", "Websites")
     private let websitesKey = InMemoryVaultKey()
+    private let provider = ProviderState()
 
     private func sync(keychain: EnteVaultKeychain? = nil) -> AutoFillAccountSync {
-        AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults, updatesSystem: false)
+        let provider = provider
+        return AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults,
+                                   updatesSystem: false, providerIsEnabled: { provider.isEnabled })
     }
 
     private func update(_ sync: AutoFillAccountSync, with codes: [EnteCode] = Self.codes) async {
@@ -163,6 +200,35 @@ struct AutoFillAccountSyncTests {
         #expect(accounts.map(\.id) == ["github"])
         #expect(accounts.first?.websites == ["github.com"])
         #expect(accounts.first.map { OTPGenerator.code(for: $0.account, at: Date(timeIntervalSince1970: 59)) } == "996554")
+    }
+
+    @Test func aNameIsNotTurnedIntoAWebsite() async throws {
+        await update(sync(), with: [Self.code("mastodon", "otpauth://totp/Mastodon:alice?secret=JBSWY3DPEHPK3PXP&issuer=Mastodon")])
+        #expect(try storage.load()?.first?.websites == [])
+    }
+
+    @Test func aPublicSuffixChosenEarlierIsLeftOut() async throws {
+        let sync = sync()
+        await update(sync)
+        sync.setWebsites(["co.uk", "example.co.uk"], for: "github")
+        await sync.finishWriting()
+        #expect(try storage.load()?.first?.websites == ["example.co.uk"])
+    }
+
+    @Test func keepsNoAccountsWhileAutoFillIsOff() async throws {
+        provider.isEnabled = false
+        await update(sync())
+        #expect(try storage.load() == nil)
+
+        let sync = sync()
+        provider.isEnabled = true
+        await update(sync)
+        #expect(try storage.load()?.map(\.id) == ["github"])
+
+        // Turned off in Settings, then the app starts again.
+        provider.isEnabled = false
+        await update(self.sync())
+        #expect(try storage.load() == nil)
     }
 
     @Test func parsesTheAccountsOffTheMainThread() async {

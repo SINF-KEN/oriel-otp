@@ -61,6 +61,7 @@ struct AppLockSection: View {
                 self.change = nil
                 if case .failure(let error) = result { self.error = error }
             }
+            .appLockCover()
         }
         .errorAlert(error: $error)
     }
@@ -103,6 +104,7 @@ private struct AppLockChangeView: View {
         case new
         case confirm(String)
         case mismatch
+        case easyToGuess
     }
 
     @State private var step: Step
@@ -128,10 +130,14 @@ private struct AppLockChangeView: View {
                         Task { await currentVerified() }
                         return true
                     }
-                case .new, .mismatch:
-                    AppLockSecretEntry(method: change.to, prompt: step == .mismatch ? mismatchPrompt : newPrompt, checksRetryDate: false,
+                case .new, .mismatch, .easyToGuess:
+                    AppLockSecretEntry(method: change.to, prompt: newStepPrompt, checksRetryDate: false,
                                        minimumPasswordLength: Self.minimumPasswordLength) { secret in
                         guard change.to != .password || secret.count >= Self.minimumPasswordLength else { return false }
+                        if change.to.codeLength != nil, AppLockConfiguration.isEasyToGuess(code: secret) {
+                            step = .easyToGuess
+                            return false
+                        }
                         step = .confirm(secret)
                         return true
                     }
@@ -176,6 +182,14 @@ private struct AppLockChangeView: View {
         change.to == .password
             ? String(localized: "Choose a password of at least 4 characters", comment: "App lock change prompt")
             : String(localized: "Choose a \(change.to.codeLength ?? 0)-digit code", comment: "App lock change prompt. The placeholder is 4 or 6.")
+    }
+
+    private var newStepPrompt: String {
+        switch step {
+        case .mismatch: mismatchPrompt
+        case .easyToGuess: String(localized: "This code is too easy to guess. Choose another code.", comment: "App lock change prompt after a code such as 1234 or 1111")
+        default: newPrompt
+        }
     }
 
     private var confirmPrompt: String {

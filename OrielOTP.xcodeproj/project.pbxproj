@@ -1411,6 +1411,7 @@
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = "io.github.sinf-ken.OrielOTP.debug";
 				PRODUCT_MODULE_NAME = OrielOTP;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PRODUCT_NAME[sdk=macosx*]" = "Oriel OTP";
@@ -1636,6 +1637,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.AutoFillExtension";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = "io.github.sinf-ken.OrielOTP.debug.AutoFillExtension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;

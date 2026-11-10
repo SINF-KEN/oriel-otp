@@ -76,5 +76,7 @@
 		<string>A000000308</string>
 		<string>A000000151000000</string>
 	</array>
+	<key>OrielOTPSharedKeychainGroup</key>
+	<string>$(AppIdentifierPrefix)io.github.sinf-ken.OrielOTP</string>
 </dict>
 </plist>

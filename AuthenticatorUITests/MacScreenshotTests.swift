@@ -35,7 +35,7 @@ final class MacScreenshotTests: XCTestCase {
                                // A fresh window at its default size, in light mode, every run.
                                "-ApplePersistenceIgnoreState", "YES", "-NSQuitAlwaysKeepsWindows", "NO",
                                "-DemoAppearance", "light", "-DemoWindowSize", "1280x800", "-Mac.ShowInMenuBar", "YES",
-                               // The fake Ente server, even if this Mac's app has signed in to another one.
+                               // The fake Ente server, even if an earlier Debug run signed in to another one.
                                "-EnteAuth.ServerURL", "https://demo.ente.test"]
         app.launch()
         app.activate()
@@ -72,7 +72,13 @@ final class MacScreenshotTests: XCTestCase {
         let staySignedIn = window.sheets.switches["ente.stay-signed-in"].firstMatch
         XCTAssertTrue(staySignedIn.waitForExistence(timeout: 5))
         if staySignedIn.value as? Int == 1 {
+            // The switch is in the last section, below the sheet's visible part, where a click lands on nothing.
+            let form = window.sheets.scrollViews.firstMatch
+            for _ in 0..<5 where !form.frame.contains(staySignedIn.frame) {
+                form.scroll(byDeltaX: 0, deltaY: -200)
+            }
             staySignedIn.click()
+            XCTAssertEqual(staySignedIn.value as? Int, 0, "Stay signed in didn't turn off")
         }
         password.click()
         password.typeText("demo\r")

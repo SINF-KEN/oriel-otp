@@ -27,6 +27,8 @@ nonisolated struct DeviceAccountItem: Codable, Sendable, Equatable {
 nonisolated protocol DeviceAccountStorage: Sendable {
     func load() throws -> [DeviceAccountItem]?
     func save(_ items: [DeviceAccountItem]) throws
+    /// Moves a file that couldn't be read out of the way, so saving doesn't write over it.
+    func setAside() throws
 }
 
 /// Keeps the accounts in an encrypted file with a key of its own, apart from the Ente vault, which is replaced when
@@ -45,6 +47,14 @@ nonisolated struct DeviceAccountFile: DeviceAccountStorage {
 
     func load() throws -> [DeviceAccountItem]? { try file.load() }
     func save(_ items: [DeviceAccountItem]) throws { try file.save(items) }
+
+    /// Keeps the file next to the new one with the same key, so a version of the app that can read it, e.g. the one
+    /// that wrote it before a downgrade, still can.
+    func setAside() throws {
+        guard FileManager.default.fileExists(atPath: file.url.path) else { return }
+        let stamp = Int(Date().timeIntervalSince1970)
+        try FileManager.default.moveItem(at: file.url, to: file.url.deletingLastPathComponent().appending(path: "Unreadable-\(stamp)"))
+    }
 }
 
 enum DeviceAccountsError: Error, LocalizedError {
@@ -85,6 +95,9 @@ enum DeviceAccountsError: Error, LocalizedError {
     @ObservationIgnored private let storage: DeviceAccountStorage
     /// The file couldn't be read yet, e.g. because the app was launched in the background on a locked device.
     @ObservationIgnored private var isLocked = false
+    /// The file can't be read at all, e.g. it was written by a later version of the app. It is set aside before the
+    /// first save rather than written over.
+    @ObservationIgnored private var isUnreadable = false
 
     init(storage: DeviceAccountStorage = DeviceAccountFile()) {
         self.storage = storage
@@ -99,6 +112,7 @@ enum DeviceAccountsError: Error, LocalizedError {
             // Its key is gone or it is damaged, which reading it again won't change.
             items = []
             isLocked = false
+            isUnreadable = true
         } catch {
             isLocked = true
         }
@@ -154,12 +168,30 @@ enum DeviceAccountsError: Error, LocalizedError {
         try update { $0.removeAll { $0.id == id } }
     }
 
+    /// Keeps accounts whose only copy was in the Ente vault, which is being discarded, e.g. ones moved to Ente Auth
+    /// that never reached it. One that is here already isn't added again.
+    func keep(rawData: [String]) throws {
+        try update { items in
+            for rawData in rawData {
+                let code = EnteCloudCode(rawData: rawData)
+                let isPresent = items.contains { item in
+                    item.rawData == rawData || code.map { code in EnteCloudCode(rawData: item.rawData)?.isSameAccount(as: code) == true } == true
+                }
+                if !isPresent {
+                    items.append(DeviceAccountItem(id: UUID().uuidString.lowercased(), rawData: rawData))
+                }
+            }
+        }
+    }
+
     /// Returns the next HOTP code and moves the counter on. Nil if that can't be saved, as the code would be given
-    /// out again.
+    /// out again, or if the counter is at its end.
     func nextHOTPCode(_ id: String) -> String? {
         guard let code = code(of: id), code.kind == .hotp else { return nil }
+        let (next, overflow) = code.counter.addingReportingOverflow(1)
+        guard !overflow else { return nil }
         do {
-            try edit(id) { $0.counter = code.counter + 1 }
+            try edit(id) { $0.counter = next }
         } catch {
             return nil
         }
@@ -192,6 +224,10 @@ enum DeviceAccountsError: Error, LocalizedError {
         var changed = items
         change(&changed)
         guard changed != items else { return }
+        if isUnreadable {
+            try storage.setAside()
+            isUnreadable = false
+        }
         try storage.save(changed)
         items = changed
         onChange?()

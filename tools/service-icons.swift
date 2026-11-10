@@ -2,15 +2,22 @@
 //
 // Generates the service icons from Simple Icons (https://simpleicons.org), CC0:
 //
-//   npm pack simple-icons@16.36.0 && tar xzf simple-icons-16.36.0.tgz
-//   swift tools/service-icons.swift package
+//   npm pack simple-icons@16.36.0
+//   swift tools/service-icons.swift simple-icons-16.36.0.tgz
+//
+// The tarball must match the npm registry's integrity hash recorded below, so a different or tampered download is
+// refused. To update Simple Icons, change the version above and the hash to `npm view simple-icons@<version>
+// dist.integrity`.
 //
 // It reads the slugs in tools/service-icons.txt, copies their SVGs into an image set each in
 // Authenticator/Assets.xcassets/ServiceIcons, and writes their names and colors to
 // Authenticator/Accounts/ServiceIconCatalog.swift. Icons whose license isn't CC0 are refused, as attribution or
 // copyleft would apply to them. Run it from the root of the repository.
 
+import CryptoKit
 import Foundation
+
+let expectedIntegrity = "sha512-+VNPPkqSOLidFeSgBKUWX4n50WPpDC09hav+BgS26anIF1oQOlGBb8LvwGR+6fYRjo+B6CiKzNBceMPkSVXANQ=="
 
 struct Entry: Decodable {
     struct Aliases: Decodable {
@@ -32,9 +39,22 @@ func fail(_ message: String) -> Never {
     exit(1)
 }
 
-guard CommandLine.arguments.count == 2 else { fail("Usage: swift tools/service-icons.swift <simple-icons package directory>") }
-let package = URL(fileURLWithPath: CommandLine.arguments[1])
+guard CommandLine.arguments.count == 2 else { fail("Usage: swift tools/service-icons.swift <simple-icons tarball>") }
+let tarball = URL(fileURLWithPath: CommandLine.arguments[1])
 let fileManager = FileManager.default
+
+let integrity = "sha512-" + Data(SHA512.hash(data: try Data(contentsOf: tarball))).base64EncodedString()
+guard integrity == expectedIntegrity else {
+    fail("\(tarball.path) is \(integrity), not the expected \(expectedIntegrity)")
+}
+let unpacked = fileManager.temporaryDirectory.appending(component: "service-icons-\(UUID().uuidString)")
+try fileManager.createDirectory(at: unpacked, withIntermediateDirectories: true)
+defer { try? fileManager.removeItem(at: unpacked) }
+let tar = try Process.run(URL(fileURLWithPath: "/usr/bin/tar"), arguments: ["-xzf", tarball.path, "-C", unpacked.path])
+tar.waitUntilExit()
+guard tar.terminationStatus == 0 else { fail("Couldn't unpack \(tarball.path)") }
+// npm tarballs keep their files in a folder named "package".
+let package = unpacked.appending(component: "package")
 
 let data = try Data(contentsOf: package.appending(components: "data", "simple-icons.json"))
 let entries = Dictionary(try JSONDecoder().decode([Entry].self, from: data).map { ($0.slug, $0) }, uniquingKeysWith: { first, _ in first })
@@ -67,8 +87,14 @@ func swiftString(_ string: String) -> String {
 }
 
 var lines = [String]()
+// The slug names files and the color is written into Swift source, so both must be exactly what they should be.
+let slugPattern = #/[a-z0-9]+/#
+let hexPattern = #/[0-9A-Fa-f]{6}/#
+
 for slug in slugs {
+    guard slug.wholeMatch(of: slugPattern) != nil else { fail("\(slug) in tools/service-icons.txt isn't a slug") }
     guard let entry = entries[slug] else { fail("No icon \(slug) in Simple Icons \(version)") }
+    guard entry.hex.wholeMatch(of: hexPattern) != nil else { fail("\(slug)'s color \(entry.hex) isn't six hex digits") }
     if let license = entry.license?.type, license != "CC0-1.0" { fail("\(slug) is licensed under \(license), not CC0") }
     let imageSet = catalog.appending(component: "\(slug).imageset")
     try fileManager.createDirectory(at: imageSet, withIntermediateDirectories: true)

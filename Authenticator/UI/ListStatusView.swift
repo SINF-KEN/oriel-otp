@@ -75,6 +75,7 @@ struct ListStatusView<Actions: View>: View {
                     .navigationTitle(String(localized: "What's new", comment: "About navigation title"))
 
             }
+            .appLockCover()
         }
     }
 }

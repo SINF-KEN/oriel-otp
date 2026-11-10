@@ -100,6 +100,9 @@ import YubiKit
 
     var canSaveSession: Bool { store.canSave }
 
+    /// Changes made on this device that haven't been uploaded, which signing out loses.
+    var hasPendingChanges: Bool { cloud.hasPendingChanges }
+
     var passkeyURL: URL? { flow?.passkeyURL }
 
     var importableCodes: [EnteCode] {
@@ -175,6 +178,12 @@ import YubiKit
             // Only the flow keeps the password, while the email code or second factor it's needed for can be retried.
             defer { self.password = "" }
             let server = try EnteAPIClient.serverURL(from: self.selectedServer)
+            // Signing in to another account, or without staying signed in, replaces the copy of the accounts on this
+            // device, whose changes would be lost.
+            if self.cloud.hasPendingChanges,
+               !(self.staySignedIn && self.canSaveSession && self.cloud.vault?.belongs(email: email, server: server) == true) {
+                throw EnteSyncError.unsyncedChanges
+            }
             if let flow = self.flow, flow.needsPassword, flow.email == email, flow.api.server == server {
                 try await self.handle { try await flow.submitPassword(password) }
                 return
@@ -434,6 +443,8 @@ import YubiKit
 /// Errors shown in the Ente sync view, with messages for the errors from the layers below.
 enum EnteSyncError: Error, LocalizedError {
     case passkeyNotVerified
+    /// Signing in would replace a vault with changes that haven't been uploaded.
+    case unsyncedChanges
     case wrapped(Error)
 
     init(_ error: Error) {
@@ -448,6 +459,8 @@ enum EnteSyncError: Error, LocalizedError {
         switch self {
         case .passkeyNotVerified:
             return String(localized: "The passkey hasn't been verified yet. Verify it in the browser, then try again.", comment: "Ente sign in error")
+        case .unsyncedChanges:
+            return String(localized: "Some changes made on this device haven't been synced with Ente Auth yet. Sign in to the same account with Stay signed in on to sync them, or sign out in Settings to discard them.", comment: "Ente sign in error when signing in would replace changes that weren't uploaded")
         case .wrapped(let error):
             switch error {
             case let error as EnteLoginError:

@@ -26,12 +26,10 @@ import Testing
 @Suite(.serialized) @MainActor struct EnteSyncViewModelSignInTests {
 
     private func model(protocols: [AnyClass] = [FakeEnteServer.self]) -> EnteSyncViewModel {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = protocols
         // The session is kept in memory: the Mac build CI tests is signed without the keychain access group.
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        let session = URLSession(configuration: configuration)
+        let session = URLSession.stubbed(protocols)
         let watch = WatchAccountSync(defaults: defaults)
         let model = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session, watch: watch,
                                       cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch))
@@ -161,8 +159,8 @@ nonisolated private final class RequestLog: URLProtocol, @unchecked Sendable {
         }
 
         func wait(for path: String) async throws {
-            // Signing in can take most of a minute on CI.
-            let deadline = ContinuousClock.now + .seconds(120)
+            // Signing in can take most of a minute on CI, and several minutes in an unoptimised build.
+            let deadline = ContinuousClock.now + .seconds(600)
             while !contains(path) {
                 guard ContinuousClock.now < deadline else { throw URLError(.timedOut) }
                 try await Task.sleep(for: .milliseconds(5))

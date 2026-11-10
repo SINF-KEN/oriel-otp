@@ -22,9 +22,11 @@ import Foundation
 ///
 /// The extension can't read the Ente vault, so the accounts are written to an encrypted file in the app group, like
 /// the ones sent to the Apple Watch, each time the vault changes. HOTP accounts are left out: filling one in would
-/// have to move its counter on in the vault. The file is deleted when the app signs out of Ente.
+/// have to move its counter on in the vault. The file is only kept while AutoFill from Oriel OTP is on in Settings, and
+/// is deleted when it's off or the app signs out of Ente.
 ///
-/// Each account is suggested on the websites guessed from its issuer, unless other websites were chosen for it. The
+/// Each account is suggested on the websites guessed from its issuer, unless other websites were chosen for it. Only
+/// an issuer that is a domain or a known service gives websites: one made up from a name could belong to anyone. The
 /// chosen ones are kept in an encrypted file, as they say where the accounts are used. They can't be read while the
 /// device is locked, and nothing is written over them until they have been.
 @Observable final class AutoFillAccountSync {
@@ -44,6 +46,7 @@ import Foundation
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var hasReadWebsites = false
     @ObservationIgnored private let updatesSystem: Bool
+    @ObservationIgnored private let providerIsEnabled: @Sendable () async -> Bool
     /// The accounts of the last update, for when websites change.
     @ObservationIgnored private var accounts: [OTPAccount] = []
     @ObservationIgnored private var written: [AutoFillAccount]?
@@ -59,21 +62,25 @@ import Foundation
     }
 
     /// `updatesSystem` is off in the tests, which mustn't change the device's AutoFill suggestions.
+    /// `providerIsEnabled` tells whether AutoFill from Oriel OTP is on.
     init(storage: AutoFillStorage = AutoFillFile(), websitesURL: URL = defaultWebsitesURL,
          websitesKeychain: EnteVaultKeychain = EnteVaultKeychainKey(service: "AutoFill.Websites"),
-         defaults: UserDefaults = .standard, updatesSystem: Bool = true) {
+         defaults: UserDefaults = .standard, updatesSystem: Bool = true,
+         providerIsEnabled: @escaping @Sendable () async -> Bool = { await ASCredentialIdentityStore.shared.state().isEnabled }) {
         self.storage = storage
         websitesFile = EncryptedFile(url: websitesURL, keychain: websitesKeychain)
         self.defaults = defaults
         self.updatesSystem = updatesSystem
+        self.providerIsEnabled = providerIsEnabled
     }
 
     // MARK: - Websites
 
-    /// The websites chosen for the account, or the ones guessed from its issuer.
+    /// The websites chosen for the account, or the ones guessed from its issuer. A public suffix chosen before they
+    /// were turned down is left out, as it would match every site under it.
     func websites(for id: String, issuer: String?) -> [String] {
         readWebsites()
-        return chosenWebsites[id] ?? AutoFillWebsites.guess(issuer: issuer)
+        return chosenWebsites[id]?.filter { !AutoFillWebsites.isPublicSuffix($0) } ?? AutoFillWebsites.guess(issuer: issuer)
     }
 
     /// Whether the websites were chosen rather than guessed.
@@ -181,10 +188,12 @@ import Foundation
         guard autoFillAccounts != written else { return }
         written = autoFillAccounts
         let storage = storage
+        let providerIsEnabled = providerIsEnabled
         let previous = lastWrite
         lastWrite = Task { [weak self] in
             await previous?.value
-            let isSaved = await Self.save(autoFillAccounts, to: storage)
+            // The secrets aren't kept for an extension that isn't used. Once it's turned on, they're written again.
+            let isSaved = await providerIsEnabled() ? await Self.save(autoFillAccounts, to: storage) : await Self.remove(from: storage)
             guard let self else { return }
             if isSaved {
                 updateSuggestions(autoFillAccounts)
@@ -212,13 +221,25 @@ import Foundation
         }
     }
 
+    /// Returns false, as nothing was saved.
+    @concurrent nonisolated private static func remove(from storage: AutoFillStorage) async -> Bool {
+        storage.remove()
+        return false
+    }
+
     // MARK: - System
 
     /// Reads whether AutoFill from Oriel OTP is on, e.g. when the app comes back from Settings.
     func refresh() {
         guard updatesSystem else { return }
         Task {
+            let wasEnabled = isEnabled
             isEnabled = await ASCredentialIdentityStore.shared.state().isEnabled
+            if isEnabled != wasEnabled {
+                // Turned on or off in Settings: the accounts are written, or deleted.
+                written = nil
+                write()
+            }
         }
     }
 
@@ -227,8 +248,9 @@ import Foundation
         Task {
             let isEnabled = await ASSettingsHelper.requestToTurnOnCredentialProviderExtension()
             self.isEnabled = isEnabled
-            if isEnabled, let written {
-                updateSuggestions(written)
+            if isEnabled {
+                written = nil
+                write()
             }
         }
     }

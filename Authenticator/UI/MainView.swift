@@ -61,6 +61,8 @@ struct MainView: View {
     @State var didEnterBackground = true
     @State var otp: String? = nil
     @State var oathURL: URL? = nil
+    /// Changed for each otpauth link, so a link opened while the add account sheet is open shows its account there.
+    @State private var addAccountLinkID = UUID()
     @State var accountsToDelete: [Account] = []
     @State var accountToRename: Account?
     /// The account whose tags are being changed, from a row's menu.
@@ -128,7 +130,8 @@ struct MainView: View {
             if showAbout { showAbout.toggle() }
             oathURL = url
             addAccountDestinations = addDestinations
-            showAddAccount.toggle()
+            addAccountLinkID = UUID()
+            showAddAccount = true
         })
         .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: { userActivity in
             guard let otp = userActivity.webpageURL?.yubiOTP else { return }
@@ -477,6 +480,8 @@ struct MainView: View {
         }
         .sheet(isPresented: $showAddAccount) {
             AddAccountView(showAddCredential: $showAddAccount, accountSubject: addAccountSubject, oathURL: oathURL, destinations: addAccountDestinations)
+                // The view reads the link only when it is made.
+                .id(addAccountLinkID)
                 .scaledBodyFont()
                 .appLockCover()
         }

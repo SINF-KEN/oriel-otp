@@ -45,9 +45,7 @@ nonisolated final class EnteLoginURLProtocol: URLProtocol, @unchecked Sendable {
     }
 
     static func makeAPI() throws -> EnteAPIClient {
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.protocolClasses = [EnteLoginURLProtocol.self]
-        return try EnteAPIClient(server: URL(string: "https://ente.test")!, session: URLSession(configuration: configuration))
+        return try EnteAPIClient(server: URL(string: "https://ente.test")!, session: URLSession.stubbed([EnteLoginURLProtocol.self]))
     }
 }
 
@@ -244,13 +242,30 @@ struct TokenResponseStoreTests {
         let signature = Data([0x10, 0x20, 0x30])
         let plaintext = Data("decrypted payload".utf8)
 
-        try store.write(signature, for: .signed)
-        try store.write(plaintext, for: .decrypted)
-        #expect(store.read(.signed) == signature)
-        #expect(store.read(.decrypted) == plaintext)
+        let request = TokenResponseStore.newRequestID()
+
+        try store.write(signature, for: .signed, requestID: request)
+        try store.write(plaintext, for: .decrypted, requestID: request)
+        #expect(store.read(.signed, requestID: request) == signature)
+        #expect(store.read(.decrypted, requestID: request) == plaintext)
         try store.removeAll()
-        #expect(store.read(.signed) == nil)
-        #expect(store.read(.decrypted) == nil)
+        #expect(store.read(.signed, requestID: request) == nil)
+        #expect(store.read(.decrypted, requestID: request) == nil)
+    }
+
+    @Test func anAnswerIsOnlyReadForItsOwnRequest() throws {
+        let container = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: container) }
+        let store = TokenResponseStore(containerURL: container)
+        // The app finishes a request the extension gave up on, while the extension waits for the next one.
+        let late = TokenResponseStore.newRequestID()
+        let next = TokenResponseStore.newRequestID()
+        try store.write(Data("for the first app".utf8), for: .decrypted, requestID: late)
+        #expect(store.read(.decrypted, requestID: next) == nil)
+        #expect(throws: (any Error).self) {
+            try store.write(Data(), for: .decrypted, requestID: "../escape")
+        }
+        #expect(store.read(.decrypted, requestID: "../\(late)") == nil)
     }
 
     @Test func tokenSessionPolicyAllowsImplementedOperationsOnly() {
