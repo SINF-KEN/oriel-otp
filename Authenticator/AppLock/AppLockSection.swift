@@ -61,6 +61,7 @@ struct AppLockSection: View {
                 self.change = nil
                 if case .failure(let error) = result { self.error = error }
             }
+            .appLockCover()
         }
         .errorAlert(error: $error)
     }

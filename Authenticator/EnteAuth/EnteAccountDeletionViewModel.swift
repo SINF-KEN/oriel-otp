@@ -190,8 +190,15 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
         guard allowDelete else { throw EnteAccountDeletionError.refusedByServer }
         guard let encryptedChallenge,
               let opened = try? EnteCrypto.sealedBoxOpen(encryptedChallenge, publicKey: publicKey, secretKey: secretKey),
-              let challenge = String(data: opened, encoding: .utf8) else { throw EnteAPIError.invalidResponse }
+              let challenge = String(data: opened, encoding: .utf8), isChallenge(challenge) else { throw EnteAPIError.invalidResponse }
         try await api.deleteAccount(token: keys.token, challenge: challenge)
+    }
+
+    /// Whether opened text looks like a challenge: a token in base64 or JWT characters. The server gets back what the
+    /// secret key opens, so anything else sealed to the account's public key isn't sent back opened.
+    static func isChallenge(_ text: String) -> Bool {
+        let allowed = Set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=-_.".unicodeScalars)
+        return (16...4096).contains(text.unicodeScalars.count) && text.unicodeScalars.allSatisfy(allowed.contains)
     }
 
     /// The account no longer exists, so a session saved for it, its accounts on this device and on the watch go too.

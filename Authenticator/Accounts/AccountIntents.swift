@@ -17,6 +17,9 @@
 import AppIntents
 import CoreSpotlight
 import Foundation
+#if os(iOS)
+import UIKit
+#endif
 
 /// An account for Shortcuts, Siri and Spotlight: one in Ente Auth or on this device, whose codes the app calculates,
 /// or on the Mac one on the plugged-in YubiKey.
@@ -63,7 +66,14 @@ struct AccountEntity: AppEntity, IndexedEntity {
 struct AccountQuery: EntityStringQuery {
 
     /// Replaced in the tests.
-    var isLocked: @MainActor @Sendable () -> Bool = { AppLock.shared.isLocked }
+    /// The app lock, or on iOS the device: with the app lock off, Siri on the Lock Screen gets no account names either.
+    var isLocked: @MainActor @Sendable () -> Bool = {
+        #if os(iOS)
+        AppLock.shared.isLocked || !UIApplication.shared.isProtectedDataAvailable
+        #else
+        AppLock.shared.isLocked
+        #endif
+    }
     var suggestsAccounts: @MainActor @Sendable () -> Bool = { AccountSpotlight.shared.isEnabled }
     var calculatedEntities: @MainActor @Sendable () -> [AccountEntity] = { CalculatedAccounts.entities() }
 
@@ -187,6 +197,9 @@ struct CopyCodeIntent: AppIntent {
     #else
     static let description = IntentDescription(LocalizedStringResource("Copies the code of an account to the clipboard.", comment: "Shortcuts action description"))
     #endif
+
+    /// With the app lock off, Siri could otherwise copy a code, and name the accounts, on a locked device.
+    static let authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: LocalizedStringResource("Account", comment: "Shortcuts parameter"))
     var account: AccountEntity

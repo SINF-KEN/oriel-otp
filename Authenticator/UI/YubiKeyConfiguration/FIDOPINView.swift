@@ -75,9 +75,11 @@ struct FIDOPINView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $presentSetPIN) {
             FIDOSetChangePINView(type: .set)
+                .appLockCover()
         }
         .sheet(isPresented: $presentChangePIN) {
             FIDOSetChangePINView(type: .change)
+                .appLockCover()
         }
         .alert(error?.localizedDescription ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: {
             Button(role: .cancel) {
