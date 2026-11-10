@@ -163,6 +163,7 @@ struct EnteMigrationView: View {
                 // On the button: on the section each row would present it, and the sheets would close each other.
                 .sheet(isPresented: $isCreatingAccount) {
                     EnteSignUpView(server: server, email: model.email) { model.email = $0 }
+                        .appLockCover()
                 }
             }
             startOverButton

@@ -51,6 +51,7 @@ struct EnteAccountSection: View {
                     // On the button: on the section each row would present it, and the sheets would close each other.
                     .sheet(isPresented: $isDeletingAccount, onDismiss: { self.account = store.savedAccount }) {
                         EnteAccountDeletionView(server: account.server, email: account.email)
+                            .appLockCover()
                     }
                 }
             } else {
@@ -65,6 +66,7 @@ struct EnteAccountSection: View {
             // On the button: on the section each row would present it, and the sheets would close each other.
             .sheet(isPresented: $isMoving, onDismiss: { account = store.savedAccount }) {
                 EnteMigrationView()
+                    .appLockCover()
             }
         } header: {
             Text(verbatim: "Ente Auth")

@@ -159,13 +159,16 @@ struct AccountDetailView: View {
         }
         .sheet(isPresented: $showEditing) {
             EditView(account: account, viewModel: model, showEditing: $showEditing)
+                .appLockCover()
         }
         .sheet(isPresented: $showTags) {
             AccountTagsView(account: account, isPresented: $showTags)
+                .appLockCover()
         }
         .sheet(isPresented: $showAutoFillWebsites) {
             if let id = autoFillID {
                 AutoFillWebsitesView(id: id, issuer: account.credential.issuer, isPresented: $showAutoFillWebsites)
+                    .appLockCover()
             }
         }
         .alert("Delete account?", isPresented: $showDeleteConfirmation) {
