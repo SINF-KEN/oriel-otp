@@ -344,7 +344,10 @@ nonisolated struct EnteAPIClient: Sendable {
     static let maxResponseSize = 16 << 20
 
     /// Reads an answer, stopping with an error past `maxResponseSize`.
-    static func body(of bytes: URLSession.AsyncBytes, expectedLength: Int64) async throws -> Data {
+    ///
+    /// Off the caller's actor: the bytes come one at a time, and read from the main actor each one leaves it and comes
+    /// back, which took a quarter of an hour for 16 MiB.
+    @concurrent static func body(of bytes: URLSession.AsyncBytes, expectedLength: Int64) async throws -> Data {
         guard expectedLength <= Int64(maxResponseSize) else {
             bytes.task.cancel()
             throw EnteAPIError.invalidResponse
