@@ -24,6 +24,7 @@ extension YubiKitOATHSession {
     func calculateSteamTOTP(credential: Credential) async throws -> (code: String, validity: DateInterval) {
         let timestamp = AppClock.now.addingTimeInterval(10)
         let period = credential.type.period ?? 30
+        guard period >= 1, period.isFinite else { throw OATHSessionError.unsupportedPeriod }
         let value = UInt64(timestamp.timeIntervalSince1970 / period)
         let challenge = withUnsafeBytes(of: value.bigEndian) { Data($0) }
 
@@ -73,6 +74,14 @@ nonisolated enum OATHCredentialId {
         key.append(accountName)
         return key
     }
+
+    /// Whether YubiKit reads `key` back with the period it was written for. YubiKit takes leading digits and a slash
+    /// as the period, but writes no such prefix for the default 30 seconds, so an issuer like "24/7 Fitness" or a name
+    /// like "0/alice" would be read back with another period, or with a period of 0, which traps.
+    static func readsBack(_ key: String, period: UInt, isTOTP: Bool) -> Bool {
+        guard let match = key.firstMatch(of: #/^(\d+)\//#) else { return true }
+        return isTOTP && period != 30 && String(match.1) == String(period)
+    }
 }
 
 extension SmartCardConnection {
@@ -103,7 +112,7 @@ extension YubiKitOATHSession.CredentialTemplate: @retroactive @unchecked Sendabl
 /// Errors from creating a credential template, with the messages the Objective-C YubiKit used.
 enum CredentialTemplateError: Error, LocalizedError {
     case scheme, type, label, algorithm, counter, digits, period, missingSecret, invalidSecret, nameIssuerTooLong, issuerContainsColon
-    case repeatedParameter
+    case repeatedParameter, periodLikeName
 
     var errorDescription: String? {
         switch self {
@@ -120,6 +129,9 @@ enum CredentialTemplateError: Error, LocalizedError {
         case .issuerContainsColon: return "Character ':' is not allowed in issuer"
         case .repeatedParameter:
             return String(localized: "The link gives the same setting more than once.", comment: "Error for an otpauth link that repeats a parameter, e.g. the secret")
+        case .periodLikeName:
+            return String(localized: "A YubiKey can't keep an issuer or account name that starts with a number and a slash.",
+                          comment: "Error for an account whose issuer, or name without an issuer, starts with digits and a slash, e.g. 24/7 Fitness, which a YubiKey would read as the code's period")
         }
     }
 }
@@ -217,6 +229,9 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
         let key = OATHCredentialId.key(accountName: accountName, issuer: issuer, period: UInt(type.period ?? 0), isTOTP: type.period != nil)
         if !skip.contains(.label) && key.count > 64 {
             throw CredentialTemplateError.nameIssuerTooLong
+        }
+        guard OATHCredentialId.readsBack(key, period: UInt(type.period ?? 0), isTOTP: type.period != nil) else {
+            throw CredentialTemplateError.periodLikeName
         }
         // An empty issuer isn't part of the credential id on the YubiKey.
         let issuer = issuer?.isEmpty == true ? nil : issuer
