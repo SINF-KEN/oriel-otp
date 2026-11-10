@@ -35,12 +35,18 @@ tagged, so the workflow tests the tag push and doesn't also run for the `release
      concurrency checking and warnings as errors.
   3. Checks the translations' format specifiers with `tools/check-format-specifiers.py`: every translation, plural
      form and substitution must read its key's arguments with the same types, and no others.
-  4. Picks the `iPhone 17` simulator with the newest iOS runtime, resolves the Swift packages (below), and starts
-     booting the simulator so the boot overlaps the build.
-  5. Runs `xcodebuild test` with code coverage, which builds the app, its extensions and the embedded watch app.
-  6. Prints a summary of the result bundle and fails if `EnteLoginFlow.swift` drops below 50% line coverage or
+  4. Picks the `iPhone 17` simulator with the newest iOS runtime and resolves the Swift packages (below).
+  5. Builds the app, its extensions, the embedded watch app and the tests with `xcodebuild build-for-testing`, with
+     code coverage, while the simulator is still shut down.
+  6. Boots the simulator, runs the tests with `xcodebuild test-without-building`, and shuts the simulator down.
+  7. Prints a summary of the result bundle and fails if `EnteLoginFlow.swift` drops below 50% line coverage or
      `TokenResponseStore.swift` below 90%.
-  7. Uploads the result bundle, the logs and the summary for 7 days, also when a step failed.
+  8. Uploads the result bundle, the logs and the summary for 7 days, also when a step failed.
+
+  The simulator boots only after the build. Its first boot on a fresh runner takes most of the machine for minutes:
+  when it started before the build, `xcodebuild` took 3 to 8 minutes to start and the build 7 to 11 minutes, against
+  under 4 for the macOS job's build. Both builds print `-showBuildTimingSummary`, which lists where the build time
+  went.
 - **`test-macos`**, on a second runner at the same time: builds the watch app on its own for the watchOS simulator,
   so a watchOS-only failure shows as such, then runs the unit tests on macOS. There's no provisioning profile, so the
   Mac build is signed ad hoc with a copy of the Mac entitlements without the keychain access group, the app group
