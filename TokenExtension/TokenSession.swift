@@ -114,7 +114,8 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         }
 
         Logger.ctk.yubilog("Extension: sending notification for keyObjectID: \(objectId)")
-        sendNotificationWithData(dataToSign, keyObjectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm)
+        let requestID = TokenResponseStore.newRequestID()
+        sendNotificationWithData(dataToSign, keyObjectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID)
 
         let loopEndTime = Date(timeIntervalSinceNow: 95)
         var runLoop = true
@@ -123,7 +124,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: polling tick \(tick)...")
-            if let signedData = readTokenResponse(.signed) {
+            if let signedData = readTokenResponse(.signed, requestID: requestID) {
                 Logger.ctk.yubilog("Extension: Got signedData from shared container")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3) // Set in future to block duplicate requests from CryptoTokenKit
                 reset()
@@ -183,7 +184,8 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             throw NSError(domain: TKErrorDomain, code: TKError.Code.canceledByUser.rawValue, userInfo: nil)
         }
 
-        sendNotificationWithEncryptedData(ciphertext, keyObjectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm)
+        let requestID = TokenResponseStore.newRequestID()
+        sendNotificationWithEncryptedData(ciphertext, keyObjectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID)
 
         let loopEndTime = Date(timeIntervalSinceNow: 95)
         var runLoop = true
@@ -192,7 +194,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: decrypt polling tick \(tick)...")
-            if let decryptedData = readTokenResponse(.decrypted) {
+            if let decryptedData = readTokenResponse(.decrypted, requestID: requestID) {
                 Logger.ctk.yubilog("Extension: Got decryptedData from shared container")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: -10)
                 reset()
@@ -249,8 +251,8 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         return TokenResponseStore(containerURL: container)
     }
 
-    private func readTokenResponse(_ kind: TokenResponseKind) -> Data? {
-        tokenResponseStore?.read(kind)
+    private func readTokenResponse(_ kind: TokenResponseKind, requestID: String) -> Data? {
+        tokenResponseStore?.read(kind, requestID: requestID)
     }
     
     private func cancelAllNotifications() {
@@ -260,14 +262,15 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     }
     
     // Send local notification with data to sign
-    private func sendNotificationWithData(_ data: Data, keyObjectID: String, keyType: KeyType, algorithm: SecKeyAlgorithm) {
+    private func sendNotificationWithData(_ data: Data, keyObjectID: String, keyType: KeyType, algorithm: SecKeyAlgorithm, requestID: String) {
             cancelAllNotifications()
         let categoryID = OperationType.signData.rawValue
         let content = UNMutableNotificationContent()
         content.title = String(localized: "YubiKey required")
         content.body = String(localized: "Tap here to complete the request using your YubiKey.")
         content.categoryIdentifier = categoryID
-        content.userInfo = ["operationType": categoryID, "data": data, "keyObjectID": keyObjectID, "algorithm": algorithm.rawValue, "keyType": keyType.rawValue];
+        content.userInfo = ["operationType": categoryID, "data": data, "keyObjectID": keyObjectID, "algorithm": algorithm.rawValue, "keyType": keyType.rawValue,
+                            TokenResponseStore.requestIDKey: requestID]
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         
@@ -281,14 +284,15 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     }
     
     // Send local notification with encryption data
-    private func sendNotificationWithEncryptedData(_ cipherData: Data, keyObjectID: String, keyType: KeyType, algorithm: SecKeyAlgorithm) {
+    private func sendNotificationWithEncryptedData(_ cipherData: Data, keyObjectID: String, keyType: KeyType, algorithm: SecKeyAlgorithm, requestID: String) {
         cancelAllNotifications()
         let categoryID = OperationType.decryptData.rawValue
         let content = UNMutableNotificationContent()
         content.title = String(localized: "YubiKey required")
         content.body = String(localized: "Tap here to complete the decryption request using your YubiKey.")
         content.categoryIdentifier = categoryID
-        content.userInfo = ["operationType": categoryID, "data": cipherData, "keyObjectID": keyObjectID, "algorithm": algorithm.rawValue, "keyType": keyType.rawValue];
+        content.userInfo = ["operationType": categoryID, "data": cipherData, "keyObjectID": keyObjectID, "algorithm": algorithm.rawValue, "keyType": keyType.rawValue,
+                            TokenResponseStore.requestIDKey: requestID]
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
         
