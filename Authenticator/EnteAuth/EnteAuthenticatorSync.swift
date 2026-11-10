@@ -151,6 +151,16 @@ enum EnteAuthenticatorSyncError: Error, LocalizedError {
 nonisolated enum EnteAuthenticatorSync {
 
     static let pageSize = 500
+    /// The most diff requests one sync makes: 500,000 entities at full pages, far more than anyone keeps.
+    static let maxPages = 1_000
+    /// How far past the device's clock, in microseconds, an entity's `updatedAt` may be: a year, for a device whose
+    /// clock is wrong.
+    static let maxClockSkew: Int64 = 366 * 24 * 3600 * 1_000_000
+
+    /// Whether an `updatedAt`, in microseconds, is no further past the device's clock than `maxClockSkew`.
+    static func isPlausible(updatedAt: Int64) -> Bool {
+        updatedAt <= Int64(Date().timeIntervalSince1970 * 1_000_000) + maxClockSkew
+    }
 
     /// Fetches and decrypts the authenticator key, creating it like Ente Auth does when the account has never used
     /// Ente Auth: a random key, encrypted with the master key. If another app created the key in the meantime, that
@@ -230,7 +240,8 @@ nonisolated enum EnteAuthenticatorSync {
     /// server may return fewer than asked for. So paging only stops on an empty page. Entities changed at the same
     /// time can straddle two pages, so after a page with something new it asks again from just before the page's
     /// latest time and drops the versions it already has. Each request either moves `sinceTime` forward or brings
-    /// something new, so it can't loop forever.
+    /// something new. A server can still keep bringing new entities, so paging stops with an error after
+    /// `maxPages` requests.
     static func changes(api: EnteAPIClient, token: String, since sinceTime: Int64) async throws -> (entities: [EnteAuthenticatorEntity], latest: Int64) {
         var latest = [String: EnteAuthenticatorEntity]()
         var sinceTime = sinceTime
@@ -239,8 +250,19 @@ nonisolated enum EnteAuthenticatorSync {
         // page: the server may have more entities changed at that time than fit a page. If more entities follow,
         // some of those may be missing, and asking again can't get them.
         var fullPageAtOneTime = false
+        // `updatedAt` is in microseconds. A time far past the device's clock would become the time every later sync
+        // asks from, and nothing changed after it would ever be pulled.
+        // A time saved before this check could be one of those: pulling everything again settles it.
+        if !isPlausible(updatedAt: sinceTime) {
+            sinceTime = 0
+        }
+        var pages = 0
         while true {
+            try Task.checkCancellation()
+            pages += 1
+            guard pages <= maxPages else { throw EnteAPIError.invalidResponse }
             let response = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: pageSize) }
+            guard response.allSatisfy({ isPlausible(updatedAt: $0.updatedAt) }) else { throw EnteAPIError.invalidResponse }
             // Ignores anything at or before `sinceTime`, so every page that is kept moves forward.
             let page = response.filter { $0.updatedAt > sinceTime }
             guard let maxUpdatedAt = page.map(\.updatedAt).max() else { break }
