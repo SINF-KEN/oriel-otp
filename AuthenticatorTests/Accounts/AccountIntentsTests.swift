@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import AppIntents
 import Foundation
 import Testing
 
@@ -82,5 +83,14 @@ import Testing
         spotlight.update()
         await spotlight.finishUpdating()
         #expect(counter.count == 3)
+    }
+}
+
+@MainActor struct CopyCodeIntentTests {
+
+    /// With the app lock off, Siri on the Lock Screen mustn't copy a code or name an account.
+    @Test func copyCodeNeedsTheDeviceUnlocked() {
+        #expect(String(describing: CopyCodeIntent.authenticationPolicy)
+                == String(describing: IntentAuthenticationPolicy.requiresAuthentication))
     }
 }
