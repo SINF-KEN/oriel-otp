@@ -133,6 +133,38 @@ nonisolated protocol AppLockStorage: Sendable {
     func saveAttempts(_ attempts: AppLockAttempts?) throws
 }
 
+/// What the lock protects on the device: the files the app keeps its accounts in, and the keychain items that open
+/// them or reach the accounts elsewhere (the Ente session, the saved YubiKey passwords).
+nonisolated struct AppLockProtectedData: Sendable {
+    /// Whether any of the files is there.
+    var exists: @Sendable () -> Bool
+    /// Deletes the keychain items, so that files kept aside can't be opened again once the lock is gone.
+    var forget: @Sendable () -> Void
+
+    /// The app's. Named here rather than through the types that keep them, as the AutoFill extension builds this file
+    /// without those.
+    static let app = AppLockProtectedData(
+        exists: {
+            let files = [URL.applicationSupportDirectory.appending(components: "DeviceAccounts", "Accounts"),
+                         URL.applicationSupportDirectory.appending(components: "EnteAuth", "Vault"),
+                         URL.applicationSupportDirectory.appending(components: "Tags", "YubiKeyTags"),
+                         URL.applicationSupportDirectory.appending(components: "Favorites", "Favorites"),
+                         URL.applicationSupportDirectory.appending(components: "AutoFill", "Websites")]
+                + [AppGroup.containerURL?.appending(components: "AutoFill", "Accounts")].compactMap { $0 }
+            return files.contains { FileManager.default.fileExists(atPath: $0.path(percentEncoded: false)) }
+        },
+        forget: {
+            for service in ["DeviceAccounts", "EnteAuth.Vault", "Tags", "Favorites", "AutoFill.Websites", "AutoFill.Accounts",
+                            "EnteAuth", "OATH"] {
+                var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword, String(kSecAttrService): service]
+                #if os(macOS)
+                query[String(kSecUseDataProtectionKeychain)] = true
+                #endif
+                SecItemDelete(query as CFDictionary)
+            }
+        })
+}
+
 /// The lock and its wrong attempts in the keychain: `WhenUnlockedThisDeviceOnly`, so they never leave the device or
 /// come back from a backup, and can't be changed from outside the app like its preferences can.
 nonisolated struct AppLockKeychain: AppLockStorage {
@@ -232,8 +264,10 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 /// YubiKey and in Ente Auth, not only in the app.
 ///
 /// The keychain keeps the lock when the app is deleted, the app's preferences don't, which is how a lock left by an
-/// earlier installation shows. Preferences can be edited though, so they alone don't remove a lock: it's forgotten
-/// once the device owner confirms it with Face ID, Touch ID or the device passcode.
+/// earlier installation shows. Preferences can be edited though, so they alone don't remove a lock. While the files the
+/// lock protects are still there, the app wasn't deleted, and the lock stays. Without them, the lock is forgotten once
+/// the device owner confirms it with Face ID, Touch ID or the device passcode, and the keychain items that would open
+/// those files, or reach the accounts in Ente Auth, are deleted with it: files kept aside and put back can't be read.
 @MainActor @Observable final class AppLock {
     static let shared = Bundle.main.bundleURL.pathExtension == "appex"
         // The AutoFill extension can't tell which installation of the app saved the lock, the app forgets an earlier
@@ -267,11 +301,14 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
     @ObservationIgnored private let uptime: () -> TimeInterval
     @ObservationIgnored private let deviceOwnerIsAvailable: () -> Bool
     @ObservationIgnored private let authenticateDeviceOwner: @MainActor (String) async -> KeychainAuthentication?
+    @ObservationIgnored private let protectedData: AppLockProtectedData
     @ObservationIgnored private var pendingActions: [@MainActor () -> Void] = []
     @ObservationIgnored private var didAskForDeviceOwner = false
     /// The saved lock is kept until the device owner confirms forgetting it, `configuration` is the device method
     /// until then. See `holdUnconfirmedLock()`.
     @ObservationIgnored private var isUnconfirmedLock = false
+    /// Whether forgetting the unconfirmed lock deletes the keychain items of what it protected.
+    @ObservationIgnored private var forgetsProtectedData = false
 
     var method: AppLockMethod { configuration?.method ?? .off }
 
@@ -282,8 +319,10 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
          now: @escaping () -> Date = Date.init,
          uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
          deviceOwnerIsAvailable: @escaping () -> Bool = { AppLock.canUseDeviceOwner },
-         authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) }) {
+         authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) },
+         protectedData: AppLockProtectedData = .app) {
         self.storage = storage
+        self.protectedData = protectedData
         self.defaults = defaults
         self.keepsSavedLock = keepsSavedLock
         self.now = now
@@ -309,16 +348,25 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
         do {
             let saved = try storage.load()
             if saved != nil, !keepsSavedLock, !defaults.bool(forKey: Self.enabledKey) {
-                // Left by an earlier installation of the app, or the preferences were changed.
-                holdUnconfirmedLock()
+                if protectedData.exists() {
+                    // The preferences were changed: the app wasn't deleted, as what the lock protects is still there.
+                    defaults.set(true, forKey: Self.enabledKey)
+                    configuration = saved
+                    isUnconfirmedLock = false
+                } else {
+                    // Left by an earlier installation of the app.
+                    holdUnconfirmedLock(forgetsProtectedData: true)
+                }
             } else {
                 configuration = saved
                 isUnconfirmedLock = false
+                forgetsProtectedData = false
             }
             isUnavailable = false
         } catch is DecodingError {
-            // A lock that can't be decoded can't be unlocked, so it mustn't lock the app for good.
-            holdUnconfirmedLock()
+            // A lock that can't be decoded can't be unlocked, so it mustn't lock the app for good. Only the app writes
+            // the keychain item, so this isn't a way to get rid of a lock, and the accounts are kept.
+            holdUnconfirmedLock(forgetsProtectedData: false)
             isUnavailable = false
         } catch {
             // The device is locked, or the keychain failed. The app stays locked and reads it again when it's next
@@ -329,7 +377,8 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 
     /// Asks for the device owner before a saved lock that can't be used is forgotten. A device without a passcode has
     /// no owner to ask.
-    private func holdUnconfirmedLock() {
+    private func holdUnconfirmedLock(forgetsProtectedData: Bool) {
+        self.forgetsProtectedData = forgetsProtectedData
         if deviceOwnerIsAvailable() {
             configuration = AppLockConfiguration(method: .device)
             isUnconfirmedLock = true
@@ -339,6 +388,10 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
     }
 
     private func forgetSavedLock() {
+        if forgetsProtectedData {
+            protectedData.forget()
+        }
+        forgetsProtectedData = false
         try? storage.save(nil)
         try? storage.saveAttempts(nil)
         defaults.set(false, forKey: Self.enabledKey)
@@ -403,12 +456,19 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
         guard let configuration, configuration.method.hasSecret else { return false }
         updateRetryDate()
         guard retryDate == nil else { return false }
+        // Counted as wrong before it's checked, and only checked once that's saved: an attempt whose count can't be
+        // saved would be a free one. Saving first, before the slow comparison, also leaves the AutoFill extension,
+        // which shares the count, little time to read it in between and lose one of the two.
+        let failures = (storage.loadAttempts()?.failures ?? 0) + 1
+        do {
+            try storage.saveAttempts(AppLockAttempts(failures: failures, lastFailure: uptime()))
+        } catch {
+            return false
+        }
         if configuration.matches(secret) {
             try? storage.saveAttempts(nil)
             return true
         }
-        let failures = (storage.loadAttempts()?.failures ?? 0) + 1
-        try? storage.saveAttempts(AppLockAttempts(failures: failures, lastFailure: uptime()))
         updateRetryDate()
         return false
     }
