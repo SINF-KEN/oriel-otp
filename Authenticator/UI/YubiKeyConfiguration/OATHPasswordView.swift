@@ -58,12 +58,15 @@ struct OATHPasswordView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $presentSetPassword) {
             OATHSetChangePasswordView(type: .set)
+                .appLockCover()
         }
         .sheet(isPresented: $presentChangePassword) {
             OATHSetChangePasswordView(type: .change)
+                .appLockCover()
         }
         .sheet(isPresented: $presentRemovePassword) {
             OATHSetChangePasswordView(type: .remove)
+                .appLockCover()
         }
         .errorAlert(error: $error) { dismiss() }
         .onChange(of: model.state) { _, state in

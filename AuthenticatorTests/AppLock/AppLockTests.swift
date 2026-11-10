@@ -58,7 +58,17 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
 
     func loadAttempts() -> AppLockAttempts? { attempts }
 
-    func saveAttempts(_ attempts: AppLockAttempts?) throws { self.attempts = attempts }
+    /// Thrown by `saveAttempts(_:)`.
+    var saveAttemptsError: Error? {
+        get { lock.withLock { _saveAttemptsError } }
+        set { lock.withLock { _saveAttemptsError = newValue } }
+    }
+    private var _saveAttemptsError: Error?
+
+    func saveAttempts(_ attempts: AppLockAttempts?) throws {
+        if let saveAttemptsError { throw saveAttemptsError }
+        self.attempts = attempts
+    }
 
     func load() throws -> AppLockConfiguration? {
         if isUnavailable { throw AppLockUnavailableError() }
@@ -72,9 +82,26 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
     }
 }
 
+/// What the lock protects, in memory: whether the app's files are there, and whether their keys were deleted.
+nonisolated final class FakeProtectedData: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _exists = false
+    private var _forgotten = 0
+    var exists: Bool {
+        get { lock.withLock { _exists } }
+        set { lock.withLock { _exists = newValue } }
+    }
+    var forgotten: Int { lock.withLock { _forgotten } }
+
+    var data: AppLockProtectedData {
+        AppLockProtectedData(exists: { self.exists }, forget: { self.lock.withLock { self._forgotten += 1 } })
+    }
+}
+
 @MainActor struct AppLockTests {
 
     let storage = InMemoryAppLockStorage()
+    let protectedData = FakeProtectedData()
     let defaults: UserDefaults
 
     init() {
@@ -89,7 +116,7 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
                   hasDeviceOwner: Bool = true,
                   deviceOwner: Bool = true) -> AppLock {
         AppLock(storage: storage, defaults: defaults, keepsSavedLock: keepsSavedLock, now: now, uptime: uptime, deviceOwnerIsAvailable: { hasDeviceOwner },
-                authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil })
+                authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil }, protectedData: protectedData.data)
     }
 
     @Test func notLockedWithoutALock() {
@@ -387,6 +414,8 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(storage.configuration == nil)
         #expect(storage.attempts == nil)
         #expect(!makeLock().isLocked)
+        // Files kept aside and put back can't be read without the lock.
+        #expect(protectedData.forgotten == 1)
     }
 
     @Test func lockMissingFromThePreferencesIsForgottenWithoutADeviceOwner() throws {
@@ -395,6 +424,51 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
         #expect(!lock.isLocked)
         #expect(lock.method == .off)
         #expect(storage.configuration == nil)
+        #expect(protectedData.forgotten == 1)
+    }
+
+    @Test func anAttemptWhoseCountCantBeSavedIsRefused() throws {
+        try makeLock().setMethod(.code4, secret: "1234")
+        let lock = makeLock()
+        storage.saveAttemptsError = SecureStoreError.dataCastError
+        #expect(!lock.unlock(with: "1234"))
+        #expect(lock.isLocked)
+        storage.saveAttemptsError = nil
+        #expect(lock.unlock(with: "1234"))
+        #expect(storage.attempts == nil)
+    }
+
+    @Test func aWrongAttemptIsCountedBeforeItsChecked() throws {
+        try makeLock().setMethod(.code4, secret: "1234")
+        let lock = makeLock()
+        #expect(!lock.unlock(with: "0000"))
+        #expect(storage.attempts?.failures == 1)
+    }
+
+    @Test func lockMissingFromThePreferencesStaysWhileWhatItProtectsIsThere() async throws {
+        // The app wasn't deleted, its preferences were changed: the device owner can't stand in for the code.
+        storage.configuration = AppLockConfiguration(method: .code4, secret: "1234", rounds: 1)
+        protectedData.exists = true
+        let lock = makeLock()
+        #expect(lock.isLocked)
+        #expect(lock.method == .code4)
+        await lock.unlockWithDeviceOwner()
+        #expect(lock.isLocked)
+        #expect(storage.configuration != nil)
+        #expect(lock.unlock(with: "1234"))
+        #expect(protectedData.forgotten == 0)
+        // And it stays the lock from then on.
+        protectedData.exists = false
+        #expect(makeLock().method == .code4)
+    }
+
+    @Test func lockThatCantBeDecodedIsForgottenWithoutTheAccounts() async throws {
+        storage.loadError = DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "corrupt"))
+        protectedData.exists = true
+        let lock = makeLock()
+        await lock.unlockWithDeviceOwner()
+        #expect(!lock.isLocked)
+        #expect(protectedData.forgotten == 0)
     }
 
     @Test func settingALockReplacesOneWaitingForTheDeviceOwner() async throws {
@@ -466,7 +540,8 @@ nonisolated final class InMemoryAppLockStorage: AppLockStorage, @unchecked Senda
 
     @Test func waitingActionsGetTheFaceIDThatUnlockedTheApp() async throws {
         let context = LAContext()
-        let lock = AppLock(storage: storage, defaults: defaults, authenticateDeviceOwner: { _ in KeychainAuthentication(context: context) })
+        let lock = AppLock(storage: storage, defaults: defaults, authenticateDeviceOwner: { _ in KeychainAuthentication(context: context) },
+                           protectedData: protectedData.data)
         try lock.setMethod(.device)
         lock.lock()
 

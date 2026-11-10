@@ -339,12 +339,44 @@ nonisolated struct EnteAPIClient: Sendable {
         return request
     }
 
+    /// The most an answer may hold. A page of the authenticator diff, the largest answer Ente gives, is far smaller, and
+    /// a server that sends more could otherwise use up the app's memory.
+    static let maxResponseSize = 16 << 20
+
+    /// Reads an answer, stopping with an error past `maxResponseSize`.
+    ///
+    /// Off the caller's actor: the bytes come one at a time, and read from the main actor each one leaves it and comes
+    /// back, which took a quarter of an hour for 16 MiB.
+    @concurrent static func body(of bytes: URLSession.AsyncBytes, expectedLength: Int64) async throws -> Data {
+        guard expectedLength <= Int64(maxResponseSize) else {
+            bytes.task.cancel()
+            throw EnteAPIError.invalidResponse
+        }
+        var data = Data()
+        data.reserveCapacity(Int(max(0, expectedLength)))
+        for try await byte in bytes {
+            guard data.count < maxResponseSize else {
+                bytes.task.cancel()
+                throw EnteAPIError.invalidResponse
+            }
+            data.append(byte)
+        }
+        return data
+    }
+
     private func send<T: Decodable>(_ method: String, _ path: String, token: String? = nil, query: [String: String] = [:], body: [String: String]? = nil,
                                     json: Data? = nil) async throws -> T {
         let request = try request(method, path, token: token, query: query, body: body, json: json)
-        let (data, response) = try await session.data(for: request)
-        guard let response = response as? HTTPURLResponse else { throw EnteAPIError.invalidResponse }
-        guard (200..<300).contains(response.statusCode) else { throw EnteAPIError.http(statusCode: response.statusCode) }
+        let (bytes, response) = try await session.bytes(for: request)
+        guard let response = response as? HTTPURLResponse else {
+            bytes.task.cancel()
+            throw EnteAPIError.invalidResponse
+        }
+        guard (200..<300).contains(response.statusCode) else {
+            bytes.task.cancel()
+            throw EnteAPIError.http(statusCode: response.statusCode)
+        }
+        let data = try await Self.body(of: bytes, expectedLength: response.expectedContentLength)
         if T.self == Empty.self {
             return Empty() as! T
         }
@@ -376,6 +408,9 @@ extension URLSession {
     /// For talking to Ente's server: keeps nothing on disk, and redirects stay on the server.
     nonisolated static let ente: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
+        // URLSession's default lets a server that trickles its answer hold a request, and every sync queued behind it,
+        // for a week.
+        configuration.timeoutIntervalForResource = 300
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         // URLProtocol.registerClass only reaches the shared session. It only answers for its own hosts.
         configuration.protocolClasses = [FakeEnteServer.self] + (configuration.protocolClasses ?? [])

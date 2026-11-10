@@ -182,6 +182,7 @@ struct EnteSyncView: View {
                     // On the button: on the section each row would present it, and the sheets would close each other.
                     .sheet(isPresented: $isCreatingAccount) {
                         EnteSignUpView(server: server, email: model.email) { model.email = $0 }
+                            .appLockCover()
                     }
                     Button(String(localized: "Delete an account on this server", comment: "Ente button that opens account deletion on a self-hosted server"), role: .destructive) {
                         isDeletingAccount = true
@@ -189,6 +190,7 @@ struct EnteSyncView: View {
                     .accessibilityIdentifier("ente.delete-account")
                     .sheet(isPresented: $isDeletingAccount) {
                         EnteAccountDeletionView(server: server, email: model.email)
+                            .appLockCover()
                     }
                 }
             }

@@ -116,7 +116,8 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
             }
             items[index] = item
         }
-        lastSyncTime = max(lastSyncTime, latest)
+        // A time far past the clock, saved before such times were refused, is replaced by one from a full pull.
+        lastSyncTime = EnteAuthenticatorSync.isPlausible(updatedAt: lastSyncTime) ? max(lastSyncTime, latest) : latest
     }
 
     /// Adds an item to upload. Returns its id.

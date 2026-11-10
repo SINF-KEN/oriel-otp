@@ -106,6 +106,8 @@ final class TokenRequestViewModel {
               let objectId = userInfo.objectId(),
               let algorithm = userInfo.algorithm(),
               let message = userInfo.data() else { Logger.ctk.error("No data to sign"); throw .cancelled }
+        // The extension only takes an answer filed under the request it's waiting for.
+        guard let requestID = userInfo[TokenResponseStore.requestIDKey] as? String else { throw .cancelled }
         let session: PIVSession
         let isNFCConnection: Bool
         do {
@@ -181,7 +183,7 @@ final class TokenRequestViewModel {
             ConnectionManager.shared.closeNFC(message: String(localized: "Successfully signed data", comment: "PIV extension NFC successfully signed data"))
 
             Logger.ctk.yubilog("Writing signedData to shared container")
-            guard writeTokenResponse(signature, for: .signed) else { throw .cancelled }
+            guard writeTokenResponse(signature, for: .signed, requestID: requestID) else { throw .cancelled }
             Logger.ctk.yubilog("signedData written, operationCompleted = true")
             self.operationCompleted = true
         case .decryptData:
@@ -201,7 +203,7 @@ final class TokenRequestViewModel {
             ConnectionManager.shared.closeNFC(message: String(localized: "Successfully decrypted cipher data", comment: "PIV extension NFC successfully decrypted cipher data"))
 
             Logger.ctk.yubilog("Writing decryptedData to shared container")
-            guard writeTokenResponse(decryptedData, for: .decrypted) else { throw .cancelled }
+            guard writeTokenResponse(decryptedData, for: .decrypted, requestID: requestID) else { throw .cancelled }
             Logger.ctk.yubilog("decryptedData written, operationCompleted = true")
             self.operationCompleted = true
         }
@@ -221,11 +223,11 @@ final class TokenRequestViewModel {
     // Signed and decrypted data is handed to the TokenExtension through a file in the shared
     // app group container. Complete file protection keeps it encrypted while the device is locked,
     // and the extension deletes the file as soon as it has read it.
-    private func writeTokenResponse(_ data: Data, for kind: TokenResponseKind) -> Bool {
+    private func writeTokenResponse(_ data: Data, for kind: TokenResponseKind, requestID: String) -> Bool {
         guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier) else { return false }
         let store = TokenResponseStore(containerURL: container)
         do {
-            try store.write(data, for: kind)
+            try store.write(data, for: kind, requestID: requestID)
             return true
         } catch {
             Logger.ctk.error("Failed to write \(kind.rawValue): \(error)")
