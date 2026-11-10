@@ -133,4 +133,16 @@ import Testing
     }
 }
 
+@MainActor struct EnteDeletionChallengeTests {
+
+    @Test func onlyATokenIsSentBackOpened() {
+        #expect(EnteAccountDeletionViewModel.isChallenge("delete-jwt" + EnteCrypto.randomBytes(32).enteURLSafeBase64))
+        #expect(EnteAccountDeletionViewModel.isChallenge("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjF9.c2lnbmF0dXJl"))
+        #expect(!EnteAccountDeletionViewModel.isChallenge("my secret notes"))
+        #expect(!EnteAccountDeletionViewModel.isChallenge("short"))
+        #expect(!EnteAccountDeletionViewModel.isChallenge(String(repeating: "a", count: 5000)))
+        #expect(!EnteAccountDeletionViewModel.isChallenge("otpauth://totp/A:b?secret=JBSWY3DPEHPK3PXP"))
+    }
+}
+
 #endif
