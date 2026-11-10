@@ -42,7 +42,7 @@ jobs:
             echo "code=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          code=$(grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|crowdin\.yml|\.github/dependabot\.yml)$' <<< "$files" || true)
+          code=$(grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|\.github/dependabot\.yml)$' <<< "$files" || true)
           if [[ -n "$code" ]]; then
             echo "code=true" >> "$GITHUB_OUTPUT"
           else
@@ -55,8 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/dependency-review-action@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: moderate
           license-check: false
@@ -74,7 +74,7 @@ jobs:
       GIT_CONFIG_KEY_0: init.defaultBranch
       GIT_CONFIG_VALUE_0: main
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Lint new Swift code
         run: |
@@ -110,6 +110,10 @@ jobs:
           test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 10
           test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 10
 
+      # A translation that reads an argument as the wrong type crashes the app; see the script for what it checks.
+      - name: Check translation format specifiers
+        run: python3 -I tools/check-format-specifiers.py
+
       - name: Select simulator
         id: simulator
         run: |
@@ -138,37 +142,42 @@ jobs:
         timeout-minutes: 15
         uses: ./.github/actions/swift-packages
 
-      # The first boot on a fresh runner takes most of the machine for a few minutes. Started before the packages,
-      # it slowed restoring their 17 MB cache from seconds to minutes; started here, it overlaps the build instead.
-      - name: Start selected simulator
-        run: |
-          set -euo pipefail
-          DEVICE_ID="${{ steps.simulator.outputs.id }}"
-          DEVICE_STATE=$(xcrun simctl list devices available -j | jq -er --arg id "$DEVICE_ID" '[.devices[][] | select(.udid == $id) | .state][0]')
-          case "$DEVICE_STATE" in
-            Booted|Booting)
-              echo "Simulator is already $DEVICE_STATE"
-              ;;
-            Shutdown)
-              xcrun simctl boot "$DEVICE_ID"
-              echo "Simulator boot started before the build"
-              ;;
-            *)
-              echo "::error::Unexpected state '$DEVICE_STATE' for simulator $DEVICE_ID"
-              xcrun simctl list devices available
-              exit 1
-              ;;
-          esac
-
       # This builds the app and extension with warnings as errors. There's no separate analyze build: the sources
       # are all Swift, which the Clang static analyzer doesn't check. The Debug build is optimized: the Ente sign in
       # tests do 4096-bit SRP with BigInt, which takes the unoptimized build minutes and the optimized one seconds.
       # Debug's DEBUG flag and testability are unchanged.
-      - name: Test on simulator
-        timeout-minutes: 30
+      #
+      # The simulator stays shut down until the build is done. Its first boot on a fresh runner takes most of the
+      # machine for minutes: started before the build, it kept xcodebuild from starting for 3 to 8 minutes, and the
+      # build then took 7 to 11 minutes, against under 4 for the macOS job's build on the same kind of runner.
+      - name: Build for testing
+        timeout-minutes: 25
         run: |
           set -euo pipefail
-          xcodebuild test \
+          xcodebuild build-for-testing \
+            -project OrielOTP.xcodeproj \
+            -scheme OrielOTP \
+            -destination "id=${{ steps.simulator.outputs.id }}" \
+            -clonedSourcePackagesDirPath "${{ steps.packages.outputs.path }}" \
+            -disableAutomaticPackageResolution \
+            -onlyUsePackageVersionsFromResolvedFile \
+            -skipPackageUpdates \
+            -enableCodeCoverage YES \
+            -showBuildTimingSummary \
+            SWIFT_OPTIMIZATION_LEVEL=-O \
+            2>&1 | tee "$RUNNER_TEMP/xcodebuild-build.log"
+
+      # A step of its own, so the run shows how long the boot takes: -b boots the simulator and waits until it's ready.
+      - name: Boot simulator
+        id: boot
+        timeout-minutes: 15
+        run: xcrun simctl bootstatus "${{ steps.simulator.outputs.id }}" -b
+
+      - name: Test on simulator
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          xcodebuild test-without-building \
             -project OrielOTP.xcodeproj \
             -scheme OrielOTP \
             -destination "id=${{ steps.simulator.outputs.id }}" \
@@ -178,8 +187,13 @@ jobs:
             -skipPackageUpdates \
             -enableCodeCoverage YES \
             -resultBundlePath "$RUNNER_TEMP/OrielOTP.xcresult" \
-            SWIFT_OPTIMIZATION_LEVEL=-O \
             2>&1 | tee "$RUNNER_TEMP/xcodebuild-test.log"
+
+      # Nothing below needs the simulator. With it running, summarizing the result bundle took 25 to 105 seconds, and
+      # the runner another 20 to 30 seconds to stop the simulator's processes when the job ended.
+      - name: Shut down simulator
+        if: ${{ !cancelled() && steps.boot.outcome != 'skipped' }}
+        run: xcrun simctl shutdown "${{ steps.simulator.outputs.id }}" || true
 
       - name: Summarize test results
         if: ${{ !cancelled() }}
@@ -190,7 +204,15 @@ jobs:
             xcrun xcresulttool get test-results summary --path "$RESULT_BUNDLE" \
               | tee "$RUNNER_TEMP/test-summary.json" \
               | jq -r '"Result: \(.result); passed: \(.passedTests); failed: \(.failedTests); skipped: \(.skippedTests)"'
-            xcrun xccov view --report --only-targets "$RESULT_BUNDLE" || true
+            # xccov reads the result bundle once: the coverage baselines below check this report too.
+            if xcrun xccov view --report --json "$RESULT_BUNDLE" > "$RUNNER_TEMP/coverage.json"; then
+              jq -r '.targets[]
+                | [.name, "\(.files | length) files",
+                   "\(.lineCoverage * 10000 | round / 100)% (\(.coveredLines)/\(.executableLines))"]
+                | @tsv' "$RUNNER_TEMP/coverage.json" | column -t -s $'\t' || true
+            else
+              rm -f "$RUNNER_TEMP/coverage.json"
+            fi
           elif [ -f "$RUNNER_TEMP/xcodebuild-test.log" ]; then
             echo "::warning::Xcode did not produce a result bundle; see the uploaded xcodebuild log."
           else
@@ -203,14 +225,15 @@ jobs:
         if: success()
         run: |
           set -euo pipefail
-          RESULT_BUNDLE="$RUNNER_TEMP/OrielOTP.xcresult"
+          COVERAGE="$RUNNER_TEMP/coverage.json"
+          # The summary step wrote the report, unless xccov failed there; failing again here fails the job.
+          [[ -s "$COVERAGE" ]] || xcrun xccov view --report --json "$RUNNER_TEMP/OrielOTP.xcresult" > "$COVERAGE"
           # The name xccov reports for the app target can change (it's "Oriel OTP.app" once the target also builds
           # for macOS), and the embedded watch app is a .app target too, so pick the .app target with the app's
           # TokenResponseStore.swift instead of matching its name.
-          xcrun xccov view --report --json "$RESULT_BUNDLE" \
-            | jq -e '[.targets[] | select((.name | endswith(".app")) and any(.files[]; .name == "TokenResponseStore.swift"))]
-              | if length == 1 then .[0] else error("Expected one .app target, found \(length)") end' \
-            > "$RUNNER_TEMP/app-file-coverage.json"
+          jq -e '[.targets[] | select((.name | endswith(".app")) and any(.files[]; .name == "TokenResponseStore.swift"))]
+            | if length == 1 then .[0] else error("Expected one .app target, found \(length)") end' \
+            "$COVERAGE" > "$RUNNER_TEMP/app-file-coverage.json"
           check_coverage() {
             local file_name="$1"
             local minimum="$2"
@@ -225,12 +248,13 @@ jobs:
 
       - name: Upload test results and logs
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: OrielOTP-test-results
           path: |
             ${{ runner.temp }}/OrielOTP.xcresult
             ${{ runner.temp }}/resolve-packages.log
+            ${{ runner.temp }}/xcodebuild-build.log
             ${{ runner.temp }}/xcodebuild-test.log
             ${{ runner.temp }}/test-summary.json
           if-no-files-found: ignore
@@ -248,7 +272,7 @@ jobs:
       GIT_CONFIG_KEY_0: init.defaultBranch
       GIT_CONFIG_VALUE_0: main
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Resolve Swift packages
         id: packages
@@ -295,6 +319,7 @@ jobs:
             -onlyUsePackageVersionsFromResolvedFile \
             -skipPackageUpdates \
             -resultBundlePath "$RUNNER_TEMP/OrielOTP-macOS.xcresult" \
+            -showBuildTimingSummary \
             CODE_SIGN_IDENTITY=- \
             CODE_SIGN_STYLE=Manual \
             DEVELOPMENT_TEAM= \
@@ -305,7 +330,7 @@ jobs:
 
       - name: Upload test results and logs
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: OrielOTP-macOS-test-results
           path: |
