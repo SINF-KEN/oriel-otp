@@ -120,6 +120,10 @@ nonisolated final class SecureStore: Sendable {
                 // Saved by an earlier version, which let it go into backups and onto other devices. If adding it
                 // again fails, it is tried again on the next read.
                 try? setValue(data, useAuthentication: false, for: userAccount)
+            } else if data != nil {
+                // Added before the app had a keychain group of its own, where the AutoFill extension can read it.
+                // An item that was just added again above is in the app's group already.
+                SharedKeychain.moveToAppGroup(query, attributes: queriedItem)
             }
             return data
         case errSecItemNotFound:
@@ -176,7 +180,7 @@ nonisolated final class SecureStore: Sendable {
     }
     
     private func error(from status: OSStatus) -> SecureStoreError {
-        let message = SecCopyErrorMessageString(status, nil) as String? ?? NSLocalizedString("Unhandled Error", comment: "")
+        let message = SecCopyErrorMessageString(status, nil) as String? ?? String(localized: "Unhandled Error", comment: "Keychain error without a message")
         return SecureStoreError.unhandledError(message: message)
     }
 }

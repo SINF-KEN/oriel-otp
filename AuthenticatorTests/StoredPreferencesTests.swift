@@ -159,15 +159,20 @@ private struct UnavailableVaultKey: EnteVaultKeychain {
 
 struct PasswordPreferencesTests {
 
-    private let preferences = PasswordPreferences()
+    // Preferences of their own, removed after each test, so nothing is left in the app's.
+    private let suiteName = "PasswordPreferencesTests-\(UUID().uuidString)"
+    private let defaults: UserDefaults
+    private let preferences: PasswordPreferences
     // The UserDefaults key is spelled out so renaming it, which would lose saved preferences, fails the tests.
-    // A device id of its own, so the tests don't touch the preferences of a real YubiKey.
-    private let deviceId = "test-\(UUID().uuidString)"
+    private let deviceId = "test-device"
+
+    init() {
+        defaults = UserDefaults(suiteName: suiteName)!
+        preferences = PasswordPreferences(defaults: defaults)
+    }
 
     private func cleanUp(_ ids: String...) {
-        for id in ids {
-            UserDefaults.standard.removeObject(forKey: "PasswordSaveType" + id)
-        }
+        defaults.removePersistentDomain(forName: suiteName)
     }
 
     @Test(arguments: [
@@ -184,6 +189,7 @@ struct PasswordPreferencesTests {
     }
 
     @Test func unknownDeviceUsesNoSavedPassword() {
+        defer { cleanUp() }
         #expect(!preferences.useSavedPassword(keyIdentifier: deviceId))
         #expect(!preferences.useScreenLock(keyIdentifier: deviceId))
     }
@@ -201,6 +207,6 @@ struct PasswordPreferencesTests {
         preferences.setPasswordPreference(saveType: .lock, keyIdentifier: deviceId)
         preferences.migrate(fromKeyIdentifier: deviceId, toKeyIdentifier: newDeviceId)
         #expect(preferences.useScreenLock(keyIdentifier: newDeviceId))
-        #expect(UserDefaults.standard.object(forKey: "PasswordSaveType" + deviceId) == nil)
+        #expect(defaults.object(forKey: "PasswordSaveType" + deviceId) == nil)
     }
 }

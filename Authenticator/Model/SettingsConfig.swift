@@ -20,40 +20,25 @@ import Foundation
  Using UserDefaults as permanent storage
  */
 class SettingsConfig {
-    static private let noServiceWarning = "nfcwarning"
-    static private let allowBackup = "backup"
-    static private let freVersion = "freVersion"
-    static private let whatsNewVersion = "whatsNewVersion"
-    static private let userFoundMenu = "userFoundMenu"
     static private let bypassTouch = "bypassTouch"
     static private let nfcOnAppLaunch = "nfcOnAppLaunch"
     static private let showNFCSwipeHintCounter = "showNFCSwipeHintCounter"
     static private let showWhatsNewCounter = "showWhatsNewCounter"
     static private let showWhatsNewCounterAppVersion = "showWhatsNewCounterAppVersion"
-    static private let nfcOnOTPLaunch = "nfcOnOTPLaunch"
-    static private let copyOTP = "copyOTP"
     static private let ignoreUSBCWithOTP = "ignoreUSBCWithOTP"
     
-    static var showWhatsNewText: Bool {
-        get {
-            if Bundle.main.appVersion != UserDefaults.standard.string(forKey: showWhatsNewCounterAppVersion) {
-                UserDefaults.standard.set(0, forKey: showWhatsNewCounter)
-                UserDefaults.standard.set(Bundle.main.appVersion, forKey: showWhatsNewCounterAppVersion)
-            }
-            let counter = UserDefaults.standard.integer(forKey: showWhatsNewCounter)
-            // Show whats new text the first 3 times app is started
-            if counter > 2 {
-                return false
-            } else {
-                UserDefaults.standard.set(counter + 1, forKey: showWhatsNewCounter)
-                return true
-            }
+    /// Whether "What's new" is shown, the first 3 launches of each version. Worked out once per launch: a view's body
+    /// reads it on every render, which counted renders rather than launches.
+    static let showWhatsNewText: Bool = {
+        if Bundle.main.appVersion != UserDefaults.standard.string(forKey: showWhatsNewCounterAppVersion) {
+            UserDefaults.standard.set(0, forKey: showWhatsNewCounter)
+            UserDefaults.standard.set(Bundle.main.appVersion, forKey: showWhatsNewCounterAppVersion)
         }
-    }
-    
-    static func didShowWhatsNewText() {
-        UserDefaults.standard.set(100, forKey: showWhatsNewCounter)
-    }
+        let counter = UserDefaults.standard.integer(forKey: showWhatsNewCounter)
+        guard counter < 3 else { return false }
+        UserDefaults.standard.set(counter + 1, forKey: showWhatsNewCounter)
+        return true
+    }()
     
     static var showNFCSwipeHint: Bool {
         get {
@@ -65,51 +50,6 @@ class SettingsConfig {
                 UserDefaults.standard.set(counter + 1, forKey: showNFCSwipeHintCounter)
                 return true
             }
-        }
-    }
-    
-    static var userHasFoundMenu: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: userFoundMenu)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: userFoundMenu)
-        }
-    }
-    
-    static var showNoServiceWarning: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: noServiceWarning)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: noServiceWarning)
-        }
-    }
-    
-    static var showBackupWarning: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: allowBackup)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: allowBackup)
-        }
-    }
-    
-    static var lastFreVersionShown : Int {
-        get {
-            return UserDefaults.standard.integer(forKey: freVersion)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: freVersion)
-        }
-    }
-    
-    static var lastWhatsNewVersionShown : String? {
-        get {
-            return UserDefaults.standard.string(forKey: whatsNewVersion)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: whatsNewVersion)
         }
     }
     
@@ -128,28 +68,6 @@ class SettingsConfig {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: nfcOnAppLaunch)
-        }
-    }
-    
-    static var isNFCOnOTPLaunchEnabled: Bool {
-        get {
-            if UserDefaults.standard.object(forKey: nfcOnOTPLaunch) == nil {
-                UserDefaults.standard.set(true, forKey: nfcOnOTPLaunch)
-            }
-            
-            return UserDefaults.standard.bool(forKey: nfcOnOTPLaunch)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: nfcOnOTPLaunch)
-        }
-    }
-    
-    static var isCopyOTPEnabled: Bool {
-        get {
-            return UserDefaults.standard.bool(forKey: copyOTP)
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: copyOTP)
         }
     }
     

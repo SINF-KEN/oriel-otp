@@ -102,23 +102,6 @@ struct VersionHistoryRowView: View {
     }
 }
 
-extension VersionHistoryView {
-    static var shouldShowOnAppLaunch: Bool {
-        // Wait for first application update before showing whats new on app launch
-        // Go back in history until we reach the update last shown and search for changes that should be prompted
-        guard let lastVersionPrompted = SettingsConfig.lastWhatsNewVersionShown else {
-            SettingsConfig.lastWhatsNewVersionShown = Bundle.main.appVersion
-            return false
-        }
-
-        for change in changes {
-            if change.version == lastVersionPrompted { return false }
-            if change.shouldPromptUser { return true }
-        }
-        return false
-    }
-}
-
 fileprivate extension Array where Element == Change {
     init?(withChangesFrom: String) {
         guard

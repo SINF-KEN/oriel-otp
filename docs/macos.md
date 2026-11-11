@@ -1,7 +1,7 @@
 # The Mac version
 
-The Mac version is being built in steps, following the checklist in
-[issue #18](https://github.com/SINF-KEN/oriel-otp/issues/18).
+The Mac version is a native macOS build of the same app, from the same target. It was built following the
+checklist in [issue #18](https://github.com/SINF-KEN/oriel-otp/issues/18).
 
 ## Approach: a native macOS destination
 
@@ -82,8 +82,8 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
   without the permission. Paste QR Code or Link reads an image or an `otpauth://` link from the pasteboard; a picture
   can be dropped on the sheet; and File > Import From Device takes one with an iPhone or iPad. QR codes are found with
   Core Image. Entering the details by hand still works.
-- **Shortcuts and Spotlight** (`MacIntents.swift`): Copy Code, with the account picked from the plugged-in YubiKey,
-  and Add Account. The Dock menu also has Add Account. Both open `orielotp://add-account`, which brings back the
+- **Shortcuts and Spotlight**: Copy Code and Open Account (`Accounts/AccountIntents.swift`, shared with iOS), with the
+  account picked from Ente Auth or this device, and Add Account (`Mac/MacIntents.swift`). The Dock menu also has Add Account. Both open `orielotp://add-account`, which brings back the
   window when it was closed.
 - **Touch ID** protects a saved YubiKey password and the saved Ente session, as Face ID does on iOS.
 - **Open at login** uses `SMAppService`.
@@ -100,7 +100,7 @@ with `[sdk=macosx*]` build settings:
 | `com.apple.security.network.client` | Ente Auth |
 | `com.apple.security.files.user-selected.read-write` | Saving and opening a backup of the accounts on this Mac, and saving the Ente recovery key, with the system's dialogs |
 | `keychain-access-groups` | The data protection keychain, for saved passwords and the Ente session |
-| `com.apple.security.application-groups` | Shares the AutoFill accounts and the app lock's preferences with the AutoFill extension |
+| `com.apple.security.application-groups` | Shares the AutoFill accounts and the websites chosen for them with the AutoFill extension (the app lock is in the shared keychain group, not the app group) |
 | `com.apple.developer.authentication-services.autofill-credential-provider` | The AutoFill extension |
 
 The smart card extension isn't part of the Mac build, so only the AutoFill extension uses the app group there. The NFC

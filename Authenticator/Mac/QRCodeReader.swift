@@ -54,7 +54,7 @@ enum QRCodeReader {
     static func readPasteboard() throws -> URL {
         let pasteboard = NSPasteboard.general
         if let string = pasteboard.string(forType: .string)?.trimmingCharacters(in: .whitespacesAndNewlines),
-           let url = URL(string: string), url.scheme == "otpauth" {
+           let url = URL(string: string), OTPAuthURLParser.isOTPAuth(url) {
             return url
         }
         if let image = NSImage(pasteboard: pasteboard), let url = otpauthURLs(in: image).first {
@@ -71,7 +71,7 @@ enum QRCodeReader {
                 return url
             }
             if let data = try? await provider.data(of: .url), let url = URL(dataRepresentation: data, relativeTo: nil) {
-                if url.scheme == "otpauth" {
+                if OTPAuthURLParser.isOTPAuth(url) {
                     return url
                 }
                 if url.isFileURL, let image = NSImage(contentsOf: url), let otpauthURL = otpauthURLs(in: image).first {
@@ -93,7 +93,7 @@ enum QRCodeReader {
         return features
             .compactMap { ($0 as? CIQRCodeFeature)?.messageString }
             .compactMap { URL(string: $0) }
-            .filter { $0.scheme == "otpauth" }
+            .filter(OTPAuthURLParser.isOTPAuth)
     }
 }
 

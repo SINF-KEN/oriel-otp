@@ -42,14 +42,12 @@
 		818866C022DFD72C006BC0A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 818866BF22DFD72C006BC0A8 /* Assets.xcassets */; };
 		818866C322DFD72C006BC0A8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */; platformFilter = ios; };
 		81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */; };
-		81DF8FD3237A090A00737268 /* ApplicationSessionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */; };
 		A1C1EA0000000000000000B1 /* LargestClearRectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */; };
 		A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */; };
 		A1C1EA0000000000000000B3 /* Debug/SimulatedYubiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */; };
 		A1C1EA0000000000000000B4 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F4 /* Platform.swift */; };
 		A5588BF9239B0A7F003E4CA5 /* FavoritesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */; };
 		A591411D23830EB800CCCF67 /* UIApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */; };
-		A591412123835F4600CCCF67 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591412023835F4600CCCF67 /* Constants.swift */; };
 		A5D4E86D24083CF300FD63A0 /* OTPConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */; };
 		A5E9DEB0237DE1660011FBF4 /* SettingsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */; };
 		A7C40000000000000000000B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
@@ -103,7 +101,6 @@
 		B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = B4D71E802CE4E6E6004D4C29 /* YubiKit */; };
 		B4DB228A299BC373003110ED /* OATHSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4DB2289299BC373003110ED /* OATHSession.swift */; };
 		B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */; };
-		B9F0FF11F842A39183974083 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */; };
 		C1A0000000000000000000B7 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000A7 /* AppIconView.swift */; };
 		C1A0000000000000000000D1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
@@ -228,14 +225,12 @@
 		818866CF22DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866F622E7A877006BC0A8 /* Authenticator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Authenticator.entitlements; sourceTree = "<group>"; };
 		81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySessionError.swift; sourceTree = "<group>"; };
-		81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSessionObserver.swift; sourceTree = "<group>"; };
 		A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargestClearRectTests.swift; sourceTree = "<group>"; };
 		A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredPreferencesTests.swift; sourceTree = "<group>"; };
 		A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/SimulatedYubiKey.swift; sourceTree = "<group>"; };
 		A1C1EA0000000000000000F4 /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
 		A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStorage.swift; sourceTree = "<group>"; };
 		A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplicationExtension.swift; sourceTree = "<group>"; };
-		A591412023835F4600CCCF67 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTPConfigurationView.swift; sourceTree = "<group>"; };
 		A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsConfig.swift; sourceTree = "<group>"; };
 		A7C400000000000000000003 /* OrielOTPWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTPWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -245,7 +240,6 @@
 		B40F44442B27033A000D5E02 /* TokenRequestYubiOTPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestYubiOTPView.swift; sourceTree = "<group>"; };
 		B411242E29D423A300D58001 /* ListStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStatusView.swift; sourceTree = "<group>"; };
 		B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		B43751982C9AD7F1004017A4 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LaunchScreen.xcstrings; sourceTree = "<group>"; };
 		B44E5E802C74BE67007ABB79 /* OATHResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHResetView.swift; sourceTree = "<group>"; };
 		B44E5EB22C777F22007ABB79 /* OATHPasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHPasswordViewModel.swift; sourceTree = "<group>"; };
 		B44E5EBA2C778802007ABB79 /* OATHPasswordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OATHPasswordView.swift; sourceTree = "<group>"; };
@@ -419,7 +413,6 @@
 				B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */,
 				E17E0000000000000000A003 /* Clibsodium in Frameworks */,
 				E17E0000000000000000B003 /* BigInt in Frameworks */,
-				B9F0FF11F842A39183974083 /* (null) in Frameworks */,
 				51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -646,7 +639,6 @@
 				513D4DF32660D8DC0022C53D /* TokenSession */,
 				513D4DF02660D5AB0022C53D /* YubiKeyConfiguration */,
 				817DBA0E2368B7BE001FC18D /* Helpers */,
-				A591412023835F4600CCCF67 /* Constants.swift */,
 				818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */,
 				B4719B16298AA6E7006CDAEA /* MainView.swift */,
 				B411242E29D423A300D58001 /* ListStatusView.swift */,
@@ -665,7 +657,6 @@
 				5155428B2656FCF600B19C59 /* CryptoTokenKit */,
 				51EEC530246D34D800061A8F /* Extensions */,
 				816C684423430DC000209342 /* SecureStore */,
-				81DF8FD2237A090A00737268 /* ApplicationSessionObserver.swift */,
 				51F8E3BE263848E30010686B /* ConnectionManager.swift */,
 				A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */,
 				81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */,
@@ -1024,7 +1015,6 @@
 				B43751A42CA440E7004017A4 /* NFCSettingsView.swift in Sources */,
 				51AFD4D62716FCDB008F2630 /* ApplicationSettingsViewModel.swift in Sources */,
 				B4BB02E42C81B21D00B72904 /* FIDOPINView.swift in Sources */,
-				A591412123835F4600CCCF67 /* Constants.swift in Sources */,
 				51BBE37F273982D700DA47CC /* OATHSession+Extensions.swift in Sources */,
 				B44E5EB32C777F22007ABB79 /* OATHPasswordViewModel.swift in Sources */,
 				B4B83B6A2CBE8D4200B33C47 /* Logger+Extensions.swift in Sources */,
@@ -1072,7 +1062,6 @@
 				B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */,
 				A5588BF9239B0A7F003E4CA5 /* FavoritesStorage.swift in Sources */,
 				B4B1711827DF8C48002A62DE /* ScanAccountView.swift in Sources */,
-				81DF8FD3237A090A00737268 /* ApplicationSessionObserver.swift in Sources */,
 				5155428A2656F79500B19C59 /* SecCertificate+Extensions.swift in Sources */,
 				816C685E234697BF00209342 /* PasswordPreferences.swift in Sources */,
 				B4C93E9529C1B90900C2A8B8 /* AddAccountView.swift in Sources */,
@@ -1163,7 +1152,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				818866C222DFD72C006BC0A8 /* Base */,
-				B43751982C9AD7F1004017A4 /* mul */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -1240,6 +1228,8 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = OrielOTP;
@@ -1259,6 +1249,8 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = OrielOTP;
@@ -1440,7 +1432,6 @@
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				YKF_ENABLE_VERBOSE_LOGGING = YES;
 			};
 			name = Debug;
 		};
@@ -1491,7 +1482,6 @@
 				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				YKF_ENABLE_VERBOSE_LOGGING = NO;
 			};
 			name = Release;
 		};
@@ -1600,7 +1590,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XW69FY82W3;
 				CURRENT_PROJECT_VERSION = 207;
-				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Oriel OTP";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "io.github.sinf-ken.OrielOTP";

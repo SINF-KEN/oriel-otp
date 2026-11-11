@@ -42,14 +42,26 @@ enum EnteLoginError: Error, LocalizedError, Equatable {
     }
 }
 
-/// The keys of a signed in Ente account. The master key never leaves memory.
+/// The keys of a signed in Ente account. The master key never leaves memory, and it and the secret key are zeroed once
+/// the last copy of these keys goes.
 nonisolated struct EnteAccountKeys: Sendable {
     let userID: Int64
     let token: String
-    let masterKey: Data
+    private let storedMasterKey: EnteSecret
     /// The account's key pair, only needed to delete the account.
-    var publicKey: Data?
-    var secretKey: Data?
+    let publicKey: Data?
+    private let storedSecretKey: EnteSecret?
+
+    var masterKey: Data { storedMasterKey.data }
+    var secretKey: Data? { storedSecretKey?.data }
+
+    init(userID: Int64, token: String, masterKey: Data, publicKey: Data? = nil, secretKey: Data? = nil) {
+        self.userID = userID
+        self.token = token
+        self.storedMasterKey = EnteSecret(masterKey)
+        self.publicKey = publicKey
+        self.storedSecretKey = secretKey.map(EnteSecret.init)
+    }
 }
 
 enum EnteLoginStep: Equatable {
@@ -72,7 +84,7 @@ final class EnteLoginFlow {
         case emailCode
         /// Verified, the keys are being decrypted or the password didn't decrypt them. `submitPassword(_:)` tries another one.
         case password(verified: EnteAuthResponse)
-        case secondFactor(response: EnteAuthResponse, keyEncryptionKey: Data?)
+        case secondFactor(response: EnteAuthResponse, keyEncryptionKey: EnteSecret?)
         case complete(EnteAccountKeys)
     }
 
@@ -166,15 +178,17 @@ final class EnteLoginFlow {
         return try await advance(verified, keyEncryptionKey: keyEncryptionKey)
     }
 
-    private func advance(_ response: EnteAuthResponse, keyEncryptionKey: Data?) async throws -> EnteLoginStep {
+    /// The key encryption key, if SRP derived it already, is kept for the second factor and zeroed once the keys are
+    /// decrypted or the flow is dropped.
+    private func advance(_ response: EnteAuthResponse, keyEncryptionKey: EnteSecret?) async throws -> EnteLoginStep {
         if response.secondFactorRequired {
             state = .secondFactor(response: response, keyEncryptionKey: keyEncryptionKey)
             return .secondFactor(totp: response.totpSessionID != nil, passkey: response.passkeyRequired)
         }
         // Verified, so a wrong password can be retried with submitPassword(_:).
         state = .password(verified: response)
-        let keyEncryptionKey = if let keyEncryptionKey { keyEncryptionKey } else { try await deriveKeyEncryptionKey(for: response) }
-        state = .complete(try await Self.decryptKeys(response, keyEncryptionKey: keyEncryptionKey))
+        let keyEncryptionKey = if let keyEncryptionKey { keyEncryptionKey } else { EnteSecret(try await deriveKeyEncryptionKey(for: response)) }
+        state = .complete(try await Self.decryptKeys(response, keyEncryptionKey: keyEncryptionKey.data))
         password = nil
         return .complete
     }
@@ -189,17 +203,17 @@ final class EnteLoginFlow {
     }
 
     private static func signInWithSRP(api: EnteAPIClient, password: String, attributes: EnteSRPAttributes,
-                                      onDerivingKeys: (Bool) -> Void) async throws -> (EnteAuthResponse, Data) {
+                                      onDerivingKeys: (Bool) -> Void) async throws -> (EnteAuthResponse, EnteSecret) {
         guard let kekSalt = Data(enteBase64: attributes.kekSalt),
               let srpSalt = Data(enteBase64: attributes.srpSalt) else { throw EnteLoginError.invalidAccountData }
         onDerivingKeys(true)
-        let keyEncryptionKey: Data
+        let keyEncryptionKey: EnteSecret
         let client: EnteSRPClient
         do {
             defer { onDerivingKeys(false) }
-            keyEncryptionKey = try await deriveKeyEncryptionKey(password: password, salt: kekSalt,
-                                                                opsLimit: attributes.opsLimit, memLimit: attributes.memLimit)
-            client = try await makeSRPClient(identity: attributes.srpUserID, keyEncryptionKey: keyEncryptionKey, salt: srpSalt)
+            keyEncryptionKey = EnteSecret(try await deriveKeyEncryptionKey(password: password, salt: kekSalt,
+                                                                           opsLimit: attributes.opsLimit, memLimit: attributes.memLimit))
+            client = try await makeSRPClient(identity: attributes.srpUserID, keyEncryptionKey: keyEncryptionKey.data, salt: srpSalt)
         }
         let session = try await api.createSRPSession(srpUserID: attributes.srpUserID, srpA: client.publicKey)
         let proofs = try await srpProofs(client, serverPublicKey: session.srpB)
@@ -236,7 +250,9 @@ final class EnteLoginFlow {
     }
 
     @concurrent nonisolated private static func makeSRPClient(identity: String, keyEncryptionKey: Data, salt: Data) async throws -> EnteSRPClient {
-        let loginKey = try EnteCrypto.deriveLoginKey(keyEncryptionKey: keyEncryptionKey)
+        var loginKey = try EnteCrypto.deriveLoginKey(keyEncryptionKey: keyEncryptionKey)
+        // The client keeps its own copy, zeroed with it.
+        defer { loginKey.wipe() }
         return EnteSRPClient(identity: identity, password: loginKey, salt: salt)
     }
 
@@ -253,14 +269,19 @@ final class EnteLoginFlow {
               let secretKeyNonce = Data(enteBase64: attributes.secretKeyDecryptionNonce),
               let publicKey = Data(enteBase64: attributes.publicKey) else { throw EnteLoginError.invalidAccountData }
 
-        let masterKey: Data
+        var masterKey: Data
         do {
             masterKey = try EnteCrypto.secretBoxOpen(encryptedKey, nonce: keyNonce, key: keyEncryptionKey)
         } catch {
             throw EnteLoginError.incorrectPassword
         }
-        guard let secretKey = try? EnteCrypto.secretBoxOpen(encryptedSecretKey, nonce: secretKeyNonce, key: masterKey),
-              try EnteCrypto.publicKey(forSecretKey: secretKey) == publicKey else { throw EnteLoginError.invalidAccountData }
+        // EnteAccountKeys keeps copies of its own, so these are zeroed whatever happens.
+        defer { masterKey.wipe() }
+        guard var secretKey = try? EnteCrypto.secretBoxOpen(encryptedSecretKey, nonce: secretKeyNonce, key: masterKey) else {
+            throw EnteLoginError.invalidAccountData
+        }
+        defer { secretKey.wipe() }
+        guard try EnteCrypto.publicKey(forSecretKey: secretKey) == publicKey else { throw EnteLoginError.invalidAccountData }
 
         let token: String
         if let encryptedToken = response.encryptedToken.flatMap({ Data(enteBase64: $0) }) {

@@ -184,7 +184,7 @@ import YubiKit
                !(self.staySignedIn && self.canSaveSession && self.cloud.vault?.belongs(email: email, server: server) == true) {
                 throw EnteSyncError.unsyncedChanges
             }
-            if let flow = self.flow, flow.needsPassword, flow.email == email, flow.api.server == server {
+            if let flow = self.flow, flow.needsPassword, flow.email == email, EnteAPIClient.isSameServer(flow.api.server, server) {
                 try await self.handle { try await flow.submitPassword(password) }
                 return
             }
@@ -274,6 +274,13 @@ import YubiKit
             } catch _ where Task.isCancelled {
                 abandonSignIn()
                 throw CancellationError()
+            }
+            // Checked when signing in started, but the email code or the passkey can take minutes, and an account
+            // added meanwhile would be lost with the copy of the accounts that is replaced below.
+            if cloud.hasPendingChanges, !(saveSession && cloud.vault?.belongs(email: flow.email, server: api.server) == true) {
+                abandonSignIn()
+                phase = .signIn
+                throw EnteSyncError.unsyncedChanges
             }
             signedInEmail = flow.email
             if saveSession, let authenticatorKey {
@@ -420,7 +427,7 @@ import YubiKit
 
     /// The server as typed on the sign in screen, empty for Ente's own server.
     private static func serverField(for server: URL) -> String {
-        server == EnteAPIClient.defaultServer ? "" : server.absoluteString
+        EnteAPIClient.isSameServer(server, EnteAPIClient.defaultServer) ? "" : server.absoluteString
     }
 
     private func run(_ operation: @escaping () async throws -> Void) {

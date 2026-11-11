@@ -32,6 +32,10 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
     case storageFull(notAdded: [String])
     /// The account's name on the YubiKey gives a period no code can be calculated with, e.g. "0/alice".
     case unsupportedPeriod
+    /// The account was read from another YubiKey than the one connected now.
+    case otherYubiKey
+    /// No YubiKey answered, e.g. it was unplugged.
+    case yubiKeyNotReachable
 
     public var errorDescription: String? {
         switch self {
@@ -59,6 +63,10 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
         case .unsupportedPeriod:
             return String(localized: "No code can be calculated for this account: its name on the YubiKey starts with a number and a slash, which is read as an invalid period. Delete the account and add it again.",
                           comment: "Error for a YubiKey account whose stored name starts with digits and a slash, e.g. 0/alice, written by another app")
+        case .otherYubiKey:
+            return String(localized: "This account is on another YubiKey. Connect the YubiKey it is on and try again.", comment: "Error when deleting or renaming an account after another YubiKey was connected")
+        case .yubiKeyNotReachable:
+            return String(localized: "The YubiKey couldn't be reached. Connect it again and try again.", comment: "Error when a YubiKey was unplugged before a change could be made")
         }
     }
 }
@@ -174,6 +182,8 @@ final class OATHSession: Sendable {
         }
         /// Nil for an account that isn't on a YubiKey.
         fileprivate let yubiKitCredential: YubiKitOATHSession.Credential?
+        /// The YubiKey the account was read from, as `OATHSession.deviceId`. Nil for an account that isn't on one.
+        let deviceId: String?
 
         /// Whether a code can be calculated with a period YubiKit read from an account's name. YubiKit divides by it.
         static func isUsable(period: TimeInterval) -> Bool {
@@ -194,9 +204,10 @@ final class OATHSession: Sendable {
             self.period = type == .totp ? period : 0
             self.requiresTouch = false
             self.yubiKitCredential = nil
+            self.deviceId = nil
         }
 
-        fileprivate init(yubiKitCredential: YubiKitOATHSession.Credential, requiresTouch: Bool? = nil) {
+        fileprivate init(yubiKitCredential: YubiKitOATHSession.Credential, deviceId: String, requiresTouch: Bool? = nil) {
             switch yubiKitCredential.type {
             case .totp(let period):
                 self.type = .totp
@@ -211,6 +222,7 @@ final class OATHSession: Sendable {
             self.accountName = yubiKitCredential.name
             self.requiresTouch = requiresTouch ?? yubiKitCredential.requiresTouch
             self.yubiKitCredential = yubiKitCredential
+            self.deviceId = deviceId
         }
     }
 
@@ -314,8 +326,11 @@ final class OATHSession: Sendable {
         return result
     }
 
+    /// The credential to change on this YubiKey. A credential read from another key is refused: the key connected
+    /// now may have an account of the same name, which a delete or rename confirmed for the other key would hit.
     private func yubiKitCredential(of credential: Credential) throws -> YubiKitOATHSession.Credential {
         guard let yubiKitCredential = credential.yubiKitCredential else { throw OATHSessionError.credentialNotFound }
+        guard credential.deviceId == deviceId else { throw OATHSessionError.otherYubiKey }
         return yubiKitCredential
     }
 
@@ -335,22 +350,22 @@ final class OATHSession: Sendable {
         guard let renamed = try await session.listCredentials().first(where: { $0.id == Data(key.utf8) }) else {
             throw OATHSessionError.credentialNotFound
         }
-        return Credential(yubiKitCredential: renamed, requiresTouch: credential.requiresTouch)
+        return Credential(yubiKitCredential: renamed, deviceId: deviceId, requiresTouch: credential.requiresTouch)
     }
 
     func list() async throws -> [Credential] {
-        try await session.listCredentials().map { Credential(yubiKitCredential: $0) }
+        try await session.listCredentials().map { Credential(yubiKitCredential: $0, deviceId: deviceId) }
     }
 
     /// Calculates the codes of every account that needs no touch. If an account's name on the YubiKey gives a period
     /// YubiKit can't calculate with (another app may have written "0/alice"), YubiKit would trap while calculating
     /// them all, so the accounts are only listed then, and each code is calculated when asked for.
     func calculateAll(timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> [(Credential, OTP?)] {
-        let listed = try await session.listCredentials().map { Credential(yubiKitCredential: $0) }
+        let listed = try await session.listCredentials().map { Credential(yubiKitCredential: $0, deviceId: deviceId) }
         guard listed.allSatisfy(\.hasUsablePeriod) else {
             return listed.map { ($0, nil) }
         }
-        return try await session.calculateCredentialCodes(timestamp: timestamp).map { (Credential(yubiKitCredential: $0), $1?.otp) }
+        return try await session.calculateCredentialCodes(timestamp: timestamp).map { (Credential(yubiKitCredential: $0, deviceId: deviceId), $1?.otp) }
     }
 
     func calculate(credential: Credential, timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> OTP {

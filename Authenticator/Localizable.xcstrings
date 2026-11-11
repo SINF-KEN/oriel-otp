@@ -2528,35 +2528,6 @@
         }
       }
     },
-    "Add to Ente Auth" : {
-      "comment" : "Main view menu item, and the add account title when adding to Ente Auth only",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu Ente Auth hinzufügen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter à Ente Auth"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ente Authに追加"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pridať do Ente Auth"
-          }
-        }
-      }
-    },
     "Add website" : {
       "comment" : "AutoFill websites button",
       "localizations" : {
@@ -3208,60 +3179,60 @@
         }
       }
     },
-    "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth." : {
+    "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there." : {
       "comment" : "App lock settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird abgefragt, wenn die App geöffnet wird oder aus dem Hintergrund zurückkehrt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Lösche die App, Deine Konten bleiben auf Deinem YubiKey und in Ente Auth."
+            "state" : "needs_review",
+            "value" : "Wird abgefragt, wenn die App geöffnet wird oder aus dem Hintergrund zurückkehrt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Der einzige Weg zurück ist, die App zu löschen, wodurch die unter „Dieses Gerät“ gespeicherten Konten gelöscht werden. Konten auf einem YubiKey oder in Ente Auth bleiben dort."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demandé à l’ouverture de l’app ou à son retour au premier plan. Un code ou un mot de passe oublié ne peut pas être récupéré : supprimez l’app, vos comptes restent sur votre YubiKey et dans Ente Auth."
+            "state" : "needs_review",
+            "value" : "Demandé à l’ouverture de l’app ou à son retour au premier plan. Un code ou un mot de passe oublié ne peut pas être récupéré : le seul moyen d’y revenir est de supprimer l’app, ce qui supprime les comptes enregistrés sur « Cet appareil ». Les comptes sur une YubiKey ou dans Ente Auth y restent."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリを開いたとき、またはバックグラウンドから戻ったときに求められます。忘れたコードやパスワードは復元できません。アプリを削除してください。アカウントはYubiKeyとEnte Authに残っています。"
+            "state" : "needs_review",
+            "value" : "アプリを開いたとき、またはバックグラウンドから戻ったときに求められます。忘れたコードやパスワードは復元できません。元に戻すにはアプリを削除するしかなく、「このデバイス」に保存したアカウントも削除されます。YubiKeyやEnte Authのアカウントはそのまま残ります。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžaduje sa pri otvorení aplikácie alebo pri návrate z pozadia. Zabudnutý kód alebo heslo sa nedá obnoviť: odstráňte aplikáciu, vaše účty zostanú na YubiKey a v Ente Auth."
+            "state" : "needs_review",
+            "value" : "Vyžaduje sa pri otvorení aplikácie alebo pri návrate z pozadia. Zabudnutý kód alebo heslo sa nedá obnoviť: jediná cesta späť je odstrániť aplikáciu, čím sa odstránia účty uložené v „Toto zariadenie“. Účty na YubiKey alebo v Ente Auth tam zostanú."
           }
         }
       }
     },
-    "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth." : {
+    "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there." : {
       "comment" : "Mac app lock settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird abgefragt, wenn die App geöffnet wird, der Bildschirm gesperrt wird oder der Mac in den Ruhezustand wechselt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Lösche die App, Deine Konten bleiben auf Deinem YubiKey und in Ente Auth."
+            "state" : "needs_review",
+            "value" : "Wird abgefragt, wenn die App geöffnet wird, der Bildschirm gesperrt wird oder der Mac in den Ruhezustand wechselt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Der einzige Weg zurück ist, die App zu löschen, wodurch die unter „Dieses Gerät“ gespeicherten Konten gelöscht werden. Konten auf einem YubiKey oder in Ente Auth bleiben dort."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demandé à l’ouverture de l’app, au verrouillage de l’écran ou à la mise en veille du Mac. Un code ou un mot de passe oublié ne peut pas être récupéré : supprimez l’app, vos comptes restent sur votre YubiKey et dans Ente Auth."
+            "state" : "needs_review",
+            "value" : "Demandé à l’ouverture de l’app, au verrouillage de l’écran ou à la mise en veille du Mac. Un code ou un mot de passe oublié ne peut pas être récupéré : le seul moyen d’y revenir est de supprimer l’app, ce qui supprime les comptes enregistrés sur « Cet appareil ». Les comptes sur une YubiKey ou dans Ente Auth y restent."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリを開いたとき、画面がロックされたとき、Macがスリープしたときに求められます。忘れたコードやパスワードは復元できません。アプリを削除してください。アカウントはYubiKeyとEnte Authに残っています。"
+            "state" : "needs_review",
+            "value" : "アプリを開いたとき、画面がロックされたとき、Macがスリープしたときに求められます。忘れたコードやパスワードは復元できません。元に戻すにはアプリを削除するしかなく、「このデバイス」に保存したアカウントも削除されます。YubiKeyやEnte Authのアカウントはそのまま残ります。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžaduje sa pri otvorení aplikácie, uzamknutí obrazovky alebo uspaní Macu. Zabudnutý kód alebo heslo sa nedá obnoviť: odstráňte aplikáciu, vaše účty zostanú na YubiKey a v Ente Auth."
+            "state" : "needs_review",
+            "value" : "Vyžaduje sa pri otvorení aplikácie, uzamknutí obrazovky alebo uspaní Macu. Zabudnutý kód alebo heslo sa nedá obnoviť: jediná cesta späť je odstrániť aplikáciu, čím sa odstránia účty uložené v „Toto zariadenie“. Účty na YubiKey alebo v Ente Auth tam zostanú."
           }
         }
       }
@@ -4666,35 +4637,6 @@
         }
       }
     },
-    "Copies the code of an account on your YubiKey to the clipboard. The YubiKey has to be plugged in." : {
-      "comment" : "Shortcuts action description",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopiert den Code eines Kontos auf Ihrem YubiKey in die Zwischenablage. Der YubiKey muss angeschlossen sein."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copie dans le presse-papiers le code d’un compte de votre YubiKey. La YubiKey doit être branchée."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey上のアカウントのコードをクリップボードにコピーします。YubiKeyを接続しておく必要があります。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skopíruje kód účtu z vášho YubiKey do schránky. YubiKey musí byť pripojený."
-          }
-        }
-      }
-    },
     "Copies the code of an account to the clipboard." : {
       "comment" : "Shortcuts action description",
       "localizations" : {
@@ -5333,7 +5275,6 @@
       }
     },
     "Data to String conversion error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5359,7 +5300,8 @@
             "value" : "Chyba prevodu údajov na reťazec"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Decryption failed" : {
       "comment" : "PIV extension decryption failed error message",
@@ -6964,7 +6906,6 @@
       }
     },
     "Failed to cast object to Data error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6990,7 +6931,8 @@
             "value" : "Chyba pri prevode objektu na údaje"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Failed to change app icon" : {
       "localizations" : {
@@ -7997,36 +7939,6 @@
         }
       }
     },
-    "Invalid URI format" : {
-      "comment" : "Invalid Uri, wrong parameters",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ungültiges URI-Format"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Format URI non valide"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無効なURIフォーマット"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neplatný formát URI"
-          }
-        }
-      }
-    },
     "Invalid decryption" : {
       "comment" : "PIV extension NFC invalid decryption",
       "localizations" : {
@@ -8144,7 +8056,6 @@
       }
     },
     "Item not found in secure storage" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8170,7 +8081,8 @@
             "value" : "Položka sa nenašla v zabezpečenom úložisku"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Key is password protected" : {
       "comment" : "OATH NFC password protected key",
@@ -10250,31 +10162,31 @@
         }
       }
     },
-    "Opens Oriel OTP to add an account to your YubiKey." : {
+    "Opens Oriel OTP to add an account." : {
       "comment" : "Shortcuts action description",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffnet Oriel OTP, um ein Konto zu Ihrem YubiKey hinzuzufügen."
+            "value" : "Öffnet Oriel OTP, um ein Konto hinzuzufügen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvre Oriel OTP pour ajouter un compte à votre YubiKey."
+            "value" : "Ouvre Oriel OTP pour ajouter un compte."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTPを開いてYubiKeyにアカウントを追加します。"
+            "value" : "Oriel OTPを開いてアカウントを追加します。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Otvorí Oriel OTP na pridanie účtu do vášho YubiKey."
+            "value" : "Otvorí Oriel OTP na pridanie účtu."
           }
         }
       }
@@ -11161,36 +11073,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pripojte YubiKey k Macu priamo alebo cez USB rozbočovač či adaptér.\n\nKeď sa zobrazí výzva, dotknite sa YubiKey."
-          }
-        }
-      }
-    },
-    "Plug-in your YubiKey for that operation" : {
-      "comment" : "No service found",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schließe Deinen YubiKey für diesen Vorgang an"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Branchez votre YubiKey pour cette opération"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "操作を実行するには YubiKey を接続してください"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapojte svoj YubiKey pre túto operáciu"
           }
         }
       }
@@ -13924,7 +13806,6 @@
     },
     "Something went wrong and key doesn't respond" : {
       "comment" : "No response",
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14243,7 +14124,6 @@
       }
     },
     "String to Data conversion error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14269,7 +14149,8 @@
             "value" : "Chyba prevodu reťazca na údaje"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Success" : {
       "comment" : "iOS NFC alert default success message",
@@ -15687,36 +15568,6 @@
         }
       }
     },
-    "The key doesn't respond" : {
-      "comment" : "Timeout issue",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Key antwortet nicht"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La clé ne répond pas"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "キーが応答しません"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kľúč nereaguje"
-          }
-        }
-      }
-    },
     "The key is busy performing another operation." : {
       "localizations" : {
         "de" : {
@@ -16382,36 +16233,6 @@
         }
       }
     },
-    "This QR code is not supported" : {
-      "comment" : "Invalid Uri format, not OATH URL",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser QR-Code wird nicht unterstützt"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code QR non pris en charge"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このQRコードはサポートされていません"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tento QR kód nie je podporovaný"
-          }
-        }
-      }
-    },
     "This server already has an account with this email. Sign in instead." : {
       "comment" : "Ente account creation error",
       "localizations" : {
@@ -16694,36 +16515,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tento preklad je výsledkom práce komunity. Opravu môžete navrhnúť [v issue na GitHube](https://github.com/SINF-KEN/oriel-otp/issues)."
-          }
-        }
-      }
-    },
-    "This version of iOS does not support operations with the YubiKey over NFC" : {
-      "comment" : "Not supported",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Version von iOS unterstützt keine Operationen mit dem YubiKey über NFC"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette version d'iOS ne prend pas en charge les opérations avec YubiKey via NFC"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このバージョンのiOSでは、NFCでのYubiKeyを使用した操作はサポートされていません"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Táto verzia iOS nepodporuje operácie s YubiKey cez NFC"
           }
         }
       }
@@ -17355,7 +17146,6 @@
       }
     },
     "Unhandled Error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17381,7 +17171,8 @@
             "value" : "Nespracovaná chyba"
           }
         }
-      }
+      },
+      "comment" : "Keychain error without a message"
     },
     "Unknown account" : {
       "comment" : "Ente import unreadable account",
@@ -18763,35 +18554,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "YubiKey"
-          }
-        }
-      }
-    },
-    "YubiKey Account" : {
-      "comment" : "Shortcuts type name",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey-Konto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compte YubiKey"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKeyアカウント"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Účet YubiKey"
           }
         }
       }

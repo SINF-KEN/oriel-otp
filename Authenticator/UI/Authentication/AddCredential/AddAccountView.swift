@@ -21,6 +21,8 @@ import Combine
 
 /// Where a new account is saved: on this device, on the YubiKey, in Ente Auth, or on the YubiKey and in Ente Auth.
 struct AccountDestinations: OptionSet, Hashable {
+    /// Where the last choice is kept in the app's preferences.
+    static let storageKey = "AddAccount.Destinations"
     let rawValue: Int
     static let yubiKey = AccountDestinations(rawValue: 1 << 0)
     /// The Ente Auth vault on this device, which uploads it to Ente.
@@ -72,7 +74,7 @@ struct AddAccountView: View {
     @State private var qrCodeError: QRCodeReader.ReadError?
     #endif
     /// The last choice of where to save, the default when both can be chosen.
-    @AppStorage("AddAccount.Destinations") private var lastDestinations = AccountDestinations.device.rawValue
+    @AppStorage(AccountDestinations.storageKey) private var lastDestinations = AccountDestinations.device.rawValue
     @State private var chosenDestinations: AccountDestinations
     // Adding to Ente Auth goes through the vault of the saved account, so it is only offered when there is one.
     private let enteEmail = EnteCloud.shared.email
@@ -86,10 +88,10 @@ struct AddAccountView: View {
         let defaults = UserDefaults.standard
         // Before the choice, a switch added accounts to Ente Auth as well as the YubiKey.
         if defaults.bool(forKey: "EnteAuth.AddNewAccounts") {
-            defaults.set(AccountDestinations.both.rawValue, forKey: "AddAccount.Destinations")
+            defaults.set(AccountDestinations.both.rawValue, forKey: AccountDestinations.storageKey)
             defaults.removeObject(forKey: "EnteAuth.AddNewAccounts")
         }
-        let last = AccountDestinations(rawValue: defaults.object(forKey: "AddAccount.Destinations") as? Int ?? AccountDestinations.device.rawValue)
+        let last = AccountDestinations(rawValue: defaults.object(forKey: AccountDestinations.storageKey) as? Int ?? AccountDestinations.device.rawValue)
         _chosenDestinations = State(initialValue: last.isEmpty || !destinations.isSuperset(of: last) ? .device : last)
         let template = oathURL.flatMap { try? YubiKitOATHSession.CredentialTemplate(otpauthURL: $0) }
         _template = State(initialValue: template)

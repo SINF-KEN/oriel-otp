@@ -23,18 +23,21 @@ still push or merge past it.
 A newer push to a pull request cancels its run in progress; runs for `main` and tags always finish. Release builds are
 tagged, so the workflow tests the tag push and doesn't also run for the `release` event.
 
-- **`changes`** lists a pull request's files. If they're all documentation (`docs/`, top-level `*.md`, `LICENSE`,
-  `NOTICE`) or `.github/dependabot.yml`, the macOS jobs are skipped. Pushes always build.
+- **`changes`** lists a pull request's files, a renamed file by its old path too. If they're all documentation
+  (`docs/`, top-level `*.md`, `LICENSE`, `NOTICE`) or `.github/dependabot.yml`, the macOS jobs are skipped. Pushes
+  always build.
 - **`dependency-review`** runs on pull requests and fails on a vulnerability of moderate severity or higher in a
   changed dependency.
 - **`test`** (iOS):
   1. Lints a few files with `swift-format --strict`. The older files don't follow the configuration, so the lint is
      limited to the files listed in the workflow rather than reformatting the whole repository.
-  2. Validates the project file, plists, entitlements, privacy manifests and schemes, checks that every
-     `Package.resolved` pin has a 40-character revision, and that the 10 targets' configurations keep complete strict
+  2. Checks that the project file, plists, entitlements, the four privacy manifests and the schemes are well formed
+     (`plutil -lint` and `xmllint`, not what the manifests declare), that every `Package.resolved` pin has a
+     40-character revision, and that the 12 build configurations (6 targets, Debug and Release) keep complete strict
      concurrency checking and warnings as errors.
   3. Checks the translations' format specifiers with `tools/check-format-specifiers.py`: every translation, plural
-     form and substitution must read its key's arguments with the same types, and no others.
+     form and substitution must read its key's arguments with the same types, and no others. `%n`, a `*` width or
+     precision, a `%` that isn't a known specifier, and positional specifiers mixed with plain ones are refused.
   4. Picks the `iPhone 17` simulator with the newest iOS runtime and resolves the Swift packages (below).
   5. Builds the app, its extensions, the embedded watch app and the tests with `xcodebuild build-for-testing`, with
      code coverage, while the simulator is still shut down.
@@ -91,6 +94,9 @@ with automatic resolution and updates turned off, for every workflow that builds
   - Each checkout's files are hashed into a Git tree and compared with the tree of the pinned commit. Only that
     commit object is fetched from the package's repository (`git fetch --depth=1 --filter=tree:0`), and Git checks
     that it hashes to the pinned revision. Any changed, added or removed file fails the step.
+  - For a pin with a version, the package repository's tag for that version must point at the pinned revision
+    (`git ls-remote`). Without this, the checks above only prove the files are those of the pinned commit, not that
+    the commit is the release it is named after.
   - swift-sodium ships libsodium prebuilt, as `Clibsodium.xcframework` in its repository. Its SHA-256 (of the
     `shasum -a 256` list of its files, sorted by path) is recorded in the action as `CLIBSODIUM_SHA256`, so a
     swift-sodium update fails until the new binary has been looked at and the value updated.

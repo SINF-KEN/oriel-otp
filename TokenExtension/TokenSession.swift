@@ -239,7 +239,13 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             userDefaults.removeObject(forKey: "signedData")
             userDefaults.removeObject(forKey: "decryptedData")
         }
-        try? tokenResponseStore?.removeAll()
+        do {
+            try tokenResponseStore?.removeAll()
+        } catch {
+            Logger.ctk.error("Couldn't remove the token responses: \(error.localizedDescription, privacy: .public)")
+            // Tried again once, e.g. a file still open; the app removes what's left the next time it answers.
+            try? tokenResponseStore?.removeAll()
+        }
     }
 
     // The app writes signed and decrypted data to files with complete file protection in the

@@ -73,6 +73,9 @@ import YubiKit
     /// The vault file couldn't be read because the device was locked, or the accounts only it has couldn't be kept on
     /// the device before discarding it. Nothing is written over the file until it is read again.
     @ObservationIgnored private var isVaultLocked = false
+    /// The vault file can't be read at all, e.g. it was written by a later version of the app. It is set aside before
+    /// the first save rather than written over: it may hold accounts that were never uploaded.
+    @ObservationIgnored private var isVaultUnreadable = false
 
     init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
          watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil, device: DeviceAccounts? = nil) {
@@ -96,13 +99,22 @@ import YubiKit
         let vault: EnteVault?
         do {
             vault = try storage.load()
-        } catch EnteVaultError.unavailable {
+        } catch EnteVaultError.unreadable {
+            // Its key is gone or it can't be decoded, which reading it again won't change. The first sync fills a
+            // new vault, and the file is kept next to it.
+            vault = nil
+            isVaultUnreadable = true
+            if saved != nil {
+                error = EnteVaultError.unreadable
+            }
+        } catch {
+            // The device is locked, or the keychain failed for now. Taking that for "no vault" would write an empty
+            // one over the file.
             isVaultLocked = true
             return
-        } catch {
-            vault = nil
         }
         isVaultLocked = false
+        recoverSetAsideVaults()
         if let vault, saved.map({ vault.belongs(email: $0.email, server: $0.server) }) != true {
             // Signed out while the vault was kept, or the vault of another account. It is discarded once the accounts
             // only it has are on the device.
@@ -111,7 +123,7 @@ import YubiKit
                 return
             }
             if saved == nil {
-                storage.remove()
+                removeFile()
             }
         }
         if let saved {
@@ -122,6 +134,32 @@ import YubiKit
                 self.vault = EnteVault(email: saved.email, server: saved.server)
             }
         }
+    }
+
+    /// Puts the accounts that never reached Ente from vault files set aside earlier on this device, once those files
+    /// can be read, e.g. after the app that wrote them is installed again. Their other accounts are on Ente's server.
+    private func recoverSetAsideVaults() {
+        storage.recoverSetAside { vault in
+            guard keepAccountsNeverUploaded(of: vault) else { throw EnteVaultError.unavailable }
+        }
+    }
+
+    /// Saves the vault, moving a file that couldn't be read out of the way first.
+    private func save(_ vault: EnteVault) throws {
+        if isVaultUnreadable {
+            try storage.setAside()
+            isVaultUnreadable = false
+        }
+        try storage.save(vault)
+    }
+
+    /// Deletes the vault file, except one that couldn't be read, which is set aside.
+    private func removeFile() {
+        if isVaultUnreadable {
+            guard (try? storage.setAside()) != nil else { return }
+            isVaultUnreadable = false
+        }
+        storage.remove()
     }
 
     /// Reads the vault if it couldn't be read before because the device was locked.
@@ -199,7 +237,7 @@ import YubiKit
         session = nil
         guard vault != nil else {
             if !isVaultLocked {
-                storage.remove()
+                removeFile()
             }
             autoFill?.remove()
             return
@@ -218,9 +256,9 @@ import YubiKit
         }
         self.vault = vault
         if let vault {
-            try? storage.save(vault)
+            try? save(vault)
         } else {
-            storage.remove()
+            removeFile()
         }
         changed()
     }
@@ -378,7 +416,7 @@ import YubiKit
         let before = vault
         change(&vault)
         guard vault != before else { return }
-        try storage.save(vault)
+        try save(vault)
         self.vault = vault
         changed()
     }
@@ -449,10 +487,9 @@ import YubiKit
         try edit(id) { $0.rename(issuer: issuer, accountName: accountName) }
     }
 
-    /// A pin that can't be saved is simply gone at the next launch, so it isn't reported.
-    func setPinned(_ id: String, _ isPinned: Bool) {
+    func setPinned(_ id: String, _ isPinned: Bool) throws {
         guard let code = code(of: id), code.isPinned != isPinned else { return }
-        try? edit(id) { $0.isPinned = isPinned }
+        try edit(id) { $0.isPinned = isPinned }
     }
 
     /// Files the account under the tags, which Ente Auth shows too.

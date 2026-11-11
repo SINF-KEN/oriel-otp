@@ -52,7 +52,7 @@ struct EnteSRPClientTests {
     @Test func rejectsInvalidServerValues() {
         let client = EnteSRPClient(identity: identity, password: loginKey, salt: salt, privateKey: privateKey)
         #expect(throws: EnteSRPError.invalidServerValue) { try client.proofs(serverPublicKey: Data(count: 512)) }
-        #expect(throws: EnteSRPError.invalidServerValue) { try client.proofs(serverPublicKey: EnteSRPClient.primeBytes) }
+        #expect(throws: EnteSRPError.invalidServerValue) { try client.proofs(serverPublicKey: EnteSRPClient.N.serialize()) }
         #expect(throws: EnteSRPError.invalidServerValue) { try client.proofs(serverPublicKey: Data(count: 513)) }
     }
 

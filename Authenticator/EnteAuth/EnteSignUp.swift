@@ -66,19 +66,20 @@ enum EnteSignUp {
     @concurrent nonisolated static func generateKeys(password: String) async throws -> EnteNewAccountKeys {
         var masterKey = EnteCrypto.randomBytes(EnteCrypto.keyLength)
         var recoveryKey = EnteCrypto.randomBytes(EnteCrypto.keyLength)
-        var keyEncryptionKey: Data
-        let kekSalt: Data, opsLimit: UInt64, memLimit: UInt64
-        (keyEncryptionKey, kekSalt, opsLimit, memLimit) = try EnteCrypto.deriveNewKeyEncryptionKey(password: password)
-        let publicKey: Data
-        var secretKey: Data
-        (publicKey, secretKey) = try EnteCrypto.generateKeyPair()
-        // Only the encrypted keys leave this function, and the login key, which SRP needs.
+        var keyEncryptionKey = Data()
+        var secretKey = Data()
+        // Only the encrypted keys leave this function, and the login key, which SRP needs. Set up before anything
+        // can throw, so the keys made so far are wiped then too.
         defer {
             masterKey.wipe()
             recoveryKey.wipe()
             keyEncryptionKey.wipe()
             secretKey.wipe()
         }
+        let kekSalt: Data, opsLimit: UInt64, memLimit: UInt64
+        (keyEncryptionKey, kekSalt, opsLimit, memLimit) = try EnteCrypto.deriveNewKeyEncryptionKey(password: password)
+        let publicKey: Data
+        (publicKey, secretKey) = try EnteCrypto.generateKeyPair()
 
         let encryptedKey = try EnteCrypto.secretBox(masterKey, key: keyEncryptionKey)
         let encryptedSecretKey = try EnteCrypto.secretBox(secretKey, key: masterKey)
@@ -109,13 +110,40 @@ enum EnteSignUp {
             loginKey: loginKey)
     }
 
-    /// Sets up SRP, so the password never has to leave the device, and checks the server's proof.
+    /// The server refused to start setting up SRP, which it does when SRP is set up already.
+    struct SRPAlreadySetUp: Error {}
+
+    /// Sets up SRP, so the password never has to leave the device, and checks the server's proof. Throws
+    /// `SRPAlreadySetUp` if the server refuses the first of the two requests; an error from the second one, which
+    /// brings the proof, is never taken for that.
     static func setUpSRP(_ keys: EnteNewAccountKeys, api: EnteAPIClient, token: String) async throws {
         let client = EnteSRPClient(identity: keys.srpUserID, password: keys.loginKey, salt: keys.srpSalt)
-        let setup = try await api.setUpSRP(token: token, srpUserID: keys.srpUserID, srpSalt: keys.srpSalt,
+        let setup: (setupID: String, srpB: Data)
+        do {
+            setup = try await api.setUpSRP(token: token, srpUserID: keys.srpUserID, srpSalt: keys.srpSalt,
                                            srpVerifier: keys.srpVerifier, srpA: client.publicKey)
+        } catch EnteAPIError.http(statusCode: 400) {
+            throw SRPAlreadySetUp()
+        }
         let proofs = try client.proofs(serverPublicKey: setup.srpB)
         let srpM2 = try await api.completeSRPSetup(token: token, setupID: setup.setupID, srpM1: proofs.clientProof)
+        try EnteSRPClient.verify(serverProof: srpM2, expected: proofs.expectedServerProof)
+    }
+
+    /// Signs in with SRP, like a new device would, and checks the server's proof. For when SRP was set up by an
+    /// attempt whose answer was lost, so its proof was never checked: the server only passes this with the verifier
+    /// made here. The session this starts isn't used: its token comes encrypted and is dropped.
+    static func verifySRPSignIn(_ keys: EnteNewAccountKeys, api: EnteAPIClient) async throws {
+        let client = EnteSRPClient(identity: keys.srpUserID, password: keys.loginKey, salt: keys.srpSalt)
+        let session = try await api.createSRPSession(srpUserID: keys.srpUserID, srpA: client.publicKey)
+        let proofs = try client.proofs(serverPublicKey: session.srpB)
+        let response: EnteAuthResponse
+        do {
+            response = try await api.verifySRPSession(sessionID: session.sessionID, srpUserID: keys.srpUserID, srpM1: proofs.clientProof)
+        } catch EnteAPIError.http(statusCode: 401) {
+            throw EnteSignUpError.notVerified
+        }
+        guard let srpM2 = response.srpM2.flatMap({ Data(enteBase64: $0) }) else { throw EnteSRPError.serverProofMismatch }
         try EnteSRPClient.verify(serverProof: srpM2, expected: proofs.expectedServerProof)
     }
 }

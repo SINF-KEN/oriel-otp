@@ -53,6 +53,13 @@ class PasswordPreferences {
     // Prefix of the UserDefaults keys, kept from when it was defined on UIViewController so saved preferences still load.
     nonisolated static let PasswordUserDefaultsKey = "PasswordSaveType"
 
+    /// The app's preferences, or a suite of their own in tests.
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+    }
+
     /* This method returns what biometric authentiacation type set on user's device.
     canEvaluatePolicy should be called before getting the biometryType.
     */
@@ -94,39 +101,39 @@ class PasswordPreferences {
     }
     
     func migrate(fromKeyIdentifier: String, toKeyIdentifier: String) {
-        if UserDefaults.standard.value(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier) != nil {
-            let value = UserDefaults.standard.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier)
-            UserDefaults.standard.set(value, forKey: PasswordPreferences.PasswordUserDefaultsKey + toKeyIdentifier)
-            UserDefaults.standard.removeObject(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier)
+        if defaults.value(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier) != nil {
+            let value = defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier)
+            defaults.set(value, forKey: PasswordPreferences.PasswordUserDefaultsKey + toKeyIdentifier)
+            defaults.removeObject(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier)
         }
     }
     
     func neverSavePassword(keyIdentifier: String) -> Bool {
-        return UserDefaults.standard.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier) == PasswordSaveType.never.rawValue
+        return defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier) == PasswordSaveType.never.rawValue
     }
 
     func useSavedPassword(keyIdentifier: String) -> Bool {
-        let savedPreference = UserDefaults.standard.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
+        let savedPreference = defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
         return savedPreference == PasswordSaveType.save.rawValue
     }
     
     func useScreenLock(keyIdentifier: String) -> Bool {
-        let savedPreference = UserDefaults.standard.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
+        let savedPreference = defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
         return savedPreference == PasswordSaveType.lock.rawValue
     }
     
     func setPasswordPreference(saveType: PasswordSaveType, keyIdentifier: String) {
-        UserDefaults.standard.set(saveType.rawValue, forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
+        defaults.set(saveType.rawValue, forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
     }
     
     func resetPasswordPreference(keyIdentifier: String) {
-        UserDefaults.standard.set(PasswordSaveType.none.rawValue, forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
+        defaults.set(PasswordSaveType.none.rawValue, forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
     }
     
     func resetPasswordPreferenceForAll() {
-        for key in UserDefaults.standard.dictionaryRepresentation().keys {
+        for key in defaults.dictionaryRepresentation().keys {
             if key.starts(with: PasswordPreferences.PasswordUserDefaultsKey) {
-                UserDefaults.standard.removeObject(forKey: key)
+                defaults.removeObject(forKey: key)
             }
         }
     }

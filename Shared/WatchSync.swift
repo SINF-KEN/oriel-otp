@@ -137,6 +137,7 @@ final class WatchAccountReceiver {
     }
 
     private static let pendingClearKey = "Watch.PendingAccountDeletion"
+    private static let pendingKeyClearKey = "Watch.PendingKeyDeletion"
 
     private(set) var accounts: [OTPAccount]
 
@@ -165,6 +166,13 @@ final class WatchAccountReceiver {
         } else {
             load()
         }
+        if isKeyClearPending, keyItem.write(nil) { isKeyClearPending = false }
+    }
+
+    /// The key the iPhone said to delete is still in the keychain, deleting it failed.
+    private(set) var isKeyClearPending: Bool {
+        get { defaults.bool(forKey: Self.pendingKeyClearKey) }
+        set { newValue ? defaults.set(true, forKey: Self.pendingKeyClearKey) : defaults.removeObject(forKey: Self.pendingKeyClearKey) }
     }
 
     /// The accounts the iPhone said to delete are still in the keychain, deleting them failed.
@@ -175,14 +183,15 @@ final class WatchAccountReceiver {
 
     /// Whether everything received was saved.
     var isSaved: Bool {
-        !isClearPending && unsavedAccounts == nil && unsavedKey == nil
+        !isClearPending && !isKeyClearPending && unsavedAccounts == nil && unsavedKey == nil
     }
 
     func apply(_ context: [String: Any]) -> Outcome {
         let key: WatchSyncKey?
         switch keyItem.read() {
         case .found(let data):
-            key = unsavedKey ?? WatchSyncKey(data: data)
+            // A key that is to be deleted isn't used any more.
+            key = unsavedKey ?? (isKeyClearPending ? nil : WatchSyncKey(data: data))
         case .notFound:
             key = unsavedKey
         case .unavailable:
@@ -208,13 +217,17 @@ final class WatchAccountReceiver {
     /// Keeps a key from the iPhone and applies the context with it.
     func receive(_ key: WatchSyncKey, context: [String: Any]) -> Outcome {
         unsavedKey = keyItem.write(key.data) ? nil : key
+        // The new key replaces the one that was to be deleted, or is saved over it by `retry()`.
+        isKeyClearPending = false
         return apply(context)
     }
 
     /// Saves what couldn't be saved or deleted earlier, e.g. while the watch was locked.
     func retry() {
-        if let unsavedKey, keyItem.write(unsavedKey.data) {
-            self.unsavedKey = nil
+        if let unsavedKey {
+            if keyItem.write(unsavedKey.data) { self.unsavedKey = nil }
+        } else if isKeyClearPending, keyItem.write(nil) {
+            isKeyClearPending = false
         }
         if let unsavedAccounts {
             replace(with: unsavedAccounts)
@@ -229,7 +242,8 @@ final class WatchAccountReceiver {
         replace(with: [])
         // The iPhone uses a new key from now on, the old one isn't needed.
         unsavedKey = nil
-        keyItem.write(nil)
+        // Refused while the watch is locked: deleted by `retry()`, like the accounts.
+        isKeyClearPending = !keyItem.write(nil)
         return .applied
     }
 

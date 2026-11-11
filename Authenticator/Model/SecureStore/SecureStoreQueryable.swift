@@ -56,11 +56,14 @@ nonisolated public struct PasswordQueryable {
     let accessGroup: String?
     /// Who may read a protected item: by default only the currently enrolled Face ID or Touch ID.
     let accessControl: SecAccessControlCreateFlags
+    /// What the Touch ID or password prompt says it is for. Nil for the saved YubiKey password.
+    let reason: String?
 
-    init(service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet) {
+    init(service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet, reason: String? = nil) {
         self.service = service
         self.accessGroup = accessGroup
         self.accessControl = accessControl
+        self.reason = reason
     }
 }
 
@@ -82,10 +85,10 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
 
         if useAuthentication {
             let context = LAContext()
-            // Number of seconds to wait between a device unlock with biometric and another biometric authentication request.
-            // So, if the user opens our app within 10 seconds of unlocking the device, we not prompting the user for FaceID/TouchID again.
-            context.touchIDAuthenticationAllowableReuseDuration = 10
-            context.localizedReason = "Unlock YubiKey."
+            // A protected item is only read after Face ID or Touch ID, as PRIVACY.md says: unlocking the device a
+            // few seconds earlier doesn't count.
+            context.touchIDAuthenticationAllowableReuseDuration = 0
+            context.localizedReason = reason ?? String(localized: "Use the saved YubiKey password.", comment: "Face ID or Touch ID prompt for the saved OATH password of a YubiKey")
             query[String(kSecUseAuthenticationContext)] = context
         }
 #endif

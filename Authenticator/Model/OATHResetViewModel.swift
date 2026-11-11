@@ -46,6 +46,8 @@ import YubiKit
     }
 
     func reset() {
+        // Every error compares equal, so the view only sees a second one after the state went back to ready.
+        state = .ready
         Task {
             do {
                 let connection = try await ConnectionManager.shared.anyConnection()

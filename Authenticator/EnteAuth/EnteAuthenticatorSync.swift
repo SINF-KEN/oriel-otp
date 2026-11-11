@@ -151,6 +151,8 @@ enum EnteAuthenticatorSyncError: Error, LocalizedError {
 nonisolated enum EnteAuthenticatorSync {
 
     static let pageSize = 500
+    /// The largest page asked for, when the server fills a whole page with entities changed at one time.
+    static let maxPageSize = 8_000
     /// The most diff requests one sync makes: 500,000 entities at full pages, far more than anyone keeps.
     static let maxPages = 1_000
     /// How far past the device's clock, in microseconds, an entity's `updatedAt` may be: a year, for a device whose
@@ -239,9 +241,17 @@ nonisolated enum EnteAuthenticatorSync {
     /// Ente's server returns the entities changed after `sinceTime`, oldest first, up to `limit`, and a self-hosted
     /// server may return fewer than asked for. So paging only stops on an empty page. Entities changed at the same
     /// time can straddle two pages, so after a page with something new it asks again from just before the page's
-    /// latest time and drops the versions it already has. Each request either moves `sinceTime` forward or brings
-    /// something new. A server can still keep bringing new entities, so paging stops with an error after
-    /// `maxPages` requests.
+    /// latest time and drops the versions it already has. Each request either moves `sinceTime` forward, brings
+    /// something new or asks for a larger page. A server can still keep bringing new entities, so paging stops with
+    /// an error after `maxPages` requests.
+    ///
+    /// When the server fills the page it was asked for with entities changed at one time, all seen before, there may
+    /// be more of them than fit the page, which no `sinceTime` can reach. It then asks for the same again with a
+    /// larger page, up to `maxPageSize`, and fails beyond that. A server that returns fewer entities than asked for
+    /// and has more of them at one time than it returns gives no sign of it when nothing changed later: those are
+    /// left out, as this API has no way to ask for them.
+    ///
+    /// An entity with an `updatedAt` of 0 or less could never be asked for again, so such an answer is refused.
     static func changes(api: EnteAPIClient, token: String, since sinceTime: Int64) async throws -> (entities: [EnteAuthenticatorEntity], latest: Int64) {
         var latest = [String: EnteAuthenticatorEntity]()
         var sinceTime = sinceTime
@@ -257,16 +267,18 @@ nonisolated enum EnteAuthenticatorSync {
             sinceTime = 0
         }
         var pages = 0
+        var limit = pageSize
         while true {
             try Task.checkCancellation()
             pages += 1
             guard pages <= maxPages else { throw EnteAPIError.invalidResponse }
-            let response = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: pageSize) }
-            guard response.allSatisfy({ isPlausible(updatedAt: $0.updatedAt) }) else { throw EnteAPIError.invalidResponse }
+            let response = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: limit) }
+            guard response.allSatisfy({ $0.updatedAt > 0 && isPlausible(updatedAt: $0.updatedAt) }) else { throw EnteAPIError.invalidResponse }
             // Ignores anything at or before `sinceTime`, so every page that is kept moves forward.
             let page = response.filter { $0.updatedAt > sinceTime }
             guard let maxUpdatedAt = page.map(\.updatedAt).max() else { break }
-            // Stops rather than leave out entities it can't get.
+            // Entities changed at the time of a full page may be missing, and asking again can't get them: stops
+            // with an error rather than go on without them.
             if fullPageAtOneTime { throw EnteAPIError.invalidResponse }
             largestPage = max(largestPage, page.count)
             var foundNew = false
@@ -279,8 +291,16 @@ nonisolated enum EnteAuthenticatorSync {
                 sinceTime = maxUpdatedAt - 1
                 fullPageAtOneTime = false
             } else {
-                if page.allSatisfy({ $0.updatedAt == maxUpdatedAt }) && page.count == largestPage {
-                    fullPageAtOneTime = true
+                if page.allSatisfy({ $0.updatedAt == maxUpdatedAt }) {
+                    if response.count >= limit {
+                        // As many as asked for, so there may be more changed at that time: asks again for more.
+                        guard limit < maxPageSize else { throw EnteAPIError.invalidResponse }
+                        limit = min(limit * 4, maxPageSize)
+                        continue
+                    }
+                    if page.count == largestPage {
+                        fullPageAtOneTime = true
+                    }
                 }
                 sinceTime = maxUpdatedAt
             }

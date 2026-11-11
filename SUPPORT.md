@@ -59,10 +59,12 @@ already on the key, set up two-factor authentication again in the service's sett
 way works at any time: **Copy to YubiKey** or **Move to YubiKey** on an Ente Auth account.
 
 **I forgot my app lock code or password.**
-It can't be recovered or reset. Delete the app and install it again, then confirm with Face ID, Touch ID or your
-device passcode, which removes the lock. The accounts are on your YubiKey and in Ente Auth, not only in the app: sign
-in to Ente Auth again to get those back. After too many wrong attempts the app makes you wait before the next one, up
-to an hour. Restarting the device starts the wait over.
+It can't be recovered or reset. The only way back in is to delete the app and install it again, then confirm with
+Face ID, Touch ID or your device passcode, which removes the lock. **Deleting the app deletes the accounts saved to
+This device**, which have no other copy. Accounts on a YubiKey or in Ente Auth stay there: sign in to Ente Auth again
+to get those back. Before deleting the app, wait out the delay and try the codes or passwords you may have used:
+after too many wrong attempts the app makes you wait before the next one, doubling up to 24 hours, and restarting
+the device starts the wait over. If you get back in, move the accounts on this device to Ente Auth or a YubiKey.
 
 **Another app can't use the certificate on my YubiKey.**
 Under **Configuration > Smart card extension**, add the certificate to the device and allow notifications. When an

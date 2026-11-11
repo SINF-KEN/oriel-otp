@@ -30,6 +30,7 @@ nonisolated final class InMemoryVaultStorage: EnteVaultStorage, @unchecked Senda
     func load() throws -> EnteVault? { lock.withLock { vault } }
     func save(_ vault: EnteVault) throws { lock.withLock { self.vault = vault } }
     func remove() { lock.withLock { vault = nil } }
+    func setAside() throws { lock.withLock { vault = nil } }
 }
 
 /// A vault file that can't be read until the device is unlocked.
@@ -45,6 +46,7 @@ nonisolated final class LockedVaultStorage: EnteVaultStorage, @unchecked Sendabl
     }
     func save(_ vault: EnteVault) throws { try storage.save(vault) }
     func remove() { storage.remove() }
+    func setAside() throws { try storage.setAside() }
 }
 
 /// Stands in for the keychain item with the vault file's key.
@@ -416,7 +418,7 @@ struct EnteVaultTests {
         // Not in Ente Auth's own format, so any edit would rewrite it.
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"])
         let id = try #require(cloud.accounts.first).id
-        cloud.setPinned(id, false)
+        try cloud.setPinned(id, false)
         try cloud.rename(id, issuer: "GitHub", accountName: "alice")
         #expect(!cloud.hasPendingChanges)
     }
@@ -520,8 +522,12 @@ struct EnteCloudSyncTests {
             try await api.updateAuthenticatorEntity(token: token, id: id, encryptedData: encrypted.encryptedData, header: encrypted.header)
         }
 
+        /// Deletes an entity for good, like another device emptying Ente's trash. Only the tests do this: the app
+        /// moves accounts to the trash instead, so the API client has no hard delete.
         func delete(_ id: String) async throws {
-            try await api.deleteAuthenticatorEntity(token: token, id: id)
+            let request = try api.request("DELETE", "/authenticator/entity", token: token, query: ["id": id])
+            let (_, response) = try await api.session.data(for: request)
+            #expect((response as? HTTPURLResponse)?.statusCode == 200)
         }
 
         /// The plain text of each entity that isn't deleted, by id.
@@ -618,7 +624,7 @@ struct EnteCloudSyncTests {
         let offline = cloud(session: OfflineURLProtocol.session)
         #expect(offline.accounts.count == 1)
         #expect(try offline.add(template("GitLab")) == .added)
-        offline.setPinned(try id(of: "GitHub", in: offline), true)
+        try offline.setPinned(try id(of: "GitHub", in: offline), true)
         await offline.sync(reportsErrors: false)
         #expect(offline.hasPendingChanges)
         #expect(offline.error == nil)
@@ -660,7 +666,7 @@ struct EnteCloudSyncTests {
         await cloud().sync()
 
         let offline = cloud(session: OfflineURLProtocol.session)
-        offline.setPinned(try self.id(of: "GitHub", in: offline), true)
+        try offline.setPinned(try self.id(of: "GitHub", in: offline), true)
         try await other.delete(id)
 
         let online = cloud()

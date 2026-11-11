@@ -216,7 +216,12 @@ import YubiKit
         let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .ente(id: id))
         account.isPendingSync = isPending
         account.onPinnedChange = { [weak self] account in
-            self?.cloud.setPinned(id, account.isPinned)
+            do {
+                try self?.cloud.setPinned(id, account.isPinned)
+            } catch {
+                // Otherwise the pin would look saved, and be gone at the next launch.
+                self?.sessionError = error
+            }
         }
         return account
     }
@@ -308,7 +313,12 @@ import YubiKit
         let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
         let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .device(id: id))
         account.onPinnedChange = { [weak self] account in
-            self?.device.setPinned(id, account.isPinned)
+            do {
+                try self?.device.setPinned(id, account.isPinned)
+            } catch {
+                // Otherwise the pin would look saved, and be gone at the next launch.
+                self?.sessionError = error
+            }
         }
         return account
     }
@@ -380,34 +390,36 @@ import YubiKit
             if !account.tags.isEmpty {
                 let id = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
                                               period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
-                try? self?.saveKeyTags(account.tags, for: id)
+                do {
+                    try self?.saveKeyTags(account.tags, for: id)
+                } catch {
+                    // The account is on the key; only its tags are missing, which the user is told.
+                    self?.sessionError = error
+                }
                 self?.keyAccounts.first { $0.credential.id == id }?.tags = account.tags
                 self?.sortAccounts()
             }
             if moving {
-                self?.removeAfterMove(account)
-                completion(.moved)
+                // If the source can't be removed, the account is on both: "copied", with the error.
+                completion(self?.removeAfterMove(account) == true ? .moved : .copied)
             } else {
                 completion(.copied)
             }
         }
     }
     
-    private func removeAfterMove(_ account: Account) {
-        switch account.location {
-        case .yubiKey: break
-        case .ente(let id):
-            do {
-                try cloud.delete(id)
-            } catch {
-                sessionError = error
+    /// Removes the account from where it was moved from. Returns false, and shows the error, if it couldn't be.
+    private func removeAfterMove(_ account: Account) -> Bool {
+        do {
+            switch account.location {
+            case .yubiKey: break
+            case .ente(let id): try cloud.delete(id)
+            case .device(let id): try device.delete(id)
             }
-        case .device(let id):
-            do {
-                try device.delete(id)
-            } catch {
-                sessionError = error
-            }
+            return true
+        } catch {
+            sessionError = error
+            return false
         }
     }
 
@@ -749,7 +761,12 @@ import YubiKit
                 let credential = try await session.renameCredential(account.credential, issuer: issuer, accountName: accountName)
                 // The tags are kept by the account's id, which the new name changes.
                 if !account.tags.isEmpty {
-                    try? saveKeyTags(account.tags, for: credential.id, movingFrom: oldId)
+                    do {
+                        try saveKeyTags(account.tags, for: credential.id, movingFrom: oldId)
+                    } catch {
+                        // Renamed on the key; only the tags didn't follow, which the user is told.
+                        sessionError = error
+                    }
                 }
                 if wasPinned {
                     account.isPinned = false
@@ -793,7 +810,12 @@ import YubiKit
                 try await session.deleteCredential(account.credential)
                 keyAccounts.removeAll { $0.accountId == account.accountId }
                 if !account.tags.isEmpty {
-                    try? saveKeyTags([], for: account.credential.id)
+                    do {
+                        try saveKeyTags([], for: account.credential.id)
+                    } catch {
+                        // Left behind, they'd come back on an account added later with the same name.
+                        sessionError = error
+                    }
                 }
                 session.endNFC(message: String(localized: "Account deleted", comment: "OATH NFC account deleted"))
                 completion()

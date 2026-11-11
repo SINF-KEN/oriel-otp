@@ -150,11 +150,16 @@ where there are many of a kind:
 
 | Screen | Identifiers |
 | --- | --- |
-| Account list | `accounts.add-account`, `accounts.scan-nfc`, `accounts.refresh` (Mac), `accounts.sync-from-ente` (the button in the empty list) |
+| Account list | `accounts.add-account`, `accounts.empty-add-account`, `accounts.scan-nfc`, `accounts.refresh` (Mac), `accounts.sync-from-ente` (the button in the empty list), `accounts.search`, `accounts.tag-filter`, `accounts.about`, `accounts.configuration` |
 | A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth; its code, without VoiceOver: `account-row.<account id>.copy` |
-| Account details | `account-details.code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete` |
+| Account details | `account-details.code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete`, `account-details.tags`, `account-details.tag-list`, `account-details.autofill-websites`, `account-details.toolbar-autofill-websites` |
+| Tags | `tags.new-tag` |
 | Add account | `add-account.issuer`, `add-account.account-name`, `add-account.secret`, `add-account.save`, `add-account.enter-manually` |
-| Ente sync | `ente.email`, `ente.password`, `ente.sign-in`, `ente.server`, `ente.stay-signed-in`, `ente.add` |
+| Ente sync | `ente.email`, `ente.password`, `ente.sign-in`, `ente.server`, `ente.server-choice`, `ente.stay-signed-in`, `ente.add`, `ente.create-account`, `ente.migrate`, `ente.delete-account` |
+| Ente sign up | `ente.sign-up.email`, `ente.sign-up.continue`, `ente.sign-up.code`, `ente.sign-up.verify`, `ente.sign-up.password`, `ente.sign-up.confirm`, `ente.sign-up.create`, `ente.sign-up.recovery-key`, `ente.sign-up.saved`, `ente.sign-up.done` |
+| Moving to another server | `ente.migrate.email`, `ente.migrate.password`, `ente.migrate.sign-in`, `ente.migrate.continue`, `ente.migrate.confirm`, `ente.migrate.move`, `ente.migrate.done` |
+| Deleting the Ente account | `ente.delete-account.email`, `ente.delete-account.password`, `ente.delete-account.code`, `ente.delete-account.confirm`, `ente.delete-account.delete`, `ente.delete-account.done` |
+| Settings | `configuration.oath-storage`, `settings.hide-codes`, `settings.spotlight` |
 | App lock | `app-lock.unlock`, `app-lock.key.<digit>`, `app-lock.delete`, `app-lock.password` |
 | About | `about.commit` (release builds only), `about.tutorial`, `about.version-history`, `about.app-icon`, `tutorial.next`, `tutorial.back` |
 
@@ -162,8 +167,9 @@ The search field is the system's (`app.searchFields.firstMatch`), and the accoun
 button (`OverflowBarButtonItem`, `TopOverflowBarButtonItem` from iOS 27.2). Its items (Sync from Ente Auth, Configuration, About) don't keep identifiers on iOS,
 so they're found by their title. Name new identifiers the same way and add them here.
 
-App Intents cover the tasks that make sense from outside the app: Scan NFC YubiKey and Add Account on iOS (Siri,
-Shortcuts, Spotlight, Apple Intelligence), Add Account and Copy Code on the Mac, with a parameter for the account.
+App Intents cover the tasks that make sense from outside the app (Siri, Shortcuts, Spotlight, Apple Intelligence):
+Copy Code and Open Account on iOS and the Mac (`Accounts/AccountIntents.swift`), with a parameter for the account, for
+Ente Auth accounts and those on this device; Scan NFC YubiKey on iOS; and Add Account on both.
 
 ## Testing
 

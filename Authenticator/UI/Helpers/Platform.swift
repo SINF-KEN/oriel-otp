@@ -70,9 +70,10 @@ enum Platform {
 
     /// Copies a code to the pasteboard.
     ///
-    /// On iOS it stays on the device rather than going to the other devices through Universal Clipboard. On the Mac
-    /// it's marked as concealed (https://nspasteboard.org) so clipboard managers don't keep it. On both it's removed
-    /// after a while, on the Mac unless something else has been copied since.
+    /// On both it stays on the device rather than going to the other devices through Universal Clipboard. On the Mac
+    /// it's also marked as concealed and transient (https://nspasteboard.org) so clipboard managers don't keep it.
+    /// On both it's removed after a while, on the Mac unless something else has been copied since, and also when the
+    /// app quits before that.
     static func copy(_ string: String) {
         #if os(iOS)
         UIPasteboard.general.setItems([[UTType.utf8PlainText.identifier: string]],
@@ -80,17 +81,40 @@ enum Platform {
                                                 .expirationDate: Date.now.addingTimeInterval(TimeInterval(pasteboardLifetime.components.seconds))])
         #else
         let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
+        pasteboard.prepareForNewContents(with: .currentHostOnly)
         pasteboard.setString(string, forType: .string)
         pasteboard.setString("", forType: NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType"))
+        pasteboard.setString("", forType: NSPasteboard.PasteboardType("org.nspasteboard.TransientType"))
         let changeCount = pasteboard.changeCount
+        copiedChangeCount = changeCount
+        if terminationObserver == nil {
+            // The task below doesn't outlive the app, so a code copied in its last minute is removed as it quits.
+            terminationObserver = NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil,
+                                                                         queue: .main) { _ in
+                MainActor.assumeIsolated { clearCopiedCode() }
+            }
+        }
         Task {
             try? await Task.sleep(for: pasteboardLifetime)
-            guard NSPasteboard.general.changeCount == changeCount else { return }
-            NSPasteboard.general.clearContents()
+            guard copiedChangeCount == changeCount else { return }
+            clearCopiedCode()
         }
         #endif
     }
+
+    #if os(macOS)
+    /// The pasteboard's change count after the last code was copied, nil once it has been removed.
+    private static var copiedChangeCount: Int?
+    private static var terminationObserver: NSObjectProtocol?
+
+    /// Removes the copied code, unless something else has been copied since.
+    static func clearCopiedCode() {
+        guard let copiedChangeCount else { return }
+        self.copiedChangeCount = nil
+        guard NSPasteboard.general.changeCount == copiedChangeCount else { return }
+        NSPasteboard.general.clearContents()
+    }
+    #endif
 }
 
 #if os(macOS)
@@ -107,7 +131,6 @@ extension NSColor {
 // The keyboard and navigation bar modifiers only exist on iOS. They do nothing on the Mac, so the shared views can keep
 // using them without checking the platform each time.
 enum UIKeyboardType {
-    case asciiCapable
     case asciiCapableNumberPad
     case emailAddress
     case numberPad

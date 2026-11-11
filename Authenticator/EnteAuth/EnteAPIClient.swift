@@ -119,14 +119,16 @@ nonisolated struct EnteAPIClient: Sendable {
 
     /// The host of a URL as URLSession connects to it, in lower case and without a trailing dot. Nil unless it's a plain
     /// host name or IP address: a percent-encoded or non-ASCII host is decoded before connecting, so it would be checked
-    /// as one host and connected to as another.
+    /// as one host and connected to as another. A host with more than one trailing dot is refused too: `api.ente.io..`
+    /// would otherwise not be taken for Ente's server.
     static func host(of url: URL) -> String? {
         guard var host = url.host(percentEncoded: true)?.lowercased() else { return nil }
         if host.hasSuffix(".") {
             host.removeLast()
         }
         let allowed = Set("abcdefghijklmnopqrstuvwxyz0123456789-._:[]".unicodeScalars)
-        guard !host.isEmpty, !host.hasPrefix("."), !host.contains(".."), host.unicodeScalars.allSatisfy(allowed.contains) else { return nil }
+        guard !host.isEmpty, !host.hasPrefix("."), !host.hasSuffix("."), !host.contains(".."),
+              host.unicodeScalars.allSatisfy(allowed.contains) else { return nil }
         return host
     }
 
@@ -302,11 +304,6 @@ nonisolated struct EnteAPIClient: Sendable {
     func updateAuthenticatorEntity(token: String, id: String, encryptedData: String, header: String) async throws {
         let _: Empty = try await send("PUT", "/authenticator/entity", token: token,
                                       body: ["id": id, "encryptedData": encryptedData, "header": header])
-    }
-
-    /// Deletes an entity for good. Other devices see it in the diff with `isDeleted` set.
-    func deleteAuthenticatorEntity(token: String, id: String) async throws {
-        let _: Empty = try await send("DELETE", "/authenticator/entity", token: token, query: ["id": id])
     }
 
     // MARK: - Transport

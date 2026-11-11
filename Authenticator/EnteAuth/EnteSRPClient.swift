@@ -55,26 +55,28 @@ nonisolated struct EnteSRPClient {
 
     static let g = BigUInt(5)
 
-    static var primeBytes: Data { N.serialize() }
-
     // k = H(N | PAD(g))
     static let k = BigUInt(hash(N.serialize(), pad(g.serialize())))
 
     private let identity: Data
-    private let password: Data
+    /// The login key, zeroed with the last copy of this client.
+    private let password: EnteSecret
     private let salt: Data
-    private let a: BigUInt
+    /// The private value a, as bytes zeroed with the last copy of this client. BigUInt keeps its words where they
+    /// can't be reached to zero, so `a` and the values made from it in `proofs` are only made while they're needed.
+    private let privateValue: EnteSecret
     private let A: BigUInt
 
     /// - Parameter privateKey: Only set by tests, otherwise 64 random bytes are used like Ente's clients do.
     init(identity: String, password: Data, salt: Data, privateKey: Data? = nil) {
         self.identity = Data(identity.utf8)
-        self.password = password
+        self.password = EnteSecret(password)
         self.salt = salt
-        var a = BigUInt(privateKey ?? EnteCrypto.randomBytes(64))
-        if a.isZero { a = 1 }
-        self.a = a
-        self.A = Self.g.power(a, modulus: Self.N)
+        var bytes = privateKey ?? EnteCrypto.randomBytes(64)
+        defer { bytes.wipe() }
+        if BigUInt(bytes).isZero { bytes = Data([1]) }
+        self.privateValue = EnteSecret(bytes)
+        self.A = Self.g.power(BigUInt(bytes), modulus: Self.N)
     }
 
     /// A padded to the group size, sent as `srpA`.
@@ -92,7 +94,8 @@ nonisolated struct EnteSRPClient {
         let u = BigUInt(Self.hash(paddedA, paddedB))
         guard !u.isZero else { throw EnteSRPError.invalidServerValue }
 
-        let x = Self.x(identity: identity, password: password, salt: salt)
+        let a = BigUInt(privateValue.data)
+        let x = Self.x(identity: identity, password: password.data, salt: salt)
         let N = Self.N
         let gx = Self.g.power(x, modulus: N)
         let kgx = (Self.k * gx) % N

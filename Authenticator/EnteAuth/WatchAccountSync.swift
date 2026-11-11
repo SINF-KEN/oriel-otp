@@ -56,6 +56,9 @@ import Foundation
 
     nonisolated private static let enabledKey = "Watch.ShowEnteAccounts"
     private static let pendingClearKey = "Watch.PendingClear"
+    /// Set once the switch has been on. From then on, while it is off, every activation tells the watch to delete its
+    /// accounts: with two paired watches only the active one gets the context sent when the switch is turned off.
+    private static let wasEnabledKey = "Watch.WasEnabled"
     /// The key must be deleted before another is used, deleting it failed while the iPhone was locked.
     nonisolated private static let pendingRotationKey = "Watch.PendingKeyRotation"
 
@@ -103,6 +106,7 @@ import Foundation
     func enable() {
         isEnabled = true
         defaults.set(true, forKey: Self.enabledKey)
+        defaults.set(true, forKey: Self.wasEnabledKey)
     }
 
     /// Turns the switch off and tells the watch to delete the accounts.
@@ -110,6 +114,7 @@ import Foundation
         guard isEnabled || defaults.bool(forKey: Self.pendingClearKey) else { return }
         isEnabled = false
         defaults.removeObject(forKey: Self.enabledKey)
+        defaults.set(true, forKey: Self.wasEnabledKey)
         unsentAccounts = nil
         if update([]) {
             defaults.removeObject(forKey: Self.pendingClearKey)
@@ -210,7 +215,9 @@ import Foundation
         func sessionStateChanged() {
             guard let session else { return }
             isWatchAvailable = session.activationState == .activated && session.isPaired && session.isWatchAppInstalled
-            if !isEnabled && defaults.bool(forKey: Self.pendingClearKey) && update([]) {
+            // Also without a clear pending: the watch that is active now may not be the one that got the last one.
+            let clears = defaults.bool(forKey: Self.pendingClearKey) || defaults.bool(forKey: Self.wasEnabledKey)
+            if !isEnabled && clears && update([]) {
                 defaults.removeObject(forKey: Self.pendingClearKey)
             }
             if isEnabled, let unsentAccounts, update(unsentAccounts) {

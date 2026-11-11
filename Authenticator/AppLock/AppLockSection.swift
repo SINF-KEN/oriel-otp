@@ -51,9 +51,9 @@ struct AppLockSection: View {
             Text(String(localized: "App lock", comment: "App lock settings section header"))
         } footer: {
             #if os(macOS)
-            Text(String(localized: "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth.", comment: "Mac app lock settings footer"))
+            Text(String(localized: "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there.", comment: "Mac app lock settings footer"))
             #else
-            Text(String(localized: "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth.", comment: "App lock settings footer"))
+            Text(String(localized: "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there.", comment: "App lock settings footer"))
             #endif
         }
         .sheet(item: $change) { change in

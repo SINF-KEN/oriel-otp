@@ -125,7 +125,7 @@ struct MainView: View {
                 return
             }
             #endif
-            guard url.scheme == "otpauth" else { return }
+            guard OTPAuthURLParser.isOTPAuth(url) else { return }
             if showConfiguration { showConfiguration.toggle() }
             if showAbout { showAbout.toggle() }
             oathURL = url
@@ -133,25 +133,11 @@ struct MainView: View {
             addAccountLinkID = UUID()
             showAddAccount = true
         })
-        .onContinueUserActivity(NSUserActivityTypeBrowsingWeb, perform: { userActivity in
-            guard let otp = userActivity.webpageURL?.yubiOTP else { return }
-            if showConfiguration { showConfiguration.toggle() }
-            if showAbout { showAbout.toggle() }
-            self.otp = otp
-            if ApplicationSettingsViewModel().isNFCOnOTPLaunchEnabled {
-                AppLock.shared.whenUnlocked { model.updateAccountsOverNFC() }
-            }
-        })
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         .onReceive(NotificationCenter.default.publisher(for: .simulatedYubicoOTP)) { notification in
             otp = notification.object as? String
         }
         #endif
-        .onChange(of: otp) { _, otp in
-            if let otp, SettingsConfig.isCopyOTPEnabled {
-                toastPresenter.copyToClipboard(otp)
-            }
-        }
         .onChange(of: scenePhase, initial: true) { _, phase in
             #if os(macOS)
             MainWindowState.shared.isVisible = phase != .background
@@ -571,6 +557,17 @@ struct MainView: View {
                 Text(String(localized: "This removes the accounts from the YubiKey. You won’t be able to generate codes for them anymore.", comment: "Delete several accounts alert"))
             } else {
                 Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
+            }
+        }
+        // A confirmation for an account on a YubiKey doesn't outlive the key: the next key connected may have an
+        // account of the same name.
+        .onChange(of: model.accounts.filter { $0.location == .yubiKey }.map(\.accountId)) { _, onYubiKey in
+            let isGone = { (account: Account) in account.location == .yubiKey && !onYubiKey.contains(account.accountId) }
+            if accountsToDelete.contains(where: isGone) {
+                accountsToDelete.removeAll(where: isGone)
+            }
+            if let accountToRename, isGone(accountToRename) {
+                self.accountToRename = nil
             }
         }
         #if os(iOS)
@@ -1251,20 +1248,3 @@ extension String {
     }
 }
 
-extension URL {
-    
-    var yubiOTP: String? {
-        if self.scheme == "https" && self.host == "my.yubico.com" {
-            var otp: String
-            let components = URLComponents(url: self, resolvingAgainstBaseURL: false)
-            if let fragment = components?.fragment {
-                otp = fragment
-            } else {
-                otp = self.lastPathComponent
-            }
-            return otp
-        } else {
-            return nil
-        }
-    }
-}

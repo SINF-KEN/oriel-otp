@@ -17,30 +17,15 @@
 import Foundation
 
 enum KeySessionError : Error {
-    case notSupported
-    case noService
     case noResponse
-    case timeout
-    case invalidUri
-    case invalidCredentialUri
 }
 
 
 extension KeySessionError: LocalizedError {
     public var errorDescription: String? {
         switch self {
-        case .notSupported:
-            return NSLocalizedString("This version of iOS does not support operations with the YubiKey over NFC", comment: "Not supported")
-        case .noService:
-            return NSLocalizedString("Plug-in your YubiKey for that operation", comment: "No service found")
         case .noResponse:
-            return NSLocalizedString("Something went wrong and key doesn't respond", comment: "No response")
-        case .invalidUri:
-            return NSLocalizedString("This QR code is not supported", comment: "Invalid Uri format, not OATH URL")
-        case .timeout:
-            return NSLocalizedString("The key doesn't respond", comment: "Timeout issue")
-        case .invalidCredentialUri:
-            return NSLocalizedString("Invalid URI format", comment: "Invalid Uri, wrong parameters")
+            return String(localized: "Something went wrong and key doesn't respond", comment: "No response")
         }
     }
 }

@@ -16,6 +16,7 @@
 
 import CryptoKit
 import Foundation
+import OSLog
 
 /// An Ente Auth entity kept on the device.
 nonisolated struct EnteVaultItem: Codable, Sendable, Equatable, Identifiable {
@@ -85,6 +86,12 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
                 ?? items.firstIndex { item in
                     item.entityID == nil && rawData != nil && !entity.isDeleted && (item.uploadedRawData == rawData || item.rawData == rawData)
                 }
+                // The same, changed on another device before this one saw it: still the account uploaded from here,
+                // which the secret tells. Without this it would be listed twice, with two HOTP counters.
+                ?? items.firstIndex { item in
+                    guard item.entityID == nil, !entity.isDeleted, let uploaded = item.uploadedRawData, let rawData else { return false }
+                    return Self.isSameSecret(uploaded, rawData)
+                }
             guard !entity.isDeleted else {
                 if let index { items.remove(at: index) }
                 continue
@@ -100,7 +107,14 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
             if item.entityID == nil {
                 item.entityID = entity.id
                 item.serverUpdatedAt = entity.updatedAt
-                item.isPending = item.rawData != rawData
+                if item.rawData != rawData, let uploaded = item.uploadedRawData, uploaded != rawData {
+                    // Changed on another device since the upload, so that version wins, like for any other entity.
+                    let merged = Self.keepingHigherCounter(of: item.rawData, in: rawData)
+                    item.rawData = merged
+                    item.isPending = merged != rawData
+                } else {
+                    item.isPending = item.rawData != rawData
+                }
                 item.uploadedRawData = nil
             } else if let uploaded = item.uploadedRawData, uploaded == rawData {
                 // This device's own update. Changes made since it was uploaded stay pending.
@@ -167,12 +181,21 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
     }
 
     /// The pulled data, with the local HOTP counter if that one is further on. Codes up to the local counter have been
-    /// shown here, so going back would show them again.
+    /// shown here, so going back would show them again. Only for the same secret: an account that was given a new
+    /// secret on another device starts at the counter that device set.
     private static func keepingHigherCounter(of local: String?, in pulled: String) -> String {
-        guard let local, let localCounter = EnteEntryEditor(rawData: local)?.counter,
-              var editor = EnteEntryEditor(rawData: pulled), localCounter > editor.counter ?? 0 else { return pulled }
+        guard let local, let localEditor = EnteEntryEditor(rawData: local), let localCounter = localEditor.counter,
+              var editor = EnteEntryEditor(rawData: pulled), localEditor.isHOTP, editor.isHOTP,
+              let secret = editor.secret, localEditor.secret == secret, localCounter > editor.counter ?? 0 else { return pulled }
         editor.counter = localCounter
         return editor.rawData ?? pulled
+    }
+
+    /// Whether both entities are of the same kind and calculate their codes from the same secret.
+    private static func isSameSecret(_ first: String, _ second: String) -> Bool {
+        guard let first = EnteEntryEditor(rawData: first), let second = EnteEntryEditor(rawData: second),
+              let secret = first.secret, !secret.isEmpty else { return false }
+        return secret == second.secret && first.isHOTP == second.isHOTP
     }
 }
 
@@ -186,26 +209,11 @@ nonisolated struct EnteEntryEditor {
     private var components: URLComponents
     private var display: [String: Any]
 
+    /// Reads the entity with `EnteEntry.read`, like the list does, so an edit changes the account the list shows.
     init?(rawData: String) {
-        var urlString: String?
-        var display = [String: Any]()
-        if let json = try? JSONSerialization.jsonObject(with: Data(rawData.utf8), options: .fragmentsAllowed) {
-            if let string = json as? String {
-                urlString = string
-            } else if let object = json as? [String: Any] {
-                urlString = object["rawData"] as? String
-                display = object["display"] as? [String: Any] ?? [:]
-            }
-        } else if rawData.hasPrefix("otpauth://") {
-            urlString = rawData
-        }
-        guard let urlString, var components = URLComponents(string: urlString.replacingOccurrences(of: "#", with: "%23")),
-              components.scheme?.lowercased() == "otpauth" else { return nil }
-        if let codeDisplay = Self.value(of: "codeDisplay", in: components),
-           let parameter = try? JSONSerialization.jsonObject(with: Data(codeDisplay.utf8)) as? [String: Any] {
-            display.merge(parameter) { _, new in new }
-        }
-        components.percentEncodedQueryItems = components.percentEncodedQueryItems?.filter { $0.name != "codeDisplay" }
+        let (components, display) = EnteEntry.read(rawData: rawData)
+        guard var components else { return nil }
+        components.percentEncodedQueryItems = components.percentEncodedQueryItems?.filter { !EnteEntry.isNamed("codeDisplay", $0) }
         self.components = components
         self.display = display
     }
@@ -241,9 +249,19 @@ nonisolated struct EnteEntryEditor {
         set { display["tags"] = EnteEntry.cleaned(newValue) }
     }
 
-    /// The counter of a HOTP account.
+    /// Whether the account is counter based.
+    var isHOTP: Bool { components.host?.lowercased() == "hotp" }
+
+    /// The secret the codes are calculated from, nil if it can't be read.
+    var secret: Data? {
+        Self.value(of: "secret", in: components).flatMap(OTPAuthURLParser.base32Decode)
+    }
+
+    /// The counter of a HOTP account, nil if it has none or it isn't a whole number.
     var counter: UInt64? {
-        get { Self.value(of: "counter", in: components).flatMap { UInt64($0) } }
+        get {
+            Self.value(of: "counter", in: components).flatMap { OTPAuthURLParser.integer("counter", in: ["counter": $0], default: UInt64(0)) }
+        }
         set { Self.set("counter", to: newValue.map(String.init), in: &components) }
     }
 
@@ -267,7 +285,8 @@ nonisolated struct EnteEntryEditor {
         let encoded = value.map {
             $0.addingPercentEncoding(withAllowedCharacters: queryValueAllowed) ?? $0
         }
-        let isNamed = { (item: URLQueryItem) in item.name.lowercased() == name.lowercased() }
+        // The names here are still percent-encoded: `%63ounter` is replaced too, rather than given a second value.
+        let isNamed = { (item: URLQueryItem) in EnteEntry.isNamed(name, item) }
         // In the place of the first one, which no parameter before it is removed from.
         let index = items.firstIndex(where: isNamed) ?? items.endIndex
         items.removeAll(where: isNamed)
@@ -318,11 +337,9 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
             case "SHA512": algorithm = .sha512
             default: return nil
             }
-            let digits = items["digits"].flatMap { Int($0) } ?? 6
-            guard (1...10).contains(digits) else { return nil }
+            guard let digits = OTPAuthURLParser.integer("digits", in: items, default: 6), (1...10).contains(digits) else { return nil }
             // The counter is moved on once its code has been shown, which the largest one can't be.
-            let counter = items["counter"].flatMap { UInt64($0) } ?? 0
-            guard counter < .max else { return nil }
+            guard let counter = OTPAuthURLParser.integer("counter", in: items, default: UInt64(0)), counter < .max else { return nil }
             let (issuer, accountName) = OTPAuthURLParser.label(of: components)
             self.init(issuer: issuer, accountName: accountName, kind: .hotp, secret: secret, algorithm: algorithm, digits: digits,
                       period: 0, counter: counter, isPinned: entry.isPinned, tags: entry.tags, iconID: entry.iconID)
@@ -373,11 +390,21 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
 
 // MARK: - Storage
 
-enum EnteVaultError: Error {
-    /// The file or its key can't be decrypted, e.g. because the device was restored from a backup.
+enum EnteVaultError: Error, LocalizedError {
+    /// The file or its key can't be decrypted, e.g. because the device was restored from a backup, or the file was
+    /// written by a later version of the app.
     case unreadable
-    /// The file or its key can't be read until the device is unlocked.
+    /// The file or its key can't be read right now, e.g. until the device is unlocked.
     case unavailable
+
+    var errorDescription: String? {
+        switch self {
+        case .unreadable:
+            return String(localized: "The copy of your Ente Auth accounts on this device couldn't be read. It was kept, and the accounts are downloaded again from Ente Auth.", comment: "Error when the file with the Ente accounts on the device can't be decrypted")
+        case .unavailable:
+            return String(localized: "Your Ente Auth accounts on this device can't be read right now. Unlock the device and try again.", comment: "Error when the file with the Ente accounts on the device can't be read yet")
+        }
+    }
 }
 
 /// Where the vault is kept: an encrypted file in the app, memory in the tests.
@@ -385,6 +412,14 @@ nonisolated protocol EnteVaultStorage: Sendable {
     func load() throws -> EnteVault?
     func save(_ vault: EnteVault) throws
     func remove()
+    /// Moves a file that couldn't be read out of the way, so saving doesn't write over it.
+    func setAside() throws
+    /// Hands over each vault set aside earlier that can be read now, and deletes its file unless `keep` throws.
+    func recoverSetAside(_ keep: (EnteVault) throws -> Void)
+}
+
+nonisolated extension EnteVaultStorage {
+    func recoverSetAside(_ keep: (EnteVault) throws -> Void) {}
 }
 
 /// The key the vault file is encrypted with.
@@ -431,12 +466,52 @@ nonisolated struct EncryptedFile<Value: Codable> {
         var url = url
         var values = URLResourceValues()
         values.isExcludedFromBackup = true
-        try? url.setResourceValues(values)
+        do {
+            try url.setResourceValues(values)
+        } catch {
+            Logger.system.error("Couldn't exclude \(url.lastPathComponent, privacy: .public) from backups: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     func remove() {
         try? FileManager.default.removeItem(at: url)
         keychain.removeKey()
+    }
+
+    private static var setAsidePrefix: String { "Unreadable-" }
+
+    /// Moves a file that couldn't be read out of the way, so saving doesn't write over it. It stays next to the new
+    /// one with the same key, so a version of the app that can read it, e.g. the one that wrote it before a
+    /// downgrade, still can: see `recoverSetAside`.
+    func setAside() throws {
+        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        let folder = url.deletingLastPathComponent()
+        let stamp = Int(Date().timeIntervalSince1970)
+        var target = folder.appending(path: "\(Self.setAsidePrefix)\(stamp)")
+        var copy = 1
+        // Two files set aside in the same second mustn't fail the second move.
+        while FileManager.default.fileExists(atPath: target.path) {
+            copy += 1
+            target = folder.appending(path: "\(Self.setAsidePrefix)\(stamp)-\(copy)")
+        }
+        try FileManager.default.moveItem(at: url, to: target)
+    }
+
+    /// Hands over the value of each file set aside that can be read now, oldest first, and deletes the file unless
+    /// `keep` throws. A file that still can't be read stays: it may be the only copy of what is in it.
+    func recoverSetAside(_ keep: (Value) throws -> Void) {
+        let folder = url.deletingLastPathComponent()
+        guard let names = try? FileManager.default.contentsOfDirectory(atPath: folder.path) else { return }
+        for name in names.filter({ $0.hasPrefix(Self.setAsidePrefix) }).sorted() {
+            let file = EncryptedFile(url: folder.appending(path: name), keychain: keychain)
+            guard let value = try? file.load() else { continue }
+            do {
+                try keep(value)
+                try FileManager.default.removeItem(at: file.url)
+            } catch {
+                continue
+            }
+        }
     }
 }
 
@@ -456,6 +531,8 @@ nonisolated struct EnteVaultFile: EnteVaultStorage {
     func load() throws -> EnteVault? { try file.load() }
     func save(_ vault: EnteVault) throws { try file.save(vault) }
     func remove() { file.remove() }
+    func setAside() throws { try file.setAside() }
+    func recoverSetAside(_ keep: (EnteVault) throws -> Void) { file.recoverSetAside(keep) }
 }
 
 /// The vault key in the keychain: `WhenUnlockedThisDeviceOnly`, so it never leaves the device and can be read
@@ -482,12 +559,16 @@ nonisolated struct EnteVaultKeychainKey: EnteVaultKeychain {
     func existingKey() throws -> SymmetricKey? {
         var query = query
         query[String(kSecReturnData)] = true
+        query[String(kSecReturnAttributes)] = true
         query[String(kSecMatchLimit)] = kSecMatchLimitOne
         var result: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
         switch status {
         case errSecSuccess:
-            guard let data = result as? Data else { throw SecureStoreError.dataCastError }
+            let item = result as? [String: Any]
+            guard let data = item?[String(kSecValueData)] as? Data else { throw SecureStoreError.dataCastError }
+            // A key added before the app had a keychain group of its own is where the AutoFill extension can read it.
+            SharedKeychain.moveToAppGroup(self.query, attributes: item)
             return SymmetricKey(data: data)
         case errSecItemNotFound:
             return nil
