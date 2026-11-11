@@ -379,9 +379,19 @@
 			path = Accounts;
 			sourceTree = "<group>";
 		};
+		BAC0000000000000000000A1 /* Backup */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Backup;
+			sourceTree = "<group>";
+		};
 		ACC0000000000000000000A2 /* Accounts */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Accounts;
+			sourceTree = "<group>";
+		};
+		BAC0000000000000000000A2 /* Backup */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Backup;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -606,6 +616,7 @@
 				E17E0000000000000000C003 /* Mac */,
 				A10C00000000000000000001 /* AppLock */,
 				ACC0000000000000000000A1 /* Accounts */,
+				BAC0000000000000000000A1 /* Backup */,
 			);
 			path = Authenticator;
 			sourceTree = "<group>";
@@ -622,6 +633,7 @@
 				E17E0000000000000000C002 /* EnteAuth */,
 				A10C00000000000000000002 /* AppLock */,
 				ACC0000000000000000000A2 /* Accounts */,
+				BAC0000000000000000000A2 /* Backup */,
 			);
 			path = AuthenticatorTests;
 			sourceTree = "<group>";
@@ -777,6 +789,7 @@
 				E17E0000000000000000C003 /* Mac */,
 				A10C00000000000000000001 /* AppLock */,
 				ACC0000000000000000000A1 /* Accounts */,
+				BAC0000000000000000000A1 /* Backup */,
 			);
 			name = OrielOTP;
 			packageProductDependencies = (
@@ -805,6 +818,7 @@
 				E17E0000000000000000C002 /* EnteAuth */,
 				A10C00000000000000000002 /* AppLock */,
 				ACC0000000000000000000A2 /* Accounts */,
+				BAC0000000000000000000A2 /* Backup */,
 			);
 			name = OrielOTPTests;
 			productName = OrielOTPTests;

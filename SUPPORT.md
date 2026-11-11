@@ -5,8 +5,9 @@ and can copy Ente Auth accounts onto a key. It needs iOS or iPadOS 18 or later, 
 optional, and needs the OATH application, such as the YubiKey 5 Series. The optional Apple Watch app needs watchOS 10 or
 later.
 
-Accounts saved on **This device** aren't in backups or iCloud, so they're lost with the device. Keep each service's
-recovery codes, or use **Move to Ente Auth** or **Move to YubiKey** in the account's menu.
+Accounts saved on **This device** aren't in backups or iCloud, so they're lost with the device. Use **Back up
+accounts…** in the settings, which saves them to a file protected by a password, keep each service's recovery codes, or
+use **Move to Ente Auth** or **Move to YubiKey** in the account's menu.
 
 - On iPhone, the YubiKey connects over NFC or USB-C. YubiKeys can't connect through a Lightning port; on an iPhone
   with Lightning, use NFC.

@@ -115,6 +115,64 @@
       },
       "shouldTranslate" : false
     },
+    "Accounts restored: %lld" : {
+      "comment" : "Backup restore result. The placeholder is a number.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wiederhergestellte Konten: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comptes restaurés : %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "復元したアカウント：%lld"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnovené účty: %lld"
+          }
+        }
+      }
+    },
+    "Accounts saved on this device can be backed up to a file encrypted with a password you choose. There are none yet. A backup, or an encrypted export from Ente Auth, can be restored here." : {
+      "comment" : "Backup settings footer without accounts on this device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät gespeicherte Konten können in einer Datei gesichert werden, die mit einem Passwort deiner Wahl verschlüsselt ist. Noch gibt es keine. Ein Backup oder ein verschlüsselter Export aus Ente Auth kann hier wiederhergestellt werden."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les comptes enregistrés sur cet appareil peuvent être sauvegardés dans un fichier chiffré avec un mot de passe de votre choix. Il n’y en a pas encore. Une sauvegarde, ou un export chiffré d’Ente Auth, peut être restaurée ici."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスに保存したアカウントは、自分で決めたパスワードで暗号化したファイルにバックアップできます。まだアカウントはありません。バックアップやEnte Authの暗号化エクスポートは、ここで復元できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Účty uložené v tomto zariadení možno zálohovať do súboru zašifrovaného heslom, ktoré si zvolíte. Zatiaľ tu žiadne nie sú. Zálohu alebo šifrovaný export z Ente Auth možno obnoviť tu."
+          }
+        }
+      }
+    },
     "Add %@" : {
       "comment" : "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com.",
       "localizations" : {
@@ -169,6 +227,325 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pridajte ju, len ak sa na nej prihlasujete do tohto účtu. Kódy sa na webovej stránke navrhujú až po jej pridaní."
+          }
+        }
+      }
+    },
+    "Already on this device: %lld" : {
+      "comment" : "Backup restore result. The placeholder is a number of accounts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bereits auf diesem Gerät: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déjà sur cet appareil : %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すでにこのデバイスにあるもの：%lld"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Už v tomto zariadení: %lld"
+          }
+        }
+      }
+    },
+    "Back up accounts" : {
+      "comment" : "Backup navigation title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarder les comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをバックアップ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zálohovať účty"
+          }
+        }
+      }
+    },
+    "Back up accounts…" : {
+      "comment" : "Backup settings button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten sichern …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarder les comptes…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをバックアップ…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zálohovať účty…"
+          }
+        }
+      }
+    },
+    "Back up your accounts" : {
+      "comment" : "Face ID reason when making a backup",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Konten sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarder vos comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをバックアップ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zálohovať účty"
+          }
+        }
+      }
+    },
+    "Backup" : {
+      "comment" : "Backup settings section header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップ"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Záloha"
+          }
+        }
+      }
+    },
+    "Backup password" : {
+      "comment" : "Backup password section header",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup-Passwort"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mot de passe de la sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップのパスワード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heslo zálohy"
+          }
+        }
+      }
+    },
+    "Backup saved. Keep the file and its password somewhere safe, away from this device." : {
+      "comment" : "Message after a backup was saved",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup gesichert. Bewahre die Datei und ihr Passwort an einem sicheren Ort auf, nicht auf diesem Gerät."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sauvegarde enregistrée. Conservez le fichier et son mot de passe en lieu sûr, à l’écart de cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存しました。ファイルとそのパスワードは、このデバイス以外の安全な場所に保管してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Záloha bola uložená. Súbor a jeho heslo si uložte na bezpečné miesto mimo tohto zariadenia."
+          }
+        }
+      }
+    },
+    "Choose a password of at least %lld characters. Anyone with the file can try passwords as often as they like, so pick a long one. You need it to restore the backup: it can't be reset, and it isn't stored in the app." : {
+      "comment" : "Backup password footer. The placeholder is the minimum length, 8.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähle ein Passwort mit mindestens %lld Zeichen. Wer die Datei hat, kann beliebig oft Passwörter ausprobieren, wähle also ein langes. Du brauchst es, um das Backup wiederherzustellen: Es kann nicht zurückgesetzt werden und wird nicht in der App gespeichert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisissez un mot de passe d’au moins %lld caractères. Quiconque possède le fichier peut essayer des mots de passe autant de fois qu’il le souhaite, choisissez-en donc un long. Vous en avez besoin pour restaurer la sauvegarde : il ne peut pas être réinitialisé et n’est pas stocké dans l’app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld文字以上のパスワードを設定してください。ファイルを手に入れた人はパスワードを何度でも試せるため、長いものにしてください。バックアップの復元にはこのパスワードが必要です。リセットはできず、アプリにも保存されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zvoľte heslo s aspoň %lld znakmi. Každý, kto má súbor, môže skúšať heslá ľubovoľne často, preto zvoľte dlhé. Potrebujete ho na obnovenie zálohy: nedá sa obnoviť a neukladá sa v aplikácii."
+          }
+        }
+      }
+    },
+    "Couldn't be read: %lld" : {
+      "comment" : "Backup restore result. The placeholder is a number of accounts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht lesbar: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Illisibles : %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み取れなかったもの：%lld"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nepodarilo sa načítať: %lld"
+          }
+        }
+      }
+    },
+    "Decrypting the backup. This can take a few seconds." : {
+      "comment" : "Backup restore progress",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Backup wird entschlüsselt. Das kann einige Sekunden dauern."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déchiffrement de la sauvegarde. Cela peut prendre quelques secondes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを復号しています。数秒かかることがあります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Záloha sa dešifruje. Môže to trvať niekoľko sekúnd."
+          }
+        }
+      }
+    },
+    "Encrypting your accounts. This can take a few seconds." : {
+      "comment" : "Backup progress",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Konten werden verschlüsselt. Das kann einige Sekunden dauern."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiffrement de vos comptes. Cela peut prendre quelques secondes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを暗号化しています。数秒かかることがあります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaše účty sa šifrujú. Môže to trvať niekoľko sekúnd."
           }
         }
       }
@@ -5979,6 +6356,35 @@
         }
       }
     },
+    "Enter the password the backup was made with. Its accounts are added to this device. Accounts that are here already are left as they are." : {
+      "comment" : "Backup restore footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib das Passwort ein, mit dem das Backup erstellt wurde. Seine Konten werden diesem Gerät hinzugefügt. Konten, die bereits hier sind, bleiben unverändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le mot de passe utilisé pour créer la sauvegarde. Ses comptes sont ajoutés à cet appareil. Les comptes déjà présents restent tels quels."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップの作成時に設定したパスワードを入力してください。バックアップ内のアカウントがこのデバイスに追加されます。すでにあるアカウントはそのまま残ります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte heslo, s ktorým bola záloha vytvorená. Jej účty sa pridajú do tohto zariadenia. Účty, ktoré tu už sú, zostanú bez zmeny."
+          }
+        }
+      }
+    },
     "Enter the PIN to access the certificate." : {
       "comment" : "PIV extension enter PIN message",
       "localizations" : {
@@ -6120,6 +6526,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Zadajte overovací kód odoslaný na %@. Ak váš server nemá e-mail, nájdete ho v denníku servera."
+          }
+        }
+      }
+    },
+    "Enter your app lock code to back up your accounts" : {
+      "comment" : "Backup prompt for the app lock code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Deinen Code der App-Sperre ein, um Deine Konten zu sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code de verrouillage de l’app pour sauvegarder vos comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをバックアップするには、アプリのロックのコードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ak chcete zálohovať účty, zadajte kód na uzamknutie aplikácie"
+          }
+        }
+      }
+    },
+    "Enter your app lock password to back up your accounts" : {
+      "comment" : "Backup prompt for the app lock password",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Dein Passwort der App-Sperre ein, um Deine Konten zu sichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le mot de passe de verrouillage de l’app pour sauvegarder vos comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントをバックアップするには、アプリのロックのパスワードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ak chcete zálohovať účty, zadajte heslo na uzamknutie aplikácie"
           }
         }
       }
@@ -11824,6 +12288,93 @@
         }
       }
     },
+    "Restore accounts" : {
+      "comment" : "Backup restore button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konten wiederherstellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer les comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを復元"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnoviť účty"
+          }
+        }
+      }
+    },
+    "Restore from backup" : {
+      "comment" : "Backup restore navigation title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Backup wiederherstellen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer à partir d’une sauvegarde"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップから復元"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnoviť zo zálohy"
+          }
+        }
+      }
+    },
+    "Restore from backup…" : {
+      "comment" : "Backup settings button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Backup wiederherstellen …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restaurer à partir d’une sauvegarde…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップから復元…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnoviť zo zálohy…"
+          }
+        }
+      }
+    },
     "Room for %lld more accounts." : {
       "comment" : "YubiKey OATH storage. The placeholder is the number of accounts that still fit.",
       "localizations" : {
@@ -11978,6 +12529,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uložiť a chrániť pomocou %@"
+          }
+        }
+      }
+    },
+    "Save backup…" : {
+      "comment" : "Backup button that encrypts the accounts and opens the save dialog",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backup sichern …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer la sauvegarde…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "バックアップを保存…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uložiť zálohu…"
           }
         }
       }
@@ -12152,6 +12732,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uloží účet aj do Ente Auth pre %@. YubiKey svoje účty nikdy nevydá, takže ho môžete skopírovať iba teraz."
+          }
+        }
+      }
+    },
+    "Saves the accounts kept only on this device to a file encrypted with a password you choose, which Ente Auth can open too. Without a backup they're lost with the device. Accounts on a YubiKey or in Ente Auth aren't included." : {
+      "comment" : "Backup settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sichert die Konten, die nur auf diesem Gerät gespeichert sind, in einer Datei, die mit einem Passwort deiner Wahl verschlüsselt ist und die auch Ente Auth öffnen kann. Ohne Backup gehen sie mit dem Gerät verloren. Konten auf einem YubiKey oder in Ente Auth sind nicht enthalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre les comptes conservés uniquement sur cet appareil dans un fichier chiffré avec un mot de passe de votre choix, qu’Ente Auth peut aussi ouvrir. Sans sauvegarde, ils sont perdus avec l’appareil. Les comptes sur une YubiKey ou dans Ente Auth ne sont pas inclus."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスにのみ保存されているアカウントを、自分で決めたパスワードで暗号化したファイルに保存します。このファイルはEnte Authでも開けます。バックアップがないと、デバイスを失ったときにアカウントも失われます。YubiKeyやEnte Authのアカウントは含まれません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uloží účty uchovávané iba v tomto zariadení do súboru zašifrovaného heslom, ktoré si zvolíte a ktorý dokáže otvoriť aj Ente Auth. Bez zálohy sa stratia spolu so zariadením. Účty na YubiKey alebo v Ente Auth nie sú zahrnuté."
           }
         }
       }
@@ -14295,31 +14904,31 @@
         }
       }
     },
-    "The account is kept only on this device and isn't in its backups. Keep the service's recovery codes, as you'd lose the account with the device." : {
+    "The account is kept only on this device and isn't in its backups. Back it up in the app's settings or keep the service's recovery codes, as you'd otherwise lose the account with the device." : {
       "comment" : "Add account footer when adding to this device",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Konto wird nur auf diesem Gerät gespeichert und ist nicht in dessen Backups enthalten. Bewahre die Wiederherstellungscodes des Dienstes auf, denn mit dem Gerät würdest du auch das Konto verlieren."
+            "value" : "Das Konto wird nur auf diesem Gerät gespeichert und ist nicht in dessen Backups enthalten. Sichere es in den Einstellungen der App oder bewahre die Wiederherstellungscodes des Dienstes auf, denn sonst würdest du mit dem Gerät auch das Konto verlieren."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le compte est conservé uniquement sur cet appareil et n’est pas inclus dans ses sauvegardes. Gardez les codes de récupération du service, car vous perdriez le compte avec l’appareil."
+            "value" : "Le compte est conservé uniquement sur cet appareil et n’est pas inclus dans ses sauvegardes. Sauvegardez-le dans les réglages de l’app ou gardez les codes de récupération du service, sinon vous perdriez le compte avec l’appareil."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アカウントはこのデバイスにのみ保存され、バックアップには含まれません。デバイスを失うとアカウントも失われるため、サービスのリカバリーコードを保管してください。"
+            "value" : "アカウントはこのデバイスにのみ保存され、デバイスのバックアップには含まれません。デバイスを失うとアカウントも失われるため、アプリの設定でバックアップするか、サービスのリカバリーコードを保管してください。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Účet sa uchováva iba v tomto zariadení a nie je súčasťou jeho záloh. Uschovajte si obnovovacie kódy služby, pretože so zariadením by ste stratili aj účet."
+            "value" : "Účet sa uchováva iba v tomto zariadení a nie je súčasťou jeho záloh. Zálohujte ho v nastaveniach aplikácie alebo si uschovajte obnovovacie kódy služby, inak by ste so zariadením stratili aj účet."
           }
         }
       }
@@ -14639,6 +15248,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Starý server ukončil túto reláciu. Otvorte Synchronizovať z Ente Auth, zadajte heslo a skúste to znova."
+          }
+        }
+      }
+    },
+    "The password is wrong, or the file is damaged." : {
+      "comment" : "Backup restore error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Passwort ist falsch oder die Datei ist beschädigt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mot de passe est incorrect ou le fichier est endommagé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パスワードが間違っているか、ファイルが破損しています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heslo je nesprávne alebo je súbor poškodený."
           }
         }
       }
@@ -15567,6 +16205,35 @@
         }
       }
     },
+    "There are no accounts on this device to back up." : {
+      "comment" : "Backup error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät gibt es keine Konten, die gesichert werden können."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il n’y a aucun compte à sauvegarder sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスにはバックアップするアカウントがありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V tomto zariadení nie sú žiadne účty na zálohovanie."
+          }
+        }
+      }
+    },
     "There's already an account named %@ on this YubiKey." : {
       "comment" : "OATH add account duplicate error. The placeholder is the issuer and account name.",
       "localizations" : {
@@ -15621,6 +16288,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tieto certifikáty boli pridané na tento %@ a môžu ich používať iné aplikácie."
+          }
+        }
+      }
+    },
+    "This backup was made in a way this version of the app can't read." : {
+      "comment" : "Backup restore error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Backup wurde auf eine Weise erstellt, die diese Version der App nicht lesen kann."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette sauvegarde a été créée d’une manière que cette version de l’app ne peut pas lire."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このバックアップは、このバージョンのアプリでは読み取れない形式で作成されています。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Táto záloha bola vytvorená spôsobom, ktorý táto verzia aplikácie nedokáže prečítať."
           }
         }
       }
@@ -15708,6 +16404,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Toto zariadenie"
+          }
+        }
+      }
+    },
+    "This device doesn't have enough free memory to open this backup. Close other apps and try again, or restore it on another device." : {
+      "comment" : "Backup restore error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Gerät hat nicht genug freien Arbeitsspeicher, um dieses Backup zu öffnen. Schließe andere Apps und versuche es erneut oder stelle es auf einem anderen Gerät wieder her."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet appareil n’a pas assez de mémoire disponible pour ouvrir cette sauvegarde. Fermez d’autres apps et réessayez, ou restaurez-la sur un autre appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスには、このバックアップを開くための空きメモリが足りません。ほかのアプリを閉じてやり直すか、別のデバイスで復元してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toto zariadenie nemá dostatok voľnej pamäte na otvorenie tejto zálohy. Zatvorte iné aplikácie a skúste to znova, alebo ju obnovte v inom zariadení."
+          }
+        }
+      }
+    },
+    "This file isn't a backup made by Oriel OTP or an encrypted export from Ente Auth." : {
+      "comment" : "Backup restore error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei ist weder ein Backup von Oriel OTP noch ein verschlüsselter Export aus Ente Auth."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier n’est ni une sauvegarde d’Oriel OTP ni un export chiffré d’Ente Auth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルは、Oriel OTPのバックアップでもEnte Authの暗号化エクスポートでもありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tento súbor nie je záloha z Oriel OTP ani šifrovaný export z Ente Auth."
           }
         }
       }

@@ -307,7 +307,7 @@ struct AddAccountView: View {
 
     @ViewBuilder private var destinationFooter: some View {
         if destinations == .device {
-            Text(String(localized: "The account is kept only on this device and isn't in its backups. Keep the service's recovery codes, as you'd lose the account with the device.", comment: "Add account footer when adding to this device"))
+            Text(String(localized: "The account is kept only on this device and isn't in its backups. Back it up in the app's settings or keep the service's recovery codes, as you'd otherwise lose the account with the device.", comment: "Add account footer when adding to this device"))
         } else if let enteEmail {
             switch destinations {
             case .ente:

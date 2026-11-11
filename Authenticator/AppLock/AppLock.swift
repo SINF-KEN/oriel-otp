@@ -478,6 +478,12 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
         await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
     }
 
+    /// Asks for Face ID, Touch ID or the device passcode before the secrets of the accounts on this device are
+    /// written to a backup file.
+    func verifyDeviceOwnerForBackup() async -> Bool {
+        await authenticateDeviceOwner(String(localized: "Back up your accounts", comment: "Face ID reason when making a backup")) != nil
+    }
+
     /// Changes the lock. `secret` is the new code or password, for the methods that have one.
     func setMethod(_ method: AppLockMethod, secret: String? = nil) throws {
         precondition(!method.hasSecret || secret != nil, "A code or password is needed")
