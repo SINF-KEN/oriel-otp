@@ -99,7 +99,7 @@ import YubiKit
                                                            issuer: "A, B & C #1", accountName: "é+x@example.com", digits: 8)
         #expect(try device.add(odd) == .added)
         let github = try #require(device.accounts.first { $0.code.issuer == "GitHub" })
-        device.setPinned(github.id, true)
+        try device.setPinned(github.id, true)
         try device.setTags(github.id, ["work", "open source"])
         let bank = try #require(device.accounts.first { $0.code.issuer == "Bank" })
         _ = try #require(device.nextHOTPCode(bank.id))

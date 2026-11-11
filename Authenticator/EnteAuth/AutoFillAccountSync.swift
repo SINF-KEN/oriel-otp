@@ -54,6 +54,8 @@ import Foundation
     @ObservationIgnored private var lastWrite: Task<Void, Never>?
     /// The update under way. Nothing is written until it's done, as `accounts` is about to change.
     @ObservationIgnored private var pendingUpdate: Task<Void, Never>?
+    /// Updates replaced by a later one or by `remove()`, which still finish parsing. `finishWriting()` waits for them.
+    @ObservationIgnored private var replacedUpdates: [Task<Void, Never>] = []
     /// Changes with each update and when signing out, so what an earlier update found is dropped.
     @ObservationIgnored private var generation = 0
 
@@ -144,6 +146,7 @@ import Foundation
         generation += 1
         let generation = generation
         let websitesFile = hasReadWebsites ? nil : websitesFile
+        replacePendingUpdate()
         pendingUpdate = Task { [weak self] in
             let (accounts, websites) = await Self.read(codes, websitesFile: websitesFile)
             guard let self, generation == self.generation else { return }
@@ -171,7 +174,7 @@ import Foundation
     /// Deletes the accounts and the websites chosen for them, for when the app signs out of Ente.
     func remove() {
         generation += 1
-        pendingUpdate = nil
+        replacePendingUpdate()
         accounts = []
         hasReadWebsites = true
         if !chosenWebsites.isEmpty {
@@ -204,8 +207,22 @@ import Foundation
         }
     }
 
-    /// Waits for the accounts to be written.
+    private func replacePendingUpdate() {
+        if let pendingUpdate {
+            replacedUpdates.append(pendingUpdate)
+        }
+        pendingUpdate = nil
+    }
+
+    /// Waits for the accounts to be written, and for updates that were replaced to finish parsing.
     func finishWriting() async {
+        while !replacedUpdates.isEmpty {
+            let updates = replacedUpdates
+            replacedUpdates = []
+            for update in updates {
+                await update.value
+            }
+        }
         await pendingUpdate?.value
         await lastWrite?.value
     }

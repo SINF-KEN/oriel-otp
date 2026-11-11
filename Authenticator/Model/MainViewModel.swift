@@ -216,7 +216,12 @@ import YubiKit
         let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .ente(id: id))
         account.isPendingSync = isPending
         account.onPinnedChange = { [weak self] account in
-            self?.cloud.setPinned(id, account.isPinned)
+            do {
+                try self?.cloud.setPinned(id, account.isPinned)
+            } catch {
+                // Otherwise the pin would look saved, and be gone at the next launch.
+                self?.sessionError = error
+            }
         }
         return account
     }
@@ -308,7 +313,12 @@ import YubiKit
         let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
         let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .device(id: id))
         account.onPinnedChange = { [weak self] account in
-            self?.device.setPinned(id, account.isPinned)
+            do {
+                try self?.device.setPinned(id, account.isPinned)
+            } catch {
+                // Otherwise the pin would look saved, and be gone at the next launch.
+                self?.sessionError = error
+            }
         }
         return account
     }

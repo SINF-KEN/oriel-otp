@@ -24,8 +24,9 @@ import Testing
 /// Signs in to the fake Ente server with the email and password entered together, the way the sign in screen does.
 struct EnteFakeServerLoginTests {
 
-    private func start(_ email: String, password: String = FakeEnteServer.password) async throws -> (EnteLoginFlow, EnteLoginStep) {
-        let api = try EnteAPIClient(server: FakeEnteServer.server, session: URLSession.stubbed([FakeEnteServer.self]))
+    private func start(_ email: String, password: String = FakeEnteServer.password,
+                       server: URL = FakeEnteServer.server) async throws -> (EnteLoginFlow, EnteLoginStep) {
+        let api = try EnteAPIClient(server: server, session: URLSession.stubbed([FakeEnteServer.self]))
         return try await EnteLoginFlow.start(api: api, email: email, password: password)
     }
 
@@ -35,6 +36,14 @@ struct EnteFakeServerLoginTests {
         let keys = try #require(flow.keys)
         #expect(keys.userID == 42)
         #expect(!keys.token.isEmpty)
+    }
+
+    /// A server that doesn't know the account's verifier can't prove it, so it can't hand out keys for the account,
+    /// even though the password decrypts them.
+    @Test func srpSignInRefusesAWrongServerProof() async throws {
+        await #expect(throws: EnteSRPError.serverProofMismatch) {
+            try await start("alice@example.com", server: FakeEnteServer.serverSendingAWrongProof())
+        }
     }
 
     @Test func srpAccountRejectsAWrongPassword() async throws {

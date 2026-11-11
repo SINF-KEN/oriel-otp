@@ -487,10 +487,9 @@ import YubiKit
         try edit(id) { $0.rename(issuer: issuer, accountName: accountName) }
     }
 
-    /// A pin that can't be saved is simply gone at the next launch, so it isn't reported.
-    func setPinned(_ id: String, _ isPinned: Bool) {
+    func setPinned(_ id: String, _ isPinned: Bool) throws {
         guard let code = code(of: id), code.isPinned != isPinned else { return }
-        try? edit(id) { $0.isPinned = isPinned }
+        try edit(id) { $0.isPinned = isPinned }
     }
 
     /// Files the account under the tags, which Ente Auth shows too.

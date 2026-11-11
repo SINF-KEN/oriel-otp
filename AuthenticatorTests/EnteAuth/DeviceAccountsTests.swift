@@ -74,7 +74,7 @@ private struct SaveFailed: Error {}
         #expect(try accounts.add(template("GitHub")) == .added)
         let id = try #require(accounts.accounts.first).id
         try accounts.rename(id, issuer: "GitHub", accountName: "bob")
-        accounts.setPinned(id, true)
+        try accounts.setPinned(id, true)
 
         let relaunched = DeviceAccounts(storage: storage)
         let code = try #require(relaunched.accounts.first).code

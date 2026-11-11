@@ -45,15 +45,15 @@ nonisolated extension SecureStoreError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .string2DataConversionError:
-            return NSLocalizedString("String to Data conversion error", comment: "")
+            return String(localized: "String to Data conversion error", comment: "Keychain error")
         case .data2StringConversionError:
-            return NSLocalizedString("Data to String conversion error", comment: "")
+            return String(localized: "Data to String conversion error", comment: "Keychain error")
         case .dataCastError:
-            return NSLocalizedString("Failed to cast object to Data error", comment: "")
+            return String(localized: "Failed to cast object to Data error", comment: "Keychain error")
         case .unhandledError(let message):
             return message
         case .itemNotFound:
-            return NSLocalizedString("Item not found in secure storage", comment: "")
+            return String(localized: "Item not found in secure storage", comment: "Keychain error")
         }
     }
 }

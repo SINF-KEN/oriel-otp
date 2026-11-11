@@ -240,7 +240,6 @@
 		B40F44442B27033A000D5E02 /* TokenRequestYubiOTPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestYubiOTPView.swift; sourceTree = "<group>"; };
 		B411242E29D423A300D58001 /* ListStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStatusView.swift; sourceTree = "<group>"; };
 		B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		B43751982C9AD7F1004017A4 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LaunchScreen.xcstrings; sourceTree = "<group>"; };
 		B44E5E802C74BE67007ABB79 /* OATHResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHResetView.swift; sourceTree = "<group>"; };
 		B44E5EB22C777F22007ABB79 /* OATHPasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHPasswordViewModel.swift; sourceTree = "<group>"; };
 		B44E5EBA2C778802007ABB79 /* OATHPasswordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OATHPasswordView.swift; sourceTree = "<group>"; };
@@ -1153,7 +1152,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				818866C222DFD72C006BC0A8 /* Base */,
-				B43751982C9AD7F1004017A4 /* mul */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";

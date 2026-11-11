@@ -31,10 +31,12 @@ nonisolated private let hasKeychainAccessGroup: Bool = {
 nonisolated private let hasKeychainAccessGroup = true
 #endif
 
-// The tests share one keychain service, so they must not run in parallel.
+// The tests share one keychain service, so they must not run in parallel. It's named for this run, and emptied after
+// each test, so nothing is left in the keychain or read from an earlier run.
 @Suite(.serialized, .enabled(if: hasKeychainAccessGroup, "Needs a keychain access group"))
 final class SecureStoreTests {
-    let secureStoreWithGenericPwd = SecureStore(secureStoreQueryable: PasswordQueryable(service: "someService"))
+    nonisolated private static let service = "SecureStoreTests-\(UUID().uuidString)"
+    let secureStoreWithGenericPwd = SecureStore(secureStoreQueryable: PasswordQueryable(service: SecureStoreTests.service))
 
     deinit {
         try? secureStoreWithGenericPwd.removeAllValues()
@@ -88,7 +90,7 @@ final class SecureStoreTests {
 
     /// The protection of the item, e.g. `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`.
     private func accessible(_ userAccount: String) -> String? {
-        var query = PasswordQueryable(service: "someService").setUpQuery(useAuthentication: false)
+        var query = PasswordQueryable(service: Self.service).setUpQuery(useAuthentication: false)
         query[String(kSecAttrAccount)] = userAccount
         query[String(kSecReturnAttributes)] = true
         query[String(kSecMatchLimit)] = kSecMatchLimitOne
@@ -104,7 +106,7 @@ final class SecureStoreTests {
 
     // Earlier versions left out the protection, so the default let them go into backups and onto other devices.
     @Test func movesAValueSavedByAnEarlierVersionToThisDevice() async throws {
-        var item = PasswordQueryable(service: "someService").setUpQuery(useAuthentication: false)
+        var item = PasswordQueryable(service: Self.service).setUpQuery(useAuthentication: false)
         item[String(kSecAttrAccount)] = "earlier"
         item[String(kSecValueData)] = Data("pwd_1234".utf8)
         item[String(kSecAttrAccessible)] = kSecAttrAccessibleWhenUnlocked
@@ -117,7 +119,7 @@ final class SecureStoreTests {
 
     // Updating an item keeps its protection, so a new value has to replace the item.
     @Test func replacingAValueReplacesItsProtection() throws {
-        var item = PasswordQueryable(service: "someService").setUpQuery(useAuthentication: false)
+        var item = PasswordQueryable(service: Self.service).setUpQuery(useAuthentication: false)
         item[String(kSecAttrAccount)] = "earlier"
         item[String(kSecValueData)] = Data("pwd_1234".utf8)
         item[String(kSecAttrAccessible)] = kSecAttrAccessibleAfterFirstUnlock

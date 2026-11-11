@@ -29,6 +29,10 @@ jobs:
        github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      # To find the commit main was at before this push.
+      actions: read
     outputs:
       code: ${{ steps.files.outputs.code }}
       sha: ${{ steps.files.outputs.sha }}
@@ -41,6 +45,10 @@ jobs:
           filter: blob:none
       - name: Check changed files
         id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TESTS_RUN_ID: ${{ github.event.workflow_run.id }}
         run: |
           set -euo pipefail
           # Only a commit that is on main is signed and uploaded, whatever ref started the run.
@@ -49,13 +57,22 @@ jobs:
             exit 1
           fi
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          # main only takes squashed pull requests (the repository allows no other merges), so the last commit is
-          # the whole change. --no-renames lists a moved file by its old path too.
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]] || ! git rev-parse -q --verify HEAD^ >/dev/null; then
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "code=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          code=$(git diff --no-renames --name-only HEAD^ HEAD \
+          # A push can bring several commits: a rebase merge, a merge commit or a direct push. The whole push is
+          # compared with where main was before it, which is the commit the previous push to main tested; every push
+          # to main runs the tests. Without that commit, or after a force push, the build is uploaded.
+          base=$(gh api "repos/$REPOSITORY/actions/workflows/swift.yml/runs?branch=main&event=push&per_page=50" \
+            --jq "[.workflow_runs[] | select(.id < $TESTS_RUN_ID and .head_branch == \"main\")][0].head_sha // empty")
+          if [[ -z "$base" ]] || ! git merge-base --is-ancestor "$base" HEAD; then
+            echo "code=true" >> "$GITHUB_OUTPUT"
+            echo "Couldn't find where main was before this push; uploading." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          # --no-renames lists a moved file by its old path too.
+          code=$(git diff --no-renames --name-only "$base" HEAD \
             | grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|\.github/.*)$' || true)
           if [[ -n "$code" ]]; then
             echo "code=true" >> "$GITHUB_OUTPUT"

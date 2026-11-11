@@ -45,6 +45,12 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     static let code = "123456"
     private static let newAccountDomain = "new.ente.test"
     fileprivate static let emptyServerDomain = "empty.ente.test"
+    fileprivate static let wrongProofDomain = "wrong-proof.ente.test"
+
+    /// A server whose SRP proof (M2) is wrong, as a server that doesn't know the account's verifier would send.
+    static func serverSendingAWrongProof() -> URL {
+        URL(string: "https://\(UUID().uuidString.lowercased()).\(wrongProofDomain)")!
+    }
 
     /// A server without an account, where one can be created.
     static func emptyServer() -> URL {
@@ -72,6 +78,7 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     override class func canInit(with request: URLRequest) -> Bool {
         guard let host = request.url?.host else { return false }
         return host == server.host || host.hasSuffix("." + newAccountDomain) || host.hasSuffix("." + emptyServerDomain)
+            || host.hasSuffix("." + wrongProofDomain)
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
@@ -128,7 +135,8 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         accountsLock.withLock {
             if let account = accounts[host] { return account }
             let account = FakeEnteAccount(usesEnteAuth: host == FakeEnteServer.server.host,
-                                          isRegistered: !host.hasSuffix("." + FakeEnteServer.emptyServerDomain))
+                                          isRegistered: !host.hasSuffix("." + FakeEnteServer.emptyServerDomain),
+                                          sendsWrongProof: host.hasSuffix("." + FakeEnteServer.wrongProofDomain))
             accounts[host] = account
             return account
         }
@@ -171,8 +179,12 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         lock.withLock { authenticatorKey != nil }
     }
 
-    private init(usesEnteAuth: Bool, isRegistered: Bool) {
+    /// Sends a server proof that doesn't match, which the app must refuse.
+    private let sendsWrongProof: Bool
+
+    private init(usesEnteAuth: Bool, isRegistered: Bool, sendsWrongProof: Bool = false) {
         self.isRegistered = isRegistered
+        self.sendsWrongProof = sendsWrongProof
         let keyEncryptionKey = try! EnteCrypto.deriveKeyEncryptionKey(password: FakeEnteServer.password, salt: kekSalt,
                                                                       opsLimit: opsLimit, memLimit: memLimit)
         loginKey = try! EnteCrypto.deriveLoginKey(keyEncryptionKey: keyEncryptionKey)
@@ -436,7 +448,10 @@ nonisolated private final class FakeEnteAccount: @unchecked Sendable {
         guard let sessionID = body["sessionID"] as? String, let session = sessions.removeValue(forKey: sessionID),
               let srpM1 = (body["srpM1"] as? String).flatMap({ Data(enteBase64: $0) }) else { return (400, [:]) }
         // A wrong password gives a different S, so the proof doesn't match.
-        guard let srpM2 = serverProof(session, verifier: verifier(srpUserID: session.srpUserID), srpM1: srpM1) else { return (401, [:]) }
+        guard var srpM2 = serverProof(session, verifier: verifier(srpUserID: session.srpUserID), srpM1: srpM1) else { return (401, [:]) }
+        if sendsWrongProof {
+            srpM2[0] ^= 1
+        }
         var response = session.srpUserID == srpUserID(twoFactor: true) ? startTwoFactor() : signedIn()
         response["srpM2"] = srpM2.base64EncodedString()
         return (200, response)

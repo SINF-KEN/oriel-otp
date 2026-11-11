@@ -321,6 +321,25 @@ nonisolated enum EnteCrypto {
     }
 }
 
+/// The bytes of a key held for longer than one call, zeroed when the last reference to them goes.
+///
+/// Holds its own copy, so wiping reaches it unless a copy handed out by `data` is still alive then. Callers pass `data`
+/// straight to a call rather than keep it.
+nonisolated final class EnteSecret: @unchecked Sendable {
+    // Only changed by deinit, when nothing else can read it.
+    private var storage: Data
+
+    init(_ bytes: Data) {
+        storage = bytes.withUnsafeBytes { Data($0) }
+    }
+
+    var data: Data { storage }
+
+    deinit {
+        storage.wipe()
+    }
+}
+
 nonisolated extension Data {
 
     /// Zeroes a key once it's no longer needed. Data shares its bytes between copies and copies them before a change,

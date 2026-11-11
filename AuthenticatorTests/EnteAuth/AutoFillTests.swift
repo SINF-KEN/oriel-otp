@@ -289,7 +289,7 @@ struct AutoFillAccountSyncTests {
             return codes
         }
         sync.remove()
-        try await Task.sleep(for: .milliseconds(150))
+        // Waits for the parsing too, so the test can't end before it.
         await sync.finishWriting()
         #expect(try storage.load() == nil)
     }
@@ -302,7 +302,7 @@ struct AutoFillAccountSyncTests {
             return codes
         }
         sync.update { [] }
-        try await Task.sleep(for: .milliseconds(150))
+        // Waits for the slower first update too, so the test can't end before it.
         await sync.finishWriting()
         #expect(try storage.load() == nil)
     }
