@@ -418,7 +418,7 @@ struct EnteVaultTests {
         // Not in Ente Auth's own format, so any edit would rewrite it.
         let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"])
         let id = try #require(cloud.accounts.first).id
-        cloud.setPinned(id, false)
+        try cloud.setPinned(id, false)
         try cloud.rename(id, issuer: "GitHub", accountName: "alice")
         #expect(!cloud.hasPendingChanges)
     }
@@ -624,7 +624,7 @@ struct EnteCloudSyncTests {
         let offline = cloud(session: OfflineURLProtocol.session)
         #expect(offline.accounts.count == 1)
         #expect(try offline.add(template("GitLab")) == .added)
-        offline.setPinned(try id(of: "GitHub", in: offline), true)
+        try offline.setPinned(try id(of: "GitHub", in: offline), true)
         await offline.sync(reportsErrors: false)
         #expect(offline.hasPendingChanges)
         #expect(offline.error == nil)
@@ -666,7 +666,7 @@ struct EnteCloudSyncTests {
         await cloud().sync()
 
         let offline = cloud(session: OfflineURLProtocol.session)
-        offline.setPinned(try self.id(of: "GitHub", in: offline), true)
+        try offline.setPinned(try self.id(of: "GitHub", in: offline), true)
         try await other.delete(id)
 
         let online = cloud()

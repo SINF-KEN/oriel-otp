@@ -23,14 +23,14 @@ import YubiKit
 
 struct AccountTests {
 
-    private final class Flag: @unchecked Sendable {
+    nonisolated private final class Flag: @unchecked Sendable {
         var isSet = false
     }
 
-    private func account(validFor seconds: TimeInterval = 30, connectionType: OATHSession.ConnectionType = .nfc,
+    private func account(validFor seconds: TimeInterval = 30, connectionType: OrielOTP.OATHSession.ConnectionType = .nfc,
                          requestRefresh: @escaping (Account) -> Void = { _ in }) -> Account {
-        let credential = OATHSession.Credential(type: .totp, issuer: "GitHub", accountName: "alice", period: 30)
-        let otp = OATHSession.OTP(code: "123456", validity: DateInterval(start: .now, duration: seconds))
+        let credential = OrielOTP.OATHSession.Credential(type: .totp, issuer: "GitHub", accountName: "alice", period: 30)
+        let otp = OrielOTP.OATHSession.OTP(code: "123456", validity: DateInterval(start: .now, duration: seconds))
         return Account(credential: credential, code: otp, keyVersion: Version("5.4.0")!, requestRefresh: requestRefresh,
                        connectionType: connectionType, isPinned: false)
     }
@@ -70,19 +70,28 @@ struct AccountTests {
         #expect(account.formattedCode == nil)
     }
 
+    /// Waits for the flag rather than for a set time, so a slow machine doesn't fail the test.
+    private func waitFor(_ flag: Flag, timeout: Duration = .seconds(10)) async throws -> Bool {
+        let deadline = ContinuousClock.now + timeout
+        while !flag.isSet, ContinuousClock.now < deadline {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        return flag.isSet
+    }
+
     @Test func aNewCodeReplacesTheRefreshOfTheOldOne() async throws {
         let flag = Flag()
         let account = account(validFor: 0.05, connectionType: .wired) { _ in flag.isSet = true }
-        account.update(otp: OATHSession.OTP(code: "654321", validity: DateInterval(start: .now, duration: 60)))
-        try await Task.sleep(for: .milliseconds(200))
+        account.update(otp: OrielOTP.OATHSession.OTP(code: "654321", validity: DateInterval(start: .now, duration: 60)))
+        // Well past when the old code's refresh would have run. Waiting less can only let the test pass, not fail.
+        try await Task.sleep(for: .milliseconds(500))
         #expect(!flag.isSet)
     }
 
     @Test func aCodeIsRefreshedWhenItExpires() async throws {
         let flag = Flag()
         let account = account(validFor: 0.05, connectionType: .wired) { _ in flag.isSet = true }
-        try await Task.sleep(for: .milliseconds(300))
-        #expect(flag.isSet)
+        #expect(try await waitFor(flag))
         _ = account
     }
 }

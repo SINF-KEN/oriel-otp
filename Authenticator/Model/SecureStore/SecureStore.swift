@@ -180,7 +180,7 @@ nonisolated final class SecureStore: Sendable {
     }
     
     private func error(from status: OSStatus) -> SecureStoreError {
-        let message = SecCopyErrorMessageString(status, nil) as String? ?? NSLocalizedString("Unhandled Error", comment: "")
+        let message = SecCopyErrorMessageString(status, nil) as String? ?? String(localized: "Unhandled Error", comment: "Keychain error without a message")
         return SecureStoreError.unhandledError(message: message)
     }
 }

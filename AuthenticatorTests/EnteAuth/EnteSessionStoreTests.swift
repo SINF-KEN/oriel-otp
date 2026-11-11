@@ -160,8 +160,8 @@ func makeTestDefaults() -> UserDefaults {
         watch.enable()
         try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
                                         authenticatorKey: Data(repeating: 7, count: 32)))
-        await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
-                            session: URLSession.stubbed([UnansweredLogoutServer.self]))
+        let logout = await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
+                                         session: URLSession.stubbed([UnansweredLogoutServer.self]))
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
         #expect(!watch.isEnabled)
@@ -173,7 +173,8 @@ func makeTestDefaults() -> UserDefaults {
         #expect(UnansweredLogoutServer.tokens == ["old-token"])
         try store.save(session)
         UnansweredLogoutServer.fail()
-        try await Task.sleep(for: .milliseconds(100))
+        // Once the failed request has been handled, however long that takes.
+        await logout?.value
         #expect(try await store.unlock() == session)
     }
 

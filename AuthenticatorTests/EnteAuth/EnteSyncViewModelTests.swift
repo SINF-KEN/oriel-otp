@@ -28,8 +28,9 @@ struct EnteSyncViewModelTests {
 
     private func model(codes: [String], onYubiKey: [String] = [], capacity: Int?) -> EnteSyncViewModel {
         let existing = Set(onYubiKey.map { "\($0):alice" })
-        let store = EnteSessionStore(service: "EnteSyncViewModelTests")
-        let defaults = UserDefaults(suiteName: "EnteSyncViewModelTests")!
+        // Nothing is kept between runs: a keychain in memory and preferences of their own.
+        let defaults = makeTestDefaults()
+        let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
         let watch = WatchAccountSync(defaults: defaults)
         let model = EnteSyncViewModel(existingCredentialIds: existing, capacity: capacity, store: store, defaults: defaults, watch: watch,
                                       cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch))

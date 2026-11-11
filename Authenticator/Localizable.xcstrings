@@ -2528,35 +2528,6 @@
         }
       }
     },
-    "Add to Ente Auth" : {
-      "comment" : "Main view menu item, and the add account title when adding to Ente Auth only",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zu Ente Auth hinzufügen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajouter à Ente Auth"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ente Authに追加"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pridať do Ente Auth"
-          }
-        }
-      }
-    },
     "Add website" : {
       "comment" : "AutoFill websites button",
       "localizations" : {
@@ -4666,35 +4637,6 @@
         }
       }
     },
-    "Copies the code of an account on your YubiKey to the clipboard. The YubiKey has to be plugged in." : {
-      "comment" : "Shortcuts action description",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kopiert den Code eines Kontos auf Ihrem YubiKey in die Zwischenablage. Der YubiKey muss angeschlossen sein."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copie dans le presse-papiers le code d’un compte de votre YubiKey. La YubiKey doit être branchée."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey上のアカウントのコードをクリップボードにコピーします。YubiKeyを接続しておく必要があります。"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skopíruje kód účtu z vášho YubiKey do schránky. YubiKey musí byť pripojený."
-          }
-        }
-      }
-    },
     "Copies the code of an account to the clipboard." : {
       "comment" : "Shortcuts action description",
       "localizations" : {
@@ -5246,7 +5188,6 @@
       }
     },
     "Data to String conversion error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5272,7 +5213,8 @@
             "value" : "Chyba prevodu údajov na reťazec"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Decryption failed" : {
       "comment" : "PIV extension decryption failed error message",
@@ -6877,7 +6819,6 @@
       }
     },
     "Failed to cast object to Data error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6903,7 +6844,8 @@
             "value" : "Chyba pri prevode objektu na údaje"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Failed to change app icon" : {
       "localizations" : {
@@ -7910,36 +7852,6 @@
         }
       }
     },
-    "Invalid URI format" : {
-      "comment" : "Invalid Uri, wrong parameters",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ungültiges URI-Format"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Format URI non valide"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "無効なURIフォーマット"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Neplatný formát URI"
-          }
-        }
-      }
-    },
     "Invalid decryption" : {
       "comment" : "PIV extension NFC invalid decryption",
       "localizations" : {
@@ -8057,7 +7969,6 @@
       }
     },
     "Item not found in secure storage" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -8083,7 +7994,8 @@
             "value" : "Položka sa nenašla v zabezpečenom úložisku"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Key is password protected" : {
       "comment" : "OATH NFC password protected key",
@@ -11078,36 +10990,6 @@
         }
       }
     },
-    "Plug-in your YubiKey for that operation" : {
-      "comment" : "No service found",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schließe Deinen YubiKey für diesen Vorgang an"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Branchez votre YubiKey pour cette opération"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "操作を実行するには YubiKey を接続してください"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zapojte svoj YubiKey pre túto operáciu"
-          }
-        }
-      }
-    },
     "Plus" : {
       "comment" : "Voice Control name for the Add account button, after its + symbol",
       "localizations" : {
@@ -13837,7 +13719,6 @@
     },
     "Something went wrong and key doesn't respond" : {
       "comment" : "No response",
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14156,7 +14037,6 @@
       }
     },
     "String to Data conversion error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -14182,7 +14062,8 @@
             "value" : "Chyba prevodu reťazca na údaje"
           }
         }
-      }
+      },
+      "comment" : "Keychain error"
     },
     "Success" : {
       "comment" : "iOS NFC alert default success message",
@@ -15600,36 +15481,6 @@
         }
       }
     },
-    "The key doesn't respond" : {
-      "comment" : "Timeout issue",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Key antwortet nicht"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La clé ne répond pas"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "キーが応答しません"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kľúč nereaguje"
-          }
-        }
-      }
-    },
     "The key is busy performing another operation." : {
       "localizations" : {
         "de" : {
@@ -16295,36 +16146,6 @@
         }
       }
     },
-    "This QR code is not supported" : {
-      "comment" : "Invalid Uri format, not OATH URL",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dieser QR-Code wird nicht unterstützt"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code QR non pris en charge"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このQRコードはサポートされていません"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tento QR kód nie je podporovaný"
-          }
-        }
-      }
-    },
     "This server already has an account with this email. Sign in instead." : {
       "comment" : "Ente account creation error",
       "localizations" : {
@@ -16607,36 +16428,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tento preklad je výsledkom práce komunity. Opravu môžete navrhnúť [v issue na GitHube](https://github.com/SINF-KEN/oriel-otp/issues)."
-          }
-        }
-      }
-    },
-    "This version of iOS does not support operations with the YubiKey over NFC" : {
-      "comment" : "Not supported",
-      "extractionState" : "stale",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Version von iOS unterstützt keine Operationen mit dem YubiKey über NFC"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette version d'iOS ne prend pas en charge les opérations avec YubiKey via NFC"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "このバージョンのiOSでは、NFCでのYubiKeyを使用した操作はサポートされていません"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Táto verzia iOS nepodporuje operácie s YubiKey cez NFC"
           }
         }
       }
@@ -17268,7 +17059,6 @@
       }
     },
     "Unhandled Error" : {
-      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -17294,7 +17084,8 @@
             "value" : "Nespracovaná chyba"
           }
         }
-      }
+      },
+      "comment" : "Keychain error without a message"
     },
     "Unknown account" : {
       "comment" : "Ente import unreadable account",
@@ -18676,35 +18467,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "YubiKey"
-          }
-        }
-      }
-    },
-    "YubiKey Account" : {
-      "comment" : "Shortcuts type name",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKey-Konto"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Compte YubiKey"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "YubiKeyアカウント"
-          }
-        },
-        "sk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Účet YubiKey"
           }
         }
       }

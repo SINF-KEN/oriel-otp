@@ -41,7 +41,7 @@ enum DeviceCapabilities {
     }
 
 
-    /// Every Lightning-equipped model that can install iOS/iPadOS 16 or newer, matching YubiKit. The app doesn't
+    /// Every Lightning-equipped model that can install iOS/iPadOS 18, the app's oldest. The app doesn't
     /// declare the MFi accessory protocol of Lightning YubiKeys, so these devices only connect to YubiKeys over NFC.
     nonisolated static let hasLightningPort: Bool = {
         #if os(macOS)
@@ -56,10 +56,7 @@ enum DeviceCapabilities {
         }
 
         switch model {
-        case "iPhone10,1", "iPhone10,4",  // iPhone 8
-            "iPhone10,2", "iPhone10,5",  // iPhone 8 Plus
-            "iPhone10,3", "iPhone10,6",  // iPhone X
-            "iPhone11,2",  // iPhone XS
+        case "iPhone11,2",  // iPhone XS
             "iPhone11,4", "iPhone11,6",  // iPhone XS Max
             "iPhone11,8",  // iPhone XR
             "iPhone12,1",  // iPhone 11
@@ -80,17 +77,11 @@ enum DeviceCapabilities {
             "iPhone15,2",  // iPhone 14 Pro
             "iPhone15,3",  // iPhone 14 Pro Max
 
-            "iPad6,11", "iPad6,12",  // iPad (5th generation)
-            "iPad7,5", "iPad7,6",  // iPad (6th generation)
             "iPad7,11", "iPad7,12",  // iPad (7th generation)
             "iPad11,6", "iPad11,7",  // iPad (8th generation)
             "iPad12,1", "iPad12,2",  // iPad (9th generation)
             "iPad11,1", "iPad11,2",  // iPad mini (5th generation)
-            "iPad11,3", "iPad11,4",  // iPad Air (3rd generation)
-            "iPad6,3", "iPad6,4",  // iPad Pro (9.7-inch)
-            "iPad6,7", "iPad6,8",  // iPad Pro (12.9-inch, 1st generation)
-            "iPad7,1", "iPad7,2",  // iPad Pro (12.9-inch, 2nd generation)
-            "iPad7,3", "iPad7,4":  // iPad Pro (10.5-inch)
+            "iPad11,3", "iPad11,4":  // iPad Air (3rd generation)
             return true
 
         default:

@@ -407,7 +407,8 @@ struct AccountLocationIcon: View {
 extension Account {
     /// The code for VoiceOver, read digit by digit, e.g. "1 2 3, 4 5 6" rather than "one hundred twenty-three".
     var spokenCode: String {
-        if state == .expired {
+        // Not `state`, which changes every second while counting down and would redraw every view that reads this.
+        if otp != nil, !canCopyCode {
             return String(localized: "Code expired", comment: "Accessibility label")
         }
         guard let code = formattedCode else {
