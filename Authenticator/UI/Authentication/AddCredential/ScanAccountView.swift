@@ -388,6 +388,11 @@ class ScanAccountView: UIView, @preconcurrency AVCaptureMetadataOutputObjectsDel
         guard let metadataObject = metadataObjects.first,
               let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
               let stringValue = readableObject.stringValue else { return }
+        // Google Authenticator's export holds several accounts, which go to this device all at once.
+        guard !AuthenticatorImport.isMigrationLink(stringValue) else {
+            showError(String(localized: "This QR code is an export from Google Authenticator. To import its accounts, take a screenshot of it, then choose Import from another app in Settings.", comment: "Scan QR code error for a Google Authenticator export"))
+            return
+        }
         guard let url = URL(string: stringValue.trimmingCharacters(in: .whitespacesAndNewlines)) else {
             showError(String(localized: "No account information found!", comment: "Scan QR code no account error message"))
             return
