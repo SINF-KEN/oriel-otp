@@ -10,11 +10,12 @@ search, pin, rename, delete, sync with Ente Auth, the YubiKey settings, and the 
 ## VoiceOver
 
 - An account row is one element: issuer, account name and the code read digit by digit ("1 2 3, 4 5 6"), with the
-  seconds left and, when Ente Auth accounts are listed, where it's stored as its value. Its actions are the swipe
-  actions plus Copy and Move to YubiKey and Rename; on the Mac also Copy, Pin and Delete.
-- The code in a row is a button that copies it, but the row is one element, so VoiceOver copies with the row's Copy
-  action instead. On iOS the row's hint says so ("Swipe up or down to copy the code"). After copying, the toast is
-  announced, and the row shows a checkmark for a moment.
+  seconds left and, when Ente Auth accounts are listed, where it's stored as its value. Its actions are, in order,
+  Copy, Pin, Move to YubiKey, Rename, Tags and Delete, on iOS and the Mac. With VoiceOver on, iOS leaves out the swipe
+  actions and gives the row these instead, so Copy is always the first action.
+- The code in a row is a button that copies it, but with VoiceOver the row is one element, so VoiceOver copies with
+  the row's Copy action instead. On iOS the row's hint says so ("Swipe up or down to copy the code"). After copying,
+  the toast is announced, and the row shows a checkmark for a moment.
 - Toasts (copied, synced, touch the YubiKey) are announced. So are a wrong app lock code and a scanned QR code.
 - On the Mac, rows in the main window's single column are buttons too, with an action that opens the account, and the
   list takes the keyboard focus at launch and after going back.
@@ -27,8 +28,9 @@ Icon buttons answer to their title and to shorter names, e.g. "Tap Plus" or "Tap
 for Scan NFC YubiKey. A row answers to its issuer ("Tap GitHub"). Text fields are named after their row, not their
 placeholder.
 
-The code in a row isn't an element of its own, so "Show numbers" doesn't number it. To copy by voice, "Long press
-GitHub" opens the row's menu, then "Tap Copy"; or "Tap GitHub" opens the account, then "Tap Copy".
+Without VoiceOver, the code in a row is a button of its own, named "Copy code for GitHub", so "Copy GitHub" or "Copy
+code GitHub" copies it without opening the account, and "Show numbers" and "Show grid" reach it. Switch Control and
+Full Keyboard Access move to it as well. "Tap GitHub" still opens the account.
 
 ## Larger Text
 
@@ -149,7 +151,7 @@ where there are many of a kind:
 | Screen | Identifiers |
 | --- | --- |
 | Account list | `accounts.add-account`, `accounts.scan-nfc`, `accounts.refresh` (Mac), `accounts.sync-from-ente` (the button in the empty list) |
-| A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth |
+| A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth; its code, without VoiceOver: `account-row.<account id>.copy` |
 | Account details | `account-details.code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete` |
 | Add account | `add-account.issuer`, `add-account.account-name`, `add-account.secret`, `add-account.save`, `add-account.enter-manually` |
 | Ente sync | `ente.email`, `ente.password`, `ente.sign-in`, `ente.server`, `ente.stay-signed-in`, `ente.add` |
@@ -194,7 +196,8 @@ screenshot, and it only passes if the lightest and darkest pixels have the contr
 
 `AuthenticatorUITests/TapToCopyTests.swift` taps the code in a row, beside the name and below it at a larger text size,
 and checks that it's copied without opening the account; also 24 points above the code, for the 44 point target. Tapping
-the name opens the account without copying.
+the name opens the account without copying. Without VoiceOver the code is a button of its own, named after the account
+for Voice Control, which copies without opening the account.
 
 To check by hand, use Accessibility Inspector (Xcode > Open Developer Tool) and the Simulator's Environment Overrides
 (text size, appearance, increase contrast, reduce motion, differentiate without color). For right to left, set the
