@@ -30,6 +30,7 @@ nonisolated final class InMemoryVaultStorage: EnteVaultStorage, @unchecked Senda
     func load() throws -> EnteVault? { lock.withLock { vault } }
     func save(_ vault: EnteVault) throws { lock.withLock { self.vault = vault } }
     func remove() { lock.withLock { vault = nil } }
+    func setAside() throws { lock.withLock { vault = nil } }
 }
 
 /// A vault file that can't be read until the device is unlocked.
@@ -45,6 +46,7 @@ nonisolated final class LockedVaultStorage: EnteVaultStorage, @unchecked Sendabl
     }
     func save(_ vault: EnteVault) throws { try storage.save(vault) }
     func remove() { storage.remove() }
+    func setAside() throws { try storage.setAside() }
 }
 
 /// Stands in for the keychain item with the vault file's key.
@@ -520,8 +522,12 @@ struct EnteCloudSyncTests {
             try await api.updateAuthenticatorEntity(token: token, id: id, encryptedData: encrypted.encryptedData, header: encrypted.header)
         }
 
+        /// Deletes an entity for good, like another device emptying Ente's trash. Only the tests do this: the app
+        /// moves accounts to the trash instead, so the API client has no hard delete.
         func delete(_ id: String) async throws {
-            try await api.deleteAuthenticatorEntity(token: token, id: id)
+            let request = try api.request("DELETE", "/authenticator/entity", token: token, query: ["id": id])
+            let (_, response) = try await api.session.data(for: request)
+            #expect((response as? HTTPURLResponse)?.statusCode == 200)
         }
 
         /// The plain text of each entity that isn't deleted, by id.

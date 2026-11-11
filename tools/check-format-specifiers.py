@@ -6,7 +6,9 @@
 # doesn't pass crashes the app or shows garbage, and nothing else catches it before it ships.
 #
 # A translation may leave an argument out, as a plural's "one" form often does ("One account"), and may reorder them
-# with positional specifiers (%2$@).
+# with positional specifiers (%2$@). It may not mix positional and plain specifiers, which reads the wrong argument,
+# use a * width or precision, which reads an argument of its own, use %n, which writes to memory, or contain a %
+# that isn't a known specifier.
 #
 # Usage: tools/check-format-specifiers.py [catalog.xcstrings ...]   (default: every catalog in the repository)
 # Exits with 1 and lists the problems if there are any.
@@ -20,8 +22,8 @@ import sys
 SPECIFIER = re.compile(
     r"%(?:(?P<percent>%)"
     r"|#@(?P<substitution>[A-Za-z0-9_]+)@"
-    r"|(?P<position>[0-9]+\$)?[-+ #0']*(?:[0-9]+|\*)?(?:\.(?:[0-9]+|\*))?"
-    r"(?P<length>hh|h|ll|l|q|L|z|t|j)?(?P<conversion>[@dDiuUxXoOfFeEgGaAcCsSp]))"
+    r"|(?P<position>[0-9]+\$)?[-+ #0']*(?P<width>[0-9]+|\*)?(?:\.(?P<precision>[0-9]+|\*))?"
+    r"(?P<length>hh|h|ll|l|q|L|z|t|j)?(?P<conversion>[@dDiuUxXoOfFeEgGaAcCsSpn]))"
 )
 # Inside a substitution's variations, %arg stands for the substitution's own argument.
 SUBSTITUTION_ARGUMENT = "%arg"
@@ -46,6 +48,16 @@ def arguments(text, substitutions=None):
     """Maps each argument position text reads to its type. Raises ValueError for text that can't be read."""
     result = {}
     next_position = 1
+    styles = set()
+
+    # Every % must start a specifier this script knows, or it reads an argument nobody checked.
+    position_in_text = 0
+    for match in SPECIFIER.finditer(text):
+        if "%" in text[position_in_text:match.start()]:
+            raise ValueError(f"unknown format sequence near {text[position_in_text:match.start()]!r}")
+        position_in_text = match.end()
+    if "%" in text[position_in_text:]:
+        raise ValueError(f"unknown format sequence near {text[position_in_text:]!r}")
 
     def add(position, kind):
         if result.get(position, kind) != kind:
@@ -67,6 +79,13 @@ def arguments(text, substitutions=None):
             add(position, argument_type(spec["length"], spec["conversion"]))
             next_position = position + 1
             continue
+        if match["conversion"] == "n":
+            raise ValueError("%n writes to memory")
+        if match["width"] == "*" or match["precision"] == "*":
+            raise ValueError("a * width or precision reads an argument of its own")
+        styles.add("positional" if match["position"] else "plain")
+        if len(styles) > 1:
+            raise ValueError("positional and plain specifiers are mixed")
         if match["position"]:
             position = int(match["position"][:-1])
         else:

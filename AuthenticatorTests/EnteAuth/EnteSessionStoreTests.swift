@@ -181,15 +181,12 @@ func makeTestDefaults() -> UserDefaults {
         #expect(store.savedAccount == nil)
         try store.save(session)
         #expect(store.savedAccount == EnteSavedAccount(email: "alice@example.com", server: session.server, hasSession: true))
-        #expect(store.savedEmail == "alice@example.com")
     }
 
     @Test func aRejectedSessionKeepsTheAccount() async throws {
         try store.save(session)
         store.forgetSession()
         #expect(store.savedAccount == EnteSavedAccount(email: "alice@example.com", server: session.server, hasSession: false))
-        // No session to add accounts with.
-        #expect(store.savedEmail == nil)
         await #expect(throws: EnteAuthenticatorSyncError.self) { try await store.unlock() }
     }
 

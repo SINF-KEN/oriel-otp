@@ -40,14 +40,6 @@ enum DeviceCapabilities {
         #endif
     }
 
-    /// YubiKeys connect as USB smart cards through the USB-C port on this device.
-    static var supportsUSBC: Bool {
-        #if targetEnvironment(simulator)
-        return false
-        #else
-        return !hasLightningPort
-        #endif
-    }
 
     /// Every Lightning-equipped model that can install iOS/iPadOS 16 or newer, matching YubiKit. The app doesn't
     /// declare the MFi accessory protocol of Lightning YubiKeys, so these devices only connect to YubiKeys over NFC.

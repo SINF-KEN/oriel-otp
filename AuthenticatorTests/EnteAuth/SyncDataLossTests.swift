@@ -33,6 +33,7 @@ nonisolated final class FailingVaultStorage: EnteVaultStorage, @unchecked Sendab
         try storage.save(vault)
     }
     func remove() { storage.remove() }
+    func setAside() throws { try storage.setAside() }
 }
 
 /// Answers each request with `handler`, after waiting for `gate` if it is set, so a test can act while a request is

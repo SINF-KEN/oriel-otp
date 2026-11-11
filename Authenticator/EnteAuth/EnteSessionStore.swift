@@ -57,10 +57,14 @@ struct EnteSessionStore {
     private static let account = "session"
     private static let emailKey = "EnteAuth.SavedSessionEmail"
     private static let serverKey = "EnteAuth.SavedSessionServer"
-    /// Set when the session was saved with the current access control. Earlier versions protected it on the Mac
-    /// with Touch ID only, and updating an item keeps its access control.
+    /// Set when the session was saved with the current access control and keychain group. Version 1 protected it on
+    /// the Mac with Touch ID only, and version 2 added it to the keychain group the AutoFill extension can read.
+    /// Updating an item keeps both, so an older one is deleted and added again when it is next unlocked.
     private static let versionKey = "EnteAuth.SavedSessionVersion"
-    private static let version = 2
+    /// Set when deleting the session failed, e.g. while the device was locked. The session isn't used, and deleting it
+    /// is tried again whenever the store is read.
+    private static let pendingRemovalKey = "EnteAuth.PendingSessionRemoval"
+    private static let version = 3
 
     private let keychain: EnteSessionKeychain
     private let defaults: UserDefaults
@@ -74,7 +78,8 @@ struct EnteSessionStore {
         #else
         let accessControl: SecAccessControlCreateFlags = .biometryCurrentSet
         #endif
-        self.init(keychain: SecureStore(secureStoreQueryable: PasswordQueryable(service: service, accessControl: accessControl)),
+        let reason = String(localized: "Use your saved Ente Auth sign-in.", comment: "Face ID or Touch ID prompt for the saved Ente session")
+        self.init(keychain: SecureStore(secureStoreQueryable: PasswordQueryable(service: service, accessControl: accessControl, reason: reason)),
                   defaults: defaults, canSave: Self.deviceCanSave)
     }
 
@@ -94,17 +99,13 @@ struct EnteSessionStore {
     }
 
     var savedAccount: EnteSavedAccount? {
+        retryPendingRemoval()
         guard let email = defaults.string(forKey: Self.emailKey) else { return nil }
         // Sessions saved before the server was stored were saved with the server of the sign in screen.
         let server = (defaults.string(forKey: Self.serverKey) ?? defaults.string(forKey: "EnteAuth.ServerURL"))
             .flatMap { $0.isEmpty ? nil : URL(string: $0) } ?? EnteAPIClient.defaultServer
-        return EnteSavedAccount(email: email, server: server, hasSession: keychain.hasValue(for: Self.account))
-    }
-
-    /// The email of the saved session, nil if there's no session to add accounts with.
-    var savedEmail: String? {
-        guard let savedAccount, savedAccount.hasSession else { return nil }
-        return savedAccount.email
+        let hasSession = !defaults.bool(forKey: Self.pendingRemovalKey) && keychain.hasValue(for: Self.account)
+        return EnteSavedAccount(email: email, server: server, hasSession: hasSession)
     }
 
     /// Replaces any saved session. The keychain item is deleted and added again, as updating it would keep the
@@ -112,6 +113,7 @@ struct EnteSessionStore {
     func save(_ session: EnteSavedSession) throws {
         let data = try JSONEncoder().encode(session)
         try keychain.removeValue(for: Self.account)
+        defaults.removeObject(forKey: Self.pendingRemovalKey)
         try keychain.setValue(data, useAuthentication: true, for: Self.account)
         defaults.set(session.email, forKey: Self.emailKey)
         defaults.set(session.server.absoluteString, forKey: Self.serverKey)
@@ -132,6 +134,9 @@ struct EnteSessionStore {
     }
 
     private func read(authentication: KeychainAuthentication? = nil) async throws -> EnteSavedSession {
+        retryPendingRemoval()
+        // A session that is to be deleted isn't used.
+        guard !defaults.bool(forKey: Self.pendingRemovalKey) else { throw EnteAuthenticatorSyncError.signedOut }
         let data: Data
         do {
             data = try await keychain.getValue(for: Self.account, authentication: authentication)
@@ -143,8 +148,19 @@ struct EnteSessionStore {
 
     /// Forgets the token and the key but keeps the account, for when the server no longer accepts the token.
     func forgetSession() {
-        try? keychain.removeValue(for: Self.account)
+        do {
+            try keychain.removeValue(for: Self.account)
+            defaults.removeObject(forKey: Self.pendingRemovalKey)
+        } catch {
+            defaults.set(true, forKey: Self.pendingRemovalKey)
+        }
         defaults.removeObject(forKey: Self.versionKey)
+    }
+
+    /// Deletes a session whose deletion failed earlier.
+    private func retryPendingRemoval() {
+        guard defaults.bool(forKey: Self.pendingRemovalKey), (try? keychain.removeValue(for: Self.account)) != nil else { return }
+        defaults.removeObject(forKey: Self.pendingRemovalKey)
     }
 
     /// Forgets the account, the token and the key.

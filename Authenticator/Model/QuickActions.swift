@@ -111,7 +111,7 @@ struct ScanNFCYubiKeyIntent: AppIntent {
 /// Opens the add account sheet, like the Home Screen quick action, for Siri, Shortcuts and Apple Intelligence.
 struct AddAccountIntent: AppIntent {
     static let title: LocalizedStringResource = "Add Account"
-    static let description = IntentDescription("Opens Oriel OTP to add an account to your YubiKey.")
+    static let description = IntentDescription("Opens Oriel OTP to add an account.")
     static let openAppWhenRun = true
 
     @MainActor func perform() async throws -> some IntentResult {

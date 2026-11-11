@@ -16,6 +16,7 @@
 
 import CryptoKit
 import Foundation
+import OSLog
 
 /// The app group the app shares with the AutoFill extension.
 nonisolated enum AppGroup {
@@ -48,6 +49,32 @@ nonisolated enum SharedKeychain {
         if let accessGroup {
             query[String(kSecAttrAccessGroup)] = accessGroup
         }
+    }
+
+    /// The app's own group, listed first in its entitlements, which the extensions can't read.
+    static var appAccessGroup: String? {
+        accessGroup.map { $0 + ".app" }
+    }
+
+    /// Moves an item that was just read to the app's own group, if it is in the shared one. Versions before the app
+    /// had a group of its own added every item to the shared group, where the AutoFill extension can read them, and
+    /// an item stays in the group it was added to. Moved in place, so a refused move leaves the item where it was.
+    ///
+    /// - Parameters:
+    ///   - query: The query the item was found with.
+    ///   - attributes: The item's attributes, as returned with `kSecReturnAttributes`.
+    /// - Returns: Whether the item was moved.
+    @discardableResult static func moveToAppGroup(_ query: [String: Any], attributes: [String: Any]?) -> Bool {
+        guard let accessGroup, let appAccessGroup,
+            attributes?[String(kSecAttrAccessGroup)] as? String == accessGroup
+        else { return false }
+        var query = query
+        for key in [kSecReturnData, kSecReturnAttributes, kSecReturnRef, kSecReturnPersistentRef, kSecMatchLimit] {
+            query[String(key)] = nil
+        }
+        query[String(kSecAttrAccessGroup)] = accessGroup
+        let change = [String(kSecAttrAccessGroup): appAccessGroup]
+        return SecItemUpdate(query as CFDictionary, change as CFDictionary) == errSecSuccess
     }
 }
 
@@ -128,7 +155,12 @@ nonisolated struct AutoFillFile: AutoFillStorage {
         var fileURL = url
         var values = URLResourceValues()
         values.isExcludedFromBackup = true
-        try? fileURL.setResourceValues(values)
+        do {
+            try fileURL.setResourceValues(values)
+        } catch {
+            Logger(subsystem: Bundle.main.bundleIdentifier ?? "OrielOTP", category: "AutoFill")
+                .error("Couldn't exclude the AutoFill file from backups: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     func remove() {

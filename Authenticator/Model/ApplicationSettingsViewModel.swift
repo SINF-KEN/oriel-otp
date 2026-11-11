@@ -36,21 +36,4 @@ struct ApplicationSettingsViewModel {
         }
     }
     
-    var isNFCOnOTPLaunchEnabled: Bool {
-        get {
-            return SettingsConfig.isNFCOnOTPLaunchEnabled
-        }
-        set {
-            SettingsConfig.isNFCOnOTPLaunchEnabled = newValue
-        }
-    }
-    
-    var isCopyOTPEnabled: Bool {
-        get {
-            return SettingsConfig.isCopyOTPEnabled
-        }
-        set {
-            SettingsConfig.isCopyOTPEnabled = newValue
-        }
-    }
 }

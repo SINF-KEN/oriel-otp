@@ -144,8 +144,10 @@ import Foundation
             }
             do {
                 try await EnteSignUp.setUpSRP(keys, api: api, token: token)
-            } catch EnteAPIError.http(statusCode: 400) {
-                // Already set up, by an attempt whose answer was lost. Checked below, like Ente's apps do.
+            } catch is EnteSignUp.SRPAlreadySetUp {
+                // Set up by an attempt whose answer was lost, so the server's proof was never checked. Signing in
+                // with SRP checks it. An error from the request that brings the proof isn't taken for this.
+                try await EnteSignUp.verifySRPSignIn(keys, api: api)
             }
             guard let attributes = try await api.srpAttributes(email: self.email), attributes.srpUserID == keys.srpUserID,
                   attributes.kekSalt == keys.attributes.kekSalt else { throw EnteSignUpError.notVerified }

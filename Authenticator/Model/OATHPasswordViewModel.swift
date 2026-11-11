@@ -150,12 +150,14 @@ enum OATHViewModelError: Error, LocalizedError {
     }
 
     func setPassword(_ newPassword: String, repeated repeatedPassword: String) {
-        self.isProcessing = true
+        // A second tap while the YubiKey is being written would send the password twice.
+        guard !isProcessing else { return }
         self.state = .unknown
         guard newPassword == repeatedPassword else {
             self.state = .error(OATHViewModelError.passwordsDoNotMatch)
             return
         }
+        self.isProcessing = true
         Task {
             do {
                 let session = try await ConnectionManager.shared.anyConnection().oathSession()
@@ -171,7 +173,7 @@ enum OATHViewModelError: Error, LocalizedError {
     }
 
     func changePassword(old oldPassword: String, new newPassword: String?, repeated repeatedPassword: String?) {
-        self.isProcessing = true
+        guard !isProcessing else { return }
         self.state = .unknown
         guard newPassword == repeatedPassword else {
             // Wait until the next runloop to change the state so SwiftUI picks it up
@@ -181,6 +183,7 @@ enum OATHViewModelError: Error, LocalizedError {
             }
             return
         }
+        self.isProcessing = true
         Task {
             do {
                 let session = try await ConnectionManager.shared.anyConnection().oathSession()

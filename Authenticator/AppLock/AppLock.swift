@@ -75,7 +75,7 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
     ]
 
     /// Whether a code is among the first ones tried when guessing: all the same digit, a run up or down like 1234 or
-    /// 8765, a repeated pattern like 1212 or 123123, or another common one. Codes already set keep working, only new
+    /// 8765, a repeated pattern like 1212 or 123123, doubled digits like 1122, a year, a date, or another common one. Codes already set keep working, only new
     /// ones are checked.
     static func isEasyToGuess(code: String) -> Bool {
         let digits = code.compactMap(\.wholeNumberValue)
@@ -88,7 +88,31 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
             let pattern = Array(digits.prefix(length))
             if (0..<digits.count).allSatisfy({ digits[$0] == pattern[$0 % length] }) { return true }
         }
-        return commonCodes.contains(code)
+        return commonCodes.contains(code) || isDoubledPairs(digits) || isYearOrDate(digits)
+    }
+
+    /// Two digits each written twice, e.g. 1122 or 7799, or three, e.g. 112233.
+    private static func isDoubledPairs(_ digits: [Int]) -> Bool {
+        digits.count % 2 == 0 && stride(from: 0, to: digits.count, by: 2).allSatisfy { digits[$0] == digits[$0 + 1] }
+    }
+
+    /// A year from 1900 to 2099 or a day of the year as MMDD or DDMM, and for six digits a date with a two-digit year
+    /// in any of the three orders. Birthdays and anniversaries are among the first codes tried.
+    private static func isYearOrDate(_ digits: [Int]) -> Bool {
+        func number(_ range: Range<Int>) -> Int { digits[range].reduce(0) { $0 * 10 + $1 } }
+        func isDay(month: Int, day: Int) -> Bool {
+            (1...12).contains(month) && (1...[31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1]).contains(day)
+        }
+        switch digits.count {
+        case 4:
+            let (first, second) = (number(0..<2), number(2..<4))
+            return first == 19 || first == 20 || isDay(month: first, day: second) || isDay(month: second, day: first)
+        case 6:
+            let (first, second, third) = (number(0..<2), number(2..<4), number(4..<6))
+            return isDay(month: second, day: first) || isDay(month: first, day: second) || isDay(month: second, day: third)
+        default:
+            return false
+        }
     }
 
     /// Whether `secret` is the code or password, compared in constant time.
@@ -260,8 +284,8 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 /// After 5 wrong codes or passwords, the next attempt has to wait 30 seconds, doubling with each wrong one up to a
 /// day, so a code can't be guessed slowly over months, while the owner can always try again the next day. The wait
 /// follows the system's uptime, which can't be set like the clock, and starts over when the device
-/// restarts. There's no way around a forgotten code or password other than deleting the app: the accounts are on the
-/// YubiKey and in Ente Auth, not only in the app.
+/// restarts. There's no way around a forgotten code or password other than deleting the app, which deletes the
+/// accounts saved to This device; those on a YubiKey or in Ente Auth stay there.
 ///
 /// The keychain keeps the lock when the app is deleted, the app's preferences don't, which is how a lock left by an
 /// earlier installation shows. Preferences can be edited though, so they alone don't remove a lock. While the files the

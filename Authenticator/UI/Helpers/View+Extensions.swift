@@ -19,44 +19,6 @@ import SwiftUI
 
 
 extension View {
-    func readFrame(_ frame: Binding<CGRect>) -> some View {
-        self.modifier(FrameReaderModifier(frame: frame))
-    }
-}
-
-struct FrameReaderModifier: ViewModifier  {
-    @Binding var frame: CGRect
-    
-    func body(content: Content) -> some View {
-        content.onGeometryChange(for: CGRect.self) { geometry in
-            geometry.frame(in: CoordinateSpace.global)
-        } action: { newFrame in
-            frame = newFrame
-        }
-    }
-}
-
-
-extension View {
-    func readSize(_ size: Binding<CGSize>) -> some View {
-        self.modifier(SizeReaderModifier(size: size))
-    }
-}
-
-struct SizeReaderModifier: ViewModifier  {
-    @Binding var size: CGSize
-    
-    func body(content: Content) -> some View {
-        content.onGeometryChange(for: CGSize.self) { geometry in
-            geometry.size
-        } action: { newSize in
-            size = newSize
-        }
-    }
-}
-
-
-extension View {
     @ViewBuilder func refreshable(enabled: Bool, action: @escaping () async -> Void) -> some View {
         if enabled {
             self.refreshable {

@@ -153,7 +153,7 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
     /// Parses an otpauth:// URL the same way the Objective-C YubiKit did.
     /// - Parameter skip: Validations to skip, allowing an empty account name or a colon in the issuer.
     init(otpauthURL url: URL, skip: Validation = []) throws {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.scheme == "otpauth" else {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false), components.scheme?.lowercased() == "otpauth" else {
             throw CredentialTemplateError.scheme
         }
         // The same lookup as the accounts calculated on the device, so both read the same values from a URL.
@@ -171,7 +171,7 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
         let (issuer, name) = OTPAuthURLParser.label(of: components)
 
         let isTOTP: Bool
-        switch components.host {
+        switch components.host?.lowercased() {
         case "hotp": isTOTP = false
         case "totp": isTOTP = true
         default: throw CredentialTemplateError.type
@@ -240,29 +240,11 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
 }
 
 nonisolated extension Data {
-    /// Decodes RFC 4648 Base32, ignoring case and padding, the same way the Objective-C YubiKit did.
+    /// Decodes RFC 4648 Base32 with `OTPAuthURLParser.base32Decode`, the only decoder: it ignores case, padding,
+    /// spaces and dashes, so a secret typed in groups reads the same on a YubiKey, in Ente Auth and on this device.
     init?(base32Encoded string: String) {
-        // Checked one scalar at a time: a letter followed by a combining mark is a single character.
-        guard string.unicodeScalars.allSatisfy({ ("A"..."Z").contains($0) || ("a"..."z").contains($0) || ("2"..."7").contains($0) || $0 == "=" }) else {
-            return nil
-        }
-        var bytes = [UInt8]()
-        var buffer: UInt32 = 0
-        var bits = 0
-        for character in string.uppercased().unicodeScalars where character != "=" {
-            let value: UInt32
-            switch character {
-            case "A"..."Z": value = character.value - UnicodeScalar("A").value
-            default: value = character.value - UnicodeScalar("2").value + 26
-            }
-            buffer = (buffer << 5) | value
-            bits += 5
-            if bits >= 8 {
-                bits -= 8
-                bytes.append(UInt8((buffer >> UInt32(bits)) & 0xff))
-            }
-        }
-        self.init(bytes)
+        guard let data = OTPAuthURLParser.base32Decode(string) else { return nil }
+        self = data
     }
 }
 

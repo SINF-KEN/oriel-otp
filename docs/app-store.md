@@ -32,7 +32,7 @@ The privacy manifests (`Authenticator/PrivacyInfo.xcprivacy`, `TokenExtension/Pr
 `AutoFillExtension/PrivacyInfo.xcprivacy`, `OrielOTPWatch/PrivacyInfo.xcprivacy`) declare no tracking and no collected
 data types. The required-reason APIs are `UserDefaults`: `CA92.1` for the app's own settings, and `1C8F.1` for the
 app group the app shares with the smart card and AutoFill extensions, and the system boot time: `35F9.1` in the app and
-the AutoFill extension, to measure the wait after too many wrong app lock attempts. The watch app uses only the keychain and WatchConnectivity, so its manifest lists no APIs. The Mac
+the AutoFill extension, to measure the wait after too many wrong app lock attempts. The watch app declares `UserDefaults` with `CA92.1`, for its own record of what is still to be deleted. The Mac
 app uses the same manifest as the iOS app; it adds no other required-reason APIs (the pasteboard, ScreenCaptureKit,
 notifications and login item aren't on the list). Reading a QR code from the screen happens on the Mac and the
 picture isn't kept or sent.
