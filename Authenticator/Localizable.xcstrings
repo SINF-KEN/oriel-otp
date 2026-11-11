@@ -19570,6 +19570,209 @@
           }
         }
       }
+    },
+    "This file isn't an export this app can read. Export from Google Authenticator, Aegis, 2FAS or Raivo, or choose a text file of otpauth links." : {
+      "comment" : "Import error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei ist kein Export, den die App lesen kann. Exportiere aus Google Authenticator, Aegis, 2FAS oder Raivo, oder wähle eine Textdatei mit otpauth-Links."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier n’est pas un export que l’app sait lire. Exportez depuis Google Authenticator, Aegis, 2FAS ou Raivo, ou choisissez un fichier texte de liens otpauth."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルは、このアプリで読み込めるエクスポートではありません。Google Authenticator、Aegis、2FAS、Raivoからエクスポートするか、otpauthリンクのテキストファイルを選択してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tento súbor nie je export, ktorý aplikácia vie prečítať. Exportujte z Google Authenticator, Aegis, 2FAS alebo Raivo, alebo vyberte textový súbor s odkazmi otpauth."
+          }
+        }
+      }
+    },
+    "This %@ export is encrypted. Export it again without encryption, import it, then delete the file." : {
+      "comment" : "Import error. The placeholder is the name of another authenticator app, e.g. Aegis.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser %@-Export ist verschlüsselt. Exportiere erneut ohne Verschlüsselung, importiere ihn und lösche dann die Datei."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet export %@ est chiffré. Exportez-le à nouveau sans chiffrement, importez-le, puis supprimez le fichier."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この%@のエクスポートは暗号化されています。暗号化せずにもう一度エクスポートしてから読み込み、その後ファイルを削除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tento export z %@ je zašifrovaný. Exportujte ho znova bez šifrovania, importujte ho a potom súbor vymažte."
+          }
+        }
+      }
+    },
+    "There are no accounts in this file." : {
+      "comment" : "Import error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Datei enthält keine Konten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce fichier ne contient aucun compte."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このファイルにはアカウントがありません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "V tomto súbore nie sú žiadne účty."
+          }
+        }
+      }
+    },
+    "Import from another app…" : {
+      "comment" : "Backup settings button that imports accounts exported by another authenticator app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus anderer App importieren …"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer depuis une autre app…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ほかのアプリから読み込む…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importovať z inej aplikácie…"
+          }
+        }
+      }
+    },
+    "Import reads exports from Google Authenticator (a screenshot of its QR code), Aegis, 2FAS and Raivo without encryption, and text files of otpauth links. The accounts are saved on this device. Delete the export afterwards: anyone with it has the accounts." : {
+      "comment" : "Backup settings footer about importing from another authenticator app",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importieren liest Exporte aus Google Authenticator (ein Bildschirmfoto seines QR-Codes), Aegis, 2FAS und Raivo ohne Verschlüsselung sowie Textdateien mit otpauth-Links. Die Konten werden auf diesem Gerät gespeichert. Lösche den Export danach: Wer ihn hat, hat die Konten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L’import lit les exports de Google Authenticator (une capture d’écran de son code QR), d’Aegis, de 2FAS et de Raivo sans chiffrement, ainsi que les fichiers texte de liens otpauth. Les comptes sont enregistrés sur cet appareil. Supprimez ensuite l’export : quiconque l’a dispose des comptes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込みでは、Google Authenticator（QRコードのスクリーンショット）、暗号化していないAegis、2FAS、Raivoのエクスポート、otpauthリンクのテキストファイルを読み込めます。アカウントはこのデバイスに保存されます。エクスポートは後で削除してください。持っている人は誰でもアカウントを使えます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import číta exporty z Google Authenticator (snímka obrazovky jeho QR kódu), Aegis, 2FAS a Raivo bez šifrovania a textové súbory s odkazmi otpauth. Účty sa uložia do tohto zariadenia. Export potom vymažte: ktokoľvek ho má, má aj účty."
+          }
+        }
+      }
+    },
+    "Accounts imported: %lld" : {
+      "comment" : "Import result. The placeholder is a number.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importierte Konten: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comptes importés : %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "読み込んだアカウント: %lld"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importované účty: %lld"
+          }
+        }
+      }
+    },
+    "This QR code is an export from Google Authenticator. To import its accounts, take a screenshot of it, then choose Import from another app in Settings." : {
+      "comment" : "Scan QR code error for a Google Authenticator export",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser QR-Code ist ein Export aus Google Authenticator. Um seine Konten zu importieren, mache ein Bildschirmfoto davon und wähle dann in den Einstellungen „Aus anderer App importieren“."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce code QR est un export de Google Authenticator. Pour importer ses comptes, faites-en une capture d’écran, puis choisissez Importer depuis une autre app dans les réglages."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このQRコードはGoogle Authenticatorのエクスポートです。アカウントを読み込むには、スクリーンショットを撮ってから、設定で「ほかのアプリから読み込む」を選択してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tento QR kód je export z Google Authenticator. Ak chcete importovať jeho účty, urobte z neho snímku obrazovky a potom v nastaveniach vyberte Importovať z inej aplikácie."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
