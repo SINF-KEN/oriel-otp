@@ -36,6 +36,7 @@ struct AccountRowView<Accessory: View>: View {
 
     @Environment(\.colorSchemeContrast) private var colorSchemeContrast
     @Environment(\.accessibilityShowButtonShapes) private var showButtonShapes
+    @Environment(\.accessibilityVoiceOverEnabled) private var isVoiceOverEnabled
     /// The placeholder for an expired or not yet calculated code is dimmed, but not so much that it can't be read.
     @State private var isDimmed: Bool
 
@@ -92,16 +93,15 @@ struct AccountRowView<Accessory: View>: View {
         #endif
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
-        // code is copied with the row's Copy action.
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(account.accessibilityLabel)
-        .modifier(AccountCodeStateValue(account: account, showsLocation: showsLocation))
+        // code is copied with the row's Copy action, the first of its actions. Without VoiceOver, the code is an
+        // element of its own, so Voice Control ("Copy GitHub", "Show numbers"), Switch Control and Full Keyboard
+        // Access reach it without opening the row.
+        .modifier(AccountRowAccessibility(account: account, showsLocation: showsLocation,
+                                          separatesCode: copyCode != nil && !isVoiceOverEnabled))
         #if os(iOS)
         // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
-        .accessibilityHint(copyCode == nil ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
+        .accessibilityHint(copyCode == nil || !isVoiceOverEnabled ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
         #endif
-        // Said to Voice Control without the code, e.g. "Tap GitHub".
-        .accessibilityInputLabels([account.title] + [account.subTitle.map { "\(account.title) \($0)" }].compactMap { $0 })
         // Stable for UI tests and agents, e.g. "account-row.GitHub:alice@example.com", see docs/accessibility.md.
         .accessibilityIdentifier("account-row.\(account.accountId)")
         .onChange(of: account.canCopyCode) { _, canCopyCode in
@@ -174,6 +174,11 @@ struct AccountRowView<Accessory: View>: View {
                 .hoverEffect(.highlight)
                 #endif
                 .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+                // Only reached without VoiceOver, when the row lets the code be an element of its own. Named after
+                // the account rather than the code, which changes every 30 seconds.
+                .accessibilityLabel(String(localized: "Copy code for \(account.title)", comment: "Voice Control and Switch Control name of the code in an account row, e.g. Copy code for GitHub"))
+                .accessibilityInputLabels(VoiceControlNames.copyCode(of: account))
+                .accessibilityIdentifier("account-row.\(account.accountId).copy")
         } else {
             code()
         }
@@ -635,5 +640,38 @@ private final class ProgressLayerHostView: PlatformView {
         animation.duration = 1
         animation.timingFunction = CAMediaTimingFunction(name: .linear)
         shapeLayer.add(animation, forKey: keyPath)
+    }
+}
+
+/// How an account row is read by assistive technologies.
+///
+/// With VoiceOver, the row is one element, read as issuer, name and code, then the time left and where it's stored,
+/// and copied with its Copy action. Otherwise the code's button is an element of its own beside the name, so Voice
+/// Control, Switch Control and Full Keyboard Access can copy without opening the row (#65).
+private struct AccountRowAccessibility: ViewModifier {
+    let account: Account
+    let showsLocation: Bool
+    let separatesCode: Bool
+
+    func body(content: Content) -> some View {
+        if separatesCode {
+            content
+                .accessibilityElement(children: .contain)
+                // Said to Voice Control without the code, e.g. "Tap GitHub".
+                .accessibilityInputLabels(account.voiceControlNames)
+        } else {
+            content
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(account.accessibilityLabel)
+                .modifier(AccountCodeStateValue(account: account, showsLocation: showsLocation))
+                .accessibilityInputLabels(account.voiceControlNames)
+        }
+    }
+}
+
+extension Account {
+    /// What Voice Control calls the account, without the code, e.g. "GitHub" and "GitHub alice@example.com".
+    var voiceControlNames: [String] {
+        [title] + [subTitle.map { "\(title) \($0)" }].compactMap { $0 }
     }
 }
