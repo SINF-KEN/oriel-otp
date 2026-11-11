@@ -891,16 +891,22 @@ struct MainView: View {
         // The same actions as the detail view, without having to open it. VoiceOver lists them as the row's actions.
         // Swipe actions have white labels, so their colors are dark enough for 4.5:1 in both appearances, which the
         // system red and blue aren't.
+        // With VoiceOver on, the swipe actions are left out and the same buttons are the row's actions below, so Copy
+        // comes first rather than after Pin and Delete.
         .swipeActions(edge: .leading) {
-            pinButton(account)
-                .tint(Color(.favorite))
+            if !isVoiceOverEnabled {
+                pinButton(account)
+                    .tint(Color(.favorite))
+            }
         }
         .swipeActions(edge: .trailing) {
-            // Not a destructive role, which would remove the row before the deletion is confirmed.
-            deleteButton(account)
-                .tint(Color(.deleteAction))
-            copyButton(account)
-                .tint(Color(.copyAction))
+            if !isVoiceOverEnabled {
+                // Not a destructive role, which would remove the row before the deletion is confirmed.
+                deleteButton(account)
+                    .tint(Color(.deleteAction))
+                copyButton(account)
+                    .tint(Color(.copyAction))
+            }
         }
         .contextMenu {
             copyButton(account)
@@ -910,22 +916,33 @@ struct MainView: View {
             Divider()
             deleteButton(account)
         }
-        // VoiceOver lists the swipe actions on iOS. These are the rest of the context menu's and the details' actions,
-        // so every one can be done from the list.
+        // The context menu's and the details' actions, so every one can be done from the list, with Copy first. On
+        // iOS without VoiceOver, Copy, Pin and Delete are the swipe actions, which the system lists for Switch Control
+        // and Full Keyboard Access.
         .accessibilityActions {
-            #if os(macOS)
-            copyButton(account)
-            pinButton(account)
-            #endif
+            if showsRowActions {
+                copyButton(account)
+                pinButton(account)
+            }
             CopyToYubiKeyButtons(account: account)
             if account.canRename {
                 Button(String(localized: "Rename", comment: "Menu")) { accountToRename = account }
             }
             tagsButton(account)
-            #if os(macOS)
-            deleteButton(account)
-            #endif
+            if showsRowActions {
+                deleteButton(account)
+            }
         }
+    }
+
+    /// Copy, Pin and Delete are the row's own actions: always on the Mac, which has no swipe actions, and on iOS with
+    /// VoiceOver, which then lists them in this order.
+    private var showsRowActions: Bool {
+        #if os(macOS)
+        true
+        #else
+        isVoiceOverEnabled
+        #endif
     }
 
     /// Each row shows where its account is stored once the list has accounts from different places.
