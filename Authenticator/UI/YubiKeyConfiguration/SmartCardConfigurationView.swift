@@ -26,6 +26,7 @@ struct SmartCardConfigurationView: View {
     @State private var model = SmartCardViewModel()
     @State private var certificates: [SmartCardViewModel.Certificate]? = nil
     @State private var tokens = [SecCertificate]()
+    @State private var pinAttempts: Int? = nil
     @State private var presentHelpAlert = false
     @State private var presentNotificationsAlert = false
     @State private var presentNotificationsExplanation = false
@@ -58,6 +59,13 @@ struct SmartCardConfigurationView: View {
                     }
                 } else {
                     SmartCardMessageRow(message: String(localized: "Insert YubiKey or pull down to activate NFC"))
+                }
+                if certificates != nil, let pinAttempts {
+                    if pinAttempts == 0 {
+                        SmartCardMessageRow(message: String(localized: "The PIN is blocked. Unblock it with the PUK before using the certificates.", comment: "PIV extension PIN blocked message"))
+                    } else {
+                        SmartCardMessageRow(message: String(localized: "PIN attempts left: \(pinAttempts)", comment: "PIV extension PIN attempts left. The placeholder is the number of attempts."))
+                    }
                 }
             }
             Section {
@@ -154,6 +162,9 @@ struct SmartCardConfigurationView: View {
                     Logger.ctk.error("SmartCardConfigurationView: failed to fetch certificates: \(error)")
                 }
             }
+            model.pinAttemptsCallback = { attempts in
+                self.pinAttempts = attempts
+            }
             model.tokensCallback = { result in
                 switch result {
                 case .success(let tokens):
@@ -168,6 +179,7 @@ struct SmartCardConfigurationView: View {
             model.stop()
             model.certificatesCallback = nil
             model.tokensCallback = nil
+            model.pinAttemptsCallback = nil
         }
     }
     

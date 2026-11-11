@@ -119,14 +119,7 @@ enum OATHViewModelError: Error, LocalizedError {
                 }
                 let session = try await connection.oathSession(deviceInfo: deviceInfo)
                 defer { ConnectionManager.shared.closeNFC(message: String(localized: "Password state read")) }
-                do {
-                    _ = try await session.listCredentials()
-                    state = .notSet
-                } catch where error.isOATHAuthenticationRequired {
-                    state = .set
-                } catch {
-                    state = .error(error) // If we got this far the error is pretty exotic so bailing out like this is ok.
-                }
+                state = await session.hasAccessKey ? .set : .notSet
             } catch where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
             } catch {

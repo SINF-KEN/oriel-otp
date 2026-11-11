@@ -11,7 +11,7 @@ macosx"`), with macOS 15 as the minimum. It's the same SwiftUI app, compiled aga
 The alternatives were Mac Catalyst and running the iPad app on Apple silicon ("Designed for iPad"). The native
 destination was chosen because:
 
-- YubiKit 1.4.0 supports macOS natively. It talks to a YubiKey as a USB smart card through CryptoTokenKit, which is
+- YubiKit supports macOS natively. It talks to a YubiKey as a USB smart card through CryptoTokenKit, which is
   how the Mac itself sees the key. Under Catalyst `os(iOS)` is true, so YubiKit and the app would compile their NFC
   and Lightning code, which can't work on a Mac.
 - The app is already SwiftUI, so most views work on the Mac unchanged. What's left are Mac conventions (menu bar
@@ -97,6 +97,7 @@ with `[sdk=macosx*]` build settings:
 | --- | --- |
 | `com.apple.security.app-sandbox` | Required for the Mac App Store |
 | `com.apple.security.smartcard` | Talks to the YubiKey's OATH application over CCID |
+| `com.apple.security.device.usb` | Talks to the YubiKey's FIDO application over USB HID |
 | `com.apple.security.network.client` | Ente Auth |
 | `com.apple.security.files.user-selected.read-write` | Saving and opening a backup of the accounts on this Mac, and saving the Ente recovery key, with the system's dialogs |
 | `keychain-access-groups` | The data protection keychain, for saved passwords and the Ente session |
@@ -104,8 +105,7 @@ with `[sdk=macosx*]` build settings:
 | `com.apple.developer.authentication-services.autofill-credential-provider` | The AutoFill extension |
 
 The smart card extension isn't part of the Mac build, so only the AutoFill extension uses the app group there. The NFC
-entitlement and the iOS-only `Info.plist` keys aren't there either. Add
-`com.apple.security.device.usb` if the app starts using YubiKit's HID connections (OTP or FIDO over USB).
+entitlement and the iOS-only `Info.plist` keys aren't there either.
 
 `keychain-access-groups` needs a provisioning profile, so set your team in Xcode to run the Mac app with the keychain.
 CI signs the Mac build ad hoc without it, and the keychain tests skip themselves when it's missing (see
@@ -146,7 +146,5 @@ and clear, down to 16 pt.
 ## Not in the Mac version
 
 - The smart card extension and its screens: macOS reads the YubiKey's PIV certificates with its own driver.
-- FIDO PIN and reset: they need NFC on iOS, and YubiKit's FIDO over USB uses HID, which the Mac app
-  doesn't use yet.
 - NFC settings, NFC scanning and the Yubico OTP NFC link.
 - Alternate app icons.

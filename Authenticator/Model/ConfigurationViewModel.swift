@@ -39,6 +39,8 @@ import YubiKit
             }
         }
     }
+    /// The YubiKey's product name, nil if it couldn't be read.
+    private(set) var deviceName: String?
     /// Nil until it's been read, or when the YubiKey's OATH application is turned off.
     var oathStorage: OATHStorage?
 
@@ -61,9 +63,7 @@ import YubiKit
                 }
                 Logger.connection.debug("ConfigurationViewModel: got wired connection")
                 do {
-                    let deviceInfo = try await connection.managementSession().getDeviceInfo()
-                    self.deviceInfo = deviceInfo
-                    self.oathStorage = await Self.oathStorage(connection: connection, deviceInfo: deviceInfo)
+                    try await self.readDevice(connection)
                 } catch {
                     Logger.connection.error("ConfigurationviewModel: got error: \(error)")
                 }
@@ -84,9 +84,7 @@ import YubiKit
         Task {
             do {
                 let connection = try await ConnectionManager.shared.anyConnection()
-                let deviceInfo = try await connection.managementSession().getDeviceInfo()
-                self.deviceInfo = deviceInfo
-                self.oathStorage = await Self.oathStorage(connection: connection, deviceInfo: deviceInfo)
+                try await readDevice(connection)
                 ConnectionManager.shared.closeNFC(message: String(localized: "Configuration read", comment: "NFC connection stopped message."))
             } catch where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
@@ -95,6 +93,15 @@ import YubiKit
                 ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)
             }
         }
+    }
+
+    private func readDevice(_ connection: SmartCardConnection) async throws {
+        // Reading the name selects applications on the connection, so it comes before the session.
+        let deviceName = try? await connection.deviceName
+        let deviceInfo = try await connection.managementSession().getDeviceInfo()
+        self.deviceName = deviceName
+        self.deviceInfo = deviceInfo
+        self.oathStorage = await Self.oathStorage(connection: connection, deviceInfo: deviceInfo)
     }
 
     /// Counts the accounts on the YubiKey. A YubiKey locked with a password is unlocked with the saved one, unless it

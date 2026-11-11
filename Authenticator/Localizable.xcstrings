@@ -5043,6 +5043,34 @@
         }
       }
     },
+    "Couldn't reach the FIDO application of this YubiKey. It may be turned off over USB." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die FIDO-Anwendung dieses YubiKey ist nicht erreichbar. Möglicherweise ist sie über USB deaktiviert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'accéder à l'application FIDO de cette YubiKey. Elle est peut-être désactivée en USB."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このYubiKeyのFIDOアプリケーションにアクセスできませんでした。USBで無効になっている可能性があります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikácia FIDO na tomto kľúči YubiKey nie je dostupná. Možno je cez USB vypnutá."
+          }
+        }
+      }
+    },
     "Couldn't read a QR code" : {
       "comment" : "Mac add account QR code error title",
       "localizations" : {
@@ -8402,6 +8430,34 @@
         }
       }
     },
+    "More than one YubiKey is connected. Unplug the others to manage FIDO." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es ist mehr als ein YubiKey verbunden. Trenne die anderen, um FIDO zu verwalten."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plusieurs YubiKey sont connectées. Débranchez les autres pour gérer FIDO."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複数のYubiKeyが接続されています。FIDOを管理するには、他のYubiKeyを取り外してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je pripojených viac kľúčov YubiKey. Ak chcete spravovať FIDO, odpojte ostatné."
+          }
+        }
+      }
+    },
     "Migrate from" : {
       "comment" : "Ente migration old server field",
       "localizations" : {
@@ -10336,6 +10392,35 @@
         }
       }
     },
+    "PIN attempts left: %lld" : {
+      "comment" : "PIV extension PIN attempts left. The placeholder is the number of attempts.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbleibende PIN-Versuche: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tentatives de code PIN restantes : %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PINの残り試行回数：%lld"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zostávajúce pokusy o PIN: %lld"
+          }
+        }
+      }
+    },
     "PIN has been changed" : {
       "localizations" : {
         "de" : {
@@ -11045,6 +11130,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pripojte YubiKey a skúste to znova."
+          }
+        }
+      }
+    },
+    "Plug your YubiKey back in." : {
+      "comment" : "FIDO reset view",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stecke deinen YubiKey wieder ein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rebranchez votre YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyをもう一度挿入してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Znova pripojte kľúč YubiKey."
           }
         }
       }
@@ -14675,6 +14789,34 @@
         }
       }
     },
+    "The account's time period isn't supported by the YubiKey." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Zeitraum dieses Kontos wird vom YubiKey nicht unterstützt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La période de ce compte n'est pas prise en charge par la YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアカウントの時間間隔はYubiKeyでサポートされていません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Časový interval tohto účtu YubiKey nepodporuje."
+          }
+        }
+      }
+    },
     "That window couldn't be read. Copy the QR code or drop a picture of it here instead." : {
       "comment" : "Mac QR scan error",
       "localizations" : {
@@ -15221,6 +15363,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN kód nespĺňa požiadavky tohto kľúča YubiKey."
+          }
+        }
+      }
+    },
+    "The PIN is blocked. Unblock it with the PUK before using the certificates." : {
+      "comment" : "PIV extension PIN blocked message",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die PIN ist gesperrt. Entsperre sie mit der PUK, bevor du die Zertifikate verwendest."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le code PIN est bloqué. Débloquez-le avec le code PUK avant d'utiliser les certificats."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PINがブロックされています。証明書を使用する前に、PUKでブロックを解除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PIN kód je zablokovaný. Pred použitím certifikátov ho odblokujte kódom PUK."
           }
         }
       }
@@ -17180,6 +17351,35 @@
         }
       }
     },
+    "Touch your YubiKey to confirm the reset." : {
+      "comment" : "FIDO reset view",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berühre deinen YubiKey, um das Zurücksetzen zu bestätigen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez votre YubiKey pour confirmer la réinitialisation."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リセットを確定するには、YubiKeyにタッチしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obnovenie potvrďte dotykom kľúča YubiKey."
+          }
+        }
+      }
+    },
     "Turn on AutoFill" : {
       "comment" : "AutoFill setting button",
       "localizations" : {
@@ -17609,6 +17809,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odopnúť účet"
+          }
+        }
+      }
+    },
+    "Unplug your YubiKey." : {
+      "comment" : "FIDO reset view",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trenne deinen YubiKey."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Débranchez votre YubiKey."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "YubiKeyを取り外してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odpojte kľúč YubiKey."
           }
         }
       }

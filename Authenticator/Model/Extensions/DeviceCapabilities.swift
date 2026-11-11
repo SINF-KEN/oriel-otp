@@ -40,6 +40,15 @@ enum DeviceCapabilities {
         #endif
     }
 
+    /// FIDO can be managed: over NFC on iOS, which can't reach FIDO over USB, and over USB HID on the Mac.
+    static var supportsFIDO: Bool {
+        #if os(macOS)
+        return true
+        #else
+        return supportsNFC
+        #endif
+    }
+
     /// YubiKeys connect as USB smart cards through the USB-C port on this device.
     static var supportsUSBC: Bool {
         #if targetEnvironment(simulator)

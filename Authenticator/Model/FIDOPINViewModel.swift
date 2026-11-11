@@ -21,7 +21,7 @@ import YubiKit
 
 enum FidoViewModelError: Error, LocalizedError {
     
-    case usbNotSupported, locked, pinsDoNotMatch
+    case usbNotSupported, locked, pinsDoNotMatch, severalKeys, fidoNotFound
     
     public var errorDescription: String? {
         switch self {
@@ -31,6 +31,10 @@ enum FidoViewModelError: Error, LocalizedError {
             return String(localized: "FIDO management over USB-C is not supported by iOS. Use NFC instead, or manage FIDO on a computer.")
         case .locked:
             return String(localized: "PIN is permanently blocked. Factory reset FIDO application to continue.")
+        case .severalKeys:
+            return String(localized: "More than one YubiKey is connected. Unplug the others to manage FIDO.")
+        case .fidoNotFound:
+            return String(localized: "Couldn't reach the FIDO application of this YubiKey. It may be turned off over USB.")
         }
     }
 }
@@ -116,31 +120,34 @@ enum FidoViewModelError: Error, LocalizedError {
         Task {
             do {
                 let connection = try await ConnectionManager.shared.anyConnection()
+                #if os(iOS)
                 guard !(connection is USBSmartCardConnection) else {
                     state = .error(FidoViewModelError.usbNotSupported)
                     return
                 }
+                #endif
                 watchForRemoval(of: connection)
                 let deviceInfo = try await connection.managementSession().getDeviceInfo()
                 pincomplexity = deviceInfo.pinComplexity
-                let session = try await connection.fido2Session()
-                let info = try await session.getInfo()
-                minPinLength = info.minPinLength ?? 4
-                guard let pinIsSet = info.options.clientPin else {
-                    state = .unknown
-                    return
-                }
-                if !pinIsSet {
-                    state = .notSet
-                    ConnectionManager.shared.closeNFC(message: String(localized: "PIN state read"))
-                } else {
-                    let retries = try await session.getPinRetries().retries
-                    if retries <= 0 {
-                        ConnectionManager.shared.closeNFC(errorMessage: FidoViewModelError.locked.localizedDescription)
-                        state = .error(FidoViewModelError.locked)
-                    } else {
+                try await withFIDO2Session(on: connection, deviceInfo: deviceInfo) { session in
+                    let info = try await session.getInfo()
+                    minPinLength = info.minPinLength ?? 4
+                    guard let pinIsSet = info.options.clientPin else {
+                        state = .unknown
+                        return
+                    }
+                    if !pinIsSet {
+                        state = .notSet
                         ConnectionManager.shared.closeNFC(message: String(localized: "PIN state read"))
-                        state = .set
+                    } else {
+                        let retries = try await session.getPinRetries().retries
+                        if retries <= 0 {
+                            ConnectionManager.shared.closeNFC(errorMessage: FidoViewModelError.locked.localizedDescription)
+                            state = .error(FidoViewModelError.locked)
+                        } else {
+                            ConnectionManager.shared.closeNFC(message: String(localized: "PIN state read"))
+                            state = .set
+                        }
                     }
                 }
             } catch where error.isNFCCancelledByUser {
@@ -151,6 +158,29 @@ enum FidoViewModelError: Error, LocalizedError {
                 state = .error(error)
             }
         }
+    }
+
+    /// Runs `body` with a FIDO2 session on the connection's YubiKey. On the Mac a USB YubiKey's FIDO
+    /// application is reached over the key's HID interface, which is closed when `body` returns.
+    /// - Parameter deviceInfo: The key's device info, if already read.
+    private func withFIDO2Session<T>(on connection: SmartCardConnection,
+                                     deviceInfo: DeviceInfo? = nil,
+                                     _ body: (CTAP2.Session) async throws -> T) async throws -> T {
+        #if os(macOS)
+        if connection is USBSmartCardConnection {
+            let deviceInfo = if let deviceInfo { deviceInfo } else { await connection.deviceInfo() }
+            let fidoConnection = try await ConnectionManager.shared.fidoConnection(matching: deviceInfo)
+            do {
+                let result = try await body(try await CTAP2.Session.makeSession(connection: fidoConnection))
+                await fidoConnection.close(error: nil)
+                return result
+            } catch {
+                await fidoConnection.close(error: nil)
+                throw error
+            }
+        }
+        #endif
+        return try await body(try await connection.fido2Session())
     }
 
     private func watchForRemoval(of connection: SmartCardConnection) {
@@ -166,8 +196,9 @@ enum FidoViewModelError: Error, LocalizedError {
         self.state = .unknown
         Task {
             do {
-                let session = try await ConnectionManager.shared.anyConnection().fido2Session()
-                try await session.setPin(pin)
+                try await withFIDO2Session(on: ConnectionManager.shared.anyConnection()) { session in
+                    try await session.setPin(pin)
+                }
                 self.state = .didSet
                 ConnectionManager.shared.closeNFC(message: String(localized: "PIN has been set"))
             } catch {
@@ -183,8 +214,9 @@ enum FidoViewModelError: Error, LocalizedError {
         self.state = .unknown
         Task {
             do {
-                let session = try await ConnectionManager.shared.anyConnection().fido2Session()
-                try await session.changePin(from: oldPIN, to: newPIN)
+                try await withFIDO2Session(on: ConnectionManager.shared.anyConnection()) { session in
+                    try await session.changePin(from: oldPIN, to: newPIN)
+                }
                 self.state = .didChange
                 ConnectionManager.shared.closeNFC(message: String(localized: "PIN has been changed"))
             } catch {

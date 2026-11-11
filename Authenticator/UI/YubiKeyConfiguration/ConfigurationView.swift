@@ -61,12 +61,14 @@ struct ConfigurationView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding()
-                        LabeledContent {
-                            Text(deviceInfo.deviceName)
-                        } label: {
-                            HStack {
-                                ListIconView(image: Image("securitykey"), color: Color(.systemGray))
-                                Text("Device type")
+                        if let deviceName = model.deviceName {
+                            LabeledContent {
+                                Text(deviceName)
+                            } label: {
+                                HStack {
+                                    ListIconView(image: Image("securitykey"), color: Color(.systemGray))
+                                    Text("Device type")
+                                }
                             }
                         }
                         LabeledContent {
@@ -78,7 +80,7 @@ struct ConfigurationView: View {
                             }
                         }
                         LabeledContent {
-                            Text(deviceInfo.version.description)
+                            Text(deviceInfo.firmwareDescription)
                         } label: {
                             HStack {
                                 ListIconView(image: Image(systemName: "cpu"), color: Color(.systemGray), padding: 5)
@@ -142,7 +144,7 @@ struct ConfigurationView: View {
                         Text("Reset OATH application")
                     }
                 }
-                if DeviceCapabilities.supportsNFC {
+                if DeviceCapabilities.supportsFIDO {
                     Section("FIDO") {
                         ConfigurationLink {
                             FIDOPINView()
@@ -337,36 +339,22 @@ struct ListIconView: View {
 }
 
 extension DeviceInfo {
-    var deviceName: String {
+    /// The firmware version, with the release stage and build of prerelease firmware.
+    var firmwareDescription: String {
+        Self.firmwareDescription(version: version, releaseType: versionQualifier.releaseType, iteration: versionQualifier.iteration)
+    }
 
-        let deviceName: String
-        switch formFactor {
-        case .usbAKeychain:
-            let name: String
-            if version.major == 5 { name = "5" } else
-            if version.major < 4 { name = "NEO" }
-            else { name = "" }
-            deviceName = "YubiKey \(name) NFC"
-            break
-        case .usbCKeychain:
-            deviceName = "YubiKey 5C NFC"
-        case .usbCLightning:
-            deviceName = "YubiKey 5Ci"
-        case .usbCBio, .usbABio:
-            deviceName = "YubiKey Bio"
-        case .usbCNano:
-            deviceName = "YubiKey Nano"
-        default:
-            return "Unknown key"
-        }
-
-        if (fipsCapabilityFlags != 0) || isFIPS {
-            return deviceName + " FIPS"
-        } else {
-            return deviceName
+    static func firmwareDescription(version: Version, releaseType: VersionQualifier.ReleaseType, iteration: UInt32) -> String {
+        switch releaseType {
+        case .alpha:
+            return "\(version)-alpha.\(iteration)"
+        case .beta:
+            return "\(version)-beta.\(iteration)"
+        case .final:
+            return version.description
         }
     }
-    
+
     var deviceImage: Image? {
         switch formFactor {
         case .usbAKeychain:

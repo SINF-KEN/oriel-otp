@@ -1783,8 +1783,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Yubico/yubikit-swift";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.4.0;
+				branch = release/1.5.0;
+				kind = branch;
 			};
 		};
 		E17E0000000000000000A001 /* XCRemoteSwiftPackageReference "swift-sodium" */ = {

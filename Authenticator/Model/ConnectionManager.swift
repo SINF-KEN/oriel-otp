@@ -263,6 +263,70 @@ final class ConnectionManager {
     #endif
 }
 
+#if os(macOS)
+// MARK: - FIDO over USB HID
+
+// A USB YubiKey's smart card interface can't reach the FIDO application, so the Mac uses the key's HID interface.
+extension ConnectionManager {
+
+    /// Opens the HID FIDO interface of the YubiKey with the given device info.
+    ///
+    /// With several YubiKeys plugged in, the serial number of each one is read over its HID interface so FIDO
+    /// changes go to the key the app is showing.
+    func fidoConnection(matching deviceInfo: DeviceInfo?) async throws -> HIDFIDOConnection {
+        let devices = try await HIDFIDOConnection.availableDevices()
+        // A key only reports its serial number when configured to, leaving nothing to match on.
+        guard let serialNumber = deviceInfo?.serialNumber, serialNumber != 0 else {
+            guard devices.count <= 1 else { throw FidoViewModelError.severalKeys }
+            guard let device = devices.first else { throw FidoViewModelError.fidoNotFound }
+            return try await HIDFIDOConnection(device: device)
+        }
+        var lastError: Error = FidoViewModelError.fidoNotFound
+        for device in devices {
+            do {
+                let connection = try await HIDFIDOConnection(device: device)
+                do {
+                    if try await Management.Session.makeSession(connection: connection).getDeviceInfo().serialNumber == serialNumber {
+                        Logger.connection.debug("ConnectionManager: FIDO interface at USB location \(device.locationID)")
+                        return connection
+                    }
+                } catch {
+                    await connection.close(error: nil)
+                    throw error
+                }
+                await connection.close(error: nil)
+            } catch {
+                lastError = error
+            }
+        }
+        throw lastError
+    }
+
+    /// The USB locations of the YubiKeys with a HID FIDO interface.
+    func fidoLocationIDs() async throws -> Set<Int> {
+        Set(try await HIDFIDOConnection.availableDevices().map(\.locationID))
+    }
+
+    /// Waits until the YubiKey at the given USB location is unplugged.
+    func waitForFIDORemoval(locationID: Int) async throws {
+        while try await fidoLocationIDs().contains(locationID) {
+            try await Task.sleep(for: .milliseconds(250))
+        }
+    }
+
+    /// Waits for a YubiKey to be plugged in at a USB location other than the given ones, and opens its HID
+    /// FIDO interface.
+    func waitForFIDOInsertion(excluding locationIDs: Set<Int>) async throws -> HIDFIDOConnection {
+        while true {
+            if let device = try await HIDFIDOConnection.availableDevices().first(where: { !locationIDs.contains($0.locationID) }) {
+                return try await HIDFIDOConnection(device: device)
+            }
+            try await Task.sleep(for: .milliseconds(250))
+        }
+    }
+}
+#endif
+
 #if os(iOS)
 /// An error whose description is shown in the NFC sheet when it's closed.
 private struct NFCErrorMessage: LocalizedError {
