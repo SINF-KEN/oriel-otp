@@ -33,7 +33,7 @@ While you stay signed in, the copy of your Ente Auth accounts, including their s
 
 ## Accounts on this device
 
-Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device. Deleting an account removes it for good. AutoFill and the Apple Watch app don't use these accounts.
+Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device, unless you made a backup. **Back up accounts…** in the settings writes them, including their secrets, to a file encrypted with a password you choose, saved where you choose. The app doesn't keep the password or a copy of the file, and doesn't send it anywhere. Deleting an account removes it for good. AutoFill and the Apple Watch app don't use these accounts.
 
 ## Tags, hidden codes and Spotlight
 

@@ -88,6 +88,7 @@ private struct GeneralSettingsView: View {
             }
             AppLockSection()
             PrivacySection()
+            BackupSection()
             AutoFillSection()
             EnteAccountSection()
         }
