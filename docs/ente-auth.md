@@ -69,7 +69,7 @@ Auth** (`AccountDestinations`). **This device** is always there; the others are 
 Ente account, the account is saved on this device.
 
 Accounts on this device (`DeviceAccounts`) have their own encrypted file, apart from the vault, which is replaced when
-another Ente account signs in. They stay when signing out of Ente, and **Move to Ente Auth** uploads one with its pin
+another Ente account signs in. They can be backed up to a password-protected file, see [backup.md](backup.md). They stay when signing out of Ente, and **Move to Ente Auth** uploads one with its pin
 and counter.
 
 A YubiKey never gives its OATH secrets back, so an account that is already on a key can't be copied to Ente. The app

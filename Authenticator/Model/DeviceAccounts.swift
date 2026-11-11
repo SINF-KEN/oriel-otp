@@ -69,9 +69,9 @@ enum DeviceAccountsError: Error, LocalizedError {
 /// The accounts kept only on this device, for people without a YubiKey or an Ente account. The app calculates their
 /// codes.
 ///
-/// This is the only copy: the file isn't in backups and its key never leaves the device. So a change that can't be
-/// saved is reported rather than dropped, and nothing is saved while the file couldn't be read, which would write over
-/// the accounts in it.
+/// This is the only copy, unless the person makes a backup (`DeviceBackup`): the file isn't in the device's backups
+/// and its key never leaves the device. So a change that can't be saved is reported rather than dropped, and nothing
+/// is saved while the file couldn't be read, which would write over the accounts in it.
 @Observable final class DeviceAccounts {
 
     static let shared = DeviceAccounts()
@@ -182,6 +182,41 @@ enum DeviceAccountsError: Error, LocalizedError {
                 }
             }
         }
+    }
+
+    /// What restoring a backup did.
+    struct RestoreResult: Equatable {
+        var added = 0
+        /// The same account, with the same secret, is on this device already.
+        var alreadyPresent = 0
+        /// Not an account whose codes the app can calculate, e.g. one in Ente Auth's trash.
+        var skipped = 0
+    }
+
+    /// The accounts as they are stored, for `DeviceBackup` to encrypt.
+    var backupData: [String] { items.map(\.rawData) }
+
+    /// Adds the accounts of a backup, given as its lines. One that is here already is left as it is, with its own
+    /// HOTP counter, which may have moved on since the backup. Nothing is added if they can't all be saved.
+    @discardableResult func restore(backupLines: [String]) throws -> RestoreResult {
+        var result = RestoreResult()
+        try update { items in
+            var codes = items.compactMap { EnteCloudCode(rawData: $0.rawData) }
+            for line in backupLines {
+                guard let rawData = DeviceBackup.rawData(forLine: line), let code = EnteCloudCode(rawData: rawData) else {
+                    result.skipped += 1
+                    continue
+                }
+                if codes.contains(where: { $0.isSameAccount(as: code) }) {
+                    result.alreadyPresent += 1
+                } else {
+                    items.append(DeviceAccountItem(id: UUID().uuidString.lowercased(), rawData: rawData))
+                    codes.append(code)
+                    result.added += 1
+                }
+            }
+        }
+        return result
     }
 
     /// Returns the next HOTP code and moves the counter on. Nil if that can't be saved, as the code would be given

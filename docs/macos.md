@@ -98,6 +98,7 @@ with `[sdk=macosx*]` build settings:
 | `com.apple.security.app-sandbox` | Required for the Mac App Store |
 | `com.apple.security.smartcard` | Talks to the YubiKey's OATH application over CCID |
 | `com.apple.security.network.client` | Ente Auth |
+| `com.apple.security.files.user-selected.read-write` | Saving and opening a backup of the accounts on this Mac, and saving the Ente recovery key, with the system's dialogs |
 | `keychain-access-groups` | The data protection keychain, for saved passwords and the Ente session |
 | `com.apple.security.application-groups` | Shares the AutoFill accounts and the app lock's preferences with the AutoFill extension |
 | `com.apple.developer.authentication-services.autofill-credential-provider` | The AutoFill extension |
