@@ -64,6 +64,22 @@ final class TapToCopyTests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Copied to clipboard"].exists, "Opening the account copied its code")
     }
 
+    /// Without VoiceOver, the code is an element of its own, named after the account, so Voice Control ("Copy Bank",
+    /// "Show numbers"), Switch Control and Full Keyboard Access can copy it without opening the account.
+    @MainActor func testCodeIsItsOwnButtonForVoiceControl() throws {
+        app.launchArguments = ["-DemoDate", Self.demoDate]
+        app.launch()
+        _ = try bankRow()
+        let code = app.buttons["account-row.60/Bank:alice.copy"].firstMatch
+        XCTAssertTrue(code.waitForExistence(timeout: 10), "The code isn't a button of its own")
+        XCTAssertEqual(code.label, "Copy code for Bank")
+        let changeCount = UIPasteboard.general.changeCount
+        code.tap()
+        XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "No Copied to clipboard toast")
+        XCTAssertNotEqual(UIPasteboard.general.changeCount, changeCount, "Nothing was copied")
+        XCTAssertFalse(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 2), "Copying opened the account")
+    }
+
     /// With a hardware keyboard on an iPad, which has no menu bar to find these in.
     @MainActor func testHardwareKeyboardShortcuts() throws {
         try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "For a hardware keyboard on an iPad")

@@ -224,6 +224,13 @@ enum VoiceControlNames {
     static var copy: [String] {
         [String(localized: "Copy", comment: "Menu"), String(localized: "Copy code", comment: "Voice Control name for the Copy button")]
     }
+    /// "Copy GitHub" and "Copy code GitHub" for the code in an account's row.
+    @MainActor static func copyCode(of account: Account) -> [String] {
+        account.voiceControlNames.flatMap { name in
+            [String(localized: "Copy \(name)", comment: "Voice Control name for the code in an account row, e.g. Copy GitHub"),
+             String(localized: "Copy code \(name)", comment: "Voice Control name for the code in an account row, e.g. Copy code GitHub")]
+        }
+    }
     static var syncFromEnte: [String] {
         [String(localized: "Sync from Ente Auth", comment: "Main view menu item"), String(localized: "Sync", comment: "Voice Control name for the Sync from Ente Auth button"),
          String(localized: "Ente Auth", comment: "Ente sync navigation title")]
