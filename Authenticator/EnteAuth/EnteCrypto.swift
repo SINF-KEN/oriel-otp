@@ -66,9 +66,12 @@ nonisolated enum EnteCrypto {
     /// Turns the password of a new account into a key encryption key. Ente's server only takes limits with exactly the
     /// work of libsodium's sensitive limits, so devices short of memory halve it and double the passes, like Ente's apps.
     /// This is slow and memory hungry by design, call it off the main actor.
-    static func deriveNewKeyEncryptionKey(password: String) throws -> (key: Data, salt: Data, opsLimit: UInt64, memLimit: UInt64) {
+    ///
+    /// `maximumMemory` leaves out the limits that take more, for a key that a smaller device has to derive again, as
+    /// with a backup. It must be at least 128 MiB.
+    static func deriveNewKeyEncryptionKey(password: String, maximumMemory: UInt64 = .max) throws -> (key: Data, salt: Data, opsLimit: UInt64, memLimit: UInt64) {
         let salt = randomBytes(saltLength)
-        let limits = newKeyLimits(availableMemory: availableMemory())
+        let limits = newKeyLimits(availableMemory: availableMemory()).filter { $0.memLimit <= maximumMemory }
         for (index, limit) in limits.enumerated() {
             do {
                 let key = try deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: limit.opsLimit, memLimit: limit.memLimit)
@@ -100,6 +103,13 @@ nonisolated enum EnteCrypto {
             memLimit /= 2
             opsLimit *= 2
         }
+    }
+
+    /// Whether a key with this memory limit can be derived without the system ending the app, which on iOS it does
+    /// rather than fail the allocation. True where that isn't known.
+    static func hasMemory(for memLimit: UInt64) -> Bool {
+        let headroom: UInt64 = 32 * 1024 * 1024
+        return availableMemory().map { $0 >= memLimit.addingReportingOverflow(headroom).partialValue } ?? true
     }
 
     /// How much more memory the app may use before the system ends it, where that's known.

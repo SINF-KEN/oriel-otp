@@ -28,8 +28,11 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 ## Features
 
 - **Codes on this device.** Add an account and the app calculates its codes, with no YubiKey or Ente account. The
-  account is kept only on this device, encrypted and outside its backups, so keep the service's recovery codes, or
-  move the account to Ente Auth or a YubiKey.
+  account is kept only on this device, encrypted and outside its backups, so back it up, keep the service's recovery
+  codes, or move the account to Ente Auth or a YubiKey.
+- **Encrypted backup.** Save the accounts on this device to a file protected by a password, and restore it on this or
+  another device. The file is Ente Auth's encrypted export, so Ente Auth opens it too. See
+  [docs/backup.md](docs/backup.md).
 - **OATH codes on a YubiKey (optional).** Time-based (TOTP) and counter-based (HOTP) codes, as used by most online services.
   The secrets are stored on the YubiKey and the codes are calculated there; the app doesn't keep a copy.
 - **Ente Auth import.** Sign in to Ente Auth, pick accounts and add them to the YubiKey. Accounts already on the
@@ -130,7 +133,8 @@ you lower your wrist or the screen is in Always On, and there is no way to copy 
 
 - The app has no analytics or advertising and doesn't send your data to the developer.
 - Accounts saved on this device are in an encrypted file, with a key that never leaves the device. They aren't in
-  backups or iCloud, so they're lost with the device.
+  backups or iCloud, so they're lost with the device unless you back them up in the settings, to a file encrypted
+  with a password you choose.
 - OATH secrets of YubiKey accounts live on the key. The app only writes them to the key when you add an account. Signed in to Ente
   Auth, the app keeps an encrypted copy of your Ente Auth accounts on the device, with a key that never leaves it.
 - If you turn on Apple Watch, the watch keeps a copy of your time-based Ente Auth accounts. It's off by default.
