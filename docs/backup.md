@@ -52,11 +52,31 @@ such as accounts in Ente Auth's trash, are skipped and counted. Nothing is added
 
 A wrong password and a damaged file can't be told apart: either way the message doesn't authenticate.
 
+## Importing from other apps
+
+**Import from another app…**, in the same section, adds the accounts of another authenticator's export to this
+device, with the same rule as restoring: an account that's here already is left as it is. It reads:
+
+- Google Authenticator's export QR codes, `otpauth-migration://offline?data=…`, from a screenshot (every QR code in
+  the image is read, with Core Image). Its accounts are a protocol buffer, decoded in `GoogleAuthenticatorMigration`;
+  MD5 accounts are skipped. Scanning one of these codes in Add account says to import it instead.
+- Aegis's JSON export without encryption, with its TOTP, HOTP and Steam entries.
+- 2FAS's `.2fas` file without a password.
+- Raivo's JSON.
+- Text with one otpauth or otpauth-migration link per line.
+
+Encrypted exports from Aegis, 2FAS and Raivo are recognized and turned down with a message to export without
+encryption. A backup made by this app or Ente Auth picked here is restored with its password, as from **Restore from
+backup…**. The export holds the secrets in plain text, so the section's footer says to delete it afterwards.
+
 ## Code
 
 | File | Purpose |
 | --- | --- |
 | `Authenticator/Backup/DeviceBackup.swift` | The file format: encrypting, decrypting, and the line of an account |
 | `Authenticator/Backup/BackupSection.swift` | The settings section and its two sheets |
+| `Authenticator/Backup/AuthenticatorImport.swift` | Other apps' exports, as otpauth URLs |
+| `Authenticator/Backup/AuthenticatorImportFile.swift` | The file types, and the QR codes in a screenshot |
 | `DeviceAccounts.restore(backupLines:)` | Adds the accounts of a backup |
 | `AuthenticatorTests/Backup/DeviceBackupTests.swift` | Includes a file made with PyNaCl the way Ente Auth makes one |
+| `AuthenticatorTests/Backup/AuthenticatorImportTests.swift` | Each format, and a QR code drawn into a PNG |

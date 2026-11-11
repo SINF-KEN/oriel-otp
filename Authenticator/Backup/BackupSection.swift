@@ -28,6 +28,7 @@ struct BackupSection: View {
 
     @State private var isBackingUp = false
     @State private var isPickingFile = false
+    @State private var isPickingImport = false
     @State private var picked: PickedBackup?
     @State private var notice: String?
     @State private var error: Error?
@@ -66,13 +67,26 @@ struct BackupSection: View {
                 }
                 .appLockCover()
             }
+            Button(String(localized: "Import from another app…", comment: "Backup settings button that imports accounts exported by another authenticator app")) {
+                isPickingImport = true
+            }
+            .accessibilityIdentifier("backup.import")
+            .fileImporter(isPresented: $isPickingImport, allowedContentTypes: AuthenticatorImportFile.contentTypes) { result in
+                switch result {
+                case .success(let url): importAccounts(from: url)
+                case .failure(let error): self.error = error
+                }
+            }
         } header: {
             Text(String(localized: "Backup", comment: "Backup settings section header"))
         } footer: {
-            if device.accounts.isEmpty {
-                Text(String(localized: "Accounts saved on this device can be backed up to a file encrypted with a password you choose. There are none yet. A backup, or an encrypted export from Ente Auth, can be restored here.", comment: "Backup settings footer without accounts on this device"))
-            } else {
-                Text(String(localized: "Saves the accounts kept only on this device to a file encrypted with a password you choose, which Ente Auth can open too. Without a backup they're lost with the device. Accounts on a YubiKey or in Ente Auth aren't included.", comment: "Backup settings footer"))
+            VStack(alignment: .leading, spacing: 8) {
+                if device.accounts.isEmpty {
+                    Text(String(localized: "Accounts saved on this device can be backed up to a file encrypted with a password you choose. There are none yet. A backup, or an encrypted export from Ente Auth, can be restored here.", comment: "Backup settings footer without accounts on this device"))
+                } else {
+                    Text(String(localized: "Saves the accounts kept only on this device to a file encrypted with a password you choose, which Ente Auth can open too. Without a backup they're lost with the device. Accounts on a YubiKey or in Ente Auth aren't included.", comment: "Backup settings footer"))
+                }
+                Text(String(localized: "Import reads exports from Google Authenticator (a screenshot of its QR code), Aegis, 2FAS and Raivo without encryption, and text files of otpauth links. The accounts are saved on this device. Delete the export afterwards: anyone with it has the accounts.", comment: "Backup settings footer about importing from another authenticator app"))
             }
         }
         .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
@@ -102,9 +116,35 @@ struct BackupSection: View {
         picked = PickedBackup(data: data)
     }
 
+    /// Adds the accounts of another app's export to this device. A backup made by this app, or by Ente Auth, is
+    /// restored with its password instead.
+    private func importAccounts(from url: URL) {
+        let isScoped = url.startAccessingSecurityScopedResource()
+        defer {
+            if isScoped { url.stopAccessingSecurityScopedResource() }
+        }
+        guard let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= AuthenticatorImport.maximumFileSize,
+              let data = try? Data(contentsOf: url) else {
+            error = AuthenticatorImportError.unknownFormat
+            return
+        }
+        if DeviceBackup.isBackup(data) {
+            picked = PickedBackup(data: data)
+            return
+        }
+        do {
+            let urls = try AuthenticatorImportFile.otpauthURLs(from: data)
+            notice = Self.summary(of: try device.restore(backupLines: urls), imported: true)
+        } catch {
+            self.error = error
+        }
+    }
+
     /// Counts after a colon rather than in a sentence, which reads right for any number in every language.
-    static func summary(of result: DeviceAccounts.RestoreResult) -> String {
-        var lines = [String(localized: "Accounts restored: \(result.added)", comment: "Backup restore result. The placeholder is a number.")]
+    static func summary(of result: DeviceAccounts.RestoreResult, imported: Bool = false) -> String {
+        var lines = [imported
+            ? String(localized: "Accounts imported: \(result.added)", comment: "Import result. The placeholder is a number.")
+            : String(localized: "Accounts restored: \(result.added)", comment: "Backup restore result. The placeholder is a number.")]
         if result.alreadyPresent > 0 {
             lines.append(String(localized: "Already on this device: \(result.alreadyPresent)", comment: "Backup restore result. The placeholder is a number of accounts."))
         }
