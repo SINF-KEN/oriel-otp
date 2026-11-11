@@ -35,11 +35,12 @@ import YubiKit
         Logger.allocation.debug("DisableOTPModel: deinit")
     }
 
+    /// The serial number of the YubiKey the sheet was opened for. Another key connected since is left alone.
+    private var serialNumber: UInt?
+
     func checkConfigurationLocked() {
         Task {
-            guard let connection = ConnectionManager.shared.wiredConnection else { return }
-            guard let session = try? await connection.managementSession() else { return }
-            guard let deviceInfo = try? await session.getDeviceInfo() else { return }
+            guard let (_, deviceInfo) = try? await connectedKey() else { return }
             self.isConfigurationLocked = deviceInfo.isConfigLocked
         }
     }
@@ -48,12 +49,11 @@ import YubiKit
         guard !isDisablingOTP else { return }
         isDisablingOTP = true
         Task {
-            guard let connection = ConnectionManager.shared.wiredConnection else { return }
-            guard let session = try? await connection.managementSession() else { return }
-            guard let deviceInfo = try? await session.getDeviceInfo() else { return }
             do {
+                let (session, deviceInfo) = try await connectedKey()
                 try await session.updateDeviceConfig(deviceInfo.config.disable(application: .otp, over: .usb), reboot: true)
             } catch {
+                // Also when the key can't be reached, so the button works again once it is back.
                 self.error = error
                 isDisablingOTP = false
             }
@@ -62,11 +62,32 @@ import YubiKit
 
     func ignoreThisKey() {
         Task {
-            guard let connection = ConnectionManager.shared.wiredConnection else { return }
-            guard let session = try? await connection.managementSession() else { return }
-            guard let deviceInfo = try? await session.getDeviceInfo() else { return }
-            SettingsConfig.registerUSBCDeviceToIgnore(deviceId: deviceInfo.serialNumber)
-            self.keyIgnored = true
+            do {
+                let (_, deviceInfo) = try await connectedKey()
+                SettingsConfig.registerUSBCDeviceToIgnore(deviceId: deviceInfo.serialNumber)
+                self.keyIgnored = true
+            } catch {
+                self.error = error
+            }
         }
+    }
+
+    /// The wired YubiKey, if it is the one this sheet was first shown for.
+    private func connectedKey() async throws -> (session: Management.Session, deviceInfo: DeviceInfo) {
+        guard let connection = ConnectionManager.shared.wiredConnection else { throw OATHSessionError.yubiKeyNotReachable }
+        let session: Management.Session
+        let deviceInfo: DeviceInfo
+        do {
+            session = try await connection.managementSession()
+            deviceInfo = try await session.getDeviceInfo()
+        } catch {
+            throw OATHSessionError.yubiKeyNotReachable
+        }
+        if let serialNumber {
+            guard deviceInfo.serialNumber == serialNumber else { throw OATHSessionError.otherYubiKey }
+        } else {
+            serialNumber = deviceInfo.serialNumber
+        }
+        return (session, deviceInfo)
     }
 }

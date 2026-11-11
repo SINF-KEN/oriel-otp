@@ -20,7 +20,6 @@ import OSLog
 nonisolated public extension Logger {
     private static let subsystem = Bundle.main.bundleIdentifier!
 
-    static let ui = Logger(subsystem: subsystem, category: "UI")
     static let allocation = Logger(subsystem: subsystem, category: "Allocation")
     static let connection = Logger(subsystem: subsystem, category: "Connection")
     static let ctk = Logger(subsystem: subsystem, category: "CTK")

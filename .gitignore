@@ -83,3 +83,7 @@ iOSInjectionProject/
 # Local env files with personal data, such as the answers for the ANSSI declaration. Never commit them.
 .env
 .env.*
+
+# Xcode results and packages resolved into the project folder
+*.xcresult
+SourcePackages/

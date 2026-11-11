@@ -1,49 +1,16 @@
-# Maintaining the fork
+# The fork
 
-The work is split so that everything that could go upstream stays separate from what only makes sense for the
-fork.
+Oriel OTP started as a fork of Yubico's [yubioath-ios](https://github.com/Yubico/yubioath-ios). It's now developed
+on its own: [SINF-KEN/oriel-otp](https://github.com/SINF-KEN/oriel-otp) is the only remote, changes go to `main`
+through pull requests, and nothing is rebased onto Yubico's `main` or sent upstream any more. Earlier, the work was
+split into an upstreamable `main`, a `feature/ente-auth-sync` branch and a `fork/oriel-otp` branch with only the
+rebranding; that split was dropped once the app had diverged too far for it to be useful.
 
-| Branch | Based on | Contains | Goes to |
-| --- | --- | --- | --- |
-| `main` | Yubico's `main` | Upstream plus general improvements | Yubico |
-| `feature/ente-auth-sync` | `main` | Batch add API and Ente Auth sync, with Yubico branding | Yubico, as a pull request |
-| `fork/oriel-otp` | `feature/ente-auth-sync` | Only the rebranding commits | The Oriel OTP app |
-
-## Repositories
-
-| Remote | Repository | Holds |
-| --- | --- | --- |
-| `origin` | [Yubico/yubioath-ios](https://github.com/Yubico/yubioath-ios) | Upstream |
-| `fork` | [SINF-KEN/yubioath-ios](https://github.com/SINF-KEN/yubioath-ios) | `main` and `feature/ente-auth-sync`, for pull requests to Yubico |
-| `oriel` | [SINF-KEN/oriel-otp](https://github.com/SINF-KEN/oriel-otp) | `fork/oriel-otp` as `main` and `feature/ente-auth-sync` |
-
-`main` on `oriel` also has debug-only tooling for the simulator: a simulated YubiKey, a fake Ente server at
+The debug-only tooling for the simulator lives on `main`: a simulated YubiKey, a fake Ente server at
 `https://demo.ente.test` (any email, password `demo`), a menu item that acts like scanning a YubiKey's NFC OTP,
 and a clock that can be frozen. It is all inside `#if DEBUG && (targetEnvironment(simulator) || os(macOS))`, and on
-the Mac only switched on with the `-SimulatedYubiKey YES` launch argument. It is used to take the README screenshots (see [screenshots.md](screenshots.md)). It used to live on a separate `simulator-demo` branch.
-Like the rebranding, it isn't meant for Yubico.
-
-Publishing the app branch:
-
-```bash
-git push oriel fork/oriel-otp:main
-```
-
-The rebranding is a few commits that touch identifiers, assets and a handful of strings, so it rebases with few
-conflicts:
-
-```bash
-git fetch origin
-git rebase origin/main main
-git rebase main feature/ente-auth-sync
-git rebase --onto feature/ente-auth-sync feature/ente-auth-sync@{1} fork/oriel-otp
-```
-
-The last step uses `--onto` with the feature branch's previous position (`@{1}`, from the reflog), so only the
-fork's own commits move. A plain `git rebase feature/ente-auth-sync fork/oriel-otp` would also replay the old copies
-of the feature commits once they have been rewritten, and conflict with the new ones.
-
-Put new features and fixes on `main` or a feature branch, never on `fork/oriel-otp`, so they stay upstreamable.
+the Mac only switched on with the `-SimulatedYubiKey YES` launch argument. It is used to take the README screenshots
+(see [screenshots.md](screenshots.md)).
 
 ## What the rebranding changes
 

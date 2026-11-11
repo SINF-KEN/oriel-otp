@@ -98,8 +98,19 @@ runs:
           echo "Actual:   $actual_dirs"
           exit 1
         fi
-        jq -r '.pins[] | "\(.identity) \(.location) \(.state.revision)"' "$resolved" |
-        while read -r identity location revision; do
+        jq -r '.pins[] | "\(.identity) \(.location) \(.state.revision) \(.state.version // "-")"' "$resolved" |
+        while read -r identity location revision version; do
+          # The revision must be the upstream release it is named after: a tag that was moved would show here.
+          if [[ "$version" != "-" ]]; then
+            # Some packages tag "v1.4.0" for version 1.4.0. An annotated tag lists its commit under "^{}", which wins.
+            refs=$(git ls-remote "$location" "refs/tags/$version" "refs/tags/v$version" "refs/tags/$version^{}" "refs/tags/v$version^{}")
+            tagged=$(awk '$2 ~ /\^\{\}$/ { print $1; found = 1; exit } END { if (!found) print "" }' <<< "$refs")
+            [[ -n "$tagged" ]] || tagged=$(awk 'NR == 1 { print $1 }' <<< "$refs")
+            if [[ "$tagged" != "$revision" ]]; then
+              echo "::error::$identity's tag $version is ${tagged:-missing}, not the pinned $revision."
+              exit 1
+            fi
+          fi
           checkout="$PACKAGES/checkouts/$(basename "$location" .git)"
           verify=$(mktemp -d "$RUNNER_TEMP/verify-package.XXXXXX")
           git init -q --bare -b main "$verify"

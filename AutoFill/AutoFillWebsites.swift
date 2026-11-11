@@ -240,7 +240,12 @@ nonisolated enum AutoFillIdentities {
     @discardableResult static func replace(with accounts: [AutoFillAccount]) async -> Bool {
         let store = ASCredentialIdentityStore.shared
         guard await store.state().isEnabled else { return false }
-        try? await store.replaceCredentialIdentities(identities(for: accounts))
+        do {
+            try await store.replaceCredentialIdentities(identities(for: accounts))
+        } catch {
+            // Rather than leave suggestions for accounts that may be gone, e.g. after signing out.
+            try? await store.removeAllCredentialIdentities()
+        }
         return true
     }
 }

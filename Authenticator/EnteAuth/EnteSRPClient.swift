@@ -55,8 +55,6 @@ nonisolated struct EnteSRPClient {
 
     static let g = BigUInt(5)
 
-    static var primeBytes: Data { N.serialize() }
-
     // k = H(N | PAD(g))
     static let k = BigUInt(hash(N.serialize(), pad(g.serialize())))
 

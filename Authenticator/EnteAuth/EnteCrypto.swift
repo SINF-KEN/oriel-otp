@@ -50,6 +50,9 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         guard salt.count == saltLength else { throw EnteCryptoError.invalidLength }
         guard isAllowed(opsLimit: opsLimit, memLimit: memLimit) else { throw EnteCryptoError.invalidKeyLimits }
+        // Running out of memory on iOS ends the app rather than failing the allocation. Signing in can't use lower
+        // limits like a new account can, they come with the account, so it fails with an error instead.
+        guard hasMemory(for: memLimit) else { throw EnteCryptoError.keyDerivationFailed }
         var key = [UInt8](repeating: 0, count: keyLength)
         var password = Array(password.utf8)
         defer {
@@ -124,8 +127,10 @@ nonisolated enum EnteCrypto {
     }
 
     /// Whether Argon2 limits sent by a server are safe to use. The limits come with the account and aren't
-    /// authenticated, so a server could otherwise have the password hashed cheaply, and then guess it from the SRP
-    /// proof, or run the app out of memory or keep it busy for minutes, which can't be cancelled.
+    /// authenticated, so a server could otherwise run the app out of memory or keep it busy for minutes, which can't
+    /// be cancelled. The floor matters less: the account's own server has the SRP verifier and can guess the password
+    /// from it whatever limits it sends. It only keeps a server someone was pointed to by mistake from getting a
+    /// proof that is cheaper to guess from than the account's own limits allow.
     ///
     /// Ente's clients start from libsodium's sensitive limits (1 GiB, 4 passes) and double the passes as they halve the
     /// memory on devices that need it, which leaves memory times passes the same. So the memory must be between

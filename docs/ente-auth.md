@@ -142,8 +142,11 @@ version replaces the item, pending change or not, if it is newer than that; othe
 and uploaded. So a change made here wins unless another device changed the same account since this device last
 synced, and a deletion on the server always wins. To tell its own update apart from another device's when it comes
 back in the diff (`PUT` answers without the new time), an item remembers what it uploaded last. A `POST` whose
-answer was lost isn't uploaded twice: an entity in the diff with the same plain text as an item waiting to be added
-is taken to be that item. Ente's server has no compare-and-swap, so two devices writing the same entity within one
+answer was lost is recognized when it comes back in the diff, if the next pull sees it before the item is uploaded
+again, which every sync does first: an entity with the same plain text as an item waiting to be added, or with the
+same secret as what that item uploaded (another device may have edited it since), is taken to be that item. Ente's
+API has no idempotency key, so one that another device also gave a new secret before this device saw it can't be
+recognized, and is then listed twice. Ente's server has no compare-and-swap, so two devices writing the same entity within one
 sync of each other can still overwrite each other; the last write wins there.
 
 A sync needs the saved session. It is unlocked with Face ID or Touch ID (Touch ID or the password on the Mac) the
@@ -172,7 +175,8 @@ changed in the app, and ones pulled from other devices, reach the watch without 
 The account stays signed in, like in Ente's own apps. **Stay signed in** is on by default when the device can
 protect the session: the auth token and the authenticator key, the key that decrypts the accounts, are saved in
 the keychain, only on this device (`WhenPasscodeSetThisDeviceOnly`). Reading them needs Face ID or Touch ID on
-iPhone and iPad (`biometryCurrentSet`) and Touch ID or the Mac's password on the Mac (`userPresence`). After a
+iPhone and iPad (`biometryCurrentSet`) and Touch ID or the Mac's password on the Mac (`userPresence`), each time:
+unlocking the device a moment earlier doesn't count (`touchIDAuthenticationAllowableReuseDuration` is 0). After a
 relaunch, syncing only needs that unlock, not the Ente password. The password is never stored, and neither is the
 master key: the authenticator key is all syncing and adding accounts need.
 
@@ -190,8 +194,10 @@ The email and server are kept in the app's preferences, so the account is shown 
 and with **Sign out** in the settings (the YubiKey configuration on iPhone and iPad, Settings ▸ General on the
 Mac). **Sign out** asks for the unlock to read the token, deletes the token, the key, the account and the vault right
 away, and then revokes the token with `POST /users/logout` without waiting for the answer. If the unlock is cancelled
-or the server can't be reached, the account is still deleted from the device. Changes that weren't uploaded yet are
-lost, and the confirmation says so.
+the token can't be read, so it isn't revoked: it stays valid on the server until it expires or is revoked from the
+account's sessions in Ente's apps. If the server can't be reached it isn't revoked either. Either way the account is
+deleted from the device. Changes that weren't uploaded yet are lost, and the confirmation says so; accounts added in
+the app that never reached Ente are kept on the device instead.
 
 The vault is a file in the app's Application Support folder (`EnteAuth/Vault`), encrypted with ChaChaPoly
 (CryptoKit) under a random 256-bit key. The key is in the keychain as `WhenUnlockedThisDeviceOnly`: it never leaves
@@ -289,6 +295,7 @@ Everything lives in `Authenticator/EnteAuth/` and is added to the project as a s
 
 | File | Purpose |
 | --- | --- |
+| `AutoFillAccountSync.swift`, `AutoFillSection.swift`, `AutoFillWebsitesView.swift` | The copy of the accounts the AutoFill extension reads, and the websites chosen for them |
 | `EnteCrypto.swift` | libsodium wrappers: Argon2id, KDF, secretbox, sealed box, secretstream |
 | `EnteSRPClient.swift` | SRP-6a client matching Ente's server |
 | `EnteAPIClient.swift` | HTTP client and wire models |
@@ -297,17 +304,20 @@ Everything lives in `Authenticator/EnteAuth/` and is added to the project as a s
 | `EnteVault.swift` | The vault: entities with their pending changes, the conflict rule, editing entities like Ente Auth, codes and the encrypted file |
 | `EnteCloud.swift` | Keeps the vault in step with Ente: unlocking, pulling, pushing, and the changes made in the app |
 | `EnteSessionStore.swift` | The saved account and session in the keychain |
+| `EnteAccountDeletionViewModel.swift`, `EnteAccountDeletionView.swift` | Deleting the Ente account |
 | `EnteAccountSection.swift` | The saved account, **Sign out** and **Move to another server…** in the settings |
 | `EnteMigration.swift`, `EnteMigrationViewModel.swift`, `EnteMigrationView.swift` | Moving the accounts to another server |
 | `EnteSignUp.swift`, `EnteSignUpViewModel.swift`, `EnteSignUpView.swift` | Creating an account on a self-hosted server |
 | `EnteSyncViewModel.swift`, `EnteSyncView.swift` | The sheet |
 | `FakeEnteServer.swift` | The demo server for Debug builds in the simulator and on the Mac, and the tests |
+| `WatchAccountSync.swift` | Sends the time-based accounts to the Apple Watch, sealed |
 
 Outside that folder the feature adds a menu item, buttons in the empty account list and a sheet in `MainView`, the
-toggle in `AddAccountView`, and
+**Save to** choice in `AddAccountView`, and
 `MainViewModel.addAccounts(_:requiresTouch:completion:)` / `OATHSession.addCredentials(templates:requiresTouch:)`,
-which add several accounts in one YubiKey session. For the vault, `Account` has a `location` (`.yubiKey` or
-`.ente(id:)`), `MainViewModel` keeps `keyAccounts` and `cloudAccounts` and lists both as `accounts`, and edits,
+which add several accounts in one YubiKey session. For the vault, `Account` has a `location` (`.yubiKey`,
+`.ente(id:)` or `.device(id:)`), `MainViewModel` keeps `keyAccounts`, `cloudAccounts` and `deviceAccounts` and lists them
+as `accounts`, and edits,
 deletes and HOTP calculations of an Ente Auth account go to `EnteCloud` instead of the YubiKey.
 
 The fake server handles the write endpoints too (`POST`, `PUT` and `DELETE /authenticator/entity`), with an

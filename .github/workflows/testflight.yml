@@ -49,12 +49,13 @@ jobs:
             exit 1
           fi
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          # main only takes squashed pull requests, so the last commit is the whole change.
+          # main only takes squashed pull requests (the repository allows no other merges), so the last commit is
+          # the whole change. --no-renames lists a moved file by its old path too.
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]] || ! git rev-parse -q --verify HEAD^ >/dev/null; then
             echo "code=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          code=$(git diff --name-only HEAD^ HEAD \
+          code=$(git diff --no-renames --name-only HEAD^ HEAD \
             | grep -Ev '^(docs/.*|[^/]*\.md|LICENSE|NOTICE|\.github/.*)$' || true)
           if [[ -n "$code" ]]; then
             echo "code=true" >> "$GITHUB_OUTPUT"
@@ -95,8 +96,8 @@ jobs:
       # Apple keeps in the cloud, so the distribution certificate never leaves Apple.
       #
       # The certificate is installed only now, after the packages are resolved, and its keychain is locked as soon as
-      # the archive is signed. security import only takes the password as an argument (-P); it's visible to other
-      # processes on this single-use runner only while the import runs.
+      # the archive is signed. The certificate's password isn't passed as an argument, where other processes could
+      # read it: the .p12 is converted to PEM with the password read from the environment, and imported without one.
       - name: Install signing credentials
         env:
           CERTIFICATE_P12: ${{ secrets.DEVELOPMENT_CERTIFICATE_P12 }}
@@ -109,12 +110,21 @@ jobs:
           security create-keychain -p "$password" "$keychain"
           security set-keychain-settings -lut 3600 "$keychain"
           security unlock-keychain -p "$password" "$keychain"
-          trap 'rm -f "$RUNNER_TEMP/development.p12"' EXIT
+          trap 'rm -f "$RUNNER_TEMP/development.p12" "$RUNNER_TEMP/development.pem"' EXIT
           base64 --decode <<< "$CERTIFICATE_P12" > "$RUNNER_TEMP/development.p12"
-          security import "$RUNNER_TEMP/development.p12" -k "$keychain" -P "$CERTIFICATE_PASSWORD" \
-            -T /usr/bin/codesign -T /usr/bin/security
+          openssl pkcs12 -in "$RUNNER_TEMP/development.p12" -passin env:CERTIFICATE_PASSWORD -nodes \
+            -out "$RUNNER_TEMP/development.pem"
+          security import "$RUNNER_TEMP/development.pem" -k "$keychain" -T /usr/bin/codesign -T /usr/bin/security
+          rm -f "$RUNNER_TEMP/development.p12" "$RUNNER_TEMP/development.pem"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$password" "$keychain" >/dev/null
-          security list-keychains -d user -s "$keychain" $(security list-keychains -d user | tr -d '"')
+          # Quoted one per line, so a keychain path with a space stays one argument.
+          keychains=("$keychain")
+          while IFS= read -r line; do
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line#\"}"; line="${line%\"}"
+            [[ -n "$line" ]] && keychains+=("$line")
+          done < <(security list-keychains -d user)
+          security list-keychains -d user -s "${keychains[@]}"
 
       # Fetching the provisioning profiles sometimes fails on Apple's side ("The network connection was lost", "The
       # data couldn't be read because it isn't in the correct format"), which Xcode then reports as "No profiles for
@@ -134,6 +144,8 @@ jobs:
           set -euo pipefail
           trap 'rm -f "$RUNNER_TEMP/AuthKey.p8"; security lock-keychain "$RUNNER_TEMP/signing.keychain-db" || true' EXIT
           (umask 077 && printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8")
+          # xcodebuild reads the key from the file; it and its build scripts don't get it in their environment.
+          unset API_KEY
           for attempt in 1 2 3; do
             rm -rf "$RUNNER_TEMP/OrielOTP.xcarchive"
             xcodebuild archive \
@@ -177,6 +189,7 @@ jobs:
           set -euo pipefail
           trap 'rm -f "$RUNNER_TEMP/AuthKey.p8"' EXIT
           (umask 077 && printf '%s\n' "$API_KEY" > "$RUNNER_TEMP/AuthKey.p8")
+          unset API_KEY
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -217,7 +230,7 @@ jobs:
         if: always()
         run: |
           security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true
-          rm -f "$RUNNER_TEMP/AuthKey.p8"
+          rm -f "$RUNNER_TEMP/AuthKey.p8" "$RUNNER_TEMP/development.p12" "$RUNNER_TEMP/development.pem"
 
       - name: Upload logs
         if: always()

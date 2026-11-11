@@ -29,6 +29,13 @@ nonisolated protocol DeviceAccountStorage: Sendable {
     func save(_ items: [DeviceAccountItem]) throws
     /// Moves a file that couldn't be read out of the way, so saving doesn't write over it.
     func setAside() throws
+    /// Hands over the accounts of each file set aside earlier that can be read now, and deletes the file unless
+    /// `keep` throws.
+    func recoverSetAside(_ keep: ([DeviceAccountItem]) throws -> Void)
+}
+
+nonisolated extension DeviceAccountStorage {
+    func recoverSetAside(_ keep: ([DeviceAccountItem]) throws -> Void) {}
 }
 
 /// Keeps the accounts in an encrypted file with a key of its own, apart from the Ente vault, which is replaced when
@@ -48,13 +55,8 @@ nonisolated struct DeviceAccountFile: DeviceAccountStorage {
     func load() throws -> [DeviceAccountItem]? { try file.load() }
     func save(_ items: [DeviceAccountItem]) throws { try file.save(items) }
 
-    /// Keeps the file next to the new one with the same key, so a version of the app that can read it, e.g. the one
-    /// that wrote it before a downgrade, still can.
-    func setAside() throws {
-        guard FileManager.default.fileExists(atPath: file.url.path) else { return }
-        let stamp = Int(Date().timeIntervalSince1970)
-        try FileManager.default.moveItem(at: file.url, to: file.url.deletingLastPathComponent().appending(path: "Unreadable-\(stamp)"))
-    }
+    func setAside() throws { try file.setAside() }
+    func recoverSetAside(_ keep: ([DeviceAccountItem]) throws -> Void) { file.recoverSetAside(keep) }
 }
 
 enum DeviceAccountsError: Error, LocalizedError {
@@ -115,6 +117,16 @@ enum DeviceAccountsError: Error, LocalizedError {
             isUnreadable = true
         } catch {
             isLocked = true
+        }
+        recoverSetAside()
+    }
+
+    /// Brings back the accounts of files that were set aside because they couldn't be read, once they can, e.g.
+    /// after the app that wrote them is installed again.
+    private func recoverSetAside() {
+        guard !isLocked else { return }
+        storage.recoverSetAside { items in
+            try keep(rawData: items.map(\.rawData))
         }
     }
 

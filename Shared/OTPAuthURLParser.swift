@@ -31,39 +31,50 @@ nonisolated struct EnteEntry: Sendable, Equatable {
     let iconID: String?
 
     init(rawData: String) {
+        let (components, display) = Self.read(rawData: rawData)
+        self.components = components
+        isTrashed = display["trashed"] as? Bool == true
+        isPinned = display["pinned"] as? Bool == true
+        tags = Self.cleaned(display["tags"] as? [String] ?? [])
+        let iconID = display["iconID"] as? String
+        self.iconID = iconID.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 }
+    }
+
+    /// The otpauth URL of an entity, nil if the data can't be read, and its display settings.
+    ///
+    /// The list, the Watch, AutoFill and the editor all read an entity through this, so they see the same account. A
+    /// setting in the URL's `codeDisplay` parameter wins over the same setting in the JSON object, and the parameter
+    /// is found whatever the case of its name, like the other parameters.
+    static func read(rawData: String) -> (components: URLComponents?, display: [String: Any]) {
         var urlString: String?
-        var displays = [[String: Any]]()
+        var display = [String: Any]()
         if let json = try? JSONSerialization.jsonObject(with: Data(rawData.utf8), options: .fragmentsAllowed) {
             if let string = json as? String {
                 urlString = string
             } else if let object = json as? [String: Any] {
                 urlString = object["rawData"] as? String
-                if let display = object["display"] as? [String: Any] { displays.append(display) }
+                display = object["display"] as? [String: Any] ?? [:]
             }
-        } else if rawData.hasPrefix("otpauth://") {
+        } else if rawData.lowercased().hasPrefix("otpauth://") {
             urlString = rawData
         }
 
         // Ente's apps escape '#' the same way before parsing, it is common in issuers and account names.
-        if let urlString, let components = URLComponents(string: urlString.replacingOccurrences(of: "#", with: "%23")),
+        guard let urlString, let components = URLComponents(string: urlString.replacingOccurrences(of: "#", with: "%23")),
             components.scheme?.lowercased() == "otpauth"
+        else { return (nil, display) }
+        if let codeDisplay = components.queryItems?.first(where: { $0.name.lowercased() == "codedisplay" })?.value,
+            let parameter = try? JSONSerialization.jsonObject(with: Data(codeDisplay.utf8)) as? [String: Any]
         {
-            self.components = components
-            if let codeDisplay = components.queryItems?.first(where: { $0.name == "codeDisplay" })?.value,
-                let display = try? JSONSerialization.jsonObject(with: Data(codeDisplay.utf8)) as? [String: Any]
-            {
-                displays.append(display)
-            }
-        } else {
-            self.components = nil
+            display.merge(parameter) { _, new in new }
         }
-        isTrashed = displays.contains { $0["trashed"] as? Bool == true }
-        isPinned = displays.contains { $0["pinned"] as? Bool == true }
-        // The URL's settings win over the object's, like the editor reads them.
-        let tags = displays.last { $0["tags"] != nil }?["tags"] as? [String] ?? []
-        self.tags = Self.cleaned(tags)
-        let iconID = displays.last { $0["iconID"] != nil }?["iconID"] as? String
-        self.iconID = iconID.flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : $0 }
+        return (components, display)
+    }
+
+    /// Whether a query item from `percentEncodedQueryItems` has the name, in any case and however its name is
+    /// encoded: `%63ounter` is `counter`, as `queryItems` reads it.
+    static func isNamed(_ name: String, _ item: URLQueryItem) -> Bool {
+        (item.name.removingPercentEncoding ?? item.name).lowercased() == name.lowercased()
     }
 
     /// Tags without spaces around them, empty ones or the same one twice, ignoring case.
@@ -76,6 +87,12 @@ nonisolated struct EnteEntry: Sendable, Equatable {
 
 /// Reads time-based accounts from otpauth URLs.
 nonisolated enum OTPAuthURLParser {
+
+    /// Whether the URL is an otpauth link. Schemes are compared in any case: a QR code in alphanumeric mode, which
+    /// is smaller, can only hold upper-case letters, so it reads `OTPAUTH://TOTP/...`.
+    static func isOTPAuth(_ url: URL) -> Bool {
+        url.scheme?.lowercased() == "otpauth"
+    }
 
     /// The periods accepted, in seconds. Services use 30 or 60 seconds. A day is far longer than any of them uses,
     /// and keeps the period within the range of every integer type it is converted to, where a larger one crashed.
@@ -99,6 +116,18 @@ nonisolated enum OTPAuthURLParser {
             parameters[name] = item.value ?? ""
         }
         return parameters
+    }
+
+    /// A whole-number parameter: `defaultValue` when it is missing, and nil when it is there but isn't a whole number
+    /// of the type. `digits=eight` or `counter=abc` is refused, like the YubiKey reader does, rather than read as 6
+    /// digits or a counter of 0.
+    static func integer<Value: FixedWidthInteger>(
+        _ name: String, in parameters: [String: String], default defaultValue: Value
+    ) -> Value? {
+        guard let value = parameters[name] else { return defaultValue }
+        // Only ASCII digits: `Value("+5")` is 5 too.
+        guard !value.isEmpty, value.utf8.allSatisfy({ (0x30...0x39).contains($0) }) else { return nil }
+        return Value(value)
     }
 
     /// The issuer and account name from the label, falling back to the `issuer` parameter. Both are cleaned with
@@ -157,9 +186,11 @@ nonisolated enum OTPAuthURLParser {
         case "SHA512": algorithm = .sha512
         default: return nil
         }
-        let digits = kind == .steam ? 5 : (items["digits"].flatMap { Int($0) } ?? 6)
-        let period = items["period"].flatMap { Int($0) } ?? 30
-        guard (1...10).contains(digits), periods.contains(period) else { return nil }
+        // A Steam code always has 5 characters, whatever the URL says.
+        let digits: Int? = kind == .steam ? 5 : integer("digits", in: items, default: 6)
+        guard let digits, let period = integer("period", in: items, default: 30), (1...10).contains(digits),
+            periods.contains(period)
+        else { return nil }
 
         var (issuer, accountName) = label(of: components)
         if kind == .steam {

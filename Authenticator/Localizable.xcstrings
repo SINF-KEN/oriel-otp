@@ -3208,60 +3208,60 @@
         }
       }
     },
-    "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth." : {
+    "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there." : {
       "comment" : "App lock settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird abgefragt, wenn die App geöffnet wird oder aus dem Hintergrund zurückkehrt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Lösche die App, Deine Konten bleiben auf Deinem YubiKey und in Ente Auth."
+            "state" : "needs_review",
+            "value" : "Wird abgefragt, wenn die App geöffnet wird oder aus dem Hintergrund zurückkehrt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Der einzige Weg zurück ist, die App zu löschen, wodurch die unter „Dieses Gerät“ gespeicherten Konten gelöscht werden. Konten auf einem YubiKey oder in Ente Auth bleiben dort."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demandé à l’ouverture de l’app ou à son retour au premier plan. Un code ou un mot de passe oublié ne peut pas être récupéré : supprimez l’app, vos comptes restent sur votre YubiKey et dans Ente Auth."
+            "state" : "needs_review",
+            "value" : "Demandé à l’ouverture de l’app ou à son retour au premier plan. Un code ou un mot de passe oublié ne peut pas être récupéré : le seul moyen d’y revenir est de supprimer l’app, ce qui supprime les comptes enregistrés sur « Cet appareil ». Les comptes sur une YubiKey ou dans Ente Auth y restent."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリを開いたとき、またはバックグラウンドから戻ったときに求められます。忘れたコードやパスワードは復元できません。アプリを削除してください。アカウントはYubiKeyとEnte Authに残っています。"
+            "state" : "needs_review",
+            "value" : "アプリを開いたとき、またはバックグラウンドから戻ったときに求められます。忘れたコードやパスワードは復元できません。元に戻すにはアプリを削除するしかなく、「このデバイス」に保存したアカウントも削除されます。YubiKeyやEnte Authのアカウントはそのまま残ります。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžaduje sa pri otvorení aplikácie alebo pri návrate z pozadia. Zabudnutý kód alebo heslo sa nedá obnoviť: odstráňte aplikáciu, vaše účty zostanú na YubiKey a v Ente Auth."
+            "state" : "needs_review",
+            "value" : "Vyžaduje sa pri otvorení aplikácie alebo pri návrate z pozadia. Zabudnutý kód alebo heslo sa nedá obnoviť: jediná cesta späť je odstrániť aplikáciu, čím sa odstránia účty uložené v „Toto zariadenie“. Účty na YubiKey alebo v Ente Auth tam zostanú."
           }
         }
       }
     },
-    "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: delete the app, then your accounts are on your YubiKey and in Ente Auth." : {
+    "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there." : {
       "comment" : "Mac app lock settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wird abgefragt, wenn die App geöffnet wird, der Bildschirm gesperrt wird oder der Mac in den Ruhezustand wechselt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Lösche die App, Deine Konten bleiben auf Deinem YubiKey und in Ente Auth."
+            "state" : "needs_review",
+            "value" : "Wird abgefragt, wenn die App geöffnet wird, der Bildschirm gesperrt wird oder der Mac in den Ruhezustand wechselt. Ein vergessener Code oder ein vergessenes Passwort lässt sich nicht wiederherstellen: Der einzige Weg zurück ist, die App zu löschen, wodurch die unter „Dieses Gerät“ gespeicherten Konten gelöscht werden. Konten auf einem YubiKey oder in Ente Auth bleiben dort."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demandé à l’ouverture de l’app, au verrouillage de l’écran ou à la mise en veille du Mac. Un code ou un mot de passe oublié ne peut pas être récupéré : supprimez l’app, vos comptes restent sur votre YubiKey et dans Ente Auth."
+            "state" : "needs_review",
+            "value" : "Demandé à l’ouverture de l’app, au verrouillage de l’écran ou à la mise en veille du Mac. Un code ou un mot de passe oublié ne peut pas être récupéré : le seul moyen d’y revenir est de supprimer l’app, ce qui supprime les comptes enregistrés sur « Cet appareil ». Les comptes sur une YubiKey ou dans Ente Auth y restent."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "アプリを開いたとき、画面がロックされたとき、Macがスリープしたときに求められます。忘れたコードやパスワードは復元できません。アプリを削除してください。アカウントはYubiKeyとEnte Authに残っています。"
+            "state" : "needs_review",
+            "value" : "アプリを開いたとき、画面がロックされたとき、Macがスリープしたときに求められます。忘れたコードやパスワードは復元できません。元に戻すにはアプリを削除するしかなく、「このデバイス」に保存したアカウントも削除されます。YubiKeyやEnte Authのアカウントはそのまま残ります。"
           }
         },
         "sk" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vyžaduje sa pri otvorení aplikácie, uzamknutí obrazovky alebo uspaní Macu. Zabudnutý kód alebo heslo sa nedá obnoviť: odstráňte aplikáciu, vaše účty zostanú na YubiKey a v Ente Auth."
+            "state" : "needs_review",
+            "value" : "Vyžaduje sa pri otvorení aplikácie, uzamknutí obrazovky alebo uspaní Macu. Zabudnutý kód alebo heslo sa nedá obnoviť: jediná cesta späť je odstrániť aplikáciu, čím sa odstránia účty uložené v „Toto zariadenie“. Účty na YubiKey alebo v Ente Auth tam zostanú."
           }
         }
       }
@@ -10163,31 +10163,31 @@
         }
       }
     },
-    "Opens Oriel OTP to add an account to your YubiKey." : {
+    "Opens Oriel OTP to add an account." : {
       "comment" : "Shortcuts action description",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffnet Oriel OTP, um ein Konto zu Ihrem YubiKey hinzuzufügen."
+            "value" : "Öffnet Oriel OTP, um ein Konto hinzuzufügen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ouvre Oriel OTP pour ajouter un compte à votre YubiKey."
+            "value" : "Ouvre Oriel OTP pour ajouter un compte."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTPを開いてYubiKeyにアカウントを追加します。"
+            "value" : "Oriel OTPを開いてアカウントを追加します。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Otvorí Oriel OTP na pridanie účtu do vášho YubiKey."
+            "value" : "Otvorí Oriel OTP na pridanie účtu."
           }
         }
       }

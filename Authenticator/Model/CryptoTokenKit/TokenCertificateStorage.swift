@@ -51,7 +51,8 @@ struct TokenCertificateStorage {
         tokenKeychainKey.canSign = true
         tokenKeychainKey.isSuitableForLogin = true
         tokenKeychainKey.canDecrypt = true
-        tokenKeychainKey.canPerformKeyExchange = true
+        // The extension refuses key exchange (`TokenSessionPolicy`), so the key doesn't offer it.
+        tokenKeychainKey.canPerformKeyExchange = false
 
         guard let tokenDriverConfiguration = Self.driverConfiguration else {
             return TokenCertificateStorageError.missingDriverConfigurartion

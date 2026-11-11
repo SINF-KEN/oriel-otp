@@ -33,16 +33,6 @@ struct NFCSettingsView: View {
             } footer: {
                 Text("Accounts that require touch will need an extra NFC tap to calculate its code. Bypassing it minimizes the number of NFC taps needed.")
             }
-            Section {
-                Toggle("Activate NFC on OTP tag read", isOn: $model.isNFCOnOTPLaunchEnabled)
-            } footer: {
-                Text("Start NFC and read OATH accounts when the application has been opened by reading the OTP tag on a YubiKey.")
-            }
-            Section {
-                Toggle("Copy Yubico OTP to clipboard", isOn: $model.isCopyOTPEnabled)
-            } footer: {
-                Text("Copy Yubico OTP automatically to clipboard when a YubiKey has been passively scanned using the NFC NDEF tag functionality.")
-            }
         }
         .formStyle(.grouped)
         .tint(Color(.yubiBlue))

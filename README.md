@@ -93,7 +93,8 @@ account is added; accounts already on the key can't be copied to Ente.
 With a saved session the app is also an independent Ente Auth client. Your Ente Auth accounts are kept on the device,
 encrypted, and listed with the YubiKey's, with a cloud next to each one, so their codes work without a YubiKey and
 offline. When adding an account, choose under **Save to** whether it goes on the YubiKey, in Ente Auth or both; the
-choice is remembered. Without a YubiKey to reach, the add button saves to Ente Auth. **Copy to YubiKey** and **Move to
+choice is remembered. Without a YubiKey to reach, the add button saves to **This device**, where the account
+has no other copy until you move it. **Copy to YubiKey** and **Move to
 YubiKey** on an Ente Auth account put it on the YubiKey; moving puts it in Ente's trash once it is on the key.
 Renaming, pinning or deleting an Ente Auth account changes it in Ente Auth too (deleting moves it to Ente's trash),
 and changes made in Ente's apps show up after the next sync. The app syncs when it opens, when you pull down
