@@ -115,6 +115,35 @@
       },
       "shouldTranslate" : false
     },
+    "Account List" : {
+      "comment" : "Settings section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kontenliste"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Liste des comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントリスト"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zoznam účtov"
+          }
+        }
+      }
+    },
     "Accounts restored: %lld" : {
       "comment" : "Backup restore result. The placeholder is a number.",
       "localizations" : {
@@ -8618,6 +8647,35 @@
         }
       }
     },
+    "Most used first" : {
+      "comment" : "Account list setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Meistgenutzte zuerst"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les plus utilisés en premier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "よく使う順"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Najpoužívanejšie navrchu"
+          }
+        }
+      }
+    },
     "Move accounts" : {
       "comment" : "Ente migration button",
       "localizations" : {
@@ -11550,6 +11608,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Uložiť účet do YubiKey a v Ente Auth ho presunúť do koša"
+          }
+        }
+      }
+    },
+    "Puts the accounts whose codes you copy most at the top of each section. Only how often each code is copied is kept, on this device; turning this off deletes it." : {
+      "comment" : "Account list settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zeigt die Konten, deren Codes du am häufigsten kopierst, oben in jedem Abschnitt. Gespeichert wird nur, wie oft jeder Code kopiert wurde, und nur auf diesem Gerät; beim Ausschalten wird es gelöscht."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Place en haut de chaque section les comptes dont vous copiez le plus souvent les codes. Seul le nombre de copies de chaque code est conservé, sur cet appareil ; le désactiver l’efface."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードをよくコピーするアカウントを各セクションの上部に表示します。保存されるのは各コードをコピーした回数だけで、このデバイスにのみ保存されます。オフにすると削除されます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účty, ktorých kódy kopírujete najčastejšie, sa zobrazia navrchu každej sekcie. Uchováva sa len to, koľkokrát bol každý kód skopírovaný, a len v tomto zariadení; vypnutím sa to vymaže."
           }
         }
       }

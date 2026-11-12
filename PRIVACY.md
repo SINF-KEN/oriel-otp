@@ -51,6 +51,8 @@ Tags you give accounts in Ente Auth or on this device are saved with the account
 
 **Hide codes** only changes what the screen shows; it's kept in the app's preferences.
 
+**Most used first** is off by default. While it's on, the app counts how often you copy each account's code, in the app or with the **Copy Code** action, to put the accounts you use most at the top of the list. Only the counts are kept, never a code, in a file encrypted with a key in the device keychain, in the app's storage on this device. Turning the setting off deletes the counts.
+
 **Show accounts in Spotlight** is off by default. When you turn it on, the issuer, name and tags of your Ente Auth accounts and the accounts on this device are added to the system's Spotlight index on this device, so you can search for them. Their codes and secrets are never added. Spotlight can show these names outside the app lock. Turning the setting off removes them from the index. The **Copy Code** action in Shortcuts and Siri lists the same accounts and only gives out a code once the app is unlocked.
 
 ## App lock
