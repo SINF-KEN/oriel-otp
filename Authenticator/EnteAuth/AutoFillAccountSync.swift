@@ -66,7 +66,7 @@ import Foundation
     /// `updatesSystem` is off in the tests, which mustn't change the device's AutoFill suggestions.
     /// `providerIsEnabled` tells whether AutoFill from Oriel OTP is on.
     init(storage: AutoFillStorage = AutoFillFile(), websitesURL: URL = defaultWebsitesURL,
-         websitesKeychain: EnteVaultKeychain = EnteVaultKeychainKey(service: "AutoFill.Websites"),
+         websitesKeychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.autoFillWebsites),
          defaults: UserDefaults = .standard, updatesSystem: Bool = true,
          providerIsEnabled: @escaping @Sendable () async -> Bool = { await ASCredentialIdentityStore.shared.state().isEnabled }) {
         self.storage = storage
@@ -106,7 +106,7 @@ import Foundation
 
     private func finishReadingWebsites(_ result: Result<[String: [String]]?, Error>) {
         guard !hasReadWebsites else { return }
-        if case .failure(let error) = result, case .unavailable? = error as? EnteVaultError { return }
+        if case .failure(let error) = result, case .unavailable? = error as? EncryptedFileError { return }
         hasReadWebsites = true
         if let saved = try? result.get() {
             chosenWebsites = saved

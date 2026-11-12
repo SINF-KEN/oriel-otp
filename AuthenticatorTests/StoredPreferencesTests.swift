@@ -151,9 +151,9 @@ struct FavoritesStorageTests {
 }
 
 /// A keychain that can't be read, like while the device is locked.
-private struct UnavailableVaultKey: EnteVaultKeychain {
-    func existingKey() throws -> SymmetricKey? { throw EnteVaultError.unavailable }
-    func createKey() throws -> SymmetricKey { throw EnteVaultError.unavailable }
+private struct UnavailableVaultKey: EncryptedFileKey {
+    func existingKey() throws -> SymmetricKey? { throw EncryptedFileError.unavailable }
+    func createKey() throws -> SymmetricKey { throw EncryptedFileError.unavailable }
     func removeKey() {}
 }
 

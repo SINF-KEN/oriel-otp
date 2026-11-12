@@ -108,6 +108,8 @@ struct ScanNFCYubiKeyIntent: AppIntent {
     }
 }
 
+#endif
+
 /// Opens the add account sheet, like the Home Screen quick action, for Siri, Shortcuts and Apple Intelligence.
 struct AddAccountIntent: AppIntent {
     static let title: LocalizedStringResource = "Add Account"
@@ -115,9 +117,12 @@ struct AddAccountIntent: AppIntent {
     static let openAppWhenRun = true
 
     @MainActor func perform() async throws -> some IntentResult {
+        #if os(macOS)
+        // Also opens the main window if it was closed.
+        QuickAction.addAccount.perform()
+        #else
         QuickActionCenter.shared.pending = .addAccount
+        #endif
         return .result()
     }
 }
-
-#endif

@@ -47,7 +47,7 @@ final class MemoryDeviceStorage: DeviceAccountStorage, @unchecked Sendable {
     }
 }
 
-private final class MemoryKey: EnteVaultKeychain, @unchecked Sendable {
+private final class MemoryKey: EncryptedFileKey, @unchecked Sendable {
     var key: SymmetricKey?
     func existingKey() throws -> SymmetricKey? { key }
     func createKey() throws -> SymmetricKey {
@@ -104,7 +104,7 @@ private struct SaveFailed: Error {}
         _ = try existing.add(template("GitHub"))
         let saved = storage.saveCount
 
-        storage.loadError = EnteVaultError.unavailable
+        storage.loadError = EncryptedFileError.unavailable
         let accounts = DeviceAccounts(storage: storage)
         #expect(accounts.accounts.isEmpty)
         #expect(throws: DeviceAccountsError.self) { try accounts.add(template("GitLab")) }

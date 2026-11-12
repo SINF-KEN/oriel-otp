@@ -68,58 +68,17 @@ nonisolated protocol WatchKeychainItem: Sendable {
     @discardableResult func write(_ data: Data?) -> Bool
 }
 
-/// A generic password only readable while the device is unlocked, never synced to iCloud or restored on another
-/// device.
-nonisolated struct SystemKeychainItem: WatchKeychainItem {
-
-    let service: String
-    let account: String
-
+nonisolated extension KeychainItem: WatchKeychainItem {
     func read() -> KeychainRead {
-        var query = baseQuery
-        query[kSecReturnData as String] = true
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?
-        switch SecItemCopyMatching(query as CFDictionary, &result) {
-        case errSecSuccess:
-            guard let data = result as? Data else { return .unavailable }
-            return .found(data)
-        case errSecItemNotFound:
-            return .notFound
-        default:
+        do {
+            return try data().map { .found($0) } ?? .notFound
+        } catch {
             return .unavailable
         }
     }
 
     @discardableResult func write(_ data: Data?) -> Bool {
-        guard let data else {
-            let status = SecItemDelete(baseQuery as CFDictionary)
-            return status == errSecSuccess || status == errSecItemNotFound
-        }
-        // Updated in place rather than deleted and added again, so a refused add can't lose the old item.
-        let attributes: [String: Any] = [
-            kSecValueData as String: data,
-            kSecAttrAccessible as String: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
-        switch SecItemUpdate(baseQuery as CFDictionary, attributes as CFDictionary) {
-        case errSecSuccess:
-            return true
-        case errSecItemNotFound:
-            let item = baseQuery.merging(attributes) { $1 }
-            return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
-        default:
-            return false
-        }
-    }
-
-    private var baseQuery: [String: Any] {
-        [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecAttrSynchronizable as String: false,
-            kSecUseDataProtectionKeychain as String: true
-        ]
+        (try? setData(data)) != nil
     }
 }
 
@@ -152,8 +111,8 @@ final class WatchAccountReceiver {
     private var needsLoad = false
 
     init(
-        accountsItem: WatchKeychainItem = SystemKeychainItem(service: "OrielOTP.WatchAccounts", account: "accounts"),
-        keyItem: WatchKeychainItem = SystemKeychainItem(service: "OrielOTP.WatchSyncKey", account: "key"),
+        accountsItem: WatchKeychainItem = KeychainItem(service: KeychainService.watchAccounts, account: "accounts"),
+        keyItem: WatchKeychainItem = KeychainItem(service: KeychainService.watchSyncKey, account: "key"),
         defaults: UserDefaults = .standard
     ) {
         self.accountsItem = accountsItem

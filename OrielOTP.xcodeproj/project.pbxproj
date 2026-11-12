@@ -151,6 +151,14 @@
 			);
 			target = 5155426E2656706F00B19C59 /* TokenExtension */;
 		};
+		5A0C00000000000000000007 /* Exceptions for "Shared" folder in "TokenExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIdentifiers.swift,
+				"Logger+Extensions.swift",
+			);
+			target = 5155426E2656706F00B19C59 /* TokenExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -161,6 +169,9 @@
 		};
 		A7C400000000000000000001 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5A0C00000000000000000007 /* Exceptions for "Shared" folder in "TokenExtension" target */,
+			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
