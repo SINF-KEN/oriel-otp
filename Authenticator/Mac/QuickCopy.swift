@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#if os(macOS)
 import AppKit
 import Carbon.HIToolbox
 import SwiftUI
@@ -368,3 +369,4 @@ struct QuickCopySection: View {
         }
     }
 }
+#endif
