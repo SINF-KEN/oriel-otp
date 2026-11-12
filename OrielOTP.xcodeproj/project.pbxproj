@@ -7,112 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56319DE11C4A1A730E920128 /* QuickActions.swift */; };
-		39615BAB2A1BC69B0374FBCD /* Debug/WindowSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F018E4F892C7B4FEB1051FC9 /* Debug/WindowSnapshots.swift */; };
-		513F34DC246B144300FCE030 /* UIViewAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513F34DB246B144300FCE030 /* UIViewAdditions.swift */; };
-		515542682654413600B19C59 /* SmartCardConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542672654413600B19C59 /* SmartCardConfigurationView.swift */; };
-		5155426A26554CAB00B19C59 /* SmartCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155426926554CAB00B19C59 /* SmartCardViewModel.swift */; };
 		515542722656706F00B19C59 /* CryptoTokenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 515542712656706F00B19C59 /* CryptoTokenKit.framework */; };
-		515542752656706F00B19C59 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542742656706F00B19C59 /* Token.swift */; };
-		515542772656707000B19C59 /* TokenDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542762656707000B19C59 /* TokenDriver.swift */; };
-		515542792656707000B19C59 /* TokenSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542782656707000B19C59 /* TokenSession.swift */; };
 		5155427D2656707000B19C59 /* TokenExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5155426F2656706F00B19C59 /* TokenExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		515542882656F64100B19C59 /* Data+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542872656F64100B19C59 /* Data+Extensions.swift */; };
-		5155428A2656F79500B19C59 /* SecCertificate+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515542892656F79500B19C59 /* SecCertificate+Extensions.swift */; };
-		5155428D2657015D00B19C59 /* TokenCertificateStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155428C2657015D00B19C59 /* TokenCertificateStorage.swift */; };
-		5156D05B265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5156D05A265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift */; };
-		5156D05D265D2602007A94F8 /* TokenRequestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5156D05C265D2602007A94F8 /* TokenRequestView.swift */; };
-		5156D05F265D3CEF007A94F8 /* TokenRequestViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5156D05E265D3CEF007A94F8 /* TokenRequestViewModel.swift */; };
-		5180974326DE185100A122C1 /* OATHResetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5180974226DE185100A122C1 /* OATHResetViewModel.swift */; };
-		51AFD4D62716FCDB008F2630 /* ApplicationSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */; };
-		51AFD4D827196AB6008F2630 /* VersionHistory.plist in Resources */ = {isa = PBXBuildFile; fileRef = 51AFD4D727196AB6008F2630 /* VersionHistory.plist */; };
 		51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51AFD4D9271D4277008F2630 /* QuartzCore.framework */; };
-		51BBE37F273982D700DA47CC /* OATHSession+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */; };
-		51EEC532246D34ED00061A8F /* DeviceCapabilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */; };
-		51EEC536246D38B700061A8F /* YubiKitExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */; };
-		51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BC263847BD0010686B /* ManagementViewModel.swift */; };
-		51F8E3BF263848E30010686B /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51F8E3BE263848E30010686B /* ConnectionManager.swift */; };
-		5C3E0000000000000000000D /* AppClock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C3E0000000000000000000C /* AppClock.swift */; };
-		816C684623430E0700209342 /* SecureStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684523430E0700209342 /* SecureStore.swift */; };
-		816C684823430F8E00209342 /* SecureStoreQueryable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684723430F8E00209342 /* SecureStoreQueryable.swift */; };
-		816C685023440D2200209342 /* SecureStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684F23440D2200209342 /* SecureStoreError.swift */; };
-		816C685223440EF900209342 /* SecureStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C685123440EF900209342 /* SecureStoreTests.swift */; };
-		816C685E234697BF00209342 /* PasswordPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C685D234697BE00209342 /* PasswordPreferences.swift */; };
-		817DBA0D2368B7B7001FC18D /* UIColorAdditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */; };
-		818866C022DFD72C006BC0A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 818866BF22DFD72C006BC0A8 /* Assets.xcassets */; };
-		818866C322DFD72C006BC0A8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */; platformFilter = ios; };
-		81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */; };
-		A1C1EA0000000000000000B1 /* LargestClearRectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */; };
-		A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */; };
-		A1C1EA0000000000000000B3 /* Debug/SimulatedYubiKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */; };
-		A1C1EA0000000000000000B4 /* Platform.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1EA0000000000000000F4 /* Platform.swift */; };
-		A5588BF9239B0A7F003E4CA5 /* FavoritesStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */; };
-		A591411D23830EB800CCCF67 /* UIApplicationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */; };
-		A5D4E86D24083CF300FD63A0 /* OTPConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */; };
-		A5E9DEB0237DE1660011FBF4 /* SettingsConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */; };
-		A7C40000000000000000000B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
 		A7C40000000000000000000C /* OrielOTPWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A7C400000000000000000003 /* OrielOTPWatch.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		B40327762847AE0A00DF4DB0 /* Licensing.md in Resources */ = {isa = PBXBuildFile; fileRef = B40327752847AE0A00DF4DB0 /* Licensing.md */; };
-		B40D61A02AE7F37900467AE9 /* DisableOTPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D619F2AE7F37900467AE9 /* DisableOTPView.swift */; };
-		B40D61A22AE7F89500467AE9 /* DisableOTPModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */; };
-		B40F44452B27033A000D5E02 /* TokenRequestYubiOTPView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B40F44442B27033A000D5E02 /* TokenRequestYubiOTPView.swift */; };
-		B411242F29D423A300D58001 /* ListStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B411242E29D423A300D58001 /* ListStatusView.swift */; };
-		B43751972C9AD7D8004017A4 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */; };
-		B43751A42CA440E7004017A4 /* NFCSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AFD4D32716FC78008F2630 /* NFCSettingsView.swift */; };
-		B44E5E812C74BE67007ABB79 /* OATHResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44E5E802C74BE67007ABB79 /* OATHResetView.swift */; };
-		B44E5EB32C777F22007ABB79 /* OATHPasswordViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44E5EB22C777F22007ABB79 /* OATHPasswordViewModel.swift */; };
-		B44E5EBB2C778802007ABB79 /* OATHPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B44E5EBA2C778802007ABB79 /* OATHPasswordView.swift */; };
-		B452EC1F2A1E4F460045E5D9 /* YubiOtpRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452EC1E2A1E4F460045E5D9 /* YubiOtpRowView.swift */; };
-		B452EC3D2A264A620045E5D9 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452EC3C2A264A620045E5D9 /* ToastView.swift */; };
-		B452EC442A2A06940045E5D9 /* ToastPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B452EC432A2A06940045E5D9 /* ToastPresenter.swift */; };
-		B4696F3F2CB6CE5800604F6F /* ConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4696F3E2CB6CE5200604F6F /* ConfigurationView.swift */; };
-		B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */; };
-		B46E378729C348F100CA0B67 /* EditAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B46E378629C348F100CA0B67 /* EditAccountView.swift */; };
-		B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */; };
-		B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B16298AA6E7006CDAEA /* MainView.swift */; };
-		B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */; };
-		B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B1A298AB641006CDAEA /* MainViewModel.swift */; };
-		D0A1CE000000000000000002 /* DeviceAccounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0A1CE000000000000000001 /* DeviceAccounts.swift */; };
-		B4719B2C29914051006CDAEA /* AccountRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B2B29914051006CDAEA /* AccountRowView.swift */; };
-		B4719B322993EFEE006CDAEA /* AccountDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */; };
-		B474865C2CEB7A000031A504 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B474865B2CEB79FD0031A504 /* AboutView.swift */; };
-		B47486602CEC83F90031A504 /* VersionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B474865F2CEC83F50031A504 /* VersionHistoryView.swift */; };
-		B47486622CECC2190031A504 /* TutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47486612CECC2150031A504 /* TutorialView.swift */; };
-		B47486642CECC2F50031A504 /* LicensingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47486632CECC2F00031A504 /* LicensingView.swift */; };
-		B47486662CECE36A0031A504 /* UIFont+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47486652CECE3640031A504 /* UIFont+Extensions.swift */; };
-		B4901AE42BD697620092E7A2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B4901AE32BD697620092E7A2 /* Localizable.xcstrings */; };
-		B4901AF42BD7DF960092E7A2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B4901AF32BD7DF960092E7A2 /* Localizable.xcstrings */; };
-		B4901B082BD91DA60092E7A2 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B4901B072BD91DA60092E7A2 /* InfoPlist.xcstrings */; };
-		B4A597BA2D9D7BFE00444D97 /* SmartCardConnection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A597B92D9D7BF000444D97 /* SmartCardConnection+Extensions.swift */; };
-		B4B1711827DF8C48002A62DE /* ScanAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B1711727DF8C48002A62DE /* ScanAccountView.swift */; };
-		B4B83B6A2CBE8D4200B33C47 /* Logger+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4B83B692CBE8D3A00B33C47 /* Logger+Extensions.swift */; };
-		B4BB02D92C80987B00B72904 /* SettingsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02D82C80987B00B72904 /* SettingsButton.swift */; };
-		B4BB02DC2C80A09500B72904 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02DB2C80A09500B72904 /* SettingsView.swift */; };
-		B4BB02DE2C80BC8500B72904 /* OATHSavedPasswordsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02DD2C80BC8500B72904 /* OATHSavedPasswordsViewModel.swift */; };
-		B4BB02E02C80BEBD00B72904 /* OATHSavedPasswordsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02DF2C80BEBD00B72904 /* OATHSavedPasswordsView.swift */; };
-		B4BB02E22C81A82300B72904 /* FIDOPINViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02E12C81A82300B72904 /* FIDOPINViewModel.swift */; };
-		B4BB02E42C81B21D00B72904 /* FIDOPINView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02E32C81B21D00B72904 /* FIDOPINView.swift */; };
-		B4BB02E62C81C75E00B72904 /* FIDOResetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02E52C81C75D00B72904 /* FIDOResetViewModel.swift */; };
-		B4BB02E82C81C7A700B72904 /* FIDOResetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4BB02E72C81C7A700B72904 /* FIDOResetView.swift */; };
-		B4C93E60299D156C00C2A8B8 /* ErrorAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E5F299D156C00C2A8B8 /* ErrorAlertView.swift */; };
-		B4C93E63299FB51A00C2A8B8 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E62299FB51A00C2A8B8 /* Account.swift */; };
-		B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E64299FC67800C2A8B8 /* View+Extensions.swift */; };
-		B4C93E9529C1B90900C2A8B8 /* AddAccountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C93E9429C1B90900C2A8B8 /* AddAccountView.swift */; };
 		B4D71E812CE4E6E6004D4C29 /* YubiKit in Frameworks */ = {isa = PBXBuildFile; productRef = B4D71E802CE4E6E6004D4C29 /* YubiKit */; };
-		B4DB228A299BC373003110ED /* OATHSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4DB2289299BC373003110ED /* OATHSession.swift */; };
-		B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */; };
-		C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */; };
-		C1A0000000000000000000B7 /* AppIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000A7 /* AppIconView.swift */; };
-		C1A0000000000000000000D1 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C1 /* AppIcon.icon */; };
-		C1A0000000000000000000D2 /* AppIcon-Dark.icon in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000C2 /* AppIcon-Dark.icon */; };
-		C1A0000000000000000000E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */; };
-		C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */; };
-		D1A600000000000000000001 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
-		D1A600000000000000000002 /* TokenResponseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A600000000000000000003 /* TokenResponseStore.swift */; };
 		E17E0000000000000000A003 /* Clibsodium in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000A002 /* Clibsodium */; };
 		E17E0000000000000000B003 /* BigInt in Frameworks */ = {isa = PBXBuildFile; productRef = E17E0000000000000000B002 /* BigInt */; };
 		AF110000000000000000000B /* AutoFillExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AF110000000000000000000A /* AutoFillExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		AF110000000000000000000C /* SecureStoreError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 816C684F23440D2200209342 /* SecureStoreError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -180,115 +82,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		513F34DB246B144300FCE030 /* UIViewAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIViewAdditions.swift; sourceTree = "<group>"; };
-		515542672654413600B19C59 /* SmartCardConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCardConfigurationView.swift; sourceTree = "<group>"; };
-		5155426926554CAB00B19C59 /* SmartCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCardViewModel.swift; sourceTree = "<group>"; };
 		5155426F2656706F00B19C59 /* TokenExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TokenExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		515542712656706F00B19C59 /* CryptoTokenKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CryptoTokenKit.framework; path = System/Library/Frameworks/CryptoTokenKit.framework; sourceTree = SDKROOT; };
-		515542742656706F00B19C59 /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
-		515542762656707000B19C59 /* TokenDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenDriver.swift; sourceTree = "<group>"; };
-		515542782656707000B19C59 /* TokenSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenSession.swift; sourceTree = "<group>"; };
-		5155427A2656707000B19C59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		515542862656F52000B19C59 /* TokenExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TokenExtension.entitlements; sourceTree = "<group>"; };
-		515542872656F64100B19C59 /* Data+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Extensions.swift"; sourceTree = "<group>"; };
-		515542892656F79500B19C59 /* SecCertificate+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecCertificate+Extensions.swift"; sourceTree = "<group>"; };
-		5155428C2657015D00B19C59 /* TokenCertificateStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenCertificateStorage.swift; sourceTree = "<group>"; };
 		51554293265BB65100B19C59 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		51554295265BB65100B19C59 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
-		5156D05A265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TKTokenAlgorithm+Extensions.swift"; sourceTree = "<group>"; };
-		5156D05C265D2602007A94F8 /* TokenRequestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestView.swift; sourceTree = "<group>"; };
-		5156D05E265D3CEF007A94F8 /* TokenRequestViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestViewModel.swift; sourceTree = "<group>"; };
-		5180974226DE185100A122C1 /* OATHResetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHResetViewModel.swift; sourceTree = "<group>"; };
-		51AFD4D32716FC78008F2630 /* NFCSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCSettingsView.swift; sourceTree = "<group>"; };
-		51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSettingsViewModel.swift; sourceTree = "<group>"; };
-		51AFD4D727196AB6008F2630 /* VersionHistory.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = VersionHistory.plist; sourceTree = "<group>"; };
 		51AFD4D9271D4277008F2630 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OATHSession+Extensions.swift"; sourceTree = "<group>"; };
-		51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceCapabilities.swift; sourceTree = "<group>"; };
-		51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiKitExtensionsTests.swift; sourceTree = "<group>"; };
-		51F8E3BC263847BD0010686B /* ManagementViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagementViewModel.swift; sourceTree = "<group>"; };
-		51F8E3BE263848E30010686B /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
-		56319DE11C4A1A730E920128 /* QuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActions.swift; sourceTree = "<group>"; };
 		5C3E00000000000000000002 /* OrielOTPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C3E0000000000000000000C /* AppClock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClock.swift; sourceTree = "<group>"; };
-		816C684523430E0700209342 /* SecureStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStore.swift; sourceTree = "<group>"; };
-		816C684723430F8E00209342 /* SecureStoreQueryable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreQueryable.swift; sourceTree = "<group>"; };
-		816C684F23440D2200209342 /* SecureStoreError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreError.swift; sourceTree = "<group>"; };
-		816C685123440EF900209342 /* SecureStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoreTests.swift; sourceTree = "<group>"; };
-		816C685D234697BE00209342 /* PasswordPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordPreferences.swift; sourceTree = "<group>"; };
-		817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorAdditions.swift; sourceTree = "<group>"; };
 		818866B322DFD729006BC0A8 /* Oriel OTP.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Oriel OTP.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		818866BF22DFD72C006BC0A8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		818866C222DFD72C006BC0A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		818866C422DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		818866CF22DFD72C006BC0A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		818866F622E7A877006BC0A8 /* Authenticator.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Authenticator.entitlements; sourceTree = "<group>"; };
-		81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeySessionError.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LargestClearRectTests.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredPreferencesTests.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/SimulatedYubiKey.swift; sourceTree = "<group>"; };
-		A1C1EA0000000000000000F4 /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
-		A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesStorage.swift; sourceTree = "<group>"; };
-		A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIApplicationExtension.swift; sourceTree = "<group>"; };
-		A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTPConfigurationView.swift; sourceTree = "<group>"; };
-		A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsConfig.swift; sourceTree = "<group>"; };
 		A7C400000000000000000003 /* OrielOTPWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTPWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B40327752847AE0A00DF4DB0 /* Licensing.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Licensing.md; sourceTree = "<group>"; };
-		B40D619F2AE7F37900467AE9 /* DisableOTPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisableOTPView.swift; sourceTree = "<group>"; };
-		B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisableOTPModel.swift; sourceTree = "<group>"; };
-		B40F44442B27033A000D5E02 /* TokenRequestYubiOTPView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenRequestYubiOTPView.swift; sourceTree = "<group>"; };
-		B411242E29D423A300D58001 /* ListStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListStatusView.swift; sourceTree = "<group>"; };
-		B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		B44E5E802C74BE67007ABB79 /* OATHResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHResetView.swift; sourceTree = "<group>"; };
-		B44E5EB22C777F22007ABB79 /* OATHPasswordViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHPasswordViewModel.swift; sourceTree = "<group>"; };
-		B44E5EBA2C778802007ABB79 /* OATHPasswordView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OATHPasswordView.swift; sourceTree = "<group>"; };
-		B452EC1E2A1E4F460045E5D9 /* YubiOtpRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YubiOtpRowView.swift; sourceTree = "<group>"; };
-		B452EC3C2A264A620045E5D9 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
-		B452EC432A2A06940045E5D9 /* ToastPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastPresenter.swift; sourceTree = "<group>"; };
-		B4696F3E2CB6CE5200604F6F /* ConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationView.swift; sourceTree = "<group>"; };
-		B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewModel.swift; sourceTree = "<group>"; };
-		B46E378629C348F100CA0B67 /* EditAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAccountView.swift; sourceTree = "<group>"; };
-		B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessKeyCache.swift; sourceTree = "<group>"; };
-		B4719B16298AA6E7006CDAEA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
-		B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticatorApp.swift; sourceTree = "<group>"; };
-		B4719B1A298AB641006CDAEA /* MainViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewModel.swift; sourceTree = "<group>"; };
-		D0A1CE000000000000000001 /* DeviceAccounts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAccounts.swift; sourceTree = "<group>"; };
-		B4719B2B29914051006CDAEA /* AccountRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRowView.swift; sourceTree = "<group>"; };
-		B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailsView.swift; sourceTree = "<group>"; };
-		B474865B2CEB79FD0031A504 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
-		B474865F2CEC83F50031A504 /* VersionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionHistoryView.swift; sourceTree = "<group>"; };
-		B47486612CECC2150031A504 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
-		B47486632CECC2F00031A504 /* LicensingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicensingView.swift; sourceTree = "<group>"; };
-		B47486652CECE3640031A504 /* UIFont+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Extensions.swift"; sourceTree = "<group>"; };
-		B4901AE32BD697620092E7A2 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = Localizable.xcstrings; path = Authenticator/Localizable.xcstrings; sourceTree = SOURCE_ROOT; };
-		B4901AF32BD7DF960092E7A2 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		B4901B072BD91DA60092E7A2 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		B4A597B92D9D7BF000444D97 /* SmartCardConnection+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SmartCardConnection+Extensions.swift"; sourceTree = "<group>"; };
-		B4B1711727DF8C48002A62DE /* ScanAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanAccountView.swift; sourceTree = "<group>"; };
-		B4B83B692CBE8D3A00B33C47 /* Logger+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Extensions.swift"; sourceTree = "<group>"; };
-		B4BB02D82C80987B00B72904 /* SettingsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButton.swift; sourceTree = "<group>"; };
-		B4BB02DB2C80A09500B72904 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		B4BB02DD2C80BC8500B72904 /* OATHSavedPasswordsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHSavedPasswordsViewModel.swift; sourceTree = "<group>"; };
-		B4BB02DF2C80BEBD00B72904 /* OATHSavedPasswordsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHSavedPasswordsView.swift; sourceTree = "<group>"; };
-		B4BB02E12C81A82300B72904 /* FIDOPINViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FIDOPINViewModel.swift; sourceTree = "<group>"; };
-		B4BB02E32C81B21D00B72904 /* FIDOPINView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FIDOPINView.swift; sourceTree = "<group>"; };
-		B4BB02E52C81C75D00B72904 /* FIDOResetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FIDOResetViewModel.swift; sourceTree = "<group>"; };
-		B4BB02E72C81C7A700B72904 /* FIDOResetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FIDOResetView.swift; sourceTree = "<group>"; };
-		B4C93E5F299D156C00C2A8B8 /* ErrorAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorAlertView.swift; sourceTree = "<group>"; };
-		B4C93E62299FB51A00C2A8B8 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
-		B4C93E64299FC67800C2A8B8 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
-		B4C93E9429C1B90900C2A8B8 /* AddAccountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddAccountView.swift; sourceTree = "<group>"; };
-		B4DB2289299BC373003110ED /* OATHSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OATHSession.swift; sourceTree = "<group>"; };
-		B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsViewModel.swift; sourceTree = "<group>"; };
-		C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManagerTests.swift; sourceTree = "<group>"; };
-		C1A0000000000000000000A7 /* AppIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconView.swift; sourceTree = "<group>"; };
-		C1A0000000000000000000C1 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
-		C1A0000000000000000000C2 /* AppIcon-Dark.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "AppIcon-Dark.icon"; sourceTree = "<group>"; };
-		C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		D1A600000000000000000003 /* TokenResponseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenResponseStore.swift; sourceTree = "<group>"; };
-		F018E4F892C7B4FEB1051FC9 /* Debug/WindowSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debug/WindowSnapshots.swift; sourceTree = "<group>"; };
 		AF110000000000000000000A /* AutoFillExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AutoFillExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -302,12 +104,52 @@
 			);
 			target = AF1100000000000000000001 /* AutoFillExtension */;
 		};
-		AF1100000000000000000013 /* Exceptions for "AppLock" folder in "AutoFillExtension" target */ = {
+		5A0C00000000000000000001 /* Exceptions for "Authenticator" folder in "OrielOTP" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AppLock.swift,
+				Authenticator-macOS.entitlements,
+				Authenticator.entitlements,
+				Info-macOS.plist,
+				Info.plist,
+			);
+			target = 818866B222DFD729006BC0A8 /* OrielOTP */;
+		};
+		5A0C00000000000000000002 /* Exceptions for "Authenticator" folder in "AutoFillExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"AppLock/AppLock.swift",
+				"Model/SecureStore/SecureStoreError.swift",
 			);
 			target = AF1100000000000000000001 /* AutoFillExtension */;
+		};
+		5A0C00000000000000000003 /* Exceptions for "Authenticator" folder in "OrielOTPWatch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIcon.icon,
+			);
+			target = A7C400000000000000000004 /* OrielOTPWatch */;
+		};
+		5A0C00000000000000000004 /* Exceptions for "Authenticator" folder in "TokenExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Model/TokenResponseStore.swift",
+			);
+			target = 5155426E2656706F00B19C59 /* TokenExtension */;
+		};
+		5A0C00000000000000000005 /* Exceptions for "AuthenticatorTests" folder in "OrielOTPTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 818866C822DFD72C006BC0A8 /* OrielOTPTests */;
+		};
+		5A0C00000000000000000006 /* Exceptions for "TokenExtension" folder in "TokenExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				TokenExtension.entitlements,
+			);
+			target = 5155426E2656706F00B19C59 /* TokenExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -327,34 +169,6 @@
 			path = OrielOTPWatch;
 			sourceTree = "<group>";
 		};
-		E17E0000000000000000C001 /* EnteAuth */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = EnteAuth;
-			sourceTree = "<group>";
-		};
-		E17E0000000000000000C002 /* EnteAuth */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = EnteAuth;
-			sourceTree = "<group>";
-		};
-		E17E0000000000000000C003 /* Mac */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Mac;
-			sourceTree = "<group>";
-		};
-		A10C00000000000000000001 /* AppLock */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				AF1100000000000000000013 /* Exceptions for "AppLock" folder in "AutoFillExtension" target */,
-			);
-			path = AppLock;
-			sourceTree = "<group>";
-		};
-		A10C00000000000000000002 /* AppLock */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = AppLock;
-			sourceTree = "<group>";
-		};
 		AF1100000000000000000010 /* AutoFill */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = AutoFill;
@@ -368,24 +182,31 @@
 			path = AutoFillExtension;
 			sourceTree = "<group>";
 		};
-		ACC0000000000000000000A1 /* Accounts */ = {
+		818866B522DFD729006BC0A8 /* Authenticator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Accounts;
+			exceptions = (
+				5A0C00000000000000000001 /* Exceptions for "Authenticator" folder in "OrielOTP" target */,
+				5A0C00000000000000000002 /* Exceptions for "Authenticator" folder in "AutoFillExtension" target */,
+				5A0C00000000000000000003 /* Exceptions for "Authenticator" folder in "OrielOTPWatch" target */,
+				5A0C00000000000000000004 /* Exceptions for "Authenticator" folder in "TokenExtension" target */,
+			);
+			path = Authenticator;
 			sourceTree = "<group>";
 		};
-		BAC0000000000000000000A1 /* Backup */ = {
+		818866CC22DFD72C006BC0A8 /* AuthenticatorTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Backup;
+			exceptions = (
+				5A0C00000000000000000005 /* Exceptions for "AuthenticatorTests" folder in "OrielOTPTests" target */,
+			);
+			path = AuthenticatorTests;
 			sourceTree = "<group>";
 		};
-		ACC0000000000000000000A2 /* Accounts */ = {
+		515542732656706F00B19C59 /* TokenExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Accounts;
-			sourceTree = "<group>";
-		};
-		BAC0000000000000000000A2 /* Backup */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Backup;
+			exceptions = (
+				5A0C00000000000000000006 /* Exceptions for "TokenExtension" folder in "TokenExtension" target */,
+			);
+			path = TokenExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -441,48 +262,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		513D4DEF2660D5960022C53D /* Authentication */ = {
-			isa = PBXGroup;
-			children = (
-				513F34BC24633A4A00FCE030 /* EditCredential */,
-				81FA3C2B2319839B009C22AB /* AddCredential */,
-			);
-			path = Authentication;
-			sourceTree = "<group>";
-		};
-		513D4DF02660D5AB0022C53D /* YubiKeyConfiguration */ = {
-			isa = PBXGroup;
-			children = (
-				B4696F3E2CB6CE5200604F6F /* ConfigurationView.swift */,
-				A5D4E86C24083CF300FD63A0 /* OTPConfigurationView.swift */,
-				515542672654413600B19C59 /* SmartCardConfigurationView.swift */,
-				51AFD4D32716FC78008F2630 /* NFCSettingsView.swift */,
-				B44E5EBA2C778802007ABB79 /* OATHPasswordView.swift */,
-				B4BB02DF2C80BEBD00B72904 /* OATHSavedPasswordsView.swift */,
-				B44E5E802C74BE67007ABB79 /* OATHResetView.swift */,
-				B4BB02E32C81B21D00B72904 /* FIDOPINView.swift */,
-				B4BB02E72C81C7A700B72904 /* FIDOResetView.swift */,
-			);
-			path = YubiKeyConfiguration;
-			sourceTree = "<group>";
-		};
-		513D4DF32660D8DC0022C53D /* TokenSession */ = {
-			isa = PBXGroup;
-			children = (
-				5156D05C265D2602007A94F8 /* TokenRequestView.swift */,
-				B40F44442B27033A000D5E02 /* TokenRequestYubiOTPView.swift */,
-			);
-			path = TokenSession;
-			sourceTree = "<group>";
-		};
-		513F34BC24633A4A00FCE030 /* EditCredential */ = {
-			isa = PBXGroup;
-			children = (
-				B46E378629C348F100CA0B67 /* EditAccountView.swift */,
-			);
-			path = EditCredential;
-			sourceTree = "<group>";
-		};
 		515542702656706F00B19C59 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -492,71 +271,6 @@
 				51554295265BB65100B19C59 /* UserNotificationsUI.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		515542732656706F00B19C59 /* TokenExtension */ = {
-			isa = PBXGroup;
-			children = (
-				515542862656F52000B19C59 /* TokenExtension.entitlements */,
-				515542742656706F00B19C59 /* Token.swift */,
-				515542762656707000B19C59 /* TokenDriver.swift */,
-				515542782656707000B19C59 /* TokenSession.swift */,
-				5155427A2656707000B19C59 /* Info.plist */,
-				B43751962C9AD7D8004017A4 /* InfoPlist.xcstrings */,
-				C1A0000000000000000000E3 /* PrivacyInfo.xcprivacy */,
-				5156D05A265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift */,
-				B4901AF32BD7DF960092E7A2 /* Localizable.xcstrings */,
-			);
-			path = TokenExtension;
-			sourceTree = "<group>";
-		};
-		5155428B2656FCF600B19C59 /* CryptoTokenKit */ = {
-			isa = PBXGroup;
-			children = (
-				5155428C2657015D00B19C59 /* TokenCertificateStorage.swift */,
-			);
-			path = CryptoTokenKit;
-			sourceTree = "<group>";
-		};
-		51EEC530246D34D800061A8F /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				B4B83B692CBE8D3A00B33C47 /* Logger+Extensions.swift */,
-				51EEC531246D34ED00061A8F /* DeviceCapabilities.swift */,
-				B4A597B92D9D7BF000444D97 /* SmartCardConnection+Extensions.swift */,
-				51BBE37E273982D700DA47CC /* OATHSession+Extensions.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		816C684423430DC000209342 /* SecureStore */ = {
-			isa = PBXGroup;
-			children = (
-				816C684523430E0700209342 /* SecureStore.swift */,
-				816C684723430F8E00209342 /* SecureStoreQueryable.swift */,
-				816C684F23440D2200209342 /* SecureStoreError.swift */,
-				816C685D234697BE00209342 /* PasswordPreferences.swift */,
-			);
-			path = SecureStore;
-			sourceTree = "<group>";
-		};
-		817DBA0E2368B7BE001FC18D /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				B47486652CECE3640031A504 /* UIFont+Extensions.swift */,
-				515542872656F64100B19C59 /* Data+Extensions.swift */,
-				515542892656F79500B19C59 /* SecCertificate+Extensions.swift */,
-				A591411C23830EB800CCCF67 /* UIApplicationExtension.swift */,
-				817DBA0C2368B7B7001FC18D /* UIColorAdditions.swift */,
-				A1C1EA0000000000000000F4 /* Platform.swift */,
-				513F34DB246B144300FCE030 /* UIViewAdditions.swift */,
-				B4C93E64299FC67800C2A8B8 /* View+Extensions.swift */,
-				B452EC3C2A264A620045E5D9 /* ToastView.swift */,
-				B452EC432A2A06940045E5D9 /* ToastPresenter.swift */,
-				B4BB02D82C80987B00B72904 /* SettingsButton.swift */,
-				B4BB02DB2C80A09500B72904 /* SettingsView.swift */,
-			);
-			path = Helpers;
 			sourceTree = "<group>";
 		};
 		818866AA22DFD729006BC0A8 = {
@@ -589,125 +303,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		818866B522DFD729006BC0A8 /* Authenticator */ = {
-			isa = PBXGroup;
-			children = (
-				818BE8DB22F3486500061026 /* Model */,
-				818BE8DA22F3485600061026 /* UI */,
-				818866F622E7A877006BC0A8 /* Authenticator.entitlements */,
-				B4901AE32BD697620092E7A2 /* Localizable.xcstrings */,
-				B4719B18298AA757006CDAEA /* AuthenticatorApp.swift */,
-				818866BF22DFD72C006BC0A8 /* Assets.xcassets */,
-				C1A0000000000000000000C1 /* AppIcon.icon */,
-				C1A0000000000000000000C2 /* AppIcon-Dark.icon */,
-				818866C422DFD72C006BC0A8 /* Info.plist */,
-				B4901B072BD91DA60092E7A2 /* InfoPlist.xcstrings */,
-				C1A0000000000000000000E1 /* PrivacyInfo.xcprivacy */,
-				51AFD4D727196AB6008F2630 /* VersionHistory.plist */,
-				B40327752847AE0A00DF4DB0 /* Licensing.md */,
-				E17E0000000000000000C001 /* EnteAuth */,
-				E17E0000000000000000C003 /* Mac */,
-				A10C00000000000000000001 /* AppLock */,
-				ACC0000000000000000000A1 /* Accounts */,
-				BAC0000000000000000000A1 /* Backup */,
-			);
-			path = Authenticator;
-			sourceTree = "<group>";
-		};
-		818866CC22DFD72C006BC0A8 /* AuthenticatorTests */ = {
-			isa = PBXGroup;
-			children = (
-				C0FFEE0000000000000000A1 /* ConnectionManagerTests.swift */,
-				816C685123440EF900209342 /* SecureStoreTests.swift */,
-				A1C1EA0000000000000000F2 /* StoredPreferencesTests.swift */,
-				A1C1EA0000000000000000F1 /* LargestClearRectTests.swift */,
-				51EEC535246D38B700061A8F /* YubiKitExtensionsTests.swift */,
-				818866CF22DFD72C006BC0A8 /* Info.plist */,
-				E17E0000000000000000C002 /* EnteAuth */,
-				A10C00000000000000000002 /* AppLock */,
-				ACC0000000000000000000A2 /* Accounts */,
-				BAC0000000000000000000A2 /* Backup */,
-			);
-			path = AuthenticatorTests;
-			sourceTree = "<group>";
-		};
-		818BE8DA22F3485600061026 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				81FA3C30231AF198009C22AB /* About */,
-				513D4DEF2660D5960022C53D /* Authentication */,
-				513D4DF32660D8DC0022C53D /* TokenSession */,
-				513D4DF02660D5AB0022C53D /* YubiKeyConfiguration */,
-				817DBA0E2368B7BE001FC18D /* Helpers */,
-				818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */,
-				B4719B16298AA6E7006CDAEA /* MainView.swift */,
-				B411242E29D423A300D58001 /* ListStatusView.swift */,
-				B4719B2B29914051006CDAEA /* AccountRowView.swift */,
-				B452EC1E2A1E4F460045E5D9 /* YubiOtpRowView.swift */,
-				B4719B312993EFEE006CDAEA /* AccountDetailsView.swift */,
-				B4C93E5F299D156C00C2A8B8 /* ErrorAlertView.swift */,
-				B40D619F2AE7F37900467AE9 /* DisableOTPView.swift */,
-			);
-			path = UI;
-			sourceTree = "<group>";
-		};
-		818BE8DB22F3486500061026 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				5155428B2656FCF600B19C59 /* CryptoTokenKit */,
-				51EEC530246D34D800061A8F /* Extensions */,
-				816C684423430DC000209342 /* SecureStore */,
-				51F8E3BE263848E30010686B /* ConnectionManager.swift */,
-				A5588BF8239B0A7F003E4CA5 /* FavoritesStorage.swift */,
-				81C4E43C22F94B7B003AFBB8 /* KeySessionError.swift */,
-				51F8E3BC263847BD0010686B /* ManagementViewModel.swift */,
-				B4712B6F28DDB5F6009B270D /* AccessKeyCache.swift */,
-				A1C1EA0000000000000000F3 /* Debug/SimulatedYubiKey.swift */,
-				F018E4F892C7B4FEB1051FC9 /* Debug/WindowSnapshots.swift */,
-				5155426926554CAB00B19C59 /* SmartCardViewModel.swift */,
-				5156D05E265D3CEF007A94F8 /* TokenRequestViewModel.swift */,
-				51AFD4D52716FCDB008F2630 /* ApplicationSettingsViewModel.swift */,
-				A5E9DEAF237DE1660011FBF4 /* SettingsConfig.swift */,
-				B4DB2289299BC373003110ED /* OATHSession.swift */,
-				5C3E0000000000000000000C /* AppClock.swift */,
-				B4C93E62299FB51A00C2A8B8 /* Account.swift */,
-				B4719B1A298AB641006CDAEA /* MainViewModel.swift */,
-				D0A1CE000000000000000001 /* DeviceAccounts.swift */,
-				56319DE11C4A1A730E920128 /* QuickActions.swift */,
-				B4696F402CB6CF2500604F6F /* ConfigurationViewModel.swift */,
-				B4FE90D12A4431AB00B59170 /* NotificationsViewModel.swift */,
-				B40D61A12AE7F89500467AE9 /* DisableOTPModel.swift */,
-				5180974226DE185100A122C1 /* OATHResetViewModel.swift */,
-				B44E5EB22C777F22007ABB79 /* OATHPasswordViewModel.swift */,
-				B4BB02DD2C80BC8500B72904 /* OATHSavedPasswordsViewModel.swift */,
-				B4BB02E12C81A82300B72904 /* FIDOPINViewModel.swift */,
-				B4BB02E52C81C75D00B72904 /* FIDOResetViewModel.swift */,
-				D1A600000000000000000003 /* TokenResponseStore.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		81FA3C2B2319839B009C22AB /* AddCredential */ = {
-			isa = PBXGroup;
-			children = (
-				B4C93E9429C1B90900C2A8B8 /* AddAccountView.swift */,
-				B4B1711727DF8C48002A62DE /* ScanAccountView.swift */,
-			);
-			path = AddCredential;
-			sourceTree = "<group>";
-		};
-		81FA3C30231AF198009C22AB /* About */ = {
-			isa = PBXGroup;
-			children = (
-				B474865B2CEB79FD0031A504 /* AboutView.swift */,
-				C1A0000000000000000000A7 /* AppIconView.swift */,
-				B47486612CECC2150031A504 /* TutorialView.swift */,
-				B474865F2CEC83F50031A504 /* VersionHistoryView.swift */,
-				B47486632CECC2F00031A504 /* LicensingView.swift */,
-			);
-			path = About;
-			sourceTree = "<group>";
-		};
 		B4E9D45928B65A6E00D51FFC /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -729,6 +324,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				515542732656706F00B19C59 /* TokenExtension */,
 			);
 			name = TokenExtension;
 			productName = TokenExtension;
@@ -774,13 +372,9 @@
 				AF110000000000000000000E /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				818866B522DFD729006BC0A8 /* Authenticator */,
 				A7C400000000000000000001 /* Shared */,
 				AF1100000000000000000010 /* AutoFill */,
-				E17E0000000000000000C001 /* EnteAuth */,
-				E17E0000000000000000C003 /* Mac */,
-				A10C00000000000000000001 /* AppLock */,
-				ACC0000000000000000000A1 /* Accounts */,
-				BAC0000000000000000000A1 /* Backup */,
 			);
 			name = OrielOTP;
 			packageProductDependencies = (
@@ -806,10 +400,7 @@
 				818866CB22DFD72C006BC0A8 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E17E0000000000000000C002 /* EnteAuth */,
-				A10C00000000000000000002 /* AppLock */,
-				ACC0000000000000000000A2 /* Accounts */,
-				BAC0000000000000000000A2 /* Backup */,
+				818866CC22DFD72C006BC0A8 /* AuthenticatorTests */,
 			);
 			name = OrielOTPTests;
 			productName = OrielOTPTests;
@@ -934,9 +525,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B43751972C9AD7D8004017A4 /* InfoPlist.xcstrings in Resources */,
-				C1A0000000000000000000E4 /* PrivacyInfo.xcprivacy in Resources */,
-				B4901AF42BD7DF960092E7A2 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -951,15 +539,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				818866C322DFD72C006BC0A8 /* LaunchScreen.storyboard in Resources */,
-				51AFD4D827196AB6008F2630 /* VersionHistory.plist in Resources */,
-				818866C022DFD72C006BC0A8 /* Assets.xcassets in Resources */,
-				C1A0000000000000000000D1 /* AppIcon.icon in Resources */,
-				C1A0000000000000000000D2 /* AppIcon-Dark.icon in Resources */,
-				B4901B082BD91DA60092E7A2 /* InfoPlist.xcstrings in Resources */,
-				C1A0000000000000000000E2 /* PrivacyInfo.xcprivacy in Resources */,
-				B4901AE42BD697620092E7A2 /* Localizable.xcstrings in Resources */,
-				B40327762847AE0A00DF4DB0 /* Licensing.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -974,7 +553,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7C40000000000000000000B /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -992,11 +570,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				515542792656707000B19C59 /* TokenSession.swift in Sources */,
-				D1A600000000000000000001 /* TokenResponseStore.swift in Sources */,
-				515542752656706F00B19C59 /* Token.swift in Sources */,
-				5156D05B265D0538007A94F8 /* TKTokenAlgorithm+Extensions.swift in Sources */,
-				515542772656707000B19C59 /* TokenDriver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1011,80 +584,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C3E0000000000000000000D /* AppClock.swift in Sources */,
-				B43751A42CA440E7004017A4 /* NFCSettingsView.swift in Sources */,
-				51AFD4D62716FCDB008F2630 /* ApplicationSettingsViewModel.swift in Sources */,
-				B4BB02E42C81B21D00B72904 /* FIDOPINView.swift in Sources */,
-				51BBE37F273982D700DA47CC /* OATHSession+Extensions.swift in Sources */,
-				B44E5EB32C777F22007ABB79 /* OATHPasswordViewModel.swift in Sources */,
-				B4B83B6A2CBE8D4200B33C47 /* Logger+Extensions.swift in Sources */,
-				B4BB02DC2C80A09500B72904 /* SettingsView.swift in Sources */,
-				B44E5E812C74BE67007ABB79 /* OATHResetView.swift in Sources */,
-				B411242F29D423A300D58001 /* ListStatusView.swift in Sources */,
-				816C684823430F8E00209342 /* SecureStoreQueryable.swift in Sources */,
-				515542882656F64100B19C59 /* Data+Extensions.swift in Sources */,
-				B40D61A02AE7F37900467AE9 /* DisableOTPView.swift in Sources */,
-				B4FE90D22A4431AB00B59170 /* NotificationsViewModel.swift in Sources */,
-				B4719B17298AA6E7006CDAEA /* MainView.swift in Sources */,
-				B452EC442A2A06940045E5D9 /* ToastPresenter.swift in Sources */,
-				5156D05D265D2602007A94F8 /* TokenRequestView.swift in Sources */,
-				B40F44452B27033A000D5E02 /* TokenRequestYubiOTPView.swift in Sources */,
-				B4C93E60299D156C00C2A8B8 /* ErrorAlertView.swift in Sources */,
-				A591411D23830EB800CCCF67 /* UIApplicationExtension.swift in Sources */,
-				B47486602CEC83F90031A504 /* VersionHistoryView.swift in Sources */,
-				817DBA0D2368B7B7001FC18D /* UIColorAdditions.swift in Sources */,
-				A1C1EA0000000000000000B4 /* Platform.swift in Sources */,
-				51F8E3BF263848E30010686B /* ConnectionManager.swift in Sources */,
-				B46E378729C348F100CA0B67 /* EditAccountView.swift in Sources */,
-				B4696F3F2CB6CE5800604F6F /* ConfigurationView.swift in Sources */,
-				B4712B7028DDB5F6009B270D /* AccessKeyCache.swift in Sources */,
-				A1C1EA0000000000000000B3 /* Debug/SimulatedYubiKey.swift in Sources */,
-				39615BAB2A1BC69B0374FBCD /* Debug/WindowSnapshots.swift in Sources */,
-				B47486642CECC2F50031A504 /* LicensingView.swift in Sources */,
-				513F34DC246B144300FCE030 /* UIViewAdditions.swift in Sources */,
-				B47486662CECE36A0031A504 /* UIFont+Extensions.swift in Sources */,
-				A5E9DEB0237DE1660011FBF4 /* SettingsConfig.swift in Sources */,
-				B4719B2C29914051006CDAEA /* AccountRowView.swift in Sources */,
-				C1A0000000000000000000B7 /* AppIconView.swift in Sources */,
-				B4BB02E82C81C7A700B72904 /* FIDOResetView.swift in Sources */,
-				B4DB228A299BC373003110ED /* OATHSession.swift in Sources */,
-				B4719B322993EFEE006CDAEA /* AccountDetailsView.swift in Sources */,
-				5155428D2657015D00B19C59 /* TokenCertificateStorage.swift in Sources */,
-				B474865C2CEB7A000031A504 /* AboutView.swift in Sources */,
-				B40D61A22AE7F89500467AE9 /* DisableOTPModel.swift in Sources */,
-				A5D4E86D24083CF300FD63A0 /* OTPConfigurationView.swift in Sources */,
-				5156D05F265D3CEF007A94F8 /* TokenRequestViewModel.swift in Sources */,
-				B4BB02D92C80987B00B72904 /* SettingsButton.swift in Sources */,
-				5155426A26554CAB00B19C59 /* SmartCardViewModel.swift in Sources */,
-				B4BB02DE2C80BC8500B72904 /* OATHSavedPasswordsViewModel.swift in Sources */,
-				515542682654413600B19C59 /* SmartCardConfigurationView.swift in Sources */,
-				B452EC1F2A1E4F460045E5D9 /* YubiOtpRowView.swift in Sources */,
-				B4719B19298AA757006CDAEA /* AuthenticatorApp.swift in Sources */,
-				A5588BF9239B0A7F003E4CA5 /* FavoritesStorage.swift in Sources */,
-				B4B1711827DF8C48002A62DE /* ScanAccountView.swift in Sources */,
-				5155428A2656F79500B19C59 /* SecCertificate+Extensions.swift in Sources */,
-				816C685E234697BF00209342 /* PasswordPreferences.swift in Sources */,
-				B4C93E9529C1B90900C2A8B8 /* AddAccountView.swift in Sources */,
-				B44E5EBB2C778802007ABB79 /* OATHPasswordView.swift in Sources */,
-				B452EC3D2A264A620045E5D9 /* ToastView.swift in Sources */,
-				81C4E43D22F94B7B003AFBB8 /* KeySessionError.swift in Sources */,
-				51F8E3BD263847BD0010686B /* ManagementViewModel.swift in Sources */,
-				B4BB02E62C81C75E00B72904 /* FIDOResetViewModel.swift in Sources */,
-				51EEC532246D34ED00061A8F /* DeviceCapabilities.swift in Sources */,
-				B47486622CECC2190031A504 /* TutorialView.swift in Sources */,
-				B4BB02E22C81A82300B72904 /* FIDOPINViewModel.swift in Sources */,
-				B4696F412CB6CF2B00604F6F /* ConfigurationViewModel.swift in Sources */,
-				B4719B1B298AB641006CDAEA /* MainViewModel.swift in Sources */,
-				D0A1CE000000000000000002 /* DeviceAccounts.swift in Sources */,
-				1531FDE56152F4B60499B209 /* QuickActions.swift in Sources */,
-				B4C93E65299FC67800C2A8B8 /* View+Extensions.swift in Sources */,
-				816C685023440D2200209342 /* SecureStoreError.swift in Sources */,
-				5180974326DE185100A122C1 /* OATHResetViewModel.swift in Sources */,
-				B4BB02E02C80BEBD00B72904 /* OATHSavedPasswordsView.swift in Sources */,
-				D1A600000000000000000002 /* TokenResponseStore.swift in Sources */,
-				816C684623430E0700209342 /* SecureStore.swift in Sources */,
-				B4A597BA2D9D7BFE00444D97 /* SmartCardConnection+Extensions.swift in Sources */,
-				B4C93E63299FB51A00C2A8B8 /* Account.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1092,11 +591,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				816C685223440EF900209342 /* SecureStoreTests.swift in Sources */,
-				A1C1EA0000000000000000B2 /* StoredPreferencesTests.swift in Sources */,
-				A1C1EA0000000000000000B1 /* LargestClearRectTests.swift in Sources */,
-				C0FFEE0000000000000000A2 /* ConnectionManagerTests.swift in Sources */,
-				51EEC536246D38B700061A8F /* YubiKitExtensionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1111,7 +605,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AF110000000000000000000C /* SecureStoreError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1148,14 +641,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		818866C122DFD72C006BC0A8 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				818866C222DFD72C006BC0A8 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
