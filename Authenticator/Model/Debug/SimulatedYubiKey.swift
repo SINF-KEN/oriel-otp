@@ -44,8 +44,9 @@ import YubiKit
         #endif
     }
 
-    /// Whether the key is plugged in. Unplugging closes the connection like pulling out a real key.
-    var isInserted = true {
+    /// Whether the key is plugged in. Unplugging closes the connection like pulling out a real key. `-DemoUnplugged YES`
+    /// starts with it unplugged, for the screenshot of the app without a YubiKey.
+    var isInserted = !UserDefaults.standard.bool(forKey: "DemoUnplugged") {
         didSet {
             guard isInserted != oldValue else { return }
             if isInserted {
@@ -73,6 +74,45 @@ import YubiKit
         let connection = SimulatedYubiKeyConnection(storage: storage)
         self.connection = connection
         return connection
+    }
+
+    /// `-DemoDeviceAccounts YES` saves demo accounts on this device when it has none, for the screenshot of the app
+    /// without a YubiKey. Their secrets are made like the simulated key's.
+    static func addDemoDeviceAccountsIfAsked() {
+        guard UserDefaults.standard.bool(forKey: "DemoDeviceAccounts") else { return }
+        let device = DeviceAccounts.shared
+        device.loadIfLocked()
+        guard device.accounts.isEmpty else { return }
+        let accounts = [("GitHub", "alice@example.com"), ("Google", "alice@example.com"), ("Microsoft", "alice@outlook.com"),
+                        ("Dropbox", "alice@example.com"), ("Bank", "alice"), ("Mastodon", "@alice@example.social")]
+        for (issuer, name) in accounts {
+            let secret = Data(SHA256.hash(data: Data("\(issuer):\(name)".utf8)).prefix(10))
+            let base32 = Self.base32(secret)
+            var components = URLComponents()
+            components.scheme = "otpauth"
+            components.host = "totp"
+            components.path = "/\(issuer):\(name)"
+            components.queryItems = [URLQueryItem(name: "secret", value: base32), URLQueryItem(name: "issuer", value: issuer)]
+            guard let url = components.url, let template = try? YubiKitOATHSession.CredentialTemplate(otpauthURL: url) else { continue }
+            _ = try? device.add(template)
+        }
+    }
+
+    private static func base32(_ data: Data) -> String {
+        let alphabet = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567")
+        var output = ""
+        var buffer = 0
+        var bits = 0
+        for byte in data {
+            buffer = (buffer << 8) | Int(byte)
+            bits += 8
+            while bits >= 5 {
+                output.append(alphabet[(buffer >> (bits - 5)) & 31])
+                bits -= 5
+            }
+        }
+        if bits > 0 { output.append(alphabet[(buffer << (5 - bits)) & 31]) }
+        return output
     }
 
     /// Unplugs the key, erases it back to the demo accounts and plugs it in again.

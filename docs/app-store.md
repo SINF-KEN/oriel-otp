@@ -24,6 +24,9 @@ The app links to the same privacy policy and support page under **About**, which
   id (`io.github.sinf-ken.OrielOTP`). The Mac needs its own provisioning profile for the keychain access group.
 - Mac screenshots: `docs/screenshots/mac-accounts.png`, `mac-add-account.png` and `mac-ente-accounts.png` are
   2560 × 1600, an accepted Mac size (see [screenshots.md](screenshots.md)).
+- iPhone screenshot without a YubiKey: `docs/screenshots/accounts-without-yubikey.png`, made by
+  `ScreenshotTests.testWithoutAYubiKeyScreenshot` with the simulated key unplugged (`-DemoUnplugged YES`) and demo
+  accounts on the device (`-DemoDeviceAccounts YES`). Put it first if the listing leads with "YubiKey optional".
 - Category on the Mac: Utilities (`LSApplicationCategoryType` in `Authenticator/Info-macOS.plist`).
 
 ## App Privacy
