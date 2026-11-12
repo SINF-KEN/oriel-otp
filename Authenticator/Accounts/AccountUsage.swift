@@ -107,11 +107,20 @@ import SwiftUI
 struct AccountOrderSection: View {
 
     @Bindable private var usage = AccountUsage.shared
+    @State private var showsCheckup = false
 
     var body: some View {
         Section {
             Toggle(String(localized: "Most used first", comment: "Account list setting"), isOn: $usage.isEnabled)
                 .accessibilityIdentifier("settings.most-used-first")
+            Button(String(localized: "Account Check-Up…", comment: "Account list setting button")) { showsCheckup = true }
+                .accessibilityIdentifier("settings.account-checkup")
+                .sheet(isPresented: $showsCheckup) {
+                    AccountCheckupView()
+                        #if os(macOS)
+                        .frame(minWidth: 480, minHeight: 420)
+                        #endif
+                }
         } header: {
             Text(String(localized: "Account List", comment: "Settings section"))
         } footer: {
