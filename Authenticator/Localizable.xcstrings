@@ -6661,6 +6661,35 @@
         }
       }
     },
+    "Enter your app lock code to show the QR code" : {
+      "comment" : "Prompt for the app lock code before an account's QR code is shown",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Deinen Code der App-Sperre ein, um den QR-Code anzuzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le code du verrouillage de l'app pour afficher le code QR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを表示するにはアプリロックのコードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte kód zámku aplikácie na zobrazenie QR kódu"
+          }
+        }
+      }
+    },
     "Enter your app lock password to back up your accounts" : {
       "comment" : "Backup prompt for the app lock password",
       "localizations" : {
@@ -6686,6 +6715,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ak chcete zálohovať účty, zadajte heslo na uzamknutie aplikácie"
+          }
+        }
+      }
+    },
+    "Enter your app lock password to show the QR code" : {
+      "comment" : "Prompt for the app lock password before an account's QR code is shown",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib Dein Passwort der App-Sperre ein, um den QR-Code anzuzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saisissez le mot de passe du verrouillage de l'app pour afficher le code QR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを表示するにはアプリロックのパスワードを入力してください"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadajte heslo zámku aplikácie na zobrazenie QR kódu"
           }
         }
       }
@@ -11525,6 +11583,35 @@
         }
       }
     },
+    "QR code of the account" : {
+      "comment" : "VoiceOver label of an account's QR code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code des Kontos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code QR du compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントのQRコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR kód účtu"
+          }
+        }
+      }
+    },
     "QR code scanned" : {
       "comment" : "VoiceOver announcement after scanning a QR code",
       "localizations" : {
@@ -12779,6 +12866,35 @@
         }
       }
     },
+    "Scan it with another device or authenticator app to add the account there. Anyone who sees this code can make the account's codes, so don't share it or take a screenshot of it." : {
+      "comment" : "Under an account's QR code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scanne ihn mit einem anderen Gerät oder einer anderen Authenticator-App, um das Konto dort hinzuzufügen. Wer diesen Code sieht, kann die Codes des Kontos erzeugen. Teile ihn daher nicht und mache kein Bildschirmfoto davon."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scannez-le avec un autre appareil ou une autre app d'authentification pour y ajouter le compte. Toute personne qui voit ce code peut générer les codes du compte : ne le partagez pas et n'en faites pas de capture d'écran."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "別のデバイスや認証アプリでスキャンすると、そこにアカウントを追加できます。このコードを見た人は誰でもアカウントのコードを作れるため、共有したりスクリーンショットを撮ったりしないでください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naskenujte ho iným zariadením alebo overovacou aplikáciou a pridajte tam účet. Ktokoľvek, kto tento kód uvidí, môže vytvárať kódy účtu, preto ho nezdieľajte ani si z neho nerobte snímku obrazovky."
+          }
+        }
+      }
+    },
     "Scan NFC YubiKey" : {
       "localizations" : {
         "de" : {
@@ -13467,6 +13583,93 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zobraziť iba v lište menu"
+          }
+        }
+      }
+    },
+    "Show QR Code" : {
+      "comment" : "Menu item that shows an account's QR code, to add it to another device",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le code QR"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QRコードを表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobraziť QR kód"
+          }
+        }
+      }
+    },
+    "Show the account's QR code" : {
+      "comment" : "Face ID reason when showing an account's QR code",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code des Kontos anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le code QR du compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントのQRコードを表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobraziť QR kód účtu"
+          }
+        }
+      }
+    },
+    "Show the account's QR code, to add it to another device or app" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den QR-Code des Kontos anzeigen, um es auf einem anderen Gerät oder in einer anderen App hinzuzufügen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afficher le code QR du compte, pour l'ajouter sur un autre appareil ou dans une autre app"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントのQRコードを表示して、別のデバイスやアプリに追加します"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zobraziť QR kód účtu na pridanie do iného zariadenia alebo aplikácie"
           }
         }
       }

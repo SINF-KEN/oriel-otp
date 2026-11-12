@@ -467,6 +467,11 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
         await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
     }
 
+    /// Asks for Face ID, Touch ID or the device passcode before an account's QR code, which holds its secret, is shown.
+    func verifyDeviceOwnerForQRCode() async -> Bool {
+        await authenticateDeviceOwner(String(localized: "Show the account's QR code", comment: "Face ID reason when showing an account's QR code")) != nil
+    }
+
     /// Asks for Face ID, Touch ID or the device passcode before the secrets of the accounts on this device are
     /// written to a backup file.
     func verifyDeviceOwnerForBackup() async -> Bool {

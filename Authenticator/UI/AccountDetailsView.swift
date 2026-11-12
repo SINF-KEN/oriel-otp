@@ -31,6 +31,8 @@ struct AccountDetailView: View {
     @State private var showDeleteConfirmation = false
     @State private var showAutoFillWebsites = false
     @State private var showTags = false
+    /// The account's otpauth link while its QR code shows.
+    @State private var qrCode: AccountQRCodeView.Link?
 
     @ScaledSize(relativeTo: .largeTitle) private var iconSize: CGFloat = 80
 
@@ -153,6 +155,13 @@ struct AccountDetailView: View {
                 .help(String(localized: "File the account under tags", comment: "Toolbar help"))
                 .accessibilityIdentifier("account-details.tags")
                 CopyToYubiKeyButtons(account: account)
+                if !account.isOnYubiKey {
+                    Button(action: showQRCode) {
+                        Label(String(localized: "Show QR Code", comment: "Menu item that shows an account's QR code, to add it to another device"), systemImage: "qrcode")
+                    }
+                    .help(String(localized: "Show the account's QR code, to add it to another device or app", comment: "Toolbar help"))
+                    .accessibilityIdentifier("account-details.qr-code")
+                }
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
@@ -162,6 +171,10 @@ struct AccountDetailView: View {
         }
         .sheet(isPresented: $showEditing) {
             EditView(account: account, viewModel: model, showEditing: $showEditing)
+                .appLockCover()
+        }
+        .sheet(item: $qrCode) { link in
+            AccountQRCodeView(account: account, url: link.url) { qrCode = nil }
                 .appLockCover()
         }
         .sheet(isPresented: $showTags) {
@@ -189,6 +202,17 @@ struct AccountDetailView: View {
             } else {
                 Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
             }
+        }
+    }
+
+    /// Asks who's there, then shows the QR code. A code or password is asked for in the sheet, Face ID or Touch ID before.
+    private func showQRCode() {
+        Task {
+            let lock = AppLock.shared
+            if !lock.method.hasSecret, AppLock.canUseDeviceOwner {
+                guard await lock.verifyDeviceOwnerForQRCode() else { return }
+            }
+            qrCode = model.otpauthURL(for: account).map(AccountQRCodeView.Link.init)
         }
     }
 
