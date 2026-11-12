@@ -160,6 +160,11 @@ the [YubiKit SDK](https://github.com/Yubico/yubikit-swift), and for Ente Auth on
 [swift-sodium](https://github.com/jedisct1/swift-sodium) (libsodium) and
 [BigInt](https://github.com/attaswift/BigInt), all added with the Swift Package Manager.
 
+Every folder of code is a synchronized folder in the project: a file added to `Authenticator/` is in the app,
+one added to `AuthenticatorTests/` is in the unit tests, and so on, without editing the project. The few files a
+second target also builds, and the Info.plists and entitlements that aren't resources, are listed as exceptions on
+their folder (in Xcode, a file's Target Membership).
+
 Debug builds in the simulator connect to a simulated YubiKey with demo accounts and can sign in to a fake Ente
 server at `https://demo.ente.test` with any email and the password `demo` (add `+mfa`, `+2fa` or `+nosrp` to the
 email's name to be asked for the code `123456`, and `+passkey` to also be asked for a passkey). None of this is
