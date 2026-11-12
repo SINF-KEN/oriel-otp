@@ -77,15 +77,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Lint new Swift code
+      # Every folder with Swift code. `swift-format format -i -r -p` with the same folders fixes what this finds.
+      - name: Lint Swift code
         run: |
-          xcrun swift-format lint --configuration .swift-format --strict \
-            Authenticator/Model/TokenResponseStore.swift \
-            AuthenticatorTests/EnteAuth/CIBehaviorTests.swift \
-            AuthenticatorTests/EnteAuth/OTPGeneratorTests.swift \
-            Authenticator/EnteAuth/WatchAccountSync.swift \
-            Shared/*.swift \
-            OrielOTPWatch/*.swift
+          xcrun swift-format lint --configuration .swift-format --strict --recursive --parallel \
+            Authenticator AuthenticatorTests AuthenticatorUITests AutoFill AutoFillExtension TokenExtension Shared \
+            OrielOTPWatch tools
 
       - name: Validate project metadata
         run: |
