@@ -31,7 +31,7 @@ import Testing
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
         let session = URLSession.stubbed(protocols)
         let watch = WatchAccountSync(defaults: defaults)
-        let model = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session, watch: watch,
+        let model = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session,
                                       cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch))
         model.server = FakeEnteServer.server.absoluteString
         return model

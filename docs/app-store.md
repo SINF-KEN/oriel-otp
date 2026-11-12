@@ -98,7 +98,7 @@ Description:
 >
 > MAC AND APPLE WATCH
 > The Mac app reads the YubiKey over USB, and can copy codes from the menu bar. The Apple Watch app shows the codes
-> of your time-based Ente Auth accounts on your wrist.
+> of your time-based accounts on your wrist.
 >
 > Oriel OTP is an independent fork of Yubico Authenticator and isn't affiliated with Yubico or Ente. It has no
 > analytics, advertising or tracking.
@@ -164,11 +164,11 @@ gives.
 > The app lock is off by default, so the app opens without a code. It can be turned on under Configuration > App
 > lock.
 >
-> Apple Watch: the watch app shows codes for the Ente Auth accounts only; it doesn't use the YubiKey. To test it,
-> on the iPhone choose **Sync from Ente Auth** in the account list menu, turn on **Stay signed in**, sign in with
-> the demo account, then turn on **Show Ente Auth accounts on Apple Watch** (shown when a watch with the app is
-> paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
-> watch.
+> Apple Watch: the watch app shows codes for the accounts on the iPhone and in Ente Auth; it doesn't use the
+> YubiKey. To test it, add an account with **Add account** and **This device**, or choose **Sync from Ente Auth** in
+> the account list menu, turn on **Stay signed in** and sign in with the demo account. Then open **Configuration** and
+> turn on **Show accounts on Apple Watch** (shown when a watch with the app is paired). The accounts appear on the
+> watch within a few seconds. Turning the switch off deletes them from the watch.
 >
 > AutoFill: the app includes an AutoFill extension that fills in the codes of accounts in Ente Auth and on this device
 > in Safari and other apps; it doesn't use the YubiKey. To test it, add an account with **Add account** and **This

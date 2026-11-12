@@ -233,7 +233,7 @@ import YubiKit
             replaceVault(with: EnteVault(email: session.email, server: session.server))
         } else {
             // A sync that changes nothing doesn't send them, and they may have changed while the session was locked.
-            watch.send(codes)
+            updateWatch()
         }
         startMonitoringNetwork()
     }
@@ -248,6 +248,7 @@ import YubiKit
             }
             // Keeps the accounts on this device.
             updateAutoFill()
+            updateWatch()
             return
         }
         replaceVault(with: nil)
@@ -306,7 +307,8 @@ import YubiKit
         }
         session = nil
         store.forgetSession()
-        watch.disable()
+        // The watch keeps the accounts on this device.
+        updateWatch()
         if showsError {
             error = EnteSyncError(EnteAuthenticatorSyncError.signedOut)
         }
@@ -440,10 +442,7 @@ import YubiKit
     private func changed() {
         onChange?()
         updateAutoFill()
-        // The watch shows what is in the vault. It's only sent while the session is unlocked, i.e. it is still valid.
-        if session != nil, watch.isEnabled {
-            watch.send(codes)
-        }
+        updateWatch()
     }
 
     /// AutoFill uses what is in the vault, also while the session is locked, and the accounts on this device: the codes
@@ -460,6 +459,24 @@ import YubiKit
         }
         let vault = vault
         autoFill?.update { Self.codes(in: vault) + DeviceAccounts.codes(of: deviceItems) }
+    }
+
+    /// The Apple Watch gets the time-based accounts on this device, and the vault's while there is a session for it:
+    /// once the session is signed out of or rejected, they're taken off the watch. Called again when the accounts on
+    /// this device change. Nothing is sent until they can be read, as they would look like none.
+    func updateWatch() {
+        guard watch.isEnabled, device?.isLocked != true else { return }
+        let vaultCodes = hasSession(for: vault) ? codes : []
+        watch.send(vaultCodes + DeviceAccounts.codes(of: device?.storedItems ?? []))
+    }
+
+    /// The session in memory, or a saved one for the vault that hasn't been unlocked yet: the watch already has the
+    /// vault's accounts, and a change made here meanwhile shouldn't take them off it.
+    private func hasSession(for vault: EnteVault?) -> Bool {
+        guard let vault else { return false }
+        if let session { return vault.belongs(to: session) }
+        guard let saved = store.savedAccount, saved.hasSession else { return false }
+        return vault.belongs(email: saved.email, server: saved.server)
     }
 
     /// Syncs when the network comes back with changes waiting to be uploaded.

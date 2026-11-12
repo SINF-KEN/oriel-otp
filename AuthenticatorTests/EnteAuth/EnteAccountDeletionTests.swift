@@ -34,8 +34,7 @@ import Testing
     private func model(_ server: URL, email: String = "alice@example.com") -> EnteAccountDeletionViewModel {
         let watch = WatchAccountSync(defaults: defaults)
         return EnteAccountDeletionViewModel(server: server, email: email, session: session, store: store,
-                                            cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch),
-                                            watch: watch)
+                                            cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch))
     }
 
     private func finish(_ model: EnteAccountDeletionViewModel) async throws {
