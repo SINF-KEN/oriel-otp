@@ -60,16 +60,14 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
     @ObservationIgnored private let session: URLSession
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let cloud: EnteCloud
-    @ObservationIgnored private let watch: WatchAccountSync
 
     init(server: URL, email: String = "", session: URLSession = .ente, store: EnteSessionStore = EnteSessionStore(),
-         cloud: EnteCloud = .shared, watch: WatchAccountSync = .shared) {
+         cloud: EnteCloud = .shared) {
         self.server = server
         self.email = email
         self.session = session
         self.store = store
         self.cloud = cloud
-        self.watch = watch
     }
 
     var passkeyURL: URL? { flow?.passkeyURL }
@@ -207,7 +205,6 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
               saved.email.caseInsensitiveCompare(email) == .orderedSame else { return }
         store.remove()
         cloud.remove()
-        watch.disable()
     }
 
     private func endSession() {

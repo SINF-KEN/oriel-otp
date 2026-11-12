@@ -183,6 +183,7 @@ struct ConfigurationView: View {
                 PrivacySection()
                 BackupSection()
                 AutoFillSection()
+                AppleWatchSection()
                 EnteAccountSection()
                 #endif
             }

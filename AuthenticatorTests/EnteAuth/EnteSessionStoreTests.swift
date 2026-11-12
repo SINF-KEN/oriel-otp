@@ -157,14 +157,12 @@ func makeTestDefaults() -> UserDefaults {
 
     @Test func signOutForgetsTheSessionWithoutWaitingForTheServer() async throws {
         let watch = WatchAccountSync(defaults: defaults)
-        watch.enable()
         try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
                                         authenticatorKey: Data(repeating: 7, count: 32)))
-        let logout = await store.signOut(watch: watch, cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
+        let logout = await store.signOut(cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
                                          session: URLSession.stubbed([UnansweredLogoutServer.self]))
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
-        #expect(!watch.isEnabled)
 
         // The server is still asked to end the old session. When it fails later, a new session is kept.
         for _ in 0..<100 where UnansweredLogoutServer.tokens.isEmpty {
@@ -226,7 +224,7 @@ struct EnteSavedAccountTests {
     private func makeModel(canSave: Bool = true) -> EnteSyncViewModel {
         let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: canSave)
         let watch = WatchAccountSync(defaults: defaults)
-        return EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, watch: watch,
+        return EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults,
                                  cloud: EnteCloud(store: store, storage: vaultStorage, watch: watch))
     }
 
@@ -320,18 +318,16 @@ struct EnteSavedAccountTests {
         #expect(store.savedAccount?.hasSession == true)
     }
 
-    @Test func signOutForgetsTheAccountAndDisablesTheWatch() async throws {
+    @Test func signOutForgetsTheAccount() async throws {
         let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
         let watch = WatchAccountSync(defaults: defaults)
-        watch.enable()
         try store.save(EnteSavedSession(server: FakeEnteServer.server, email: "alice@example.com", token: "the-token",
                                         authenticatorKey: EnteCrypto.randomBytes(32)))
         let cloud = EnteCloud(store: store, storage: vaultStorage, watch: watch)
         #expect(cloud.isEnabled)
-        await store.signOut(watch: watch, cloud: cloud)
+        await store.signOut(cloud: cloud)
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
-        #expect(!watch.isEnabled)
         // The copy of the accounts goes too.
         #expect(!cloud.isEnabled)
         #expect(try vaultStorage.load() == nil)

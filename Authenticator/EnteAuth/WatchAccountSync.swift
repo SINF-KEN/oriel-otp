@@ -39,11 +39,12 @@ import Foundation
     extension WCSession: WatchSession {}
 #endif
 
-/// Sends the Ente Auth accounts to the Apple Watch app, which keeps them and calculates the codes itself.
+/// Sends the time-based accounts on this device and in Ente Auth to the Apple Watch app, which keeps them and
+/// calculates the codes itself. `EnteCloud.updateWatch` puts them together.
 ///
-/// Opt in: nothing is sent until the user turns on **Show Ente Auth accounts on Apple Watch**. The accounts are sent
-/// whenever they are synced from Ente with the saved session. Turning it off or signing out of Ente sends an empty
-/// list, which makes the watch delete everything.
+/// Opt in: nothing is sent until the user turns on **Show accounts on Apple Watch** in Configuration. The accounts are
+/// sent whenever they change or are synced from Ente. Turning it off, or having no accounts left, sends an empty list,
+/// which makes the watch delete everything.
 ///
 /// The system keeps the latest application context on disk on both devices, so the accounts are sealed with a
 /// `WatchSyncKey` kept in this device's keychain, which the watch gets with `sendMessage`. A new key is made after the

@@ -17,7 +17,7 @@
 import Foundation
 import WatchConnectivity
 
-/// The Ente Auth accounts sent by the iPhone, kept in the watch's keychain so codes work without the iPhone.
+/// The accounts sent by the iPhone, kept in the watch's keychain so codes work without the iPhone.
 ///
 /// The iPhone sends them sealed in the application context. The key comes in a message: the iPhone sends it when it
 /// makes a new one, and this asks for it when a context can't be opened, again whenever the iPhone becomes reachable

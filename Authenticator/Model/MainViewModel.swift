@@ -117,6 +117,7 @@ import YubiKit
         device.onChange = { [weak self] in
             self?.updateDeviceAccounts()
             self?.cloud.updateAutoFill()
+            self?.cloud.updateWatch()
         }
         updateCloudAccounts()
         updateDeviceAccounts()

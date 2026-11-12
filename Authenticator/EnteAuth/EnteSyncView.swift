@@ -224,19 +224,6 @@ struct EnteSyncView: View {
         } footer: {
             Text(String(localized: "Your Ente Auth accounts are kept on this device, encrypted, and listed with your YubiKey's, so their codes work offline. They are synced with Ente when the app opens, after each change and when you refresh the list. Choose Sync accounts to pick ones to add to your YubiKey.", comment: "Ente saved session footer"))
         }
-        watchSection
-    }
-
-    /// Shown with a saved session when a watch with the app is paired, or while the switch is on so it can be turned off.
-    @ViewBuilder private var watchSection: some View {
-        if model.watch.isWatchAvailable || model.watch.isEnabled {
-            Section {
-                Toggle(String(localized: "Show Ente Auth accounts on Apple Watch", comment: "Ente sync Apple Watch toggle"),
-                       isOn: Binding(get: { model.watch.isEnabled }, set: { model.setShowsAccountsOnWatch($0) }))
-            } footer: {
-                Text(String(localized: "A copy of your time-based Ente Auth accounts is kept on your Apple Watch, so it can show codes without your iPhone. The accounts on the watch are updated each time you sync, and deleted when you turn this off or sign out.", comment: "Ente sync Apple Watch toggle footer"))
-            }
-        }
     }
 
     private var emailCodeSection: some View {
@@ -358,9 +345,6 @@ struct EnteSyncView: View {
                 LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: email)
             }
             Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { isConfirmingSignOut = true }
-        }
-        if model.isSessionSaved {
-            watchSection
         }
     }
 

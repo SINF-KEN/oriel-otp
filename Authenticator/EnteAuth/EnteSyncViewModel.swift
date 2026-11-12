@@ -57,24 +57,22 @@ import YubiKit
     @ObservationIgnored private(set) var flow: EnteLoginFlow?
     @ObservationIgnored private var api: EnteAPIClient?
     @ObservationIgnored private var token: String?
-    /// Whether the session is saved in the keychain, needed to show the accounts on Apple Watch.
+    /// Whether the session is saved in the keychain, so the accounts are kept on this device and synced.
     private(set) var isSessionSaved = false
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let session: URLSession
     @ObservationIgnored private var task: Task<Void, Never>?
-    @ObservationIgnored let watch: WatchAccountSync
     /// Keeps the accounts of a saved session on the device and syncs them.
     @ObservationIgnored private let cloud: EnteCloud
 
     init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard,
-         session: URLSession = .ente, watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared) {
+         session: URLSession = .ente, cloud: EnteCloud = .shared) {
         self.existingCredentialIds = existingCredentialIds
         self.capacity = capacity
         self.store = store
         self.defaults = defaults
         self.session = session
-        self.watch = watch
         self.cloud = cloud
         let savedServer = defaults.string(forKey: Self.serverKey) ?? ""
         self.server = savedServer
@@ -303,30 +301,8 @@ import YubiKit
         loadSavedSession()
     }
 
-    /// Turns showing the accounts on Apple Watch on or off. Turning it on sends the accounts right away, reading
-    /// them with the saved session first if they haven't been loaded.
-    func setShowsAccountsOnWatch(_ isOn: Bool) {
-        guard isOn else {
-            watch.disable()
-            return
-        }
-        watch.enable()
-        if phase == .accounts {
-            watch.send(codes)
-        } else {
-            loadSavedSession(onFailure: { self.watch.disable() })
-        }
-    }
-
-    private func loadSavedSession(onFailure: @escaping () -> Void = {}) {
-        run {
-            do {
-                try await self.loadSavedCodes()
-            } catch {
-                onFailure()
-                throw error
-            }
-        }
+    private func loadSavedSession() {
+        run { try await self.loadSavedCodes() }
     }
 
     private func loadSavedCodes() async throws {
@@ -343,7 +319,8 @@ import YubiKit
             // The session was revoked, e.g. from another device, or Face ID or Touch ID changed. The account is kept
             // and the password asked for again.
             store.forgetSession()
-            watch.disable()
+            // The watch keeps the accounts on this device.
+            cloud.updateWatch()
             token = nil
             isSessionSaved = false
             signedInEmail = nil
@@ -367,18 +344,16 @@ import YubiKit
             // The saved session hasn't been unlocked, the store unlocks it to end it on the server. Signing in again
             // waits for the unlock, so the account it saves isn't deleted with this one.
             let store = store
-            let watch = watch
             let cloud = cloud
             isBusy = true
             Task {
-                await store.signOut(watch: watch, cloud: cloud, session: session)
+                await store.signOut(cloud: cloud, session: session)
                 isBusy = false
             }
         } else {
             revokeSession()
             store.remove()
             cloud.remove()
-            watch.disable()
         }
         isSessionSaved = false
         codes = []
@@ -420,9 +395,6 @@ import YubiKit
         }
         selectAll()
         phase = .accounts
-        if isSessionSaved {
-            watch.send(codes)
-        }
     }
 
     /// The server as typed on the sign in screen, empty for Ente's own server.

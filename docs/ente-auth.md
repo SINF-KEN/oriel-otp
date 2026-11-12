@@ -166,9 +166,12 @@ vault.
 
 ### Apple Watch
 
-The watch gets its accounts from the vault: whenever the vault changes while the session is unlocked, and
-**Show Ente Auth accounts on Apple Watch** is on, the time-based accounts are sent as before. So accounts added or
-changed in the app, and ones pulled from other devices, reach the watch without opening the sync sheet.
+While **Show accounts on Apple Watch** (in Configuration) is on, the watch gets the time-based accounts of the vault
+and of this device, whenever either changes (`EnteCloud.updateWatch`). So accounts added or changed in the app, and
+ones pulled from other devices, reach the watch without opening the sync sheet. The vault's are only sent while there
+is a session for it, unlocked or saved: signing out, or the server rejecting the session, sends the list again without
+them, and the switch stays on for the accounts on this device. Until the accounts on this device can be read, e.g.
+after a launch in the background on a locked device, nothing is sent, as they would look like none.
 
 ## What is stored
 
