@@ -78,6 +78,7 @@ private struct GeneralSettingsView: View {
             } footer: {
                 Text(String(localized: "The menu bar shows your pinned accounts, or all accounts if none are pinned. Click one to copy its code. When the app is only in the menu bar, it isn't in the Dock.", comment: "Mac setting footer"))
             }
+            QuickCopySection()
             Section {
                 TextSizePicker()
             } footer: {

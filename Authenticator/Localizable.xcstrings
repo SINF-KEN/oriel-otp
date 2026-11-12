@@ -289,6 +289,35 @@
         }
       }
     },
+    "Another app already uses %@. Quit it or change its shortcut, then turn Quick Copy off and on." : {
+      "comment" : "Mac setting footer. The placeholder is a keyboard shortcut, e.g. ⌥⌘O.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eine andere App verwendet bereits %@. Beende sie oder ändere ihr Tastenkürzel und schalte die Schnellkopie dann aus und wieder ein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Une autre app utilise déjà %@. Quittez-la ou changez son raccourci, puis désactivez et réactivez la copie rapide."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "別のアプリがすでに%@を使用しています。そのアプリを終了するかショートカットを変更してから、クイックコピーをオフにしてもう一度オンにしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Iná aplikácia už používa %@. Ukončite ju alebo zmeňte jej skratku a potom rýchle kopírovanie vypnite a znova zapnite."
+          }
+        }
+      }
+    },
     "Ask for %@ to Copy" : {
       "comment" : "Menu. The placeholder is Face ID, Touch ID, Optic ID, Device passcode or Mac password.",
       "localizations" : {
@@ -11439,6 +11468,35 @@
         }
       }
     },
+    "Press the shortcut in any app, type an account's name and press Return to copy its code." : {
+      "comment" : "Mac setting footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Drücke das Tastenkürzel in einer beliebigen App, gib den Namen eines Kontos ein und drücke Return, um seinen Code zu kopieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Appuyez sur le raccourci dans n’importe quelle app, tapez le nom d’un compte et appuyez sur Retour pour copier son code."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "どのアプリでもショートカットを押し、アカウント名を入力してReturnを押すとコードがコピーされます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "V ľubovoľnej aplikácii stlačte skratku, napíšte názov účtu a stlačením Return skopírujte jeho kód."
+          }
+        }
+      }
+    },
     "Privacy" : {
       "comment" : "Settings section",
       "localizations" : {
@@ -11839,6 +11897,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "QR kódy získate od služieb, ktoré chcete zabezpečiť.\n\nPri pridávaní účtu dokáže Oriel OTP nájsť QR kód na obrazovke, prečítať jeho skopírovaný alebo presunutý obrázok alebo ho odfotiť iPhonom."
+          }
+        }
+      }
+    },
+    "Quick Copy" : {
+      "comment" : "Mac Quick Copy panel title, read by VoiceOver",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Schnellkopie"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie rapide"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "クイックコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rýchle kopírovanie"
+          }
+        }
+      }
+    },
+    "Quick Copy with %@" : {
+      "comment" : "Mac setting. The placeholder is a keyboard shortcut, e.g. ⌥⌘O.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Schnellkopie mit %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie rapide avec %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@でクイックコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rýchle kopírovanie pomocou %@"
           }
         }
       }
@@ -12592,6 +12708,35 @@
         }
       }
     },
+    "Return copies the code. Esc closes." : {
+      "comment" : "Mac Quick Copy footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Return kopiert den Code. Esc schließt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Retour copie le code. Échap ferme."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Returnでコードをコピー、Escで閉じます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Return skopíruje kód. Esc zavrie."
+          }
+        }
+      }
+    },
     "Room for %lld more accounts." : {
       "comment" : "YubiKey OATH storage. The placeholder is the number of accounts that still fit.",
       "localizations" : {
@@ -13235,6 +13380,35 @@
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Hľadať účty"
+          }
+        }
+      }
+    },
+    "Search accounts" : {
+      "comment" : "Mac Quick Copy search field",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten suchen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rechercher des comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを検索"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "Hľadať účty"
           }
         }
