@@ -31,7 +31,9 @@ struct AccountListView: View {
                         } description: {
                             Text(
                                 "Turn on Show accounts on Apple Watch in Oriel OTP on your iPhone, under Configuration.",
-                                comment: "Watch empty state. 'Show accounts on Apple Watch' is the name of the switch, and 'Configuration' the name of the screen it's on, on the iPhone.")
+                                comment:
+                                    "Watch empty state. 'Show accounts on Apple Watch' is the name of the switch, and 'Configuration' the name of the screen it's on, on the iPhone."
+                            )
                         }
                     }
                 } else {
