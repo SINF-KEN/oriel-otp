@@ -43,6 +43,8 @@ import YubiKit
     /// The accounts of all three, by name. Kept rather than calculated, as the list reads it several times each time
     /// it's drawn and the countdown every second.
     private(set) var accounts: [Account] = []
+    /// The tags of all accounts, by name.
+    private(set) var allTags: [String] = []
     var pinnedAccounts: [Account] { accounts.filter(\.isPinned) }
     var otherAccounts: [Account] { accounts.filter { !$0.isPinned } }
     var accountsLoaded: Bool = false
@@ -73,10 +75,10 @@ import YubiKit
     let passwordPreferences = PasswordPreferences()
     
     // Resumed with the password the user entered in the password alert, nil if they cancelled.
-    @ObservationIgnored private var passwordEntryContinuation: CheckedContinuation<String?, Never>? = nil
+    @ObservationIgnored var passwordEntryContinuation: CheckedContinuation<String?, Never>? = nil
     
     // Called once with the choice the user made in the save password dialog.
-    @ObservationIgnored private var passwordSaveTypeHandler: ((PasswordSaveType?) -> Void)? = nil
+    @ObservationIgnored var passwordSaveTypeHandler: ((PasswordSaveType?) -> Void)? = nil
     
     @ObservationIgnored private var refreshDebounceTask: Task<Void, Never>? = nil
 
@@ -84,18 +86,18 @@ import YubiKit
     
     @ObservationIgnored private var favoritesStorage = FavoritesStorage()
     @ObservationIgnored private var favorites: Set<String> = []
-    @ObservationIgnored private let tagsStorage = AccountTagsStorage()
+    @ObservationIgnored let tagsStorage = AccountTagsStorage()
     /// The tags of YubiKey accounts by credential id, nil while they can't be read.
-    @ObservationIgnored private var keyTags: [String: [String]]?
+    @ObservationIgnored var keyTags: [String: [String]]?
 
     @ObservationIgnored private var refreshRequestCount = 0
 
     @ObservationIgnored let cloud: EnteCloud
     /// The vault code each cloud account was made from, by account id.
-    @ObservationIgnored private var cloudCodes: [String: EnteCloudCode] = [:]
+    @ObservationIgnored var cloudCodes: [String: EnteCloudCode] = [:]
     @ObservationIgnored let device: DeviceAccounts
     /// The code each account on this device was made from, by account id.
-    @ObservationIgnored private var deviceCodes: [String: EnteCloudCode] = [:]
+    @ObservationIgnored var deviceCodes: [String: EnteCloudCode] = [:]
 
     private static let hasReadYubiKeyKey = "HasReadYubiKey"
     /// Whether a YubiKey was ever read here. Until then the app doesn't ask for one next to the accounts it has.
@@ -117,77 +119,6 @@ import YubiKit
         updateDeviceAccounts()
     }
 
-    private func sortAccounts() {
-        accounts = (keyAccounts + cloudAccounts + deviceAccounts).sorted()
-        let tags = Self.tags(of: accounts)
-        if tags != allTags {
-            allTags = tags
-        }
-    }
-
-    // MARK: - Tags
-
-    /// The tags of all accounts, by name.
-    private(set) var allTags: [String] = []
-
-    /// The tags in the order the list shows them: by name, the same tag in another case only once.
-    static func tags(of accounts: [Account]) -> [String] {
-        EnteEntry.cleaned(accounts.flatMap(\.tags)).sorted { $0.localizedStandardCompare($1) == .orderedAscending }
-    }
-
-    /// Files the account under the tags, in Ente Auth for its accounts, like Ente Auth does.
-    func setTags(_ tags: [String], of account: Account) {
-        let tags = EnteEntry.cleaned(tags)
-        guard tags != account.tags else { return }
-        switch account.location {
-        case .ente(let id):
-            do {
-                try cloud.setTags(id, tags)
-            } catch {
-                sessionError = error
-                return
-            }
-        case .device(let id):
-            do {
-                try device.setTags(id, tags)
-            } catch {
-                sessionError = error
-                return
-            }
-        case .yubiKey:
-            do {
-                try saveKeyTags(tags, for: account.credential.id)
-            } catch {
-                sessionError = error
-                return
-            }
-        }
-        account.tags = tags
-        sortAccounts()
-    }
-
-    /// Keeps the tags of an account on a YubiKey, or forgets them when there are none.
-    private func saveKeyTags(_ tags: [String], for credentialId: String, movingFrom oldId: String? = nil) throws {
-        guard var all = keyTags ?? tagsStorage.read() else { throw DeviceAccountsError.unavailable }
-        if let oldId {
-            all[oldId] = nil
-        }
-        all[credentialId] = tags.isEmpty ? nil : tags
-        try tagsStorage.save(all)
-        keyTags = all
-    }
-
-    /// Whether there are accounts to list, from a YubiKey, Ente Auth or this device.
-    var hasAccounts: Bool { accountsLoaded || !cloudAccounts.isEmpty || !deviceAccounts.isEmpty }
-
-    /// Whether rows show where each account is stored: with Ente Auth accounts, or when a YubiKey's are listed with
-    /// this device's. Someone who only uses this device has no need to tell them apart.
-    var showsAccountLocations: Bool {
-        !cloudAccounts.isEmpty || (!deviceAccounts.isEmpty && !keyAccounts.isEmpty)
-    }
-
-    // MARK: - Ente Auth
-
     /// Makes the accounts for the vault's entries, keeping the ones whose account didn't change so their codes stay.
     private func updateCloudAccounts() {
         var codes = [String: EnteCloudCode]()
@@ -208,86 +139,6 @@ import YubiKit
         cloudCodes = codes
     }
 
-    private func cloudAccount(id: String, code: EnteCloudCode, isPending: Bool) -> Account {
-        let credential = OATHSession.Credential(type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
-                                                period: UInt(code.period))
-        let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
-        // Calculated like on a YubiKey that is plugged in: a new code is calculated when one expires.
-        let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .ente(id: id))
-        account.isPendingSync = isPending
-        account.onPinnedChange = { [weak self] account in
-            do {
-                try self?.cloud.setPinned(id, account.isPinned)
-            } catch {
-                // Otherwise the pin would look saved, and be gone at the next launch.
-                self?.sessionError = error
-            }
-        }
-        return account
-    }
-
-    private func calculatedAccount(credential: OATHSession.Credential, otp: (code: String, validity: DateInterval)?, code: EnteCloudCode,
-                                   location: Account.Location) -> Account {
-        let account = Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
-                              keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
-                              connectionType: .wired, isPinned: code.isPinned, location: location)
-        Self.updateDisplay(of: account, from: code)
-        return account
-    }
-
-    /// The tags and icon, which can change without the account being made again.
-    private static func updateDisplay(of account: Account, from code: EnteCloudCode) {
-        if account.tags != code.tags {
-            account.tags = code.tags
-        }
-        if account.iconID != code.iconID {
-            account.iconID = code.iconID
-        }
-    }
-
-    /// Calculates the code of an account in Ente Auth or on this device.
-    private func calculateCode(for account: Account) {
-        let nextHOTPCode: () -> String?
-        let code: EnteCloudCode?
-        switch account.location {
-        case .yubiKey:
-            return
-        case .ente(let id):
-            code = cloudCodes[account.accountId]
-            nextHOTPCode = { [cloud] in cloud.nextHOTPCode(id) }
-        case .device(let id):
-            code = deviceCodes[account.accountId]
-            nextHOTPCode = { [device] in device.nextHOTPCode(id) }
-        }
-        guard let code else { return }
-        if code.kind == .hotp {
-            guard let otp = nextHOTPCode() else { return }
-            account.update(otp: OATHSession.OTP(code: otp, validity: DateInterval(start: AppClock.now, end: .distantFuture)))
-        } else {
-            // A refresh scheduled for when the code expires can fire a moment early. It still gets the next code.
-            var date = AppClock.now
-            if let end = account.otp?.validity.end, end > date, end.timeIntervalSince(date) < 1 {
-                date = end
-            }
-            let (otp, validity) = code.code(at: date)
-            account.update(otp: OATHSession.OTP(code: otp, validity: validity))
-        }
-    }
-
-    /// Calculates the codes of the time-based accounts the app calculates again, e.g. after it was in the background.
-    private func refreshCalculatedCodes() {
-        for account in cloudAccounts + deviceAccounts where account.credential.type == .totp {
-            calculateCode(for: account)
-        }
-    }
-
-    /// Adds an account to the Ente Auth vault and uploads it.
-    func addCloudAccount(_ template: YubiKitOATHSession.CredentialTemplate) throws -> EnteCloud.AddResult {
-        try cloud.add(template)
-    }
-
-    // MARK: - This device
-
     /// Makes the accounts for the ones on this device, keeping the ones that didn't change so their codes stay.
     private func updateDeviceAccounts() {
         var codes = [String: EnteCloudCode]()
@@ -307,119 +158,16 @@ import YubiKit
         deviceCodes = codes
     }
 
-    private func deviceAccount(id: String, code: EnteCloudCode) -> Account {
-        let credential = OATHSession.Credential(type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
-                                                period: UInt(code.period))
-        let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
-        let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .device(id: id))
-        account.onPinnedChange = { [weak self] account in
-            do {
-                try self?.device.setPinned(id, account.isPinned)
-            } catch {
-                // Otherwise the pin would look saved, and be gone at the next launch.
-                self?.sessionError = error
-            }
-        }
-        return account
+    /// Takes a deleted account off the YubiKey's list without reading the YubiKey again.
+    func removeKeyAccount(_ account: Account) {
+        keyAccounts.removeAll { $0.accountId == account.accountId }
     }
 
-    /// Adds an account to this device.
-    func addDeviceAccount(_ template: YubiKitOATHSession.CredentialTemplate) throws -> DeviceAccounts.AddResult {
-        try device.add(template)
-    }
-
-    enum MoveToEnteResult {
-        case moved
-        /// Ente Auth has an account with the same name. Nothing was changed, also not on this device.
-        case alreadyInEnte
-    }
-
-    /// Whether the account on this device can be moved to Ente Auth, which also backs it up.
-    func canMoveToEnte(_ account: Account) -> Bool {
-        account.isOnDevice && cloud.isEnabled
-    }
-
-    /// Puts an account on this device in Ente Auth, and deletes it here once it is saved in the vault. Until it has
-    /// been uploaded the vault is its only copy, so if the vault is discarded before then, e.g. by signing out, the
-    /// account is put back on this device (see `EnteCloud`).
-    func moveToEnte(_ account: Account) throws -> MoveToEnteResult {
-        guard case .device(let id) = account.location, let rawData = device.rawData(of: id) else { return .alreadyInEnte }
-        guard try cloud.add(rawData: rawData) == .added else { return .alreadyInEnte }
-        try device.delete(id)
-        return .moved
-    }
-
-    // MARK: - YubiKey
-
-    enum CopyToYubiKeyResult {
-        case copied, moved
-        /// The YubiKey has an account with the same name. Nothing was changed, also not where the account is now.
-        case alreadyOnYubiKey
-    }
-
-    /// The credential to put the account on a YubiKey with, nil if a YubiKey can't store it.
-    private func yubiKeyTemplate(of account: Account) -> YubiKitOATHSession.CredentialTemplate? {
-        switch account.location {
-        case .yubiKey: nil
-        case .ente(let id): cloud.yubiKeyTemplate(of: id)
-        case .device(let id): device.yubiKeyTemplate(of: id)
-        }
-    }
-
-    /// Whether the account can be copied to a YubiKey. It can't if a YubiKey can't store it. A HOTP account can only
-    /// be moved, as a copy would count codes on its own and fall out of step with the original.
-    func canCopyToYubiKey(_ account: Account, moving: Bool) -> Bool {
-        guard moving || account.credential.type != .hotp else { return false }
-        return yubiKeyTemplate(of: account) != nil
-    }
-
-    /// Puts an account in Ente Auth or on this device on the YubiKey. Moving it also moves it to Ente's trash or
-    /// deletes it from this device, once it is on the YubiKey. The completion isn't called when the YubiKey couldn't
-    /// be reached, which `handle(error:)` reports.
-    func copyToYubiKey(_ account: Account, moving: Bool, completion: @escaping (CopyToYubiKeyResult) -> Void) {
-        guard let template = yubiKeyTemplate(of: account) else { return }
-        addAccounts([template], requiresTouch: false) { [weak self] result in
-            if let error = result.error {
-                self?.sessionError = error.isOATHStorageFull ? OATHSessionError.storageFull(notAdded: [template.displayName]) : error
-                return
-            } else if result.added.isEmpty {
-                completion(.alreadyOnYubiKey)
-                return
-            }
-            // The copy on the YubiKey is filed under the same tags.
-            if !account.tags.isEmpty {
-                let id = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
-                                              period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
-                do {
-                    try self?.saveKeyTags(account.tags, for: id)
-                } catch {
-                    // The account is on the key; only its tags are missing, which the user is told.
-                    self?.sessionError = error
-                }
-                self?.keyAccounts.first { $0.credential.id == id }?.tags = account.tags
-                self?.sortAccounts()
-            }
-            if moving {
-                // If the source can't be removed, the account is on both: "copied", with the error.
-                completion(self?.removeAfterMove(account) == true ? .moved : .copied)
-            } else {
-                completion(.copied)
-            }
-        }
-    }
-    
-    /// Removes the account from where it was moved from. Returns false, and shows the error, if it couldn't be.
-    private func removeAfterMove(_ account: Account) -> Bool {
-        do {
-            switch account.location {
-            case .yubiKey: break
-            case .ente(let id): try cloud.delete(id)
-            case .device(let id): try device.delete(id)
-            }
-            return true
-        } catch {
-            sessionError = error
-            return false
+    func sortAccounts() {
+        accounts = (keyAccounts + cloudAccounts + deviceAccounts).sorted()
+        let tags = Self.tags(of: accounts)
+        if tags != allTags {
+            allTags = tags
         }
     }
 
@@ -447,29 +195,6 @@ import YubiKit
                 }
             }
         }
-    }
-    
-    /// Called by the password alert in MainView.
-    func submitPassword(_ password: String) {
-        resumePasswordEntry(with: password)
-    }
-
-    /// Called when the password alert in MainView is cancelled.
-    func cancelPasswordEntry() {
-        resumePasswordEntry(with: nil)
-    }
-
-    private func resumePasswordEntry(with password: String?) {
-        let continuation = passwordEntryContinuation
-        passwordEntryContinuation = nil
-        continuation?.resume(returning: password)
-    }
-    
-    /// Called by the save password dialog in MainView. `nil` means "Not now".
-    func selectPasswordSaveType(_ type: PasswordSaveType?) {
-        let handler = passwordSaveTypeHandler
-        passwordSaveTypeHandler = nil
-        handler?(type)
     }
     
     private func stopObservingPinnedState() {
@@ -618,7 +343,7 @@ import YubiKit
         }
     }
     
-    private func updateAccounts(using session: OATHSession? = nil) async {
+    func updateAccounts(using session: OATHSession? = nil) async {
         do {
             stopObservingPinnedState()
             let useSession: OATHSession
@@ -706,217 +431,6 @@ import YubiKit
         }
     }
     
-    /// Adds an account to the YubiKey. The completion is called only if the account was added.
-    func addAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool, completion: (() -> Void)? = nil) {
-        Task {
-            do {
-                let session = try await OATHSessionHandler.shared.anySession()
-                try await session.addCredential(template: template, requiresTouch: requiresTouch)
-                await updateAccounts(using: session)
-                completion?()
-            } catch {
-                handle(error: error, retry: { self.addAccount(template, requiresTouch: requiresTouch, completion: completion) })
-            }
-        }
-    }
-    
-    /// Adds several accounts in one YubiKey session, e.g. when importing. Accounts already on the YubiKey are skipped.
-    func addAccounts(_ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool, completion: @escaping (OATHSession.AddCredentialsResult) -> Void) {
-        Task {
-            do {
-                let session = try await OATHSessionHandler.shared.anySession()
-                let result = try await session.addCredentials(templates: templates, requiresTouch: requiresTouch)
-                await updateAccounts(using: session)
-                completion(result)
-            } catch {
-                handle(error: error, retry: { self.addAccounts(templates, requiresTouch: requiresTouch, completion: completion) })
-            }
-        }
-    }
-
-    func renameAccount(_ account: Account, issuer: String, accountName: String, completion: @escaping () -> Void) {
-        if case .ente(let id) = account.location {
-            do {
-                try cloud.rename(id, issuer: issuer, accountName: accountName)
-                completion()
-            } catch {
-                sessionError = error
-            }
-            return
-        }
-        if case .device(let id) = account.location {
-            do {
-                try device.rename(id, issuer: issuer, accountName: accountName)
-                completion()
-            } catch {
-                sessionError = error
-            }
-            return
-        }
-        Task {
-            do {
-                let wasPinned = account.isPinned
-                let session = try await OATHSessionHandler.shared.anySession()
-                let oldId = account.credential.id
-                let credential = try await session.renameCredential(account.credential, issuer: issuer, accountName: accountName)
-                // The tags are kept by the account's id, which the new name changes.
-                if !account.tags.isEmpty {
-                    do {
-                        try saveKeyTags(account.tags, for: credential.id, movingFrom: oldId)
-                    } catch {
-                        // Renamed on the key; only the tags didn't follow, which the user is told.
-                        sessionError = error
-                    }
-                }
-                if wasPinned {
-                    account.isPinned = false
-                }
-                account.credential = credential
-                account.updateTitles()
-                sortAccounts()
-                account.isPinned = wasPinned
-                await updateAccounts(using: session)
-                ConnectionManager.shared.closeNFC(message: String(localized: "Account renamed", comment: "OATH NFC account renamed"))
-                completion()
-            } catch {
-                handle(error: error, retry: { self.renameAccount(account, issuer: issuer, accountName: accountName, completion: completion) })
-            }
-        }
-    }
-    
-    /// Deletes the account from the YubiKey or this device, or moves an Ente Auth account to Ente's trash.
-    func deleteAccount(_ account: Account, completion: @escaping () -> Void) {
-        if case .ente(let id) = account.location {
-            do {
-                try cloud.delete(id)
-                completion()
-            } catch {
-                sessionError = error
-            }
-            return
-        }
-        if case .device(let id) = account.location {
-            do {
-                try device.delete(id)
-                completion()
-            } catch {
-                sessionError = error
-            }
-            return
-        }
-        Task {
-            do {
-                let session = try await OATHSessionHandler.shared.anySession()
-                try await session.deleteCredential(account.credential)
-                keyAccounts.removeAll { $0.accountId == account.accountId }
-                if !account.tags.isEmpty {
-                    do {
-                        try saveKeyTags([], for: account.credential.id)
-                    } catch {
-                        // Left behind, they'd come back on an account added later with the same name.
-                        sessionError = error
-                    }
-                }
-                session.endNFC(message: String(localized: "Account deleted", comment: "OATH NFC account deleted"))
-                completion()
-            } catch {
-                handle(error: error, retry: { self.deleteAccount(account, completion: completion) })
-            }
-        }
-    }
-    
-    /// Deletes the accounts one after the other, as the YubiKey handles one command at a time.
-    func deleteAccounts(_ accounts: [Account], completion: @escaping () -> Void) {
-        guard let account = accounts.first else {
-            completion()
-            return
-        }
-        deleteAccount(account) { [weak self] in
-            self?.deleteAccounts(Array(accounts.dropFirst()), completion: completion)
-        }
-    }
-
-    /// Shows the password alert and returns the entered password, or nil if the user cancelled.
-    private func requestPassword(isRetry: Bool) async -> String? {
-        ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Key is password protected", comment: "OATH NFC password protected key"))
-        passwordEntryMessage = isRetry ? String(localized: "Incorrect password. Re-enter password.", comment: "OATH password entry retry") : String(localized: "To prevent unauthorized access this YubiKey is protected with a password.", comment: "OATH password entry enter password")
-        // Only one password alert can be shown, an earlier request is treated as cancelled.
-        cancelPasswordEntry()
-        presentPasswordEntry = true
-        return await withCheckedContinuation { passwordEntryContinuation = $0 }
-    }
-
-    /// Asks for the password and unlocks the YubiKey with it. Returns false if the user cancelled.
-    private func collectPasswordAndUnlock(isRetry: Bool) async throws -> Bool {
-        guard let password = await requestPassword(isRetry: isRetry) else { return false }
-        let session = try await OATHSessionHandler.shared.anySession()
-        let accessKey = try await session.unlock(withPassword: password)
-        accessKeyMemoryCache.setAccessKey(accessKey, forKey: session.deviceId)
-        handleAccessKeyStorage(accessKey: accessKey, forKey: session.deviceId)
-        return true
-    }
-
-    /// Unlocks with the cached access key. Returns false if there is none or it didn't work.
-    private func unlockWithCachedAccessKey() async -> Bool {
-        guard let accessKey = await cachedAccessKey(),
-              let session = try? await OATHSessionHandler.shared.anySession() else { return false }
-        return (try? await session.unlock(withAccessKey: accessKey)) != nil
-    }
-
-    func handle(error: Error, retry: (() -> Void)? = nil) {
-        if error.isOATHAuthenticationRequired || error.isOATHWrongPassword {
-            Task {
-                do {
-                    if error.isOATHAuthenticationRequired, await unlockWithCachedAccessKey() {
-                        retry?()
-                    } else if try await collectPasswordAndUnlock(isRetry: error.isOATHWrongPassword) {
-                        retry?()
-                    }
-                } catch {
-                    ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Something went wrong"))
-                    handle(error: error, retry: retry)
-                }
-            }
-        } else if error.isNFCCancelledByUser {
-            // The user dismissed the NFC sheet.
-        } else {
-            ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)
-            self.sessionError = error
-        }
-    }
-    
-    private func cachedAccessKey() async -> Data? {
-        guard let session = try? await OATHSessionHandler.shared.anySession() else { return nil }
-        let keyIdentifier = session.deviceId
-        // Check memory cache
-        if let accessKey = self.accessKeyMemoryCache.accessKey(forKey: keyIdentifier) {
-            return accessKey
-        }
-        // Finally check key chain
-        return try? await self.accessKeySecureStore.getValue(for: keyIdentifier)
-    }
-
-    func handleAccessKeyStorage(accessKey: Data, forKey keyIdentifier: String) {
-        guard !self.passwordPreferences.neverSavePassword(keyIdentifier: keyIdentifier) else { return }
-        Task { [weak self] in
-            guard let secureStore = self?.accessKeySecureStore else { return }
-            let currentAccessKey: Data? = try? await secureStore.getValue(for: keyIdentifier)
-            guard let self, accessKey != currentAccessKey else { return }
-            self.presentPasswordSaveType = true
-            self.passwordSaveTypeHandler = { [weak self] type in
-                guard let type, let self else { return }
-                self.passwordPreferences.setPasswordPreference(saveType: type, keyIdentifier: keyIdentifier)
-                if type == .save || type == .lock {
-                    do {
-                        try self.accessKeySecureStore.setValue(accessKey, useAuthentication: self.passwordPreferences.useScreenLock(keyIdentifier: keyIdentifier), for: keyIdentifier)
-                    } catch {
-                        self.passwordPreferences.resetPasswordPreference(keyIdentifier: keyIdentifier)
-                        self.sessionError = error
-                    }
-                }
-            }
-        }
-    }
 }
 
 extension OATHSession.Credential {
