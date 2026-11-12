@@ -1,7 +1,7 @@
 name: Accessibility
 
-# Runs the accessibility audits and tap to copy tests on an iPhone and an iPad: in light mode, at the largest text size,
-# right to left, in dark mode and with Increase Contrast. It takes two macOS runners for about 20 minutes each, so it
+# Runs the accessibility audits, the tap to copy tests and the tests without a YubiKey on an iPhone and an iPad: in light mode, at the largest text size,
+# right to left, in dark mode and with Increase Contrast. It takes two macOS runners for about 22 minutes each, so it
 # only runs by hand: before a release, or after changing a screen's layout or colors. See docs/accessibility.md.
 on:
   workflow_dispatch:
