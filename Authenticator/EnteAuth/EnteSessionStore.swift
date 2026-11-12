@@ -71,7 +71,7 @@ struct EnteSessionStore {
     /// Whether the device can protect a saved session.
     let canSave: Bool
 
-    init(service: String = "EnteAuth", defaults: UserDefaults = .standard) {
+    init(service: String = KeychainService.enteSession, defaults: UserDefaults = .standard) {
         #if os(macOS)
         // Not every Mac has Touch ID, so the Mac's password unlocks the session too.
         let accessControl: SecAccessControlCreateFlags = .userPresence
@@ -102,7 +102,7 @@ struct EnteSessionStore {
         retryPendingRemoval()
         guard let email = defaults.string(forKey: Self.emailKey) else { return nil }
         // Sessions saved before the server was stored were saved with the server of the sign in screen.
-        let server = (defaults.string(forKey: Self.serverKey) ?? defaults.string(forKey: "EnteAuth.ServerURL"))
+        let server = (defaults.string(forKey: Self.serverKey) ?? defaults.string(forKey: DefaultsKey.enteServer))
             .flatMap { $0.isEmpty ? nil : URL(string: $0) } ?? EnteAPIClient.defaultServer
         let hasSession = !defaults.bool(forKey: Self.pendingRemovalKey) && keychain.hasValue(for: Self.account)
         return EnteSavedAccount(email: email, server: server, hasSession: hasSession)

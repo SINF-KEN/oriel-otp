@@ -50,7 +50,7 @@ nonisolated final class LockedVaultStorage: EnteVaultStorage, @unchecked Sendabl
 }
 
 /// Stands in for the keychain item with the vault file's key.
-nonisolated final class InMemoryVaultKey: EnteVaultKeychain, @unchecked Sendable {
+nonisolated final class InMemoryVaultKey: EncryptedFileKey, @unchecked Sendable {
     private let lock = NSLock()
     private var key: SymmetricKey?
 

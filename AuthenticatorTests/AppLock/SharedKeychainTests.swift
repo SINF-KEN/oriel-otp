@@ -56,7 +56,7 @@ struct SharedKeychainTests {
     }
 
     @Test func theAutoFillKeyIsShared() throws {
-        let key = AutoFillKeychainKey()
+        let key = KeychainFileKey(service: KeychainService.autoFillAccounts, group: .shared)
         let existing = try key.existingKey()
         defer {
             // Leaves the simulator's app as it was.

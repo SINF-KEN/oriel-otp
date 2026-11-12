@@ -29,7 +29,7 @@ nonisolated struct AccountTagsStorage: Sendable {
         URL.applicationSupportDirectory.appending(components: "Tags", "YubiKeyTags")
     }
 
-    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey(service: "Tags")) {
+    init(url: URL = defaultURL, keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.tags)) {
         file = EncryptedFile(url: url, keychain: keychain)
     }
 
@@ -37,7 +37,7 @@ nonisolated struct AccountTagsStorage: Sendable {
     func read() -> [String: [String]]? {
         do {
             return try file.load() ?? [:]
-        } catch EnteVaultError.unreadable {
+        } catch EncryptedFileError.unreadable {
             // Its key is gone, e.g. after a restore from a backup, which reading it again won't change.
             return [:]
         } catch {

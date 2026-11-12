@@ -88,7 +88,3 @@ import OSLog
         await updateTask?.value
     }
 }
-
-extension Logger {
-    nonisolated static let spotlight = Logger(subsystem: Bundle.main.bundleIdentifier ?? "OrielOTP", category: "Spotlight")
-}

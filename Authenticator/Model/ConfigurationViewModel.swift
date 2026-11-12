@@ -109,7 +109,7 @@ import YubiKit
             } catch where error.isOATHAuthenticationRequired {
                 let preferences = PasswordPreferences()
                 guard let deviceId, preferences.useSavedPassword(keyIdentifier: deviceId),
-                      let accessKey: Data = try? await SecureStore(secureStoreQueryable: PasswordQueryable(service: "OATH")).getValue(for: deviceId),
+                      let accessKey: Data = try? await SecureStore(secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords)).getValue(for: deviceId),
                       (try? await session.unlock(accessKey: accessKey)) != nil else {
                     return OATHStorage(used: nil, capacity: capacity)
                 }

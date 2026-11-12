@@ -205,7 +205,9 @@ the device or goes into a backup, and it can be read without Face ID or Touch ID
 any authenticator app. On iPhone and iPad the file also has complete data protection. It is excluded from backups,
 which couldn't decrypt it anyway; a restored device syncs the vault again from Ente. It holds the decrypted entities,
 including their secrets, the time of the last pull, and the changes waiting to be uploaded. Without a saved session
-there is no vault.
+there is no vault. The accounts on this device, the tags of YubiKey accounts, the favorites, the AutoFill websites and
+the AutoFill copy are kept the same way, each with a key of its own (`EncryptedFile` and `KeychainFileKey` in
+`AutoFill/EncryptedFile.swift`, on top of `KeychainItem` in `Shared/Keychain.swift`).
 
 When the server rejects the token (`401`), e.g. because the session was ended from another device, or when Face ID
 or Touch ID changed and the keychain item can no longer be read, the token and key are deleted but the account is

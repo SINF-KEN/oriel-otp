@@ -83,8 +83,9 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
   can be dropped on the sheet; and File > Import From Device takes one with an iPhone or iPad. QR codes are found with
   Core Image. Entering the details by hand still works.
 - **Shortcuts and Spotlight**: Copy Code and Open Account (`Accounts/AccountIntents.swift`, shared with iOS), with the
-  account picked from Ente Auth or this device, and Add Account (`Mac/MacIntents.swift`). The Dock menu also has Add Account. Both open `orielotp://add-account`, which brings back the
-  window when it was closed.
+  account picked from Ente Auth or this device, and Add Account (`Model/QuickActions.swift`, also shared with iOS).
+  The Dock menu also has Add Account. Both open `orielotp://add-account`, which brings back the window when it was
+  closed.
 - **Touch ID** protects a saved YubiKey password and the saved Ente session, as Face ID does on iOS.
 - **Open at login** uses `SMAppService`.
 

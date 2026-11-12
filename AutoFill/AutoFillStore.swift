@@ -18,66 +18,6 @@ import CryptoKit
 import Foundation
 import OSLog
 
-/// The app group the app shares with the AutoFill extension.
-nonisolated enum AppGroup {
-    static let identifier = "group.io.github.sinf-ken.OrielOTP"
-
-    static var containerURL: URL? {
-        FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier)
-    }
-
-    static var defaults: UserDefaults {
-        UserDefaults(suiteName: identifier) ?? .standard
-    }
-}
-
-/// The keychain access group the app shares with the AutoFill extension. The app's other items go to its own group,
-/// listed first in its entitlements, which the extension can't read. The items the extension needs, the key of the
-/// AutoFill file and the app lock, are added to this group explicitly.
-nonisolated enum SharedKeychain {
-    static let accessGroupKey = "OrielOTPSharedKeychainGroup"
-
-    /// Nil in a build without a team, where there are no access groups.
-    static let accessGroup: String? = {
-        guard let group = Bundle.main.object(forInfoDictionaryKey: accessGroupKey) as? String,
-              let team = group.split(separator: ".").first, team.count == 10, !group.contains("$(") else { return nil }
-        return group
-    }()
-
-    /// Puts an item that is added with `query` in the shared group.
-    static func addAccessGroup(to query: inout [String: Any]) {
-        if let accessGroup {
-            query[String(kSecAttrAccessGroup)] = accessGroup
-        }
-    }
-
-    /// The app's own group, listed first in its entitlements, which the extensions can't read.
-    static var appAccessGroup: String? {
-        accessGroup.map { $0 + ".app" }
-    }
-
-    /// Moves an item that was just read to the app's own group, if it is in the shared one. Versions before the app
-    /// had a group of its own added every item to the shared group, where the AutoFill extension can read them, and
-    /// an item stays in the group it was added to. Moved in place, so a refused move leaves the item where it was.
-    ///
-    /// - Parameters:
-    ///   - query: The query the item was found with.
-    ///   - attributes: The item's attributes, as returned with `kSecReturnAttributes`.
-    /// - Returns: Whether the item was moved.
-    @discardableResult static func moveToAppGroup(_ query: [String: Any], attributes: [String: Any]?) -> Bool {
-        guard let accessGroup, let appAccessGroup,
-            attributes?[String(kSecAttrAccessGroup)] as? String == accessGroup
-        else { return false }
-        var query = query
-        for key in [kSecReturnData, kSecReturnAttributes, kSecReturnRef, kSecReturnPersistentRef, kSecMatchLimit] {
-            query[String(key)] = nil
-        }
-        query[String(kSecAttrAccessGroup)] = accessGroup
-        let change = [String(kSecAttrAccessGroup): appAccessGroup]
-        return SecItemUpdate(query as CFDictionary, change as CFDictionary) == errSecSuccess
-    }
-}
-
 /// An account whose codes AutoFill can fill in, with the websites they are suggested on.
 nonisolated struct AutoFillAccount: Codable, Sendable, Hashable, Identifiable {
     let account: OTPAccount
@@ -85,13 +25,6 @@ nonisolated struct AutoFillAccount: Codable, Sendable, Hashable, Identifiable {
     let websites: [String]
 
     var id: String { account.id }
-}
-
-nonisolated enum AutoFillStoreError: Error {
-    /// The file or its key can't be read until the device is unlocked.
-    case unavailable
-    /// The file or its key can't be decrypted, e.g. because the device was restored from a backup.
-    case unreadable
 }
 
 /// Where the AutoFill accounts are kept: an encrypted file in the app group, memory in the tests.
@@ -104,124 +37,34 @@ nonisolated protocol AutoFillStorage: Sendable {
 
 /// The time-based Ente Auth accounts, written by the app for the AutoFill extension, which can't read the Ente vault.
 ///
-/// Kept like the vault: a file encrypted with ChaChaPoly, with a random key in the keychain that is only readable on
-/// this device while it is unlocked, and excluded from backups.
+/// Kept like the vault, in an `EncryptedFile` whose key is in the keychain group the app shares with the extension.
 nonisolated struct AutoFillFile: AutoFillStorage {
 
-    let url: URL?
-    let keychain: AutoFillKeychainKey
+    private let file: EncryptedFile<[AutoFillAccount]>?
 
     static var defaultURL: URL? {
         AppGroup.containerURL?.appending(components: "AutoFill", "Accounts")
     }
 
-    init(url: URL? = defaultURL, keychain: AutoFillKeychainKey = AutoFillKeychainKey()) {
-        self.url = url
-        self.keychain = keychain
+    init(url: URL? = defaultURL,
+         keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.autoFillAccounts, group: .shared)) {
+        file = url.map { EncryptedFile(url: $0, keychain: keychain) }
     }
 
     func load() throws -> [AutoFillAccount]? {
-        guard let url, FileManager.default.fileExists(atPath: url.path) else { return nil }
-        guard let key = try keychain.existingKey() else { throw AutoFillStoreError.unreadable }
-        let data: Data
-        do {
-            data = try Data(contentsOf: url)
-        } catch {
-            // Its data protection keeps it closed while the device is locked.
-            throw AutoFillStoreError.unavailable
-        }
-        do {
-            let box = try ChaChaPoly.SealedBox(combined: data)
-            return try JSONDecoder().decode([AutoFillAccount].self, from: try ChaChaPoly.open(box, using: key))
-        } catch {
-            throw AutoFillStoreError.unreadable
-        }
+        try file?.load()
     }
 
     func save(_ accounts: [AutoFillAccount]) throws {
-        guard let url else { throw AutoFillStoreError.unavailable }
+        guard let file else { throw EncryptedFileError.unavailable }
         guard !accounts.isEmpty else {
-            remove()
+            file.remove()
             return
         }
-        let key = try keychain.existingKey() ?? keychain.createKey()
-        let sealed = try ChaChaPoly.seal(try JSONEncoder().encode(accounts), using: key).combined
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        #if os(iOS)
-        try sealed.write(to: url, options: [.atomic, .completeFileProtection])
-        #else
-        try sealed.write(to: url, options: .atomic)
-        #endif
-        var fileURL = url
-        var values = URLResourceValues()
-        values.isExcludedFromBackup = true
-        do {
-            try fileURL.setResourceValues(values)
-        } catch {
-            Logger(subsystem: Bundle.main.bundleIdentifier ?? "OrielOTP", category: "AutoFill")
-                .error("Couldn't exclude the AutoFill file from backups: \(error.localizedDescription, privacy: .public)")
-        }
+        try file.save(accounts)
     }
 
     func remove() {
-        if let url {
-            try? FileManager.default.removeItem(at: url)
-        }
-        keychain.removeKey()
-    }
-}
-
-/// The key of the AutoFill file in the keychain group the app shares with the extension, see `SharedKeychain`:
-/// `WhenUnlockedThisDeviceOnly`, so it never leaves the device.
-nonisolated struct AutoFillKeychainKey: Sendable {
-
-    private var query: [String: Any] {
-        var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
-                                    String(kSecAttrService): "AutoFill.Accounts",
-                                    String(kSecAttrAccount): "key"]
-        #if os(macOS)
-        query[String(kSecUseDataProtectionKeychain)] = true
-        #endif
-        return query
-    }
-
-    func existingKey() throws -> SymmetricKey? {
-        var query = query
-        query[String(kSecReturnData)] = true
-        query[String(kSecMatchLimit)] = kSecMatchLimitOne
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        switch status {
-        case errSecSuccess:
-            guard let data = result as? Data else { throw AutoFillStoreError.unreadable }
-            return SymmetricKey(data: data)
-        case errSecItemNotFound:
-            return nil
-        case errSecInteractionNotAllowed:
-            throw AutoFillStoreError.unavailable
-        default:
-            throw Self.error(status)
-        }
-    }
-
-    func createKey() throws -> SymmetricKey {
-        let key = SymmetricKey(size: .bits256)
-        var query = query
-        query[String(kSecValueData)] = key.withUnsafeBytes { Data($0) }
-        query[String(kSecAttrAccessible)] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        SharedKeychain.addAccessGroup(to: &query)
-        SecItemDelete(self.query as CFDictionary)
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else { throw Self.error(status) }
-        return key
-    }
-
-    func removeKey() {
-        SecItemDelete(query as CFDictionary)
-    }
-
-    private static func error(_ status: OSStatus) -> Error {
-        NSError(domain: NSOSStatusErrorDomain, code: Int(status),
-                userInfo: [NSLocalizedDescriptionKey: SecCopyErrorMessageString(status, nil) as String? ?? String(status)])
+        file?.remove()
     }
 }

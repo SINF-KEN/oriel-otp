@@ -216,7 +216,7 @@ final class TokenRequestViewModel {
         }
         if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier) {
             Logger.ctk.yubilog("Saving canceledByUser to userDefaults")
-            userDefaults.setValue(true, forKey: "canceledByUser")
+            userDefaults.setValue(true, forKey: TokenSessionPolicy.canceledByUserKey)
         }
     }
 

@@ -355,7 +355,7 @@ struct SyncDataLossTests {
         let storage = MemoryDeviceStorage()
         let existing = [DeviceAccountItem(id: "a", rawData: rawData("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP"))]
         storage.items = existing
-        storage.loadError = EnteVaultError.unreadable
+        storage.loadError = EncryptedFileError.unreadable
         let accounts = DeviceAccounts(storage: storage)
         #expect(accounts.accounts.isEmpty)
         #expect(storage.setAsideItems == nil)

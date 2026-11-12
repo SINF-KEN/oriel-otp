@@ -17,12 +17,16 @@
 
 import OSLog
 
+/// The app's loggers, one per category, in every target. The subsystem is the bundle ID of the app or extension that
+/// logs.
 nonisolated public extension Logger {
-    private static let subsystem = Bundle.main.bundleIdentifier!
+    private static let subsystem = Bundle.main.bundleIdentifier ?? "OrielOTP"
 
     static let allocation = Logger(subsystem: subsystem, category: "Allocation")
+    static let autoFill = Logger(subsystem: subsystem, category: "AutoFill")
     static let connection = Logger(subsystem: subsystem, category: "Connection")
     static let ctk = Logger(subsystem: subsystem, category: "CTK")
+    static let spotlight = Logger(subsystem: subsystem, category: "Spotlight")
     static let system = Logger(subsystem: subsystem, category: "System")
 
     func yubilog(_ message: String) {

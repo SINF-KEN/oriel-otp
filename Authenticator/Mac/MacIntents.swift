@@ -18,17 +18,6 @@
 import AppIntents
 import Foundation
 
-/// Opens the app's add account sheet. In place of the Home Screen quick action on iOS.
-struct AddAccountIntent: AppIntent {
-    static let title: LocalizedStringResource = "Add Account"
-    static let description = IntentDescription("Opens Oriel OTP to add an account.")
-
-    @MainActor func perform() async throws -> some IntentResult {
-        QuickAction.addAccount.perform()
-        return .result()
-    }
-}
-
 /// Reads the plugged-in YubiKey for Shortcuts, connecting to it if the app isn't already.
 @MainActor enum YubiKeyAccess {
 
