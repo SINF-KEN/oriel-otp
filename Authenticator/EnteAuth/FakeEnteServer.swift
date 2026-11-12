@@ -90,7 +90,7 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
         DispatchQueue.global().asyncAfter(deadline: .now() + 0.3) { [self] in
             let (status, json) = FakeEnteAccount.account(for: request.url?.host ?? "").respond(to: request)
             let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: "HTTP/1.1",
-                                           headerFields: ["Content-Type": "application/json"])!
+                                           headerFields: ["Content-Type": "application/json", "Date": Self.dateHeader()])!
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: (try? JSONSerialization.data(withJSONObject: json)) ?? Data("{}".utf8))
             client?.urlProtocolDidFinishLoading(self)
@@ -98,6 +98,16 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     }
 
     override func stopLoading() {}
+
+    /// The server's time, which the app compares with the device's. `-DemoServerClockOffset 125` puts it 125 seconds
+    /// ahead, to show the wrong clock warning.
+    private static func dateHeader() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "GMT")
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
+        return formatter.string(from: AppClock.now.addingTimeInterval(UserDefaults.standard.double(forKey: "DemoServerClockOffset")))
+    }
 }
 
 /// Fails every request that reaches it. While tests run, `URLSession.ente` puts it after the fake server, so a test can

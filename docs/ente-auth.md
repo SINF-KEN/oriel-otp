@@ -199,6 +199,11 @@ account's sessions in Ente's apps. If the server can't be reached it isn't revok
 deleted from the device. Changes that weren't uploaded yet are lost, and the confirmation says so; accounts added in
 the app that never reached Ente are kept on the device instead.
 
+Each answer's `Date` header tells the server's time (`EnteServerClock`). After a sync, if this device's clock is
+certainly more than 30 seconds off it, counting the time the answer took, the account list shows how far off it is and
+how to set the time automatically. Services accept the code before and after the current one, so a clock further off
+gives codes that are refused, the YubiKey's too, as the app gives the YubiKey the time.
+
 The vault is a file in the app's Application Support folder (`EnteAuth/Vault`), encrypted with ChaChaPoly
 (CryptoKit) under a random 256-bit key. The key is in the keychain as `WhenUnlockedThisDeviceOnly`: it never leaves
 the device or goes into a backup, and it can be read without Face ID or Touch ID, so the codes show at once, like in
@@ -305,6 +310,7 @@ Everything lives in `Authenticator/EnteAuth/`:
 | `EnteAuthenticatorSync.swift` | Downloads, decrypts and parses the accounts, and pages through the diff |
 | `EnteVault.swift` | The vault: entities with their pending changes, the conflict rule, editing entities like Ente Auth, codes and the encrypted file |
 | `EnteCloud.swift` | Keeps the vault in step with Ente: unlocking, pulling, pushing, and the changes made in the app |
+| `EnteServerClock.swift` | The server's time from each answer's `Date` header, to tell whether this device's clock is wrong |
 | `EnteSessionStore.swift` | The saved account and session in the keychain |
 | `EnteAccountDeletionViewModel.swift`, `EnteAccountDeletionView.swift` | Deleting the Ente account |
 | `EnteAccountSection.swift` | The saved account, **Sign out** and **Move to another server…** in the settings |

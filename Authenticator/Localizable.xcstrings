@@ -16334,6 +16334,64 @@
         }
       }
     },
+    "This device's clock is %@ ahead, so codes may not work." : {
+      "comment" : "Warning above the accounts when the device's clock is wrong. The placeholder is how far, e.g. 2 minutes, 5 seconds.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Uhr dieses Geräts geht %@ vor, daher funktionieren Codes eventuell nicht."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'horloge de cet appareil avance de %@, les codes risquent de ne pas fonctionner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスの時計が %@ 進んでいるため、コードが使えない可能性があります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hodiny tohto zariadenia idú o %@ dopredu, takže kódy nemusia fungovať."
+          }
+        }
+      }
+    },
+    "This device's clock is %@ behind, so codes may not work." : {
+      "comment" : "Warning above the accounts when the device's clock is wrong. The placeholder is how far, e.g. 2 minutes, 5 seconds.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Uhr dieses Geräts geht %@ nach, daher funktionieren Codes eventuell nicht."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'horloge de cet appareil retarde de %@, les codes risquent de ne pas fonctionner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このデバイスの時計が %@ 遅れているため、コードが使えない可能性があります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hodiny tohto zariadenia meškajú o %@, takže kódy nemusia fungovať."
+          }
+        }
+      }
+    },
     "This file isn't a backup made by Oriel OTP or an encrypted export from Ente Auth." : {
       "comment" : "Backup restore error",
       "localizations" : {
@@ -17213,6 +17271,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zapnúť automatické vypĺňanie"
+          }
+        }
+      }
+    },
+    "Turn on Set Automatically in Settings > General > Date & Time." : {
+      "comment" : "How to fix the device's clock, on iPhone and iPad",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere „Automatisch einstellen“ unter Einstellungen > Allgemein > Datum & Uhrzeit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez « Réglage automatique » dans Réglages > Général > Date et heure."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定 > 一般 > 日付と時刻 で「自動設定」をオンにしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapnite Nastaviť automaticky v Nastavenia > Všeobecné > Dátum a čas."
+          }
+        }
+      }
+    },
+    "Turn on setting the time automatically in System Settings > General > Date & Time." : {
+      "comment" : "How to fix the device's clock, on the Mac",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktiviere das automatische Einstellen der Uhrzeit unter Systemeinstellungen > Allgemein > Datum & Uhrzeit."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez le réglage automatique de l'heure dans Réglages Système > Général > Date et heure."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "システム設定 > 一般 > 日付と時刻 で時刻の自動設定をオンにしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapnite automatické nastavenie času v Systémové nastavenia > Všeobecné > Dátum a čas."
           }
         }
       }
