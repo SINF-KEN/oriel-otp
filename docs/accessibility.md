@@ -207,6 +207,9 @@ and checks that it's copied without opening the account; also 24 points above th
 the name opens the account without copying. Without VoiceOver the code is a button of its own, named after the account
 for Voice Control, which copies without opening the account.
 
+`AuthenticatorUITests/NoYubiKeyTests.swift` unplugs the simulated YubiKey, adds an account to this device, opens it
+and deletes it again, and checks that the expiring codes don't ask for a YubiKey. It runs with the tap to copy tests.
+
 To check by hand, use Accessibility Inspector (Xcode > Open Developer Tool) and the Simulator's Environment Overrides
 (text size, appearance, increase contrast, reduce motion, differentiate without color). For right to left, set the
 scheme's App Language to Right-to-Left Pseudolanguage.
