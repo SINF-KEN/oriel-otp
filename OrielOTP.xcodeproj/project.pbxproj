@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D1D6E700000000000000000B /* OrielOTPWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D1D6E700000000000000000A /* OrielOTPWidgets.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		515542722656706F00B19C59 /* CryptoTokenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 515542712656706F00B19C59 /* CryptoTokenKit.framework */; };
 		5155427D2656707000B19C59 /* TokenExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5155426F2656706F00B19C59 /* TokenExtension.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		51AFD4DA271D4278008F2630 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 51AFD4D9271D4277008F2630 /* QuartzCore.framework */; };
@@ -53,6 +54,13 @@
 			remoteGlobalIDString = AF1100000000000000000001;
 			remoteInfo = AutoFillExtension;
 		};
+		D1D6E700000000000000000D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1D6E7000000000000000001;
+			remoteInfo = OrielOTPWidgets;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -64,6 +72,7 @@
 			files = (
 				5155427D2656707000B19C59 /* TokenExtension.appex in Embed Foundation Extensions */,
 				AF110000000000000000000B /* AutoFillExtension.appex in Embed Foundation Extensions */,
+				D1D6E700000000000000000B /* OrielOTPWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -92,6 +101,7 @@
 		818866C922DFD72C006BC0A8 /* OrielOTPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrielOTPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7C400000000000000000003 /* OrielOTPWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrielOTPWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF110000000000000000000A /* AutoFillExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AutoFillExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1D6E700000000000000000A /* OrielOTPWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrielOTPWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -160,6 +170,22 @@
 			);
 			target = 5155426E2656706F00B19C59 /* TokenExtension */;
 		};
+		D1D6E7000000000000000011 /* Exceptions for "Widgets" folder in "OrielOTPWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				OrielOTPWidgets.entitlements,
+			);
+			target = D1D6E7000000000000000001 /* OrielOTPWidgets */;
+		};
+		D1D6E7000000000000000012 /* Exceptions for "AutoFill" folder in "OrielOTPWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				EncryptedFile.swift,
+				WidgetAccounts.swift,
+			);
+			target = D1D6E7000000000000000001 /* OrielOTPWidgets */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -183,6 +209,9 @@
 		};
 		AF1100000000000000000010 /* AutoFill */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D1D6E7000000000000000012 /* Exceptions for "AutoFill" folder in "OrielOTPWidgets" target */,
+			);
 			path = AutoFill;
 			sourceTree = "<group>";
 		};
@@ -219,6 +248,14 @@
 				5A0C00000000000000000006 /* Exceptions for "TokenExtension" folder in "TokenExtension" target */,
 			);
 			path = TokenExtension;
+			sourceTree = "<group>";
+		};
+		D1D6E7000000000000000010 /* Widgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D1D6E7000000000000000011 /* Exceptions for "Widgets" folder in "OrielOTPWidgets" target */,
+			);
+			path = Widgets;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -271,6 +308,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1D6E7000000000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -296,6 +340,7 @@
 				AF1100000000000000000011 /* AutoFillExtension */,
 				AF1100000000000000000010 /* AutoFill */,
 				A7C400000000000000000001 /* Shared */,
+				D1D6E7000000000000000010 /* Widgets */,
 				A7C400000000000000000002 /* OrielOTPWatch */,
 				515542702656706F00B19C59 /* Frameworks */,
 				818866B422DFD729006BC0A8 /* Products */,
@@ -311,6 +356,7 @@
 				5155426F2656706F00B19C59 /* TokenExtension.appex */,
 				AF110000000000000000000A /* AutoFillExtension.appex */,
 				A7C400000000000000000003 /* OrielOTPWatch.app */,
+				D1D6E700000000000000000A /* OrielOTPWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -379,6 +425,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				D1D6E700000000000000000E /* PBXTargetDependency */,
 				5155427C2656707000B19C59 /* PBXTargetDependency */,
 				A7C40000000000000000000F /* PBXTargetDependency */,
 				AF110000000000000000000E /* PBXTargetDependency */,
@@ -462,6 +509,27 @@
 			productReference = AF110000000000000000000A /* AutoFillExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		D1D6E7000000000000000001 /* OrielOTPWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1D6E7000000000000000005 /* Build configuration list for PBXNativeTarget "OrielOTPWidgets" */;
+			buildPhases = (
+				D1D6E7000000000000000002 /* Sources */,
+				D1D6E7000000000000000003 /* Frameworks */,
+				D1D6E7000000000000000004 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A7C400000000000000000001 /* Shared */,
+				D1D6E7000000000000000010 /* Widgets */,
+			);
+			name = OrielOTPWidgets;
+			productName = OrielOTPWidgets;
+			productReference = D1D6E700000000000000000A /* OrielOTPWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -498,6 +566,9 @@
 					AF1100000000000000000001 = {
 						CreatedOnToolsVersion = 27.2;
 					};
+					D1D6E7000000000000000001 = {
+						CreatedOnToolsVersion = 27.2;
+					};
 				};
 			};
 			buildConfigurationList = 818866AE22DFD729006BC0A8 /* Build configuration list for PBXProject "OrielOTP" */;
@@ -528,6 +599,7 @@
 				5C3E00000000000000000001 /* OrielOTPUITests */,
 				A7C400000000000000000004 /* OrielOTPWatch */,
 				AF1100000000000000000001 /* AutoFillExtension */,
+				D1D6E7000000000000000001 /* OrielOTPWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -569,6 +641,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		AF1100000000000000000004 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1D6E7000000000000000004 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -620,6 +699,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D1D6E7000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -649,6 +735,12 @@
 			isa = PBXTargetDependency;
 			target = AF1100000000000000000001 /* AutoFillExtension */;
 			targetProxy = AF110000000000000000000D /* PBXContainerItemProxy */;
+		};
+		D1D6E700000000000000000E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			platformFilter = ios;
+			target = D1D6E7000000000000000001 /* OrielOTPWidgets */;
+			targetProxy = D1D6E700000000000000000D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1196,6 +1288,72 @@
 			};
 			name = Release;
 		};
+		D1D6E7000000000000000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widgets/OrielOTPWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 207;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = XW69FY82W3;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.Widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D1D6E7000000000000000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widgets/OrielOTPWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 207;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = XW69FY82W3;
+				INFOPLIST_FILE = Widgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.Widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1258,6 +1416,15 @@
 			buildConfigurations = (
 				AF1100000000000000000006 /* Debug */,
 				AF1100000000000000000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1D6E7000000000000000005 /* Build configuration list for PBXNativeTarget "OrielOTPWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1D6E7000000000000000006 /* Debug */,
+				D1D6E7000000000000000007 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

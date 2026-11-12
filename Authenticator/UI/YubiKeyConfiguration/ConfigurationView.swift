@@ -182,6 +182,9 @@ struct ConfigurationView: View {
                     AppLockSection()
                     PrivacySection()
                     AccountOrderSection()
+                    #if os(iOS)
+                        WidgetsSection()
+                    #endif
                     BackupSection()
                     AutoFillSection()
                     AppleWatchSection()

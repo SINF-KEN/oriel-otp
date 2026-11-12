@@ -41,6 +41,8 @@ nonisolated enum KeychainService {
     static let protectedAccounts = "ProtectedAccounts"
     static let autoFillWebsites = "AutoFill.Websites"
     static let autoFillAccounts = "AutoFill.Accounts"
+    /// The key of the pinned accounts the widgets show, see `WidgetAccountsFile`.
+    static let widgetAccounts = "Widgets.Accounts"
     /// The app lock and its wrong attempts.
     static let appLock = "AppLock"
     /// The key the accounts sent to the Apple Watch are sealed with, on both devices.

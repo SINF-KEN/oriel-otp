@@ -14167,6 +14167,35 @@
         }
       }
     },
+    "Show codes in widgets" : {
+      "comment" : "Widgets setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Codes in Widgets anzeigen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Afficher les codes dans les widgets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ウィジェットにコードを表示"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zobrazovať kódy vo widgetoch"
+          }
+        }
+      }
+    },
     "Show in menu bar" : {
       "comment" : "Mac setting",
       "localizations" : {
@@ -19237,6 +19266,64 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kým je YubiKey vložený, klávesnica na obrazovke sa nezobrazí. Ak chcete zobraziť klávesnicu, musíte vybrať YubiKey a potom ho znova vložiť."
+          }
+        }
+      }
+    },
+    "Widgets" : {
+      "comment" : "Settings section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Widgets"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Widgets"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ウィジェット"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Widgety"
+          }
+        }
+      }
+    },
+    "Widgets and the Copy Code control show your pinned accounts in Ente Auth and on this device. They don't ask for the app lock, so anyone holding your unlocked iPhone can see these codes. On the Lock Screen the codes stay hidden until you unlock. Accounts on a YubiKey or that ask for Face ID aren't shown." : {
+      "comment" : "Widgets settings footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Widgets und die Steuerung „Code kopieren“ zeigen deine angehefteten Konten in Ente Auth und auf diesem Gerät. Sie fragen nicht nach der App-Sperre, daher kann jeder, der dein entsperrtes iPhone hält, diese Codes sehen. Auf dem Sperrbildschirm bleiben die Codes verborgen, bis du entsperrst. Konten auf einem YubiKey oder solche, die nach Face ID fragen, werden nicht angezeigt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les widgets et la commande « Copier le code » affichent vos comptes épinglés dans Ente Auth et sur cet appareil. Ils ne demandent pas le verrouillage de l’app : toute personne qui tient votre iPhone déverrouillé peut voir ces codes. Sur l’écran verrouillé, les codes restent masqués jusqu’au déverrouillage. Les comptes sur une YubiKey ou qui demandent Face ID ne sont pas affichés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ウィジェットと「コードをコピー」コントロールには、Ente Authとこのデバイスでピン留めしたアカウントが表示されます。アプリのロックは求められないため、ロック解除されたiPhoneを持っている人なら誰でもこれらのコードを見ることができます。ロック画面では、ロックを解除するまでコードは隠されます。YubiKey上のアカウントやFace IDを求めるアカウントは表示されません。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Widgety a ovládač Kopírovať kód zobrazujú vaše pripnuté účty v Ente Auth a v tomto zariadení. Nepýtajú si zámku aplikácie, takže tieto kódy uvidí ktokoľvek, kto drží váš odomknutý iPhone. Na zamknutej obrazovke zostávajú kódy skryté, kým ho neodomknete. Účty na YubiKey alebo účty, ktoré vyžadujú Face ID, sa nezobrazujú."
           }
         }
       }

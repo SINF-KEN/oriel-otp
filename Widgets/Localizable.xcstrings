@@ -1,0 +1,296 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Account" : {
+      "comment" : "Shortcuts type name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Účet"
+          }
+        }
+      }
+    },
+    "Choose Account" : {
+      "comment" : "Control configuration",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konto auswählen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Choisir un compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントを選択"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vybrať účet"
+          }
+        }
+      }
+    },
+    "Copies the code of a pinned account." : {
+      "comment" : "Control description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopiert den Code eines angehefteten Kontos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copie le code d’un compte épinglé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ピン留めしたアカウントのコードをコピーします。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skopíruje kód pripnutého účtu."
+          }
+        }
+      }
+    },
+    "Copy Code" : {
+      "comment" : "Control name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copier le code"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopírovať kód"
+          }
+        }
+      }
+    },
+    "Copy Pinned Code" : {
+      "comment" : "Control action",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Angehefteten Code kopieren"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Copier le code épinglé"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ピン留めしたコードをコピー"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kopírovať pripnutý kód"
+          }
+        }
+      }
+    },
+    "Pin accounts and turn on Show codes in widgets in Oriel OTP." : {
+      "comment" : "Widget without accounts",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hefte Konten an und schalte in Oriel OTP „Codes in Widgets anzeigen“ ein."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Épinglez des comptes et activez « Afficher les codes dans les widgets » dans Oriel OTP."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Oriel OTPでアカウントをピン留めし、「ウィジェットにコードを表示」をオンにしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pripnite účty a v Oriel OTP zapnite Zobrazovať kódy vo widgetoch."
+          }
+        }
+      }
+    },
+    "Pinned Codes" : {
+      "comment" : "Widget name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Angeheftete Codes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Codes épinglés"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "ピン留めしたコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pripnuté kódy"
+          }
+        }
+      }
+    },
+    "The codes of your pinned accounts in Ente Auth and on this device." : {
+      "comment" : "Widget description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Die Codes deiner angehefteten Konten in Ente Auth und auf diesem Gerät."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Les codes de vos comptes épinglés dans Ente Auth et sur cet appareil."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente Authとこのデバイスでピン留めしたアカウントのコード。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kódy vašich pripnutých účtov v Ente Auth a v tomto zariadení."
+          }
+        }
+      }
+    },
+    "This account isn't pinned in Oriel OTP any more, or Show codes in widgets is off." : {
+      "comment" : "Control error",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses Konto ist in Oriel OTP nicht mehr angeheftet, oder „Codes in Widgets anzeigen“ ist aus."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce compte n’est plus épinglé dans Oriel OTP, ou « Afficher les codes dans les widgets » est désactivé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントはOriel OTPでピン留めされていないか、「ウィジェットにコードを表示」がオフです。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento účet už nie je v Oriel OTP pripnutý alebo je Zobrazovať kódy vo widgetoch vypnuté."
+          }
+        }
+      }
+    },
+    "Unlock to see your codes." : {
+      "comment" : "Widget while the device is locked",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Entsperre, um deine Codes zu sehen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Déverrouillez pour voir vos codes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コードを見るにはロックを解除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Odomknite, aby ste videli svoje kódy."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -73,3 +73,12 @@ Each run uploads the archive and upload logs as `testflight-iOS-logs` and `testf
 - *Cloud signing permission error*: the API key's role can't use cloud-managed certificates (see above).
 - *No profiles for ...*: an App ID or capability changed; the API key can update profiles but can't register a new
   App ID, so add it in the developer portal first.
+
+## App IDs
+
+Each target has its own App ID, registered in the developer portal with these capabilities before the first build
+that includes it:
+
+| Target | App ID | Capabilities |
+| --- | --- | --- |
+| OrielOTPWidgets (iOS) | `io.github.sinf-ken.OrielOTP.Widgets` | App Groups (`group.io.github.sinf-ken.OrielOTP`), Keychain Sharing |
