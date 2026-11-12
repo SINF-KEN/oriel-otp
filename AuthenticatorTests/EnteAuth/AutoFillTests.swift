@@ -18,6 +18,7 @@ import AuthenticationServices
 import Foundation
 import CryptoKit
 import Testing
+import YubiKit
 
 @testable import OrielOTP
 
@@ -193,6 +194,73 @@ struct AutoFillAccountSyncTests {
         code("github", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"),
         code("bank", "otpauth://hotp/Bank:alice?secret=JBSWY3DPEHPK3PXP&issuer=Bank&counter=3"),
     ]
+
+    private func template(_ issuer: String) throws -> YubiKitOATHSession.CredentialTemplate {
+        try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+                                                  issuer: issuer, accountName: "alice", digits: 6)
+    }
+
+    /// The accounts on this device are filled in too, without an Ente account, and stay when Ente is signed out of.
+    @Test func fillsInTheAccountsOnThisDevice() async throws {
+        let sync = sync()
+        let device = DeviceAccounts(storage: MemoryDeviceStorage())
+        let defaults = makeTestDefaults()
+        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+                              storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
+                              watch: WatchAccountSync(defaults: defaults), autoFill: sync, device: device)
+        let model = MainViewModel(cloud: cloud, device: device)
+        _ = try model.addDeviceAccount(template("GitLab"))
+        await sync.finishWriting()
+        let accounts = try #require(try storage.load())
+        #expect(accounts.map(\.account.issuer) == ["GitLab"])
+        #expect(accounts.first?.websites == ["gitlab.com"])
+
+        cloud.remove()
+        await sync.finishWriting()
+        #expect(try storage.load()?.map(\.account.issuer) == ["GitLab"])
+
+        // Deleting the last one deletes the file.
+        let account = try #require(model.deviceAccounts.first)
+        await withCheckedContinuation { done in model.deleteAccount(account) { done.resume() } }
+        await sync.finishWriting()
+        #expect(try storage.load() == nil)
+    }
+
+    /// A launch in the background on a locked device can't read the accounts on this device yet. That isn't taken for
+    /// none: they stay in AutoFill with their chosen websites, and are written again once they can be read.
+    @Test func keepsTheAccountsOnThisDeviceWhileTheyCantBeRead() async throws {
+        let deviceStorage = MemoryDeviceStorage()
+        let defaults = makeTestDefaults()
+        func cloud(autoFill: AutoFillAccountSync, device: DeviceAccounts) -> EnteCloud {
+            EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+                      storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
+                      watch: WatchAccountSync(defaults: defaults), autoFill: autoFill, device: device)
+        }
+        let sync = sync()
+        let device = DeviceAccounts(storage: deviceStorage)
+        let model = MainViewModel(cloud: cloud(autoFill: sync, device: device), device: device)
+        _ = try model.addDeviceAccount(template("GitLab"))
+        await sync.finishWriting()
+        let id = try #require(try storage.load()?.first?.id)
+        sync.setWebsites(["git.example.com"], for: id)
+        await sync.finishWriting()
+
+        deviceStorage.loadError = EncryptedFileError.unavailable
+        let relaunched = self.sync()
+        let lockedDevice = DeviceAccounts(storage: deviceStorage)
+        #expect(lockedDevice.isLocked)
+        let relaunchedCloud = cloud(autoFill: relaunched, device: lockedDevice)
+        await relaunched.finishWriting()
+        #expect(try storage.load()?.map(\.id) == [id])
+        #expect(self.sync().hasChosenWebsites(for: id))
+
+        // Unlocked, they're read and written again, with the websites chosen for them.
+        deviceStorage.loadError = nil
+        lockedDevice.onChange = { relaunchedCloud.updateAutoFill() }
+        lockedDevice.loadIfLocked()
+        await relaunched.finishWriting()
+        #expect(try storage.load()?.first?.websites == ["git.example.com"])
+    }
 
     @Test func writesTheTimeBasedAccountsWithTheirGuessedWebsites() async throws {
         await update(sync())

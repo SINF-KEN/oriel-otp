@@ -35,9 +35,9 @@ struct AutoFillSection: View {
             Text(String(localized: "AutoFill", comment: "AutoFill settings section header"))
         } footer: {
             #if os(macOS)
-            Text(String(localized: "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first.", comment: "Mac AutoFill settings footer"))
+            Text(String(localized: "Fill in the codes of your time-based accounts in Ente Auth and on this device in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first.", comment: "Mac AutoFill settings footer"))
             #else
-            Text(String(localized: "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes.", comment: "AutoFill settings footer"))
+            Text(String(localized: "Fill in the codes of your time-based accounts in Ente Auth and on this device in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes.", comment: "AutoFill settings footer"))
             #endif
         }
         .task { autoFill.refresh() }

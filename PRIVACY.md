@@ -41,7 +41,7 @@ On a server you host yourself, **Create account** sends the email address you en
 
 ## Accounts on this device
 
-Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device, unless you made a backup. **Back up accounts…** in the settings writes them, including their secrets, to a file encrypted with a password you choose, saved where you choose. The app doesn't keep the password or a copy of the file, and doesn't send it anywhere. Deleting an account removes it for good. AutoFill and the Apple Watch app don't use these accounts.
+Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device, unless you made a backup. **Back up accounts…** in the settings writes them, including their secrets, to a file encrypted with a password you choose, saved where you choose. The app doesn't keep the password or a copy of the file, and doesn't send it anywhere. Deleting an account removes it for good. AutoFill can fill in their codes (see below); the Apple Watch app doesn't use them.
 
 ## Tags, hidden codes and Spotlight
 
@@ -76,10 +76,10 @@ watch delete its copy. If the watch can't be reached at that moment, the iPhone 
 
 ## AutoFill
 
-The app's AutoFill extension can fill in the codes of your time-based Ente
-Auth accounts in Safari and other apps, once you turn on **Oriel OTP** in the system's AutoFill settings. The extension
-can't read the app's own storage, so while you stay signed in to Ente, the app keeps a second copy of these accounts,
-including their secrets, in storage it shares only with its extension. It is protected like the app's copy: encrypted
+The app's AutoFill extension can fill in the codes of your time-based accounts in Ente Auth and on this device in
+Safari and other apps, once you turn on **Oriel OTP** in the system's AutoFill settings. The extension can't read the
+app's own storage, so the app keeps a second copy of these accounts, including their secrets, in storage it shares only
+with its extension: the Ente Auth accounts while you stay signed in to Ente, and the accounts saved to **This device**. It is protected like the app's copy: encrypted
 with a random key kept in the device keychain, which never leaves the device and can only be read while the device is
 unlocked, and excluded from backups. Counter-based (HOTP) accounts and the accounts on your YubiKey are not included.
 
