@@ -30,11 +30,18 @@ enum EnteMigrationError: Error, LocalizedError, Equatable {
         case .noAccounts:
             return String(localized: "There are no accounts on the old server.", comment: "Ente migration error")
         case .sessionEnded:
-            return String(localized: "The old server ended this session. Open Sync from Ente Auth and enter your password, then try again.", comment: "Ente migration error")
+            return String(
+                localized: "The old server ended this session. Open Sync from Ente Auth and enter your password, then try again.",
+                comment: "Ente migration error")
         case .changedWhileMoving:
-            return String(localized: "Your accounts changed during the move. Nothing was switched. Try again to copy the changes too.", comment: "Ente migration error")
+            return String(
+                localized: "Your accounts changed during the move. Nothing was switched. Try again to copy the changes too.",
+                comment: "Ente migration error")
         case .notVerified:
-            return String(localized: "Some accounts didn't reach the new server. Nothing was switched, and your accounts are still on the old server. Try again.", comment: "Ente migration error")
+            return String(
+                localized:
+                    "Some accounts didn't reach the new server. Nothing was switched, and your accounts are still on the old server. Try again.",
+                comment: "Ente migration error")
         }
     }
 }
@@ -71,8 +78,10 @@ enum EnteMigration {
 
     /// Encrypts each account with the new server's key and uploads it. The plain text is copied as it is, so Ente's
     /// tags, notes, pins and trash stay. If this stops halfway, a new plan skips what reached the server.
-    static func copy(_ accounts: [String], api: EnteAPIClient, token: String, authenticatorKey: Data,
-                     onProgress: (Int) -> Void) async throws {
+    static func copy(
+        _ accounts: [String], api: EnteAPIClient, token: String, authenticatorKey: Data,
+        onProgress: (Int) -> Void
+    ) async throws {
         for (index, rawData) in accounts.enumerated() {
             try Task.checkCancellation()
             let encrypted = try EnteAuthenticatorSync.encrypt(rawData, authenticatorKey: authenticatorKey)

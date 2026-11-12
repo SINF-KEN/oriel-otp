@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import Foundation
 import OSLog
 import Observation
@@ -23,13 +22,13 @@ import Observation
 @Observable class OATHSavedPasswordsViewModel {
 
     var state: ResetState = .ready
-    
+
     enum ResetState: Equatable {
         case ready, success, error(String)
     }
-    
+
     func clearPasswords() {
-        
+
         let passwordPreferences = PasswordPreferences()
         let secureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords))
         passwordPreferences.resetPasswordPreferenceForAll()
@@ -44,7 +43,7 @@ import Observation
     init() {
         Logger.allocation.debug("OATHSavedPasswordsViewModel: init")
     }
-    
+
     deinit {
         Logger.allocation.debug("OATHSavedPasswordsViewModel: deinit")
     }

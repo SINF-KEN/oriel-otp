@@ -128,7 +128,8 @@ nonisolated struct EnteAPIClient: Sendable {
         }
         let allowed = Set("abcdefghijklmnopqrstuvwxyz0123456789-._:[]".unicodeScalars)
         guard !host.isEmpty, !host.hasPrefix("."), !host.hasSuffix("."), !host.contains(".."),
-              host.unicodeScalars.allSatisfy(allowed.contains) else { return nil }
+            host.unicodeScalars.allSatisfy(allowed.contains)
+        else { return nil }
         return host
     }
 
@@ -136,7 +137,8 @@ nonisolated struct EnteAPIClient: Sendable {
     /// query or a fragment.
     static func isPlainServer(_ url: URL) -> Bool {
         guard url.scheme?.lowercased() == "https", host(of: url) != nil,
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        else { return false }
         return components.percentEncodedUser == nil && components.percentEncodedPassword == nil
             && components.percentEncodedQuery == nil && components.percentEncodedFragment == nil
     }
@@ -144,8 +146,10 @@ nonisolated struct EnteAPIClient: Sendable {
     /// Whether two URLs are the same server, however they were typed.
     static func isSameServer(_ first: URL, _ second: URL) -> Bool {
         func parts(_ url: URL) -> [String?] {
-            [url.scheme?.lowercased(), host(of: url), String(url.port ?? 443),
-             url.path().trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
+            [
+                url.scheme?.lowercased(), host(of: url), String(url.port ?? 443),
+                url.path().trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            ]
         }
         guard host(of: first) != nil else { return false }
         return parts(first) == parts(second)
@@ -184,15 +188,17 @@ nonisolated struct EnteAPIClient: Sendable {
 
     func createSRPSession(srpUserID: String, srpA: Data) async throws -> (sessionID: String, srpB: Data) {
         struct Response: Decodable { let sessionID: String; let srpB: String }
-        let response: Response = try await send("POST", "/users/srp/create-session",
-                                                body: ["srpUserID": srpUserID, "srpA": srpA.base64EncodedString()])
+        let response: Response = try await send(
+            "POST", "/users/srp/create-session",
+            body: ["srpUserID": srpUserID, "srpA": srpA.base64EncodedString()])
         guard let srpB = Data(enteBase64: response.srpB) else { throw EnteAPIError.invalidResponse }
         return (response.sessionID, srpB)
     }
 
     func verifySRPSession(sessionID: String, srpUserID: String, srpM1: Data) async throws -> EnteAuthResponse {
-        try await send("POST", "/users/srp/verify-session",
-                       body: ["sessionID": sessionID, "srpUserID": srpUserID, "srpM1": srpM1.base64EncodedString()])
+        try await send(
+            "POST", "/users/srp/verify-session",
+            body: ["sessionID": sessionID, "srpUserID": srpUserID, "srpM1": srpM1.base64EncodedString()])
     }
 
     func sendEmailCode(email: String) async throws {
@@ -214,15 +220,21 @@ nonisolated struct EnteAPIClient: Sendable {
     func setKeyAttributes(_ attributes: EnteNewKeyAttributes, token: String) async throws {
         struct Request: Encodable { let keyAttributes: EnteNewKeyAttributes }
         try requireAccountCreation()
-        let _: Empty = try await send("PUT", "/users/attributes", token: token, json: JSONEncoder().encode(Request(keyAttributes: attributes)))
+        let _: Empty = try await send(
+            "PUT", "/users/attributes", token: token, json: JSONEncoder().encode(Request(keyAttributes: attributes)))
     }
 
-    func setUpSRP(token: String, srpUserID: String, srpSalt: Data, srpVerifier: Data, srpA: Data) async throws -> (setupID: String, srpB: Data) {
+    func setUpSRP(token: String, srpUserID: String, srpSalt: Data, srpVerifier: Data, srpA: Data) async throws -> (
+        setupID: String, srpB: Data
+    ) {
         struct Response: Decodable { let setupID: String; let srpB: String }
         try requireAccountCreation()
-        let response: Response = try await send("POST", "/users/srp/setup", token: token,
-                                                body: ["srpUserID": srpUserID, "srpSalt": srpSalt.base64EncodedString(),
-                                                       "srpVerifier": srpVerifier.base64EncodedString(), "srpA": srpA.base64EncodedString()])
+        let response: Response = try await send(
+            "POST", "/users/srp/setup", token: token,
+            body: [
+                "srpUserID": srpUserID, "srpSalt": srpSalt.base64EncodedString(),
+                "srpVerifier": srpVerifier.base64EncodedString(), "srpA": srpA.base64EncodedString()
+            ])
         guard let srpB = Data(enteBase64: response.srpB) else { throw EnteAPIError.invalidResponse }
         return (response.setupID, srpB)
     }
@@ -231,8 +243,9 @@ nonisolated struct EnteAPIClient: Sendable {
     func completeSRPSetup(token: String, setupID: String, srpM1: Data) async throws -> Data {
         struct Response: Decodable { let srpM2: String }
         try requireAccountCreation()
-        let response: Response = try await send("POST", "/users/srp/complete", token: token,
-                                                body: ["setupID": setupID, "srpM1": srpM1.base64EncodedString()])
+        let response: Response = try await send(
+            "POST", "/users/srp/complete", token: token,
+            body: ["setupID": setupID, "srpM1": srpM1.base64EncodedString()])
         guard let srpM2 = Data(enteBase64: response.srpM2) else { throw EnteAPIError.invalidResponse }
         return srpM2
     }
@@ -287,14 +300,16 @@ nonisolated struct EnteAPIClient: Sendable {
     /// Stores a new authenticator key for an account that has never used Ente Auth. Throws `http(statusCode: 409)`
     /// when the account already has one.
     func createAuthenticatorKey(token: String, encryptedKey: String, header: String) async throws {
-        let _: Empty = try await send("POST", "/authenticator/key", token: token,
-                                      body: ["encryptedKey": encryptedKey, "header": header])
+        let _: Empty = try await send(
+            "POST", "/authenticator/key", token: token,
+            body: ["encryptedKey": encryptedKey, "header": header])
     }
 
     func authenticatorDiff(token: String, sinceTime: Int64, limit: Int) async throws -> [EnteAuthenticatorEntity] {
         struct Response: Decodable { let diff: [EnteAuthenticatorEntity] }
-        let response: Response = try await send("GET", "/authenticator/entity/diff", token: token,
-                                                query: ["sinceTime": String(sinceTime), "limit": String(limit)])
+        let response: Response = try await send(
+            "GET", "/authenticator/entity/diff", token: token,
+            query: ["sinceTime": String(sinceTime), "limit": String(limit)])
         return response.diff
     }
 
@@ -306,16 +321,19 @@ nonisolated struct EnteAPIClient: Sendable {
 
     /// Replaces the data of an entity. Ente's server answers without the entity, its new time comes with the next diff.
     func updateAuthenticatorEntity(token: String, id: String, encryptedData: String, header: String) async throws {
-        let _: Empty = try await send("PUT", "/authenticator/entity", token: token,
-                                      body: ["id": id, "encryptedData": encryptedData, "header": header])
+        let _: Empty = try await send(
+            "PUT", "/authenticator/entity", token: token,
+            body: ["id": id, "encryptedData": encryptedData, "header": header])
     }
 
     // MARK: - Transport
 
     private struct Empty: Decodable {}
 
-    func request(_ method: String, _ path: String, token: String? = nil, query: [String: String] = [:], body: [String: String]? = nil,
-                 json: Data? = nil) throws -> URLRequest {
+    func request(
+        _ method: String, _ path: String, token: String? = nil, query: [String: String] = [:], body: [String: String]? = nil,
+        json: Data? = nil
+    ) throws -> URLRequest {
         guard var components = URLComponents(url: server.appendingPathComponent(path), resolvingAgainstBaseURL: false) else {
             throw EnteAPIError.invalidServerURL
         }
@@ -365,8 +383,10 @@ nonisolated struct EnteAPIClient: Sendable {
         return data
     }
 
-    private func send<T: Decodable>(_ method: String, _ path: String, token: String? = nil, query: [String: String] = [:], body: [String: String]? = nil,
-                                    json: Data? = nil) async throws -> T {
+    private func send<T: Decodable>(
+        _ method: String, _ path: String, token: String? = nil, query: [String: String] = [:], body: [String: String]? = nil,
+        json: Data? = nil
+    ) async throws -> T {
         let request = try request(method, path, token: token, query: query, body: body, json: json)
         let sent = AppClock.now
         let (bytes, response) = try await session.bytes(for: request)
@@ -397,12 +417,15 @@ nonisolated final class EnteRedirectGuard: NSObject, URLSessionTaskDelegate, Sen
 
     static func allows(from origin: URL?, to destination: URL?) -> Bool {
         guard let origin, let destination, origin.scheme?.lowercased() == "https", destination.scheme?.lowercased() == "https",
-              let host = EnteAPIClient.host(of: origin), host == EnteAPIClient.host(of: destination) else { return false }
+            let host = EnteAPIClient.host(of: origin), host == EnteAPIClient.host(of: destination)
+        else { return false }
         return (origin.port ?? 443) == (destination.port ?? 443)
     }
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
-                    newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void) {
+    func urlSession(
+        _ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest, completionHandler: @escaping @Sendable (URLRequest?) -> Void
+    ) {
         completionHandler(Self.allows(from: task.originalRequest?.url, to: request.url) ? request : nil)
     }
 }
@@ -415,15 +438,15 @@ extension URLSession {
         // for a week.
         configuration.timeoutIntervalForResource = 300
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
-        // URLProtocol.registerClass only reaches the shared session. It only answers for its own hosts.
-        configuration.protocolClasses = [FakeEnteServer.self] + (configuration.protocolClasses ?? [])
-        // Tests must never reach a real server, so there every other request fails. Signing in with 4096-bit SRP takes
-        // the fake server longer than the default 60 second timeout in an unoptimised build, and it answers locally.
-        if UnstubbedRequestFailure.isTesting {
-            configuration.protocolClasses = [FakeEnteServer.self, UnstubbedRequestFailure.self]
-            configuration.timeoutIntervalForRequest = 3600
-            configuration.timeoutIntervalForResource = 3600
-        }
+            // URLProtocol.registerClass only reaches the shared session. It only answers for its own hosts.
+            configuration.protocolClasses = [FakeEnteServer.self] + (configuration.protocolClasses ?? [])
+            // Tests must never reach a real server, so there every other request fails. Signing in with 4096-bit SRP takes
+            // the fake server longer than the default 60 second timeout in an unoptimised build, and it answers locally.
+            if UnstubbedRequestFailure.isTesting {
+                configuration.protocolClasses = [FakeEnteServer.self, UnstubbedRequestFailure.self]
+                configuration.timeoutIntervalForRequest = 3600
+                configuration.timeoutIntervalForResource = 3600
+            }
         #endif
         return URLSession(configuration: configuration, delegate: EnteRedirectGuard(), delegateQueue: nil)
     }()

@@ -15,7 +15,7 @@
  */
 
 #if os(iOS)
-import UIKit
+    import UIKit
 #endif
 import AppIntents
 
@@ -25,21 +25,25 @@ enum QuickAction: String {
     case addAccount = "io.github.sinf-ken.OrielOTP.add-account"
 
     #if os(iOS)
-    /// The Home Screen quick actions this device can do.
-    @MainActor static var shortcutItems: [UIApplicationShortcutItem] {
-        var items = [UIApplicationShortcutItem]()
-        if DeviceCapabilities.supportsNFC {
-            items.append(UIApplicationShortcutItem(type: QuickAction.scanNFC.rawValue,
-                                                   localizedTitle: String(localized: "Scan NFC YubiKey"),
-                                                   localizedSubtitle: nil,
-                                                   icon: UIApplicationShortcutIcon(systemImageName: "wave.3.right")))
+        /// The Home Screen quick actions this device can do.
+        @MainActor static var shortcutItems: [UIApplicationShortcutItem] {
+            var items = [UIApplicationShortcutItem]()
+            if DeviceCapabilities.supportsNFC {
+                items.append(
+                    UIApplicationShortcutItem(
+                        type: QuickAction.scanNFC.rawValue,
+                        localizedTitle: String(localized: "Scan NFC YubiKey"),
+                        localizedSubtitle: nil,
+                        icon: UIApplicationShortcutIcon(systemImageName: "wave.3.right")))
+            }
+            items.append(
+                UIApplicationShortcutItem(
+                    type: QuickAction.addAccount.rawValue,
+                    localizedTitle: String(localized: "Add account"),
+                    localizedSubtitle: nil,
+                    icon: UIApplicationShortcutIcon(systemImageName: "plus")))
+            return items
         }
-        items.append(UIApplicationShortcutItem(type: QuickAction.addAccount.rawValue,
-                                               localizedTitle: String(localized: "Add account"),
-                                               localizedSubtitle: nil,
-                                               icon: UIApplicationShortcutIcon(systemImageName: "plus")))
-        return items
-    }
     #endif
 }
 
@@ -52,61 +56,66 @@ enum QuickAction: String {
 }
 
 #if os(iOS)
-final class AppDelegate: NSObject, UIApplicationDelegate {
+    final class AppDelegate: NSObject, UIApplicationDelegate {
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        application.shortcutItems = QuickAction.shortcutItems
-        return true
-    }
-
-    // A quick action that launches the app arrives here rather than in the scene delegate.
-    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
-        if let item = options.shortcutItem, let action = QuickAction(rawValue: item.type) {
-            QuickActionCenter.shared.pending = action
+        func application(
+            _ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+        ) -> Bool {
+            application.shortcutItems = QuickAction.shortcutItems
+            return true
         }
-        let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
-        configuration.delegateClass = SceneDelegate.self
-        return configuration
-    }
-}
 
-final class SceneDelegate: NSObject, UIWindowSceneDelegate {
-
-    private var appLockWindow: AppLockWindow?
-
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        guard let windowScene = scene as? UIWindowScene else { return }
-        appLockWindow = AppLockWindow(windowScene: windowScene)
-    }
-
-    func sceneDidBecomeActive(_ scene: UIScene) {
-        AppLock.shared.didBecomeActive()
+        // A quick action that launches the app arrives here rather than in the scene delegate.
+        func application(
+            _ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession,
+            options: UIScene.ConnectionOptions
+        ) -> UISceneConfiguration {
+            if let item = options.shortcutItem, let action = QuickAction(rawValue: item.type) {
+                QuickActionCenter.shared.pending = action
+            }
+            let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+            configuration.delegateClass = SceneDelegate.self
+            return configuration
+        }
     }
 
-    // Not when the scene only resigns active, as the NFC and Face ID sheets make it do.
-    func sceneDidEnterBackground(_ scene: UIScene) {
-        AppLock.shared.lock()
-        appLockWindow?.update(animated: false)
+    final class SceneDelegate: NSObject, UIWindowSceneDelegate {
+
+        private var appLockWindow: AppLockWindow?
+
+        func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+            guard let windowScene = scene as? UIWindowScene else { return }
+            appLockWindow = AppLockWindow(windowScene: windowScene)
+        }
+
+        func sceneDidBecomeActive(_ scene: UIScene) {
+            AppLock.shared.didBecomeActive()
+        }
+
+        // Not when the scene only resigns active, as the NFC and Face ID sheets make it do.
+        func sceneDidEnterBackground(_ scene: UIScene) {
+            AppLock.shared.lock()
+            appLockWindow?.update(animated: false)
+        }
+
+        // A quick action used while the app is running.
+        func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem) async -> Bool {
+            guard let action = QuickAction(rawValue: shortcutItem.type) else { return false }
+            QuickActionCenter.shared.pending = action
+            return true
+        }
     }
 
-    // A quick action used while the app is running.
-    func windowScene(_ windowScene: UIWindowScene, performActionFor shortcutItem: UIApplicationShortcutItem) async -> Bool {
-        guard let action = QuickAction(rawValue: shortcutItem.type) else { return false }
-        QuickActionCenter.shared.pending = action
-        return true
-    }
-}
+    struct ScanNFCYubiKeyIntent: AppIntent {
+        static let title: LocalizedStringResource = "Scan NFC YubiKey"
+        static let description = IntentDescription("Opens Oriel OTP and reads the codes from a YubiKey over NFC.")
+        static let openAppWhenRun = true
 
-struct ScanNFCYubiKeyIntent: AppIntent {
-    static let title: LocalizedStringResource = "Scan NFC YubiKey"
-    static let description = IntentDescription("Opens Oriel OTP and reads the codes from a YubiKey over NFC.")
-    static let openAppWhenRun = true
-
-    @MainActor func perform() async throws -> some IntentResult {
-        QuickActionCenter.shared.pending = .scanNFC
-        return .result()
+        @MainActor func perform() async throws -> some IntentResult {
+            QuickActionCenter.shared.pending = .scanNFC
+            return .result()
+        }
     }
-}
 
 #endif
 
@@ -118,10 +127,10 @@ struct AddAccountIntent: AppIntent {
 
     @MainActor func perform() async throws -> some IntentResult {
         #if os(macOS)
-        // Also opens the main window if it was closed.
-        QuickAction.addAccount.perform()
+            // Also opens the main window if it was closed.
+            QuickAction.addAccount.perform()
         #else
-        QuickActionCenter.shared.pending = .addAccount
+            QuickActionCenter.shared.pending = .addAccount
         #endif
         return .result()
     }

@@ -62,7 +62,8 @@ extension SmartCardConnection {
         let securityDomainSession = try await SecurityDomainSession.makeSession(connection: self)
         let scpKeyRef = SCPKeyRef(kid: SCPKeyRef.Kid.scp11b, kvn: 0x01)
         guard let certificate = try await securityDomainSession.getCertificateBundle(for: scpKeyRef).last,
-              case .ec(let publicKey) = certificate.publicKey else { return nil }
+            case .ec(let publicKey) = certificate.publicKey
+        else { return nil }
         return try SCP11KeyParams(keyRef: scpKeyRef, pkSdEcka: publicKey)
     }
 
@@ -80,7 +81,8 @@ extension SmartCardConnection {
 
     /// Creates a PIV session, encrypted with SCP11b if the key requires it.
     func pivSession() async throws -> PIVSession {
-        let scpKeyParams = try await scp11KeyParamsIfNeeded(fipsCapability: FIPSCapability.piv, deviceInfo: isNFC ? await deviceInfo() : nil)
+        let scpKeyParams = try await scp11KeyParamsIfNeeded(
+            fipsCapability: FIPSCapability.piv, deviceInfo: isNFC ? await deviceInfo() : nil)
         return try await PIVSession.makeSession(connection: self, scpKeyParams: scpKeyParams)
     }
 
@@ -185,7 +187,8 @@ nonisolated extension Error {
             case .cancelled, .cancelledByUser:
                 return String(localized: "Connection cancelled by user", comment: "Internal error message not to be displayed to the user.")
             case .unsupported:
-                return String(localized: "NFC not supported on this device", comment: "Internal error message not to be displayed to the user.")
+                return String(
+                    localized: "NFC not supported on this device", comment: "Internal error message not to be displayed to the user.")
             default:
                 return String(localized: "YubiKey connection is not found.")
             }

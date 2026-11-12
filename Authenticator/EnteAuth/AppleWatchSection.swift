@@ -16,35 +16,40 @@
 
 #if os(iOS)
 
-import SwiftUI
+    import SwiftUI
 
-/// Showing the accounts on Apple Watch, in settings. Shown when a watch with the app is paired, or while the switch is
-/// on so it can be turned off.
-struct AppleWatchSection: View {
+    /// Showing the accounts on Apple Watch, in settings. Shown when a watch with the app is paired, or while the switch is
+    /// on so it can be turned off.
+    struct AppleWatchSection: View {
 
-    private var watch: WatchAccountSync { .shared }
+        private var watch: WatchAccountSync { .shared }
 
-    var body: some View {
-        if watch.isWatchAvailable || watch.isEnabled {
-            Section {
-                Toggle(String(localized: "Show accounts on Apple Watch", comment: "Apple Watch setting toggle"),
-                       isOn: Binding(get: { watch.isEnabled }, set: setShowsAccounts))
-            } header: {
-                Text(String(localized: "Apple Watch", comment: "Apple Watch settings section header"))
-            } footer: {
-                Text(String(localized: "A copy of your time-based accounts on this iPhone and in Ente Auth is kept on your Apple Watch, so it can show codes without your iPhone. Accounts on your YubiKey can't be shown. The copy is updated when your accounts change, and deleted when you turn this off.", comment: "Apple Watch setting footer"))
+        var body: some View {
+            if watch.isWatchAvailable || watch.isEnabled {
+                Section {
+                    Toggle(
+                        String(localized: "Show accounts on Apple Watch", comment: "Apple Watch setting toggle"),
+                        isOn: Binding(get: { watch.isEnabled }, set: setShowsAccounts))
+                } header: {
+                    Text(String(localized: "Apple Watch", comment: "Apple Watch settings section header"))
+                } footer: {
+                    Text(
+                        String(
+                            localized:
+                                "A copy of your time-based accounts on this iPhone and in Ente Auth is kept on your Apple Watch, so it can show codes without your iPhone. Accounts on your YubiKey can't be shown. The copy is updated when your accounts change, and deleted when you turn this off.",
+                            comment: "Apple Watch setting footer"))
+                }
             }
         }
-    }
 
-    private func setShowsAccounts(_ isOn: Bool) {
-        guard isOn else {
-            watch.disable()
-            return
+        private func setShowsAccounts(_ isOn: Bool) {
+            guard isOn else {
+                watch.disable()
+                return
+            }
+            watch.enable()
+            EnteCloud.shared.updateWatch()
         }
-        watch.enable()
-        EnteCloud.shared.updateWatch()
     }
-}
 
 #endif

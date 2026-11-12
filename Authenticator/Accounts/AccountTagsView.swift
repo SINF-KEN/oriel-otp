@@ -54,7 +54,9 @@ struct AccountTagsView: View {
                     Section {
                         ForEach(choices, id: \.self) { tag in
                             let isSelected = contains(tag)
-                            Button { toggle(tag) } label: {
+                            Button {
+                                toggle(tag)
+                            } label: {
                                 HStack {
                                     Label(tag, systemImage: "tag")
                                         .foregroundStyle(Color.primary)
@@ -96,7 +98,7 @@ struct AccountTagsView: View {
             }
         }
         #if os(macOS)
-        .textScaledFrame(width: 380, height: 420)
+            .textScaledFrame(width: 380, height: 420)
         #endif
     }
 
@@ -108,9 +110,15 @@ struct AccountTagsView: View {
 
     private var footer: String {
         switch account.location {
-        case .ente: String(localized: "Tags are saved in Ente Auth, which shows them too.", comment: "Tags sheet footer for an Ente Auth account")
-        case .device: String(localized: "Tags go along when the account moves to Ente Auth.", comment: "Tags sheet footer for an account on this device")
-        case .yubiKey: String(localized: "A YubiKey has no room for tags, so they are kept on this device.", comment: "Tags sheet footer for a YubiKey account")
+        case .ente:
+            String(localized: "Tags are saved in Ente Auth, which shows them too.", comment: "Tags sheet footer for an Ente Auth account")
+        case .device:
+            String(
+                localized: "Tags go along when the account moves to Ente Auth.", comment: "Tags sheet footer for an account on this device")
+        case .yubiKey:
+            String(
+                localized: "A YubiKey has no room for tags, so they are kept on this device.",
+                comment: "Tags sheet footer for a YubiKey account")
         }
     }
 

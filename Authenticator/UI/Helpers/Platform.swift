@@ -16,10 +16,10 @@
 
 import SwiftUI
 #if canImport(UIKit)
-import UIKit
-import UniformTypeIdentifiers
+    import UIKit
+    import UniformTypeIdentifiers
 #else
-import AppKit
+    import AppKit
 #endif
 
 /// What iOS and macOS do differently, behind one interface for the shared code.
@@ -28,18 +28,18 @@ enum Platform {
     /// The app runs on an iPhone, where the YubiKey can act as the keyboard over USB.
     static var isPhone: Bool {
         #if os(iOS)
-        return UIDevice.current.userInterfaceIdiom == .phone
+            return UIDevice.current.userInterfaceIdiom == .phone
         #else
-        return false
+            return false
         #endif
     }
 
     /// Opens a link in the browser, or another app that handles it.
     static func open(_ url: URL) {
         #if os(iOS)
-        UIApplication.shared.open(url)
+            UIApplication.shared.open(url)
         #else
-        NSWorkspace.shared.open(url)
+            NSWorkspace.shared.open(url)
         #endif
     }
 
@@ -47,9 +47,9 @@ enum Platform {
     /// `accessibilityReduceMotion` in its environment.
     @MainActor static var prefersReducedMotion: Bool {
         #if os(iOS)
-        UIAccessibility.isReduceMotionEnabled
+            UIAccessibility.isReduceMotionEnabled
         #else
-        NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+            NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
         #endif
     }
 
@@ -61,7 +61,7 @@ enum Platform {
     /// Haptic feedback on iPhone. Macs don't have it for this, so it does nothing there.
     static func notify(_ feedback: Feedback) {
         #if os(iOS)
-        UINotificationFeedbackGenerator().notificationOccurred(feedback == .success ? .success : .error)
+            UINotificationFeedbackGenerator().notificationOccurred(feedback == .success ? .success : .error)
         #endif
     }
 
@@ -76,81 +76,86 @@ enum Platform {
     /// app quits before that.
     static func copy(_ string: String) {
         #if os(iOS)
-        UIPasteboard.general.setItems([[UTType.utf8PlainText.identifier: string]],
-                                      options: [.localOnly: true,
-                                                .expirationDate: Date.now.addingTimeInterval(TimeInterval(pasteboardLifetime.components.seconds))])
+            UIPasteboard.general.setItems(
+                [[UTType.utf8PlainText.identifier: string]],
+                options: [
+                    .localOnly: true,
+                    .expirationDate: Date.now.addingTimeInterval(TimeInterval(pasteboardLifetime.components.seconds))
+                ])
         #else
-        let pasteboard = NSPasteboard.general
-        pasteboard.prepareForNewContents(with: .currentHostOnly)
-        pasteboard.setString(string, forType: .string)
-        pasteboard.setString("", forType: NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType"))
-        pasteboard.setString("", forType: NSPasteboard.PasteboardType("org.nspasteboard.TransientType"))
-        let changeCount = pasteboard.changeCount
-        copiedChangeCount = changeCount
-        if terminationObserver == nil {
-            // The task below doesn't outlive the app, so a code copied in its last minute is removed as it quits.
-            terminationObserver = NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil,
-                                                                         queue: .main) { _ in
-                MainActor.assumeIsolated { clearCopiedCode() }
+            let pasteboard = NSPasteboard.general
+            pasteboard.prepareForNewContents(with: .currentHostOnly)
+            pasteboard.setString(string, forType: .string)
+            pasteboard.setString("", forType: NSPasteboard.PasteboardType("org.nspasteboard.ConcealedType"))
+            pasteboard.setString("", forType: NSPasteboard.PasteboardType("org.nspasteboard.TransientType"))
+            let changeCount = pasteboard.changeCount
+            copiedChangeCount = changeCount
+            if terminationObserver == nil {
+                // The task below doesn't outlive the app, so a code copied in its last minute is removed as it quits.
+                terminationObserver = NotificationCenter.default.addObserver(
+                    forName: NSApplication.willTerminateNotification, object: nil,
+                    queue: .main
+                ) { _ in
+                    MainActor.assumeIsolated { clearCopiedCode() }
+                }
             }
-        }
-        Task {
-            try? await Task.sleep(for: pasteboardLifetime)
-            guard copiedChangeCount == changeCount else { return }
-            clearCopiedCode()
-        }
+            Task {
+                try? await Task.sleep(for: pasteboardLifetime)
+                guard copiedChangeCount == changeCount else { return }
+                clearCopiedCode()
+            }
         #endif
     }
 
     #if os(macOS)
-    /// The pasteboard's change count after the last code was copied, nil once it has been removed.
-    private static var copiedChangeCount: Int?
-    private static var terminationObserver: NSObjectProtocol?
+        /// The pasteboard's change count after the last code was copied, nil once it has been removed.
+        private static var copiedChangeCount: Int?
+        private static var terminationObserver: NSObjectProtocol?
 
-    /// Removes the copied code, unless something else has been copied since.
-    static func clearCopiedCode() {
-        guard let copiedChangeCount else { return }
-        self.copiedChangeCount = nil
-        guard NSPasteboard.general.changeCount == copiedChangeCount else { return }
-        NSPasteboard.general.clearContents()
-    }
+        /// Removes the copied code, unless something else has been copied since.
+        static func clearCopiedCode() {
+            guard let copiedChangeCount else { return }
+            self.copiedChangeCount = nil
+            guard NSPasteboard.general.changeCount == copiedChangeCount else { return }
+            NSPasteboard.general.clearContents()
+        }
     #endif
 }
 
 #if os(macOS)
-// The iOS system colors used by the shared views, under their iOS names.
-extension NSColor {
-    static var label: NSColor { .labelColor }
-    static var secondaryLabel: NSColor { .secondaryLabelColor }
-    static var tertiaryLabel: NSColor { .tertiaryLabelColor }
-    static var separator: NSColor { .separatorColor }
-    static var systemBackground: NSColor { .windowBackgroundColor }
-    static var secondarySystemBackground: NSColor { .controlBackgroundColor }
-}
+    // The iOS system colors used by the shared views, under their iOS names.
+    extension NSColor {
+        static var label: NSColor { .labelColor }
+        static var secondaryLabel: NSColor { .secondaryLabelColor }
+        static var tertiaryLabel: NSColor { .tertiaryLabelColor }
+        static var separator: NSColor { .separatorColor }
+        static var systemBackground: NSColor { .windowBackgroundColor }
+        static var secondarySystemBackground: NSColor { .controlBackgroundColor }
+    }
 
-// The keyboard and navigation bar modifiers only exist on iOS. They do nothing on the Mac, so the shared views can keep
-// using them without checking the platform each time.
-enum UIKeyboardType {
-    case asciiCapableNumberPad
-    case emailAddress
-    case numberPad
-    case numbersAndPunctuation
-    case URL
-}
+    // The keyboard and navigation bar modifiers only exist on iOS. They do nothing on the Mac, so the shared views can keep
+    // using them without checking the platform each time.
+    enum UIKeyboardType {
+        case asciiCapableNumberPad
+        case emailAddress
+        case numberPad
+        case numbersAndPunctuation
+        case URL
+    }
 
-struct TextInputAutocapitalization {
-    static let never = TextInputAutocapitalization()
-    static let characters = TextInputAutocapitalization()
-}
+    struct TextInputAutocapitalization {
+        static let never = TextInputAutocapitalization()
+        static let characters = TextInputAutocapitalization()
+    }
 
-enum NavigationBarTitleDisplayMode {
-    case inline
-    case large
-}
+    enum NavigationBarTitleDisplayMode {
+        case inline
+        case large
+    }
 
-extension View {
-    func keyboardType(_ type: UIKeyboardType) -> some View { self }
-    func textInputAutocapitalization(_ autocapitalization: TextInputAutocapitalization?) -> some View { self }
-    func navigationBarTitleDisplayMode(_ displayMode: NavigationBarTitleDisplayMode) -> some View { self }
-}
+    extension View {
+        func keyboardType(_ type: UIKeyboardType) -> some View { self }
+        func textInputAutocapitalization(_ autocapitalization: TextInputAutocapitalization?) -> some View { self }
+        func navigationBarTitleDisplayMode(_ displayMode: NavigationBarTitleDisplayMode) -> some View { self }
+    }
 #endif

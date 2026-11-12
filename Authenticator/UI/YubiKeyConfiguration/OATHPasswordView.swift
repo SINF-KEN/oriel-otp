@@ -7,11 +7,10 @@
 //  Copyright © 2026 Kenzi Voyer.
 //
 
-
 import SwiftUI
 
 struct OATHPasswordView: View {
-    
+
     @State var model = OATHPasswordViewModel()
     @Environment(\.dismiss) private var dismiss
 
@@ -19,13 +18,13 @@ struct OATHPasswordView: View {
     @State var presentChangePassword = false
     @State var presentRemovePassword = false
     @State var presentErrorAlert = false
-    
+
     @State var error: Error? = nil
-    
+
     @State var showSetButton = true
     @State var showChangeButton = false
     @State var showRemoveButton = false
-    
+
     func areButtonsDisabled() -> Bool {
         model.state == .unknown || model.state.isError() || model.isProcessing
     }
@@ -85,7 +84,8 @@ struct OATHPasswordView: View {
                     self.showChangeButton = true
                     self.showRemoveButton = !model.isFipsKey
                 case .error(let error):
-                    guard presentSetPassword == false
+                    guard
+                        presentSetPassword == false
                             && presentChangePassword == false
                             && presentRemovePassword == false
                     else { return }
@@ -103,28 +103,27 @@ struct OATHPasswordView: View {
     }
 }
 
-
 struct OATHSetChangePasswordView: View {
-    
+
     enum Action { case set, change, remove }
     let type: Action
-    
+
     @Environment(\.dismiss) private var dismiss
-    
+
     @Environment(OATHPasswordViewModel.self) var model
     @FocusState private var focusedField: FocusedField?
 
     enum FocusedField {
         case currentPassword, newPassword, repeatedPassword
     }
-    
+
     @State private var currentPassword: String = ""
     @State private var newPassword: String = ""
     @State private var repeatedPassword: String = ""
-    
+
     @State private var presentErrorAlert = false
     @State private var errorMessage: String? = nil
-    
+
     var navBarTitle: String {
         switch self.type {
         case .set:
@@ -135,11 +134,13 @@ struct OATHSetChangePasswordView: View {
             return String(localized: "Remove password")
         }
     }
-    
+
     var currentPasswordLabel: String {
-        type == .remove ? String(localized: "Password", comment: "Enter password in secure field to remove password.") : String(localized: "Current", comment: "Enter current password in secure field to change password.")
+        type == .remove
+            ? String(localized: "Password", comment: "Enter password in secure field to remove password.")
+            : String(localized: "Current", comment: "Enter current password in secure field to change password.")
     }
-    
+
     var buttonTitle: String {
         switch self.type {
         case .set:
@@ -150,7 +151,7 @@ struct OATHSetChangePasswordView: View {
             return String(localized: "Remove")
         }
     }
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -231,21 +232,23 @@ struct OATHSetChangePasswordView: View {
                 default: break
                 }
             }
-            .alert(errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: {
-                Button(role: .cancel) {
-                    errorMessage = nil
-                    if model.state.isFatalError() {
-                        dismiss()
-                    } else {
-                        focusedField = type == .set ? .newPassword : .currentPassword
+            .alert(
+                errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert,
+                actions: {
+                    Button(role: .cancel) {
+                        errorMessage = nil
+                        if model.state.isFatalError() {
+                            dismiss()
+                        } else {
+                            focusedField = type == .set ? .newPassword : .currentPassword
+                        }
+                    } label: {
+                        Text("OK")
                     }
-                } label: {
-                    Text("OK")
-                }
-            })
+                })
         }
     }
-    
+
     private func handleInput() {
         switch type {
         case .set:
@@ -257,4 +260,3 @@ struct OATHSetChangePasswordView: View {
         }
     }
 }
-

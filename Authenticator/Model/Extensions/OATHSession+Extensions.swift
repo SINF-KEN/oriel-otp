@@ -30,7 +30,8 @@ extension YubiKitOATHSession {
 
         let response = try await calculateCredentialResponse(for: credential.id, challenge: challenge)
         guard let steamCode = Self.steamCode(fromResponse: response) else { throw KeySessionError.noResponse }
-        let startDate = Date(timeIntervalSince1970: TimeInterval(Int(timestamp.timeIntervalSince1970) - Int(timestamp.timeIntervalSince1970) % 30))
+        let startDate = Date(
+            timeIntervalSince1970: TimeInterval(Int(timestamp.timeIntervalSince1970) - Int(timestamp.timeIntervalSince1970) % 30))
         let validity = DateInterval(start: startDate, duration: 30)
         return (steamCode, validity)
     }
@@ -96,8 +97,9 @@ extension SmartCardConnection {
         let select = Data([0x00, 0xa4, 0x04, 0x00, UInt8(aid.count)] + aid)
         let response = try await send(data: select)
         guard response.count >= 2, response.suffix(2) == Data([0x90, 0x00]),
-              let records = TKBERTLVRecord.sequenceOfRecords(from: response.dropLast(2)),
-              let salt = records.first(where: { $0.tag == 0x71 })?.value else {
+            let records = TKBERTLVRecord.sequenceOfRecords(from: response.dropLast(2)),
+            let salt = records.first(where: { $0.tag == 0x71 })?.value
+        else {
             throw YubiKitOATHSessionError.responseParseError("Missing salt in OATH application select response", source: .here())
         }
         let hash = Data(SHA256.hash(data: salt))
@@ -128,10 +130,15 @@ enum CredentialTemplateError: Error, LocalizedError {
         case .nameIssuerTooLong: return "Account name and issuer is to long"
         case .issuerContainsColon: return "Character ':' is not allowed in issuer"
         case .repeatedParameter:
-            return String(localized: "The link gives the same setting more than once.", comment: "Error for an otpauth link that repeats a parameter, e.g. the secret")
+            return String(
+                localized: "The link gives the same setting more than once.",
+                comment: "Error for an otpauth link that repeats a parameter, e.g. the secret")
         case .periodLikeName:
-            return String(localized: "A YubiKey can't keep an issuer or account name that starts with a number and a slash.",
-                          comment: "Error for an account whose issuer, or name without an issuer, starts with digits and a slash, e.g. 24/7 Fitness, which a YubiKey would read as the code's period")
+            return String(
+                localized: "A YubiKey can't keep an issuer or account name that starts with a number and a slash.",
+                comment:
+                    "Error for an account whose issuer, or name without an issuer, starts with digits and a slash, e.g. 24/7 Fitness, which a YubiKey would read as the code's period"
+            )
         }
     }
 }
@@ -206,13 +213,15 @@ nonisolated extension YubiKitOATHSession.CredentialTemplate {
     }
 
     /// Creates a template with the validation the Objective-C YubiKit did.
-    init(type: YubiKitOATHSession.CredentialType,
-         algorithm: YubiKitOATHSession.HashAlgorithm,
-         secret: Data,
-         issuer: String?,
-         accountName: String,
-         digits: Int,
-         skip: Validation = []) throws {
+    init(
+        type: YubiKitOATHSession.CredentialType,
+        algorithm: YubiKitOATHSession.HashAlgorithm,
+        secret: Data,
+        issuer: String?,
+        accountName: String,
+        digits: Int,
+        skip: Validation = []
+    ) throws {
         guard !secret.isEmpty else { throw CredentialTemplateError.missingSecret }
         guard [6, 7, 8].contains(digits) else { throw CredentialTemplateError.digits }
         // A zero or negative period traps when converted to UInt below and when YubiKit calculates a code, and one

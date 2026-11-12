@@ -18,13 +18,14 @@ import AppIntents
 import CoreSpotlight
 import Foundation
 #if os(iOS)
-import UIKit
+    import UIKit
 #endif
 
 /// An account for Shortcuts, Siri and Spotlight: one in Ente Auth or on this device, whose codes the app calculates,
 /// or on the Mac one on the plugged-in YubiKey.
 struct AccountEntity: AppEntity, IndexedEntity {
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = TypeDisplayRepresentation(name: LocalizedStringResource("Account", comment: "Shortcuts type name"))
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = TypeDisplayRepresentation(
+        name: LocalizedStringResource("Account", comment: "Shortcuts type name"))
     static let defaultQuery = AccountQuery()
 
     /// `Account.accountId`: "ente/<id>", "device/<id>", or the credential id of a YubiKey account, e.g.
@@ -69,9 +70,9 @@ struct AccountQuery: EntityStringQuery {
     /// The app lock, or on iOS the device: with the app lock off, Siri on the Lock Screen gets no account names either.
     var isLocked: @MainActor @Sendable () -> Bool = {
         #if os(iOS)
-        AppLock.shared.isLocked || !UIApplication.shared.isProtectedDataAvailable
+            AppLock.shared.isLocked || !UIApplication.shared.isProtectedDataAvailable
         #else
-        AppLock.shared.isLocked
+            AppLock.shared.isLocked
         #endif
     }
     var suggestsAccounts: @MainActor @Sendable () -> Bool = { AccountSpotlight.shared.isEnabled }
@@ -116,16 +117,18 @@ struct AccountQuery: EntityStringQuery {
     @MainActor private func allEntities(includingYubiKey: Bool) async throws -> [AccountEntity] {
         var entities = calculatedEntities()
         #if os(macOS)
-        if includingYubiKey {
-            do {
-                entities += try await YubiKeyAccess.accounts()
-            } catch {
-                // Without a YubiKey there are still the other accounts. With none at all, say why.
-                if entities.isEmpty { throw error }
+            if includingYubiKey {
+                do {
+                    entities += try await YubiKeyAccess.accounts()
+                } catch {
+                    // Without a YubiKey there are still the other accounts. With none at all, say why.
+                    if entities.isEmpty { throw error }
+                }
             }
-        }
         #endif
-        return entities.sorted { ($0.title.lowercased(), $0.accountName.lowercased()) < ($1.title.lowercased(), $1.accountName.lowercased()) }
+        return entities.sorted {
+            ($0.title.lowercased(), $0.accountName.lowercased()) < ($1.title.lowercased(), $1.accountName.lowercased())
+        }
     }
 }
 
@@ -148,9 +151,13 @@ struct AccountQuery: EntityStringQuery {
             case .locked:
                 String(localized: "Unlock Oriel OTP and try again.", comment: "Mac Shortcuts error when the app is locked")
             case .yubiKeyOnly:
-                String(localized: "Open Oriel OTP to get the codes of accounts on a YubiKey.", comment: "Shortcuts error on iOS for a YubiKey account")
+                String(
+                    localized: "Open Oriel OTP to get the codes of accounts on a YubiKey.",
+                    comment: "Shortcuts error on iOS for a YubiKey account")
             case .protected:
-                String(localized: "This account asks for Face ID, Touch ID or the passcode. Copy its code in Oriel OTP.", comment: "Shortcuts error when checking the device owner for a protected account failed")
+                String(
+                    localized: "This account asks for Face ID, Touch ID or the passcode. Copy its code in Oriel OTP.",
+                    comment: "Shortcuts error when checking the device owner for a protected account failed")
             }
         }
     }
@@ -180,7 +187,9 @@ struct AccountQuery: EntityStringQuery {
         if id.hasPrefix(devicePrefix) {
             let deviceID = String(id.dropFirst(devicePrefix.count))
             DeviceAccounts.shared.loadIfLocked()
-            guard let code = DeviceAccounts.shared.accounts.first(where: { $0.id == deviceID })?.code else { throw CodeError.accountNotFound }
+            guard let code = DeviceAccounts.shared.accounts.first(where: { $0.id == deviceID })?.code else {
+                throw CodeError.accountNotFound
+            }
             if code.kind == .hotp {
                 guard let otp = DeviceAccounts.shared.nextHOTPCode(deviceID) else { throw DeviceAccountsError.unavailable }
                 return otp
@@ -196,9 +205,13 @@ struct CopyCodeIntent: AppIntent {
     static let title = LocalizedStringResource("Copy Code", comment: "Shortcuts action")
     // App Store Connect turns down an intent description that names the platform (ITMS-90626), so each one has its own.
     #if os(macOS)
-    static let description = IntentDescription(LocalizedStringResource("Copies the code of an account to the clipboard. Accounts on a YubiKey work while it's plugged in.", comment: "Shortcuts action description"))
+        static let description = IntentDescription(
+            LocalizedStringResource(
+                "Copies the code of an account to the clipboard. Accounts on a YubiKey work while it's plugged in.",
+                comment: "Shortcuts action description"))
     #else
-    static let description = IntentDescription(LocalizedStringResource("Copies the code of an account to the clipboard.", comment: "Shortcuts action description"))
+        static let description = IntentDescription(
+            LocalizedStringResource("Copies the code of an account to the clipboard.", comment: "Shortcuts action description"))
     #endif
 
     /// With the app lock off, Siri could otherwise copy a code, and name the accounts, on a locked device.
@@ -218,18 +231,22 @@ struct CopyCodeIntent: AppIntent {
         guard await ProtectedAccounts.shared.unlock(account.id, title: title) else { throw CalculatedAccounts.CodeError.protected }
         let code: String
         #if os(macOS)
-        if account.isOnYubiKey {
-            code = try await YubiKeyAccess.code(for: account.id)
-        } else {
-            code = try CalculatedAccounts.code(for: account.id)
-        }
+            if account.isOnYubiKey {
+                code = try await YubiKeyAccess.code(for: account.id)
+            } else {
+                code = try CalculatedAccounts.code(for: account.id)
+            }
         #else
-        code = try CalculatedAccounts.code(for: account.id)
+            code = try CalculatedAccounts.code(for: account.id)
         #endif
         Platform.copy(code)
         AccountUsage.shared.recordUse(of: account.id)
         // The code isn't said, so it isn't read out or shown with Hide codes on. It is the result, for the next action.
-        return .result(value: code, dialog: IntentDialog(LocalizedStringResource("Copied the code for \(title).", comment: "Shortcuts result. The placeholder is the account's name.")))
+        return .result(
+            value: code,
+            dialog: IntentDialog(
+                LocalizedStringResource(
+                    "Copied the code for \(title).", comment: "Shortcuts result. The placeholder is the account's name.")))
     }
 
     /// Shortcuts don't get past the app lock. On iOS, where the app locks in the background, Shortcuts opens it to be
@@ -238,39 +255,41 @@ struct CopyCodeIntent: AppIntent {
     @MainActor private func unlockApp() async throws {
         let lock = AppLock.shared
         #if os(iOS)
-        guard lock.isLocked else { return }
-        let dialog = IntentDialog(LocalizedStringResource("Unlock Oriel OTP to copy the code.", comment: "Shortcuts prompt when the app is locked"))
-        if #available(iOS 26.0, *) {
-            try await continueInForeground(dialog, alwaysConfirm: false)
-        } else {
-            try await requestToContinueInForeground(dialog)
-        }
-        // The app asks for Face ID or its code once it's in front.
-        let deadline = ContinuousClock.now + .seconds(120)
-        while lock.isLocked {
-            guard ContinuousClock.now < deadline else { throw CalculatedAccounts.CodeError.locked }
-            try await Task.sleep(for: .milliseconds(250))
-        }
+            guard lock.isLocked else { return }
+            let dialog = IntentDialog(
+                LocalizedStringResource("Unlock Oriel OTP to copy the code.", comment: "Shortcuts prompt when the app is locked"))
+            if #available(iOS 26.0, *) {
+                try await continueInForeground(dialog, alwaysConfirm: false)
+            } else {
+                try await requestToContinueInForeground(dialog)
+            }
+            // The app asks for Face ID or its code once it's in front.
+            let deadline = ContinuousClock.now + .seconds(120)
+            while lock.isLocked {
+                guard ContinuousClock.now < deadline else { throw CalculatedAccounts.CodeError.locked }
+                try await Task.sleep(for: .milliseconds(250))
+            }
         #else
-        if lock.isLocked && lock.method == .device {
-            await lock.unlockWithDeviceOwner()
-        }
-        guard !lock.isLocked else { throw CalculatedAccounts.CodeError.locked }
+            if lock.isLocked && lock.method == .device {
+                await lock.unlockWithDeviceOwner()
+            }
+            guard !lock.isLocked else { throw CalculatedAccounts.CodeError.locked }
         #endif
     }
 }
 
 #if os(iOS)
-extension CopyCodeIntent: ForegroundContinuableIntent {
-    @available(iOS 26.0, *)
-    static var supportedModes: IntentModes { [.background, .foreground(.dynamic)] }
-}
+    extension CopyCodeIntent: ForegroundContinuableIntent {
+        @available(iOS 26.0, *)
+        static var supportedModes: IntentModes { [.background, .foreground(.dynamic)] }
+    }
 #endif
 
 /// Opens the app on an account, e.g. from a Spotlight result.
 struct OpenAccountIntent: OpenIntent {
     static let title = LocalizedStringResource("Open Account", comment: "Shortcuts action")
-    static let description = IntentDescription(LocalizedStringResource("Opens Oriel OTP on an account.", comment: "Shortcuts action description"))
+    static let description = IntentDescription(
+        LocalizedStringResource("Opens Oriel OTP on an account.", comment: "Shortcuts action description"))
 
     @Parameter(title: LocalizedStringResource("Account", comment: "Shortcuts parameter"))
     var target: AccountEntity
@@ -278,7 +297,7 @@ struct OpenAccountIntent: OpenIntent {
     @MainActor func perform() async throws -> some IntentResult {
         QuickActionCenter.shared.pendingAccountID = target.id
         #if os(macOS)
-        QuickAction.openMainWindow()
+            QuickAction.openMainWindow()
         #endif
         return .result()
     }
@@ -286,28 +305,38 @@ struct OpenAccountIntent: OpenIntent {
 
 struct OrielOTPShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: CopyCodeIntent(),
-                    phrases: ["Copy a code with \(.applicationName)",
-                              "Copy the \(\.$account) code with \(.applicationName)",
-                              "Copy my \(\.$account) code in \(.applicationName)"],
-                    shortTitle: LocalizedStringResource("Copy Code", comment: "Shortcuts action"),
-                    systemImageName: "doc.on.doc")
+        AppShortcut(
+            intent: CopyCodeIntent(),
+            phrases: [
+                "Copy a code with \(.applicationName)",
+                "Copy the \(\.$account) code with \(.applicationName)",
+                "Copy my \(\.$account) code in \(.applicationName)"
+            ],
+            shortTitle: LocalizedStringResource("Copy Code", comment: "Shortcuts action"),
+            systemImageName: "doc.on.doc")
         #if os(iOS)
-        AppShortcut(intent: ScanNFCYubiKeyIntent(),
-                    phrases: ["Scan a YubiKey with \(.applicationName)",
-                              "Show my codes in \(.applicationName)"],
-                    shortTitle: "Scan NFC YubiKey",
-                    systemImageName: "wave.3.right")
-        AppShortcut(intent: AddAccountIntent(),
-                    phrases: ["Add an account to \(.applicationName)",
-                              "Add a YubiKey account with \(.applicationName)"],
-                    shortTitle: "Add Account",
-                    systemImageName: "plus")
+            AppShortcut(
+                intent: ScanNFCYubiKeyIntent(),
+                phrases: [
+                    "Scan a YubiKey with \(.applicationName)",
+                    "Show my codes in \(.applicationName)"
+                ],
+                shortTitle: "Scan NFC YubiKey",
+                systemImageName: "wave.3.right")
+            AppShortcut(
+                intent: AddAccountIntent(),
+                phrases: [
+                    "Add an account to \(.applicationName)",
+                    "Add a YubiKey account with \(.applicationName)"
+                ],
+                shortTitle: "Add Account",
+                systemImageName: "plus")
         #else
-        AppShortcut(intent: AddAccountIntent(),
-                    phrases: ["Add an account to \(.applicationName)"],
-                    shortTitle: "Add Account",
-                    systemImageName: "plus")
+            AppShortcut(
+                intent: AddAccountIntent(),
+                phrases: ["Add an account to \(.applicationName)"],
+                shortTitle: "Add Account",
+                systemImageName: "plus")
         #endif
     }
 }

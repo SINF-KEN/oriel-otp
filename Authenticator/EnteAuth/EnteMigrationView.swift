@@ -55,7 +55,7 @@ struct EnteMigrationView: View {
             .scrollDismissesKeyboard(.immediately)
             .disabled(model.isBusy)
             #if os(macOS)
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
             .navigationTitle(String(localized: "Move to another server", comment: "Ente migration navigation title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -79,16 +79,28 @@ struct EnteMigrationView: View {
                 }
             }
             .errorAlert(error: $model.error)
-            .alert(String(localized: "Move your accounts to \(model.toHost.isolated)?", comment: "Ente migration confirmation. The placeholder is the new server."),
-                   isPresented: $isConfirming) {
+            .alert(
+                String(
+                    localized: "Move your accounts to \(model.toHost.isolated)?",
+                    comment: "Ente migration confirmation. The placeholder is the new server."),
+                isPresented: $isConfirming
+            ) {
                 Button(String(localized: "Move accounts", comment: "Ente migration button"), role: .destructive) { model.move() }
                     .accessibilityIdentifier("ente.migrate.confirm")
                 Button(String(localized: "Cancel"), role: .cancel) {}
             } message: {
                 if model.willSwitch {
-                    Text(String(localized: "Your accounts are copied, then this device syncs with the new server instead of \(model.fromHost.isolated). The accounts stay on the old server, and your other devices keep using it until you sign in to the new server there.", comment: "Ente migration confirmation message. The placeholder is the old server."))
+                    Text(
+                        String(
+                            localized:
+                                "Your accounts are copied, then this device syncs with the new server instead of \(model.fromHost.isolated). The accounts stay on the old server, and your other devices keep using it until you sign in to the new server there.",
+                            comment: "Ente migration confirmation message. The placeholder is the old server."))
                 } else {
-                    Text(String(localized: "Your accounts are copied to the new server and stay on the old one. Nothing else changes on this device.", comment: "Ente migration confirmation message when the device doesn't switch to the new server"))
+                    Text(
+                        String(
+                            localized:
+                                "Your accounts are copied to the new server and stay on the old one. Nothing else changes on this device.",
+                            comment: "Ente migration confirmation message when the device doesn't switch to the new server"))
                 }
             }
         }
@@ -103,18 +115,24 @@ struct EnteMigrationView: View {
 
     @ViewBuilder private var serversSections: some View {
         Section {
-            serverField(String(localized: "Migrate from", comment: "Ente migration old server field"), text: $model.from,
-                        prompt: EnteAPIClient.defaultServer.absoluteString, identifier: "ente.migrate.from")
+            serverField(
+                String(localized: "Migrate from", comment: "Ente migration old server field"), text: $model.from,
+                prompt: EnteAPIClient.defaultServer.absoluteString, identifier: "ente.migrate.from")
         } header: {
             Text(String(localized: "Migrate from", comment: "Ente migration old server field"))
         }
         Section {
-            serverField(String(localized: "Migrate to", comment: "Ente migration new server field"), text: $model.to,
-                        prompt: "https://ente.example.com", identifier: "ente.migrate.to")
+            serverField(
+                String(localized: "Migrate to", comment: "Ente migration new server field"), text: $model.to,
+                prompt: "https://ente.example.com", identifier: "ente.migrate.to")
         } header: {
             Text(String(localized: "Migrate to", comment: "Ente migration new server field"))
         } footer: {
-            Text(String(localized: "Your accounts are copied from the old server to the new one, end-to-end encrypted. Nothing is deleted from the old server. If you host the new server yourself, you can create an account on it in the next step.", comment: "Ente migration servers footer"))
+            Text(
+                String(
+                    localized:
+                        "Your accounts are copied from the old server to the new one, end-to-end encrypted. Nothing is deleted from the old server. If you host the new server yourself, you can create an account on it in the next step.",
+                    comment: "Ente migration servers footer"))
         }
         Section {
             Button(String(localized: "Continue", comment: "PIV extension notifications explanation button")) { model.start() }
@@ -156,7 +174,11 @@ struct EnteMigrationView: View {
                 .disabled(!model.canSignIn)
                 .accessibilityIdentifier("ente.migrate.sign-in")
             if side == .target, let server = model.signUpServer {
-                Button(String(localized: "Create an account on this server", comment: "Ente button that opens account creation on a self-hosted server")) {
+                Button(
+                    String(
+                        localized: "Create an account on this server",
+                        comment: "Ente button that opens account creation on a self-hosted server")
+                ) {
                     isCreatingAccount = true
                 }
                 .accessibilityIdentifier("ente.create-account")
@@ -168,14 +190,24 @@ struct EnteMigrationView: View {
             }
             startOverButton
         } header: {
-            Text(String(localized: "Sign in to \(host(of: side).isolated)", comment: "Ente migration sign in header. The placeholder is the server."))
+            Text(
+                String(
+                    localized: "Sign in to \(host(of: side).isolated)",
+                    comment: "Ente migration sign in header. The placeholder is the server."))
         } footer: {
             if model.isDerivingKeys {
                 derivingKeysText
             } else if side == .source {
-                Text(String(localized: "The Ente account your codes are in now. Your password never leaves this device.", comment: "Ente migration old server sign in footer"))
+                Text(
+                    String(
+                        localized: "The Ente account your codes are in now. Your password never leaves this device.",
+                        comment: "Ente migration old server sign in footer"))
             } else {
-                Text(String(localized: "The account on the new server, which may have another email and password. Your password never leaves this device.", comment: "Ente migration new server sign in footer"))
+                Text(
+                    String(
+                        localized:
+                            "The account on the new server, which may have another email and password. Your password never leaves this device.",
+                        comment: "Ente migration new server sign in footer"))
             }
         }
     }
@@ -193,7 +225,10 @@ struct EnteMigrationView: View {
             if model.isDerivingKeys {
                 derivingKeysText
             } else {
-                Text(String(localized: "Enter the verification code Ente sent to \(model.email.isolated).", comment: "Ente email code footer. The placeholder is the email address."))
+                Text(
+                    String(
+                        localized: "Enter the verification code Ente sent to \(model.email.isolated).",
+                        comment: "Ente email code footer. The placeholder is the email address."))
             }
         }
     }
@@ -266,18 +301,28 @@ struct EnteMigrationView: View {
         }
         if let plan = model.plan {
             Section {
-                LabeledContent(String(localized: "Accounts to copy", comment: "Ente migration review label"), value: plan.toCopy.count.formatted())
+                LabeledContent(
+                    String(localized: "Accounts to copy", comment: "Ente migration review label"), value: plan.toCopy.count.formatted())
                 if plan.alreadyOnTarget > 0 {
-                    LabeledContent(String(localized: "Already on the new server", comment: "Ente migration review label"), value: plan.alreadyOnTarget.formatted())
+                    LabeledContent(
+                        String(localized: "Already on the new server", comment: "Ente migration review label"),
+                        value: plan.alreadyOnTarget.formatted())
                 }
                 if plan.trashed > 0 {
-                    LabeledContent(String(localized: "In the trash, kept there", comment: "Ente migration review label"), value: plan.trashed.formatted())
+                    LabeledContent(
+                        String(localized: "In the trash, kept there", comment: "Ente migration review label"),
+                        value: plan.trashed.formatted())
                 }
             } footer: {
                 if plan.unreadable > 0 {
-                    Label(String(localized: "\(plan.unreadable.formatted()) accounts can't be decrypted and won't be copied. They stay on the old server.", comment: "Ente migration review warning. The placeholder is the number of accounts."),
-                          systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                    Label(
+                        String(
+                            localized:
+                                "\(plan.unreadable.formatted()) accounts can't be decrypted and won't be copied. They stay on the old server.",
+                            comment: "Ente migration review warning. The placeholder is the number of accounts."),
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .foregroundStyle(.orange)
                 } else {
                     Text(String(localized: "Accounts already on the new server stay as they are.", comment: "Ente migration review footer"))
                 }
@@ -302,12 +347,23 @@ struct EnteMigrationView: View {
         Section {
             LabeledContent(String(localized: "Accounts copied", comment: "Ente migration finished label"), value: model.copied.formatted())
         } header: {
-            Text(String(localized: "Moved to \(model.toHost.isolated)", comment: "Ente migration finished header. The placeholder is the new server."))
+            Text(
+                String(
+                    localized: "Moved to \(model.toHost.isolated)",
+                    comment: "Ente migration finished header. The placeholder is the new server."))
         } footer: {
             if model.didSwitch {
-                Text(String(localized: "All accounts are on the new server, and this device now syncs with it. They are still on \(model.fromHost.isolated). Check that your codes work before you delete them there, and sign in to the new server on your other devices.", comment: "Ente migration finished footer. The placeholder is the old server."))
+                Text(
+                    String(
+                        localized:
+                            "All accounts are on the new server, and this device now syncs with it. They are still on \(model.fromHost.isolated). Check that your codes work before you delete them there, and sign in to the new server on your other devices.",
+                        comment: "Ente migration finished footer. The placeholder is the old server."))
             } else {
-                Text(String(localized: "All accounts are on the new server. They are still on \(model.fromHost.isolated). Nothing else changed on this device.", comment: "Ente migration finished footer when the device didn't switch. The placeholder is the old server."))
+                Text(
+                    String(
+                        localized:
+                            "All accounts are on the new server. They are still on \(model.fromHost.isolated). Nothing else changed on this device.",
+                        comment: "Ente migration finished footer when the device didn't switch. The placeholder is the old server."))
             }
         }
     }

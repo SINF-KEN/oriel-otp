@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import SwiftUI
 
 struct LicensingView: View {
@@ -31,7 +30,8 @@ struct LicensingView: View {
 extension LicensingView {
     private func licensingText() -> AttributedString {
         guard let url = Bundle.main.url(forResource: "Licensing", withExtension: "md"),
-              let licensingMarkdown = try? String(contentsOf: url, encoding: .utf8) else { return AttributedString() }
+            let licensingMarkdown = try? String(contentsOf: url, encoding: .utf8)
+        else { return AttributedString() }
         let options = AttributedString.MarkdownParsingOptions(interpretedSyntax: .inlineOnlyPreservingWhitespace)
         // Show the plain text rather than nothing if the markdown can't be parsed.
         return (try? AttributedString(markdown: licensingMarkdown, options: options)) ?? AttributedString(licensingMarkdown)

@@ -19,7 +19,7 @@ import Foundation
 import CommonCrypto
 
 nonisolated extension SecCertificate: @retroactive Equatable {
-    
+
     var commonName: String? {
         var name: CFString?
         SecCertificateCopyCommonName(self, &name)
@@ -29,17 +29,17 @@ nonisolated extension SecCertificate: @retroactive Equatable {
     var subjectSummary: String? {
         SecCertificateCopySubjectSummary(self) as String?
     }
-    
+
     func tokenObjectId() -> String {
         let data = SecCertificateCopyData(self) as Data
         return data.sha256Hash().map { String(format: "%02X", $0) }.joined()
     }
-    
+
     func publicKey() -> SecKey? {
         return SecCertificateCopyKey(self)
     }
-    
-    public static func ==(lhs: SecCertificate, rhs: SecCertificate) -> Bool {
+
+    public static func == (lhs: SecCertificate, rhs: SecCertificate) -> Bool {
         return lhs.tokenObjectId() == rhs.tokenObjectId()
     }
 }

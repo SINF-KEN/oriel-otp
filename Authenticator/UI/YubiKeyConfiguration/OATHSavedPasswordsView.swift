@@ -17,7 +17,7 @@
 import SwiftUI
 
 struct OATHSavedPasswordsView: View {
-    
+
     @State var model = OATHSavedPasswordsViewModel()
     @State var presentConfirmAlert = false
     @State var presentErrorAlert = false
@@ -45,20 +45,23 @@ struct OATHSavedPasswordsView: View {
         }
         .navigationTitle(Text("Clear saved passwords"))
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Clear passwords", isPresented: $presentConfirmAlert, presenting: model, actions: { model in
-            Button(role: .destructive) {
-                presentConfirmAlert.toggle()
-                model.clearPasswords()
-            } label: {
-                Text("OK")
+        .alert(
+            "Clear passwords", isPresented: $presentConfirmAlert, presenting: model,
+            actions: { model in
+                Button(role: .destructive) {
+                    presentConfirmAlert.toggle()
+                    model.clearPasswords()
+                } label: {
+                    Text("OK")
+                }
+                Button(role: .cancel) {
+                    presentConfirmAlert.toggle()
+                } label: {
+                    Text("Cancel")
+                }
             }
-            Button(role: .cancel) {
-                presentConfirmAlert.toggle()
-            } label: {
-                Text("Cancel")
-            }
-        })
-        .alert(errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: { })
+        )
+        .alert(errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: {})
         .onChange(of: model.state) { _, state in
             withAnimation(.unlessReduceMotion) {
                 switch state {

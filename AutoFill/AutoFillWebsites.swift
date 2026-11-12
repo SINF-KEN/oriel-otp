@@ -121,7 +121,7 @@ nonisolated enum AutoFillWebsites {
         "x": ["x.com", "twitter.com"],
         "yahoo": ["yahoo.com"],
         "zoho": ["zoho.com"],
-        "zoom": ["zoom.us"],
+        "zoom": ["zoom.us"]
     ]
 
     /// Suffixes under which anyone can register a name, e.g. `co.uk` or `github.io`. A website is never one of them, as
@@ -138,7 +138,7 @@ nonisolated enum AutoFillWebsites {
         "amazonaws.com", "appspot.com", "azurewebsites.net", "blogspot.com", "cloudfront.net", "duckdns.org",
         "firebaseapp.com", "fly.dev", "github.io", "gitlab.io", "glitch.me", "herokuapp.com", "myshopify.com",
         "netlify.app", "ngrok.io", "onrender.com", "pages.dev", "s3.amazonaws.com", "vercel.app", "web.app",
-        "workers.dev",
+        "workers.dev"
     ]
 
     /// The websites an account's codes are suggested on without asking: the issuer itself when it is a domain, or a
@@ -156,7 +156,8 @@ nonisolated enum AutoFillWebsites {
     /// be offered the account's codes. Nil when the issuer is a domain or a known service, or isn't a name in ASCII.
     static func suggestion(issuer: String?) -> String? {
         guard let issuer = issuer?.trimmingCharacters(in: .whitespacesAndNewlines), guess(issuer: issuer).isEmpty,
-              issuer.unicodeScalars.allSatisfy(\.isASCII), !issuer.contains(".") else { return nil }
+            issuer.unicodeScalars.allSatisfy(\.isASCII), !issuer.contains(".")
+        else { return nil }
         let name = letters(of: issuer)
         guard name.count >= 2 else { return nil }
         return name + ".com"
@@ -205,7 +206,8 @@ nonisolated enum AutoFillWebsites {
 
     /// The accounts suggested for the websites the system asks for, most specific first, then the other accounts.
     static func sorted(_ accounts: [AutoFillAccount], for serviceIdentifiers: [ASCredentialServiceIdentifier])
-        -> (matching: [AutoFillAccount], others: [AutoFillAccount]) {
+        -> (matching: [AutoFillAccount], others: [AutoFillAccount])
+    {
         let hosts = serviceIdentifiers.compactMap(host(of:))
         let ordered = accounts.sorted { OTPAccount.listOrder($0.account, $1.account) }
         // The first host an account matches, then its longest website that does, e.g. m.example.com before example.com.
@@ -230,8 +232,9 @@ nonisolated enum AutoFillIdentities {
         accounts.flatMap { account in
             let label = account.account.subtitle.map { "\(account.account.title) (\($0))" } ?? account.account.title
             return account.websites.map { website in
-                ASOneTimeCodeCredentialIdentity(serviceIdentifier: ASCredentialServiceIdentifier(identifier: website, type: .domain),
-                                                label: label, recordIdentifier: account.id)
+                ASOneTimeCodeCredentialIdentity(
+                    serviceIdentifier: ASCredentialServiceIdentifier(identifier: website, type: .domain),
+                    label: label, recordIdentifier: account.id)
             }
         }
     }

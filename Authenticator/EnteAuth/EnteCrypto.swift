@@ -59,8 +59,11 @@ nonisolated enum EnteCrypto {
             wipe(&key)
             wipe(&password)
         }
-        guard crypto_pwhash(&key, UInt64(keyLength), password, UInt64(password.count), [UInt8](salt),
-                            opsLimit, Int(memLimit), crypto_pwhash_ALG_ARGON2ID13) == 0 else {
+        guard
+            crypto_pwhash(
+                &key, UInt64(keyLength), password, UInt64(password.count), [UInt8](salt),
+                opsLimit, Int(memLimit), crypto_pwhash_ALG_ARGON2ID13) == 0
+        else {
             throw EnteCryptoError.keyDerivationFailed
         }
         return Data(key)
@@ -72,7 +75,9 @@ nonisolated enum EnteCrypto {
     ///
     /// `maximumMemory` leaves out the limits that take more, for a key that a smaller device has to derive again, as
     /// with a backup. It must be at least 128 MiB.
-    static func deriveNewKeyEncryptionKey(password: String, maximumMemory: UInt64 = .max) throws -> (key: Data, salt: Data, opsLimit: UInt64, memLimit: UInt64) {
+    static func deriveNewKeyEncryptionKey(password: String, maximumMemory: UInt64 = .max) throws -> (
+        key: Data, salt: Data, opsLimit: UInt64, memLimit: UInt64
+    ) {
         let salt = randomBytes(saltLength)
         let limits = newKeyLimits(availableMemory: availableMemory()).filter { $0.memLimit <= maximumMemory }
         for (index, limit) in limits.enumerated() {
@@ -118,11 +123,11 @@ nonisolated enum EnteCrypto {
     /// How much more memory the app may use before the system ends it, where that's known.
     private static func availableMemory() -> UInt64? {
         #if os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
-        // Where there's no such limit, as in the simulator, this is 0.
-        let available = os_proc_available_memory()
-        return available > 0 ? UInt64(available) : nil
+            // Where there's no such limit, as in the simulator, this is 0.
+            let available = os_proc_available_memory()
+            return available > 0 ? UInt64(available) : nil
         #else
-        return nil
+            return nil
         #endif
     }
 
@@ -167,8 +172,9 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         let macLength = Int(crypto_secretbox_macbytes())
         guard cipherText.count >= macLength,
-              nonce.count == Int(crypto_secretbox_noncebytes()),
-              key.count == keyLength else { throw EnteCryptoError.invalidLength }
+            nonce.count == Int(crypto_secretbox_noncebytes()),
+            key.count == keyLength
+        else { throw EnteCryptoError.invalidLength }
         var message = [UInt8](repeating: 0, count: cipherText.count - macLength)
         var key = [UInt8](key)
         defer {
@@ -214,8 +220,9 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         let sealLength = Int(crypto_box_sealbytes())
         guard cipherText.count >= sealLength,
-              publicKey.count == Int(crypto_box_publickeybytes()),
-              secretKey.count == Int(crypto_box_secretkeybytes()) else { throw EnteCryptoError.invalidLength }
+            publicKey.count == Int(crypto_box_publickeybytes()),
+            secretKey.count == Int(crypto_box_secretkeybytes())
+        else { throw EnteCryptoError.invalidLength }
         var message = [UInt8](repeating: 0, count: cipherText.count - sealLength)
         var secretKey = [UInt8](secretKey)
         defer {
@@ -255,8 +262,9 @@ nonisolated enum EnteCrypto {
         try ensureInitialized()
         let additionalLength = Int(crypto_secretstream_xchacha20poly1305_abytes())
         guard cipherText.count >= additionalLength,
-              header.count == Int(crypto_secretstream_xchacha20poly1305_headerbytes()),
-              key.count == Int(crypto_secretstream_xchacha20poly1305_keybytes()) else { throw EnteCryptoError.invalidLength }
+            header.count == Int(crypto_secretstream_xchacha20poly1305_headerbytes()),
+            key.count == Int(crypto_secretstream_xchacha20poly1305_keybytes())
+        else { throw EnteCryptoError.invalidLength }
         var state = crypto_secretstream_xchacha20poly1305_state()
         var key = [UInt8](key)
         var message = [UInt8](repeating: 0, count: cipherText.count - additionalLength)
@@ -270,9 +278,12 @@ nonisolated enum EnteCrypto {
         }
         var messageLength: UInt64 = 0
         var tag: UInt8 = 0
-        guard crypto_secretstream_xchacha20poly1305_pull(&state, &message, &messageLength, &tag,
-                                                         [UInt8](cipherText), UInt64(cipherText.count), nil, 0) == 0,
-              tag == UInt8(crypto_secretstream_xchacha20poly1305_TAG_FINAL) else {
+        guard
+            crypto_secretstream_xchacha20poly1305_pull(
+                &state, &message, &messageLength, &tag,
+                [UInt8](cipherText), UInt64(cipherText.count), nil, 0) == 0,
+            tag == UInt8(crypto_secretstream_xchacha20poly1305_TAG_FINAL)
+        else {
             throw EnteCryptoError.decryptionFailed
         }
         return Data(message.prefix(Int(messageLength)))
@@ -295,8 +306,11 @@ nonisolated enum EnteCrypto {
             throw EnteCryptoError.encryptionFailed
         }
         var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_secretstream_xchacha20poly1305_abytes()))
-        guard crypto_secretstream_xchacha20poly1305_push(&state, &cipherText, nil, message, UInt64(message.count),
-                                                         nil, 0, UInt8(crypto_secretstream_xchacha20poly1305_TAG_FINAL)) == 0 else {
+        guard
+            crypto_secretstream_xchacha20poly1305_push(
+                &state, &cipherText, nil, message, UInt64(message.count),
+                nil, 0, UInt8(crypto_secretstream_xchacha20poly1305_TAG_FINAL)) == 0
+        else {
             throw EnteCryptoError.encryptionFailed
         }
         return (Data(header), Data(cipherText))

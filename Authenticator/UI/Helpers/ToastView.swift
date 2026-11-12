@@ -18,39 +18,39 @@
 import SwiftUI
 
 struct ToastView: View {
-    
+
     let message: String
-    
+
     @State var isVisible = true
-    
+
     var body: some View {
         #if os(macOS)
-        // A small banner at the bottom of the window, like the Mac's own status messages.
-        Text(message)
-            .scaledFont(.callout)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(.regularMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(Color(.separator)))
-            .shadow(color: .black.opacity(0.15), radius: 4, y: 1)
-            .padding()
-        #else
-        ZStack(alignment: .leading) {
+            // A small banner at the bottom of the window, like the Mac's own status messages.
             Text(message)
-                .scaledFont(.body)
+                .scaledFont(.callout)
                 .multilineTextAlignment(.center)
-                // YubiBlue is a light green in dark mode, so white text would lose its contrast there.
-                .foregroundStyle(Color(.systemBackground))
-                // Wraps onto more lines instead of running off a narrow screen or at large text sizes.
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
-                .background(Color(.yubiBlue))
-                .clipShape(.rect(cornerRadius: 20))
-                .shadow(radius: 5)
-        }
-        .padding(.horizontal)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(.regularMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(Color(.separator)))
+                .shadow(color: .black.opacity(0.15), radius: 4, y: 1)
+                .padding()
+        #else
+            ZStack(alignment: .leading) {
+                Text(message)
+                    .scaledFont(.body)
+                    .multilineTextAlignment(.center)
+                    // YubiBlue is a light green in dark mode, so white text would lose its contrast there.
+                    .foregroundStyle(Color(.systemBackground))
+                    // Wraps onto more lines instead of running off a narrow screen or at large text sizes.
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(EdgeInsets(top: 5, leading: 15, bottom: 5, trailing: 15))
+                    .background(Color(.yubiBlue))
+                    .clipShape(.rect(cornerRadius: 20))
+                    .shadow(radius: 5)
+            }
+            .padding(.horizontal)
         #endif
     }
 }
@@ -61,7 +61,7 @@ struct ToastModifier: ViewModifier {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var isPresenting: Bool
     var message: String
-    
+
     @ViewBuilder public func main() -> some View {
         if isPresenting {
             ToastView(message: message)
@@ -72,13 +72,13 @@ struct ToastModifier: ViewModifier {
                 .transition(reduceMotion ? .opacity : AnyTransition.scale(scale: 0.8).combined(with: .opacity))
         }
     }
-    
+
     @ViewBuilder public func body(content: Content) -> some View {
         #if os(macOS)
-        let alignment = Alignment.bottom
+            let alignment = Alignment.bottom
         #else
-        // At the bottom in regular width too, where the top of the screen has the sidebar's toolbar buttons.
-        let alignment = horizontalSizeClass == .regular ? Alignment.bottom : Alignment.top
+            // At the bottom in regular width too, where the top of the screen has the sidebar's toolbar buttons.
+            let alignment = horizontalSizeClass == .regular ? Alignment.bottom : Alignment.top
         #endif
         content
             .overlay(alignment: alignment) {
@@ -92,9 +92,9 @@ struct ToastModifier: ViewModifier {
 }
 
 public extension View {
-    
+
     func toast(isPresenting: Binding<Bool>, message: String) -> some View {
         modifier(ToastModifier(isPresenting: isPresenting, message: message))
     }
-    
+
 }

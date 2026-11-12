@@ -70,15 +70,19 @@ private struct AutoFillListView: View {
                 }
             }
             if !others.isEmpty {
-                Section(matching.isEmpty ? String(localized: "Accounts", comment: "AutoFill section of all accounts")
-                        : String(localized: "Other Accounts", comment: "AutoFill section of the accounts not suggested for the website or app")) {
+                Section(
+                    matching.isEmpty
+                        ? String(localized: "Accounts", comment: "AutoFill section of all accounts")
+                        : String(
+                            localized: "Other Accounts", comment: "AutoFill section of the accounts not suggested for the website or app")
+                ) {
                     rows(others)
                 }
             }
         }
         .navigationTitle(String(localized: "Verification Codes", comment: "AutoFill list title"))
         #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.inline)
         #endif
         .searchable(text: $searchText)
     }
@@ -100,11 +104,20 @@ private struct AutoFillListView: View {
             Text(String(localized: "Unlock your device to use your accounts.", comment: "AutoFill before the device was first unlocked"))
                 .foregroundStyle(.secondary)
         case .noAccounts:
-            Text(String(localized: "Oriel OTP fills in the codes of its time-based accounts in Ente Auth and on this device. Add one in the app, or sign in to Ente Auth there, to use it here. The accounts on your YubiKey can't be used for AutoFill.", comment: "AutoFill without accounts"))
-                .foregroundStyle(.secondary)
+            Text(
+                String(
+                    localized:
+                        "Oriel OTP fills in the codes of its time-based accounts in Ente Auth and on this device. Add one in the app, or sign in to Ente Auth there, to use it here. The accounts on your YubiKey can't be used for AutoFill.",
+                    comment: "AutoFill without accounts")
+            )
+            .foregroundStyle(.secondary)
         case .unreadable:
-            Text(String(localized: "Open Oriel OTP to use your accounts here again.", comment: "AutoFill when its copy of the accounts can't be read"))
-                .foregroundStyle(.secondary)
+            Text(
+                String(
+                    localized: "Open Oriel OTP to use your accounts here again.",
+                    comment: "AutoFill when its copy of the accounts can't be read")
+            )
+            .foregroundStyle(.secondary)
         }
     }
 }
@@ -166,25 +179,34 @@ private struct AutoFillLockView: View {
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             if lock.isUnavailable {
-                Text(String(localized: "Unlock your device to use your accounts.", comment: "AutoFill before the device was first unlocked"))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                Text(
+                    String(localized: "Unlock your device to use your accounts.", comment: "AutoFill before the device was first unlocked")
+                )
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
             } else if lock.method == .device {
-                Button(String(localized: "Unlock with \(AppLock.deviceOwnerTitle)", comment: "App lock screen button. The placeholder is Face ID, Touch ID or Device passcode.")) {
+                Button(
+                    String(
+                        localized: "Unlock with \(AppLock.deviceOwnerTitle)",
+                        comment: "App lock screen button. The placeholder is Face ID, Touch ID or Device passcode.")
+                ) {
                     Task { await lock.unlockWithDeviceOwner() }
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .disabled(lock.isAuthenticating)
             } else if let retryDate = lock.retryDate {
-                Text("Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).", comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
-                    .monospacedDigit()
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .task(id: retryDate) {
-                        try? await Task.sleep(for: .seconds(max(0, retryDate.timeIntervalSinceNow) + 0.2))
-                        lock.updateRetryDate()
-                    }
+                Text(
+                    "Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).",
+                    comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30."
+                )
+                .monospacedDigit()
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
+                .task(id: retryDate) {
+                    try? await Task.sleep(for: .seconds(max(0, retryDate.timeIntervalSinceNow) + 0.2))
+                    lock.updateRetryDate()
+                }
             } else {
                 secretField
             }
@@ -200,25 +222,31 @@ private struct AutoFillLockView: View {
 
     private var secretField: some View {
         VStack(spacing: 12) {
-            SecureField(lock.method == .password ? String(localized: "Enter your password", comment: "App lock screen prompt")
-                        : String(localized: "Enter your code", comment: "App lock screen prompt"), text: $secret)
-                #if os(iOS)
+            SecureField(
+                lock.method == .password
+                    ? String(localized: "Enter your password", comment: "App lock screen prompt")
+                    : String(localized: "Enter your code", comment: "App lock screen prompt"), text: $secret
+            )
+            #if os(iOS)
                 .keyboardType(lock.method.codeLength == nil ? .default : .numberPad)
-                #endif
-                .textContentType(.password)
-                .multilineTextAlignment(.center)
-                .textFieldStyle(.roundedBorder)
-                .focused($isFocused)
-                .onSubmit(submit)
-                .onChange(of: secret) { _, secret in
-                    if let length = lock.method.codeLength, secret.count >= length {
-                        submit()
-                    }
+            #endif
+            .textContentType(.password)
+            .multilineTextAlignment(.center)
+            .textFieldStyle(.roundedBorder)
+            .focused($isFocused)
+            .onSubmit(submit)
+            .onChange(of: secret) { _, secret in
+                if let length = lock.method.codeLength, secret.count >= length {
+                    submit()
                 }
+            }
             if isWrong {
-                Text(lock.method == .password ? String(localized: "Wrong password. Try again.", comment: "VoiceOver announcement after a wrong app lock password")
-                     : String(localized: "Wrong code. Try again.", comment: "VoiceOver announcement after a wrong app lock code"))
-                    .foregroundStyle(.red)
+                Text(
+                    lock.method == .password
+                        ? String(localized: "Wrong password. Try again.", comment: "VoiceOver announcement after a wrong app lock password")
+                        : String(localized: "Wrong code. Try again.", comment: "VoiceOver announcement after a wrong app lock code")
+                )
+                .foregroundStyle(.red)
             }
             if lock.method == .password {
                 Button(String(localized: "Unlock", comment: "AutoFill unlock button"), action: submit)

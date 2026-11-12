@@ -30,8 +30,9 @@ nonisolated final class DatedURLProtocol: URLProtocol, @unchecked Sendable {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = TimeZone(identifier: "GMT")
         formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss 'GMT'"
-        let response = HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: "HTTP/1.1",
-                                       headerFields: ["Date": formatter.string(from: Self.serverTime)])!
+        let response = HTTPURLResponse(
+            url: request.url!, statusCode: 200, httpVersion: "HTTP/1.1",
+            headerFields: ["Date": formatter.string(from: Self.serverTime)])!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         client?.urlProtocol(self, didLoad: Data(#"{"diff":[]}"#.utf8))
         client?.urlProtocolDidFinishLoading(self)
@@ -51,7 +52,8 @@ struct ServerClockTests {
     }
 
     @Test func aRightClockIsntReported() throws {
-        let measurement = try #require(EnteServerClock.measure(dateHeader: header, sent: serverDate, received: serverDate.addingTimeInterval(0.2)))
+        let measurement = try #require(
+            EnteServerClock.measure(dateHeader: header, sent: serverDate, received: serverDate.addingTimeInterval(0.2)))
         #expect(abs(measurement.offset) < 1)
         #expect(measurement.skew == nil)
     }
@@ -89,11 +91,14 @@ struct ServerClockTests {
     /// takes it away.
     @MainActor @Test func aSyncFindsTheClockOff() async throws {
         let defaults = makeTestDefaults()
-        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                              storage: InMemoryVaultStorage(), session: URLSession.stubbed([DatedURLProtocol.self]),
-                              watch: WatchAccountSync(defaults: defaults))
-        cloud.use(EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t",
-                                   authenticatorKey: EnteCrypto.randomBytes(32)))
+        let cloud = EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+            storage: InMemoryVaultStorage(), session: URLSession.stubbed([DatedURLProtocol.self]),
+            watch: WatchAccountSync(defaults: defaults))
+        cloud.use(
+            EnteSavedSession(
+                server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t",
+                authenticatorKey: EnteCrypto.randomBytes(32)))
         DatedURLProtocol.serverTime = Date().addingTimeInterval(120)
         try await cloud.syncNow()
         let skew = try #require(cloud.clockSkew)

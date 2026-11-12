@@ -23,9 +23,12 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notAllowedOnEnte:
-            return String(localized: "Accounts on Ente's servers are deleted from Ente's apps or website.", comment: "Ente account deletion error")
+            return String(
+                localized: "Accounts on Ente's servers are deleted from Ente's apps or website.", comment: "Ente account deletion error")
         case .refusedByServer:
-            return String(localized: "The server didn't allow deleting this account. Ask the person who runs it to delete it.", comment: "Ente account deletion error")
+            return String(
+                localized: "The server didn't allow deleting this account. Ask the person who runs it to delete it.",
+                comment: "Ente account deletion error")
         }
     }
 }
@@ -61,8 +64,10 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let cloud: EnteCloud
 
-    init(server: URL, email: String = "", session: URLSession = .ente, store: EnteSessionStore = EnteSessionStore(),
-         cloud: EnteCloud = .shared) {
+    init(
+        server: URL, email: String = "", session: URLSession = .ente, store: EnteSessionStore = EnteSessionStore(),
+        cloud: EnteCloud = .shared
+    ) {
         self.server = server
         self.email = email
         self.session = session
@@ -187,8 +192,9 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
         let (allowDelete, encryptedChallenge) = try await api.deleteChallenge(token: keys.token)
         guard allowDelete else { throw EnteAccountDeletionError.refusedByServer }
         guard let encryptedChallenge,
-              let opened = try? EnteCrypto.sealedBoxOpen(encryptedChallenge, publicKey: publicKey, secretKey: secretKey),
-              let challenge = String(data: opened, encoding: .utf8), isChallenge(challenge) else { throw EnteAPIError.invalidResponse }
+            let opened = try? EnteCrypto.sealedBoxOpen(encryptedChallenge, publicKey: publicKey, secretKey: secretKey),
+            let challenge = String(data: opened, encoding: .utf8), isChallenge(challenge)
+        else { throw EnteAPIError.invalidResponse }
         try await api.deleteAccount(token: keys.token, challenge: challenge)
     }
 
@@ -202,7 +208,8 @@ enum EnteAccountDeletionError: Error, LocalizedError, Equatable {
     /// The account no longer exists, so a session saved for it, its accounts on this device and on the watch go too.
     private func forgetSavedAccount(email: String) {
         guard let saved = store.savedAccount, EnteAPIClient.isSameServer(saved.server, server),
-              saved.email.caseInsensitiveCompare(email) == .orderedSame else { return }
+            saved.email.caseInsensitiveCompare(email) == .orderedSame
+        else { return }
         store.remove()
         cloud.remove()
     }

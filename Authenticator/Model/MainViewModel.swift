@@ -19,7 +19,6 @@ import Foundation
 import SwiftUI
 import YubiKit
 
-
 @Observable class MainViewModel {
 
     /// The accounts on the YubiKey that was read last.
@@ -57,7 +56,7 @@ import YubiKit
     var keyVersion: Version?
     var sessionError: Error?
     var connectionError: Error?
-    
+
     var showTouchToast: Bool = false
 
     @ObservationIgnored private var tickTask: Task<Void, Never>?
@@ -73,17 +72,17 @@ import YubiKit
     @ObservationIgnored var accessKeyMemoryCache = AccessKeyCache()
     let accessKeySecureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords))
     let passwordPreferences = PasswordPreferences()
-    
+
     // Resumed with the password the user entered in the password alert, nil if they cancelled.
     @ObservationIgnored var passwordEntryContinuation: CheckedContinuation<String?, Never>? = nil
-    
+
     // Called once with the choice the user made in the save password dialog.
     @ObservationIgnored var passwordSaveTypeHandler: ((PasswordSaveType?) -> Void)? = nil
-    
+
     @ObservationIgnored private var refreshDebounceTask: Task<Void, Never>? = nil
 
     @ObservationIgnored private var sessionTask: Task<(), Never>? = nil
-    
+
     @ObservationIgnored private var favoritesStorage = FavoritesStorage()
     @ObservationIgnored private var favorites: Set<String> = []
     @ObservationIgnored let tagsStorage = AccountTagsStorage()
@@ -200,7 +199,7 @@ import YubiKit
             }
         }
     }
-    
+
     private func stopObservingPinnedState() {
         keyAccounts.forEach { $0.onPinnedChange = nil }
     }
@@ -309,11 +308,11 @@ import YubiKit
         sessionError = nil
         connectionError = nil
     }
-    
+
     private func updateAccount(_ account: Account) async {
         do {
             let session = try await OATHSessionHandler.shared.anySession()
-            
+
             // We can't know if a HOTP requires touch. Instead we wait for 0.5 seconds for a response and if
             // the key doesn't return we assume it requires touch.
             let isWired = session.type == .wired
@@ -323,30 +322,30 @@ import YubiKit
                 self.showTouchToast = true
                 Platform.notify(.error)
                 #if os(macOS)
-                TouchPrompt.show(for: account.title)
+                    TouchPrompt.show(for: account.title)
                 #endif
             }
-            
+
             // The prompt stays up until the YubiKey has been touched, or the calculation failed.
             defer {
                 showTouchAlert.cancel()
                 showTouchToast = false
                 #if os(macOS)
-                TouchPrompt.hide()
+                    TouchPrompt.hide()
                 #endif
             }
             let otp = try await session.calculate(credential: account.credential)
-            
+
             if let account = (keyAccounts.filter { $0.accountId == account.accountId }).first {
                 account.update(otp: otp)
             }
 
             session.endNFC(message: String(localized: "Code calculated", comment: "OATH NFC code calculated"))
         } catch {
-            handle(error: error, retry: { Task { await self.updateAccount(account) }})
+            handle(error: error, retry: { Task { await self.updateAccount(account) } })
         }
     }
-    
+
     func updateAccounts(using session: OATHSession? = nil) async {
         do {
             stopObservingPinnedState()
@@ -356,26 +355,27 @@ import YubiKit
             } else {
                 useSession = try await OATHSessionHandler.shared.anySession()
             }
-            
+
             // They can't be read if the app was started while the device was locked.
             favorites = favoritesStorage.readFavorites()
             if let tags = tagsStorage.read() {
                 keyTags = tags
             }
             let credentials = try await useSession.calculateAll()
-            let updatedAccounts = try await credentials.asyncMap { (credential, otp)  in
-                if credential.type == .totp && (
-                    (!credential.requiresTouch && credential.isSteam) ||
-                    (useSession.type == .nfc && credential.requiresTouch && SettingsConfig.isBypassTouchEnabled)) {
+            let updatedAccounts = try await credentials.asyncMap { (credential, otp) in
+                if credential.type == .totp
+                    && ((!credential.requiresTouch && credential.isSteam)
+                        || (useSession.type == .nfc && credential.requiresTouch && SettingsConfig.isBypassTouchEnabled))
+                {
                     let otp = try await useSession.calculate(credential: credential)
                     return self.account(credential: credential, code: otp, keyVersion: useSession.version, connectionType: useSession.type)
                 } else {
                     return self.account(credential: credential, code: otp, keyVersion: useSession.version, connectionType: useSession.type)
                 }
             }
-            
+
             self.keyAccounts = updatedAccounts
-            
+
             updatedAccounts.forEach { account in
                 account.onPinnedChange = { [weak self] account in
                     guard let self else { return }
@@ -387,21 +387,26 @@ import YubiKit
                     self.favoritesStorage.saveFavorites(self.favorites)
                 }
             }
-            
+
             self.keyVersion = useSession.version
             self.accountsLoaded = true
             if !hasReadYubiKey {
                 hasReadYubiKey = true
                 UserDefaults.standard.set(true, forKey: Self.hasReadYubiKeyKey)
             }
-            let message = SettingsConfig.showNFCSwipeHint ? String(localized: "Success!\nHint: swipe down to dismiss", comment: "iOS NFC alert success with hint") : String(localized: "Successfully read", comment: "iOS NFC alert successfully read")
+            let message =
+                SettingsConfig.showNFCSwipeHint
+                ? String(localized: "Success!\nHint: swipe down to dismiss", comment: "iOS NFC alert success with hint")
+                : String(localized: "Successfully read", comment: "iOS NFC alert successfully read")
             useSession.endNFC(message: message)
         } catch {
-            handle(error: error, retry: { Task { await self.updateAccounts() }})
+            handle(error: error, retry: { Task { await self.updateAccounts() } })
         }
     }
-    
-    private func account(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, connectionType: OATHSession.ConnectionType) -> Account {
+
+    private func account(
+        credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, connectionType: OATHSession.ConnectionType
+    ) -> Account {
         let tags = keyTags?[credential.id] ?? []
         if let account = (keyAccounts.filter { $0.credential.id == credential.id }).first {
             account.update(otp: code)
@@ -410,7 +415,9 @@ import YubiKit
             }
             return account
         } else {
-            let account = Account(credential: credential, code: code, keyVersion: keyVersion, requestRefresh: { [weak self] in self?.requestRefresh($0) }, connectionType: connectionType, isPinned: favorites.contains(credential.id))
+            let account = Account(
+                credential: credential, code: code, keyVersion: keyVersion, requestRefresh: { [weak self] in self?.requestRefresh($0) },
+                connectionType: connectionType, isPinned: favorites.contains(credential.id))
             account.tags = tags
             return account
         }
@@ -434,7 +441,7 @@ import YubiKit
             }
         }
     }
-    
+
 }
 
 extension OATHSession.Credential {
@@ -442,7 +449,6 @@ extension OATHSession.Credential {
         OATHCredentialId.key(accountName: accountName, issuer: issuer, period: period, isTOTP: type == .totp)
     }
 }
-
 
 extension Sequence {
     nonisolated(nonsending) func asyncMap<T>(_ transform: nonisolated(nonsending) (Element) async throws -> T) async rethrows -> [T] {

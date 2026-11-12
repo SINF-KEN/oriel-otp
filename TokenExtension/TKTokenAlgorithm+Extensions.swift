@@ -19,7 +19,7 @@ import CryptoTokenKit
 
 extension TKTokenKeyAlgorithm {
     var secKeyAlgorithm: SecKeyAlgorithm? {
-        
+
         if self.isAlgorithm(SecKeyAlgorithm.rsaSignatureRaw) {
             return SecKeyAlgorithm.rsaSignatureRaw
         }

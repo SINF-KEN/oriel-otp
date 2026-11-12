@@ -72,18 +72,20 @@ struct EnteSessionStore {
     let canSave: Bool
 
     init(service: String = KeychainService.enteSession, defaults: UserDefaults = .standard) {
-        self.init(keychain: SecureStore(secureStoreQueryable: Self.queryable(service: service)), defaults: defaults, canSave: Self.deviceCanSave)
+        self.init(
+            keychain: SecureStore(secureStoreQueryable: Self.queryable(service: service)), defaults: defaults, canSave: Self.deviceCanSave)
     }
 
     /// How the session is kept in the keychain: behind Face ID or Touch ID, or on the Mac Touch ID or the Mac's password.
     static func queryable(service: String, appliesAccessControl: Bool = PasswordQueryable.deviceAppliesAccessControl) -> PasswordQueryable {
         #if os(macOS)
-        // Not every Mac has Touch ID, so the Mac's password unlocks the session too.
-        let accessControl: SecAccessControlCreateFlags = .userPresence
+            // Not every Mac has Touch ID, so the Mac's password unlocks the session too.
+            let accessControl: SecAccessControlCreateFlags = .userPresence
         #else
-        let accessControl: SecAccessControlCreateFlags = .biometryCurrentSet
+            let accessControl: SecAccessControlCreateFlags = .biometryCurrentSet
         #endif
-        let reason = String(localized: "Use your saved Ente Auth sign-in.", comment: "Face ID or Touch ID prompt for the saved Ente session")
+        let reason = String(
+            localized: "Use your saved Ente Auth sign-in.", comment: "Face ID or Touch ID prompt for the saved Ente session")
         return PasswordQueryable(service: service, accessControl: accessControl, reason: reason, appliesAccessControl: appliesAccessControl)
     }
 
@@ -96,9 +98,9 @@ struct EnteSessionStore {
     /// Saving requires Face ID or Touch ID, or on the Mac Touch ID or a password.
     private static var deviceCanSave: Bool {
         #if os(macOS)
-        LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+            LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
         #else
-        PasswordPreferences.evaluatedAuthenticationType() != .none
+            PasswordPreferences.evaluatedAuthenticationType() != .none
         #endif
     }
 
@@ -106,7 +108,8 @@ struct EnteSessionStore {
         retryPendingRemoval()
         guard let email = defaults.string(forKey: Self.emailKey) else { return nil }
         // Sessions saved before the server was stored were saved with the server of the sign in screen.
-        let server = (defaults.string(forKey: Self.serverKey) ?? defaults.string(forKey: DefaultsKey.enteServer))
+        let server =
+            (defaults.string(forKey: Self.serverKey) ?? defaults.string(forKey: DefaultsKey.enteServer))
             .flatMap { $0.isEmpty ? nil : URL(string: $0) } ?? EnteAPIClient.defaultServer
         let hasSession = !defaults.bool(forKey: Self.pendingRemovalKey) && keychain.hasValue(for: Self.account)
         return EnteSavedAccount(email: email, server: server, hasSession: hasSession)

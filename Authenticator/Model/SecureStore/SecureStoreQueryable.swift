@@ -63,15 +63,18 @@ nonisolated public struct PasswordQueryable {
     let appliesAccessControl: Bool
 
     static var deviceAppliesAccessControl: Bool {
-#if targetEnvironment(simulator)
-        false
-#else
-        true
-#endif
+        #if targetEnvironment(simulator)
+            false
+        #else
+            true
+        #endif
     }
 
-    init(service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet, reason: String? = nil,
-         appliesAccessControl: Bool = deviceAppliesAccessControl) {
+    init(
+        service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet,
+        reason: String? = nil,
+        appliesAccessControl: Bool = deviceAppliesAccessControl
+    ) {
         self.service = service
         self.accessGroup = accessGroup
         self.accessControl = accessControl
@@ -85,11 +88,11 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
         var query: [String: Any] = [:]
         query[String(kSecClass)] = kSecClassGenericPassword
         query[String(kSecAttrService)] = service
-#if os(macOS)
-        // The Mac has a second, file-based keychain. Use the same data protection keychain as on iOS, which supports
-        // the access control flags below and doesn't ask for the login password.
-        query[String(kSecUseDataProtectionKeychain)] = true
-#endif
+        #if os(macOS)
+            // The Mac has a second, file-based keychain. Use the same data protection keychain as on iOS, which supports
+            // the access control flags below and doesn't ask for the login password.
+            query[String(kSecUseDataProtectionKeychain)] = true
+        #endif
         guard appliesAccessControl else { return query }
         if let accessGroup = accessGroup {
             query[String(kSecAttrAccessGroup)] = "\(APP_ID)." + accessGroup
@@ -100,7 +103,11 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
             // A protected item is only read after Face ID or Touch ID, as PRIVACY.md says: unlocking the device a
             // few seconds earlier doesn't count.
             context.touchIDAuthenticationAllowableReuseDuration = 0
-            context.localizedReason = reason ?? String(localized: "Use the saved YubiKey password.", comment: "Face ID or Touch ID prompt for the saved OATH password of a YubiKey")
+            context.localizedReason =
+                reason
+                ?? String(
+                    localized: "Use the saved YubiKey password.",
+                    comment: "Face ID or Touch ID prompt for the saved OATH password of a YubiKey")
             query[String(kSecUseAuthenticationContext)] = context
         }
         return query
@@ -109,10 +116,13 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
     func protection(useAuthentication: Bool) throws -> [String: Any] {
         if useAuthentication && appliesAccessControl {
             var error: Unmanaged<CFError>?
-            guard let accessControl = SecAccessControlCreateWithFlags(nil, // use the default allocator
-                                                                      kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
-                                                                      accessControl,
-                                                                      &error) else {
+            guard
+                let accessControl = SecAccessControlCreateWithFlags(
+                    nil,  // use the default allocator
+                    kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
+                    accessControl,
+                    &error)
+            else {
                 let message = error.map { CFErrorCopyDescription($0.takeRetainedValue()) as String }
                 throw SecureStoreError.unhandledError(message: message ?? "No access control")
             }

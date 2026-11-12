@@ -17,7 +17,6 @@
 
 import SwiftUI
 
-
 @Observable class ToastPresenter {
     var isPresenting = false
     var message = "No message"
@@ -82,8 +81,8 @@ extension ToastPresenter {
     /// has time to check the copied state.
     static var copiedDuration: Duration {
         #if DEBUG
-        let seconds = UserDefaults.standard.double(forKey: "CopiedSeconds")
-        if seconds > 0 { return .seconds(seconds) }
+            let seconds = UserDefaults.standard.double(forKey: "CopiedSeconds")
+            if seconds > 0 { return .seconds(seconds) }
         #endif
         return .seconds(1.5)
     }
@@ -121,7 +120,11 @@ extension ToastPresenter {
     private func copyCode(_ code: String, of account: Account) {
         // A code about to change may be too late by the time it's pasted, so the toast says so.
         if let secondsLeft = account.secondsLeft, secondsLeft <= Account.nextCodeLead, account.otp?.code == code {
-            copyToClipboard(code, message: String(localized: "Copied. A new code comes in \(secondsLeft) seconds.", comment: "Toast after copying a code that is about to change. The placeholder is a number of seconds, 5 or less."))
+            copyToClipboard(
+                code,
+                message: String(
+                    localized: "Copied. A new code comes in \(secondsLeft) seconds.",
+                    comment: "Toast after copying a code that is about to change. The placeholder is a number of seconds, 5 or less."))
         } else {
             copyToClipboard(code)
         }

@@ -36,7 +36,7 @@ import YubiKit
         "otpauth://totp/99999999999999999999/alice?secret=JBSWY3DPEHPK3PXP",
         "otpauth://totp/24%2F7%20Fitness:alice?secret=JBSWY3DPEHPK3PXP",
         "otpauth://totp/alice?secret=JBSWY3DPEHPK3PXP&issuer=24/7%20Fitness",
-        "otpauth://hotp/24%2F7%20Fitness:alice?secret=JBSWY3DPEHPK3PXP&counter=0",
+        "otpauth://hotp/24%2F7%20Fitness:alice?secret=JBSWY3DPEHPK3PXP&counter=0"
     ])
     func anIdThatReadsBackWithAnotherPeriodIsRefused(_ link: String) throws {
         let url = try #require(URL(string: link))
@@ -49,7 +49,7 @@ import YubiKit
         "otpauth://totp/60%2FBank:alice?secret=JBSWY3DPEHPK3PXP&period=60",
         "otpauth://totp/Bank:24%2F7?secret=JBSWY3DPEHPK3PXP",
         "otpauth://totp/24%2F7%20Fitness:alice?secret=JBSWY3DPEHPK3PXP&period=60",
-        "otpauth://totp/1Password:alice?secret=JBSWY3DPEHPK3PXP",
+        "otpauth://totp/1Password:alice?secret=JBSWY3DPEHPK3PXP"
     ])
     func anIdThatReadsBackWithItsOwnPeriodIsKept(_ link: String) throws {
         let url = try #require(URL(string: link))

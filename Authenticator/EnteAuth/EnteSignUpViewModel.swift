@@ -30,7 +30,8 @@ import Foundation
     /// The server for what's typed in a server field, if accounts can be created on it.
     static func server(from text: String) -> URL? {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let url = try? EnteAPIClient.serverURL(from: text),
-              url.scheme == "https", EnteAPIClient.allowsAccountCreation(on: url) else { return nil }
+            url.scheme == "https", EnteAPIClient.allowsAccountCreation(on: url)
+        else { return nil }
         return url
     }
 
@@ -116,7 +117,8 @@ import Foundation
             }
             // An existing account gets its keys or a second factor instead of a plain token.
             guard response.keyAttributes == nil, response.encryptedToken == nil, !response.secondFactorRequired,
-                  let token = response.token, !token.isEmpty else { throw EnteSignUpError.accountExists }
+                let token = response.token, !token.isEmpty
+            else { throw EnteSignUpError.accountExists }
             self.token = token
             self.isDerivingKeys = true
             defer { self.isDerivingKeys = false }
@@ -150,7 +152,8 @@ import Foundation
                 try await EnteSignUp.verifySRPSignIn(keys, api: api)
             }
             guard let attributes = try await api.srpAttributes(email: self.email), attributes.srpUserID == keys.srpUserID,
-                  attributes.kekSalt == keys.attributes.kekSalt else { throw EnteSignUpError.notVerified }
+                attributes.kekSalt == keys.attributes.kekSalt
+            else { throw EnteSignUpError.notVerified }
             self.endSession()
             self.keys = nil
             self.phase = .finished

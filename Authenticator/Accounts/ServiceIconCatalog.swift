@@ -313,6 +313,6 @@ extension ServiceIcon {
         ServiceIcon(slug: "zoho", color: 0xE42527, names: ["Zoho"]),
         ServiceIcon(slug: "zoom", color: 0x0B5CFF, names: ["Zoom"]),
         ServiceIcon(slug: "zotero", color: 0xCC2936, names: ["Zotero"]),
-        ServiceIcon(slug: "zulip", color: 0x6492FE, names: ["Zulip"]),
+        ServiceIcon(slug: "zulip", color: 0x6492FE, names: ["Zulip"])
     ]
 }

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import CommonCrypto
 import CryptoKit
 import OSLog
@@ -27,10 +26,14 @@ extension PIV.VerifyPinResult {
         case .success:
             return nil
         case .fail:
-            return .wrongPassword(TokenRequestViewModel.ErrorMessage(title: String(localized: "Wrong PIN code", comment: "PIV extension wrong pin"), text: nil))
+            return .wrongPassword(
+                TokenRequestViewModel.ErrorMessage(
+                    title: String(localized: "Wrong PIN code", comment: "PIV extension wrong pin"), text: nil))
         case .pinLocked:
-            return .passwordLocked(TokenRequestViewModel.ErrorMessage(title: String(localized: "Your PIN has ben blocked", comment: "PIV extension pin blocked title"),
-                                                                      text: String(localized: "Use your PUK code to reset PIN.", comment: "PIV extension pin blocked text")))
+            return .passwordLocked(
+                TokenRequestViewModel.ErrorMessage(
+                    title: String(localized: "Your PIN has ben blocked", comment: "PIV extension pin blocked title"),
+                    text: String(localized: "Use your PUK code to reset PIN.", comment: "PIV extension pin blocked text")))
         }
     }
 }
@@ -102,7 +105,9 @@ final class TokenRequestViewModel {
     func handleTokenRequest(_ userInfo: [AnyHashable: Any], password: String) async throws(TokenError) {
         Logger.ctk.yubilog("App: handleTokenRequest started")
         guard let request = TokenRequest(userInfo: userInfo) else { Logger.ctk.error("Not a token request"); throw .cancelled }
-        let (operationType, keyType, objectId, algorithm, message) = (request.operation, request.keyType, request.objectID, request.algorithm, request.data)
+        let (operationType, keyType, objectId, algorithm, message) = (
+            request.operation, request.keyType, request.objectID, request.algorithm, request.data
+        )
         // The extension only takes an answer filed under the request it's waiting for.
         let requestID = request.requestID
         let session: PIVSession
@@ -112,7 +117,7 @@ final class TokenRequestViewModel {
             Logger.ctk.yubilog("App: got connection")
             isNFCConnection = connection.isNFC
             session = try await connection.pivSession()
-        } catch where error.isNFCCancelledByUser {
+        } catch  where error.isNFCCancelledByUser {
             throw .cancelled
         } catch {
             Logger.ctk.error("No session: \(error)")
@@ -162,22 +167,37 @@ final class TokenRequestViewModel {
                 Logger.ctk.yubilog("App: signWithKey completed")
             } catch {
                 if error.statusCode == 0x6a80 {
-                    ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Invalid signature", comment: "PIV extension NFC invalid signature"))
-                    throw .communicationError(ErrorMessage(title: String(localized: "Invalid signature", comment: "PIV extension NFC invalid signature"),
-                                                           text: String(localized: "The private key on the YubiKey does not match the certificate or there is no private key stored on the YubiKey.", comment: "PIV extension NFC invalid signature no private key")))
+                    ConnectionManager.shared.closeNFC(
+                        errorMessage: String(localized: "Invalid signature", comment: "PIV extension NFC invalid signature"))
+                    throw .communicationError(
+                        ErrorMessage(
+                            title: String(localized: "Invalid signature", comment: "PIV extension NFC invalid signature"),
+                            text: String(
+                                localized:
+                                    "The private key on the YubiKey does not match the certificate or there is no private key stored on the YubiKey.",
+                                comment: "PIV extension NFC invalid signature no private key")))
                 } else {
-                    throw .communicationError(ErrorMessage(title: String(localized: "Signing failed", comment: "PIV extension signing failed error message"), text: LocalizedErrorWrapper(error: error).localizedDescription))
+                    throw .communicationError(
+                        ErrorMessage(
+                            title: String(localized: "Signing failed", comment: "PIV extension signing failed error message"),
+                            text: LocalizedErrorWrapper(error: error).localizedDescription))
                 }
             }
             // Verify signature
             let signatureError = self.verifySignature(signature, data: message, objectId: objectId, algorithm: algorithm)
             if signatureError != nil {
-                ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Invalid signature", comment: "PIV extension invalid signature"))
-                throw .communicationError(ErrorMessage(title: String(localized: "Invalid signature", comment: "PIV extension invalid signature"),
-                                                       text: String(localized: "The private key on the YubiKey does not match the certificate.", comment: "PIV extension invalid signature message")))
+                ConnectionManager.shared.closeNFC(
+                    errorMessage: String(localized: "Invalid signature", comment: "PIV extension invalid signature"))
+                throw .communicationError(
+                    ErrorMessage(
+                        title: String(localized: "Invalid signature", comment: "PIV extension invalid signature"),
+                        text: String(
+                            localized: "The private key on the YubiKey does not match the certificate.",
+                            comment: "PIV extension invalid signature message")))
             }
 
-            ConnectionManager.shared.closeNFC(message: String(localized: "Successfully signed data", comment: "PIV extension NFC successfully signed data"))
+            ConnectionManager.shared.closeNFC(
+                message: String(localized: "Successfully signed data", comment: "PIV extension NFC successfully signed data"))
 
             Logger.ctk.yubilog("Writing signedData to shared container")
             guard writeTokenResponse(signature, for: .signed, requestID: requestID) else { throw .cancelled }
@@ -189,15 +209,26 @@ final class TokenRequestViewModel {
                 decryptedData = try await session.decrypt(message, in: slot, algorithm: algorithm)
             } catch {
                 if error.statusCode == 0x6a80 {
-                    ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Invalid decryption", comment: "PIV extension NFC invalid decryption"))
-                    throw .communicationError(ErrorMessage(title: String(localized: "Invalid decryption", comment: "PIV extension NFC invalid decryption"),
-                                                           text: String(localized: "The private key on the YubiKey does not match the certificate or there is no private key stored on the YubiKey.", comment: "PIV extension NFC invalid decryption no private key")))
+                    ConnectionManager.shared.closeNFC(
+                        errorMessage: String(localized: "Invalid decryption", comment: "PIV extension NFC invalid decryption"))
+                    throw .communicationError(
+                        ErrorMessage(
+                            title: String(localized: "Invalid decryption", comment: "PIV extension NFC invalid decryption"),
+                            text: String(
+                                localized:
+                                    "The private key on the YubiKey does not match the certificate or there is no private key stored on the YubiKey.",
+                                comment: "PIV extension NFC invalid decryption no private key")))
                 } else {
-                    throw .communicationError(ErrorMessage(title: String(localized: "Decryption failed", comment: "PIV extension decryption failed error message"), text: LocalizedErrorWrapper(error: error).localizedDescription))
+                    throw .communicationError(
+                        ErrorMessage(
+                            title: String(localized: "Decryption failed", comment: "PIV extension decryption failed error message"),
+                            text: LocalizedErrorWrapper(error: error).localizedDescription))
                 }
             }
 
-            ConnectionManager.shared.closeNFC(message: String(localized: "Successfully decrypted cipher data", comment: "PIV extension NFC successfully decrypted cipher data"))
+            ConnectionManager.shared.closeNFC(
+                message: String(
+                    localized: "Successfully decrypted cipher data", comment: "PIV extension NFC successfully decrypted cipher data"))
 
             Logger.ctk.yubilog("Writing decryptedData to shared container")
             guard writeTokenResponse(decryptedData, for: .decrypted, requestID: requestID) else { throw .cancelled }
@@ -221,7 +252,8 @@ final class TokenRequestViewModel {
     // app group container. Complete file protection keeps it encrypted while the device is locked,
     // and the extension deletes the file as soon as it has read it.
     private func writeTokenResponse(_ data: Data, for kind: TokenResponseKind, requestID: String) -> Bool {
-        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier) else { return false }
+        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier)
+        else { return false }
         let store = TokenResponseStore(containerURL: container)
         do {
             try store.write(data, for: kind, requestID: requestID)
@@ -233,7 +265,9 @@ final class TokenRequestViewModel {
     }
 
     private func verifySignature(_ signature: Data, data: Data, objectId: String, algorithm: SecKeyAlgorithm) -> Error? {
-        guard let certificate = TokenCertificateStorage().getTokenCertificate(withObjectId: objectId) else { return "No certificate for objectId: \(objectId)" }
+        guard let certificate = TokenCertificateStorage().getTokenCertificate(withObjectId: objectId) else {
+            return "No certificate for objectId: \(objectId)"
+        }
         guard let publicKey = certificate.publicKey() else { return "No public key in this certificate" }
         return Self.verify(signature, data: data, publicKey: publicKey, algorithm: algorithm)
     }
@@ -253,7 +287,6 @@ final class TokenRequestViewModel {
     }
 }
 
-
 extension TokenRequestViewModel {
 
     /// Returns whether Yubico OTP is enabled over USB on the next USB-C YubiKey, or nil on devices with a Lightning port.
@@ -262,10 +295,12 @@ extension TokenRequestViewModel {
             return nil
         }
         guard let connection = try? await ConnectionManager.shared.nextWiredConnection(),
-              let deviceInfo = try? await connection.managementSession().getDeviceInfo() else {
+            let deviceInfo = try? await connection.managementSession().getDeviceInfo()
+        else {
             return false
         }
-        return deviceInfo.config.isApplicationEnabled(.otp, over: .usb) && !SettingsConfig.isOTPOverUSBIgnored(deviceId: deviceInfo.serialNumber)
+        return deviceInfo.config.isApplicationEnabled(.otp, over: .usb)
+            && !SettingsConfig.isOTPOverUSBIgnored(deviceId: deviceInfo.serialNumber)
     }
 
     func disableOTP() async throws {
@@ -294,7 +329,8 @@ private extension PIVSession {
                 return slot
             }
         }
-        throw TokenRequestViewModel.TokenError.missingCertificate(TokenRequestViewModel.ErrorMessage(title: "Missing certificate", text: "There is no matching certificate on this YubiKey."))
+        throw TokenRequestViewModel.TokenError.missingCertificate(
+            TokenRequestViewModel.ErrorMessage(title: "Missing certificate", text: "There is no matching certificate on this YubiKey."))
     }
 
     /// Signs with the padding or hash the SecKeyAlgorithm specifies, like the Objective-C YubiKit did.

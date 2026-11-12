@@ -23,12 +23,12 @@ struct ConfigurationView: View {
     @Binding var showConfiguration: Bool
     @State var showInsertYubiKey: Bool = false
     @Environment(\.accessibilityVoiceOverEnabled) var isVoiceOverEnabled
-    
+
     // Computed so it follows VoiceOver being turned on or off while the app runs.
     var insertYubiKeyMessage: String {
         .insertYubiKey(isVoiceOverEnabled: isVoiceOverEnabled)
     }
-    
+
     var body: some View {
         NavigationStack {
             SettingsList {
@@ -48,7 +48,7 @@ struct ConfigurationView: View {
                     .padding(.horizontal, 20)
                     .listRowBackground(Color.black.opacity(0))
                 }
-                
+
                 if let deviceInfo = model.deviceInfo {
                     Section {
                         VStack(alignment: .center) {
@@ -166,42 +166,42 @@ struct ConfigurationView: View {
                     }
                 }
                 #if os(iOS)
-                // The Mac reads the PIV certificates with its own smart card driver.
-                Section("PIV") {
-                    ConfigurationLink {
-                        SmartCardConfigurationView()
-                            .onDisappear {
-                                model.start()
-                            }
-                    } label: {
-                        ListIconView(image: Image(systemName: "creditcard"), color: Color(.systemOrange))
-                        Text("Smart card extension")
+                    // The Mac reads the PIV certificates with its own smart card driver.
+                    Section("PIV") {
+                        ConfigurationLink {
+                            SmartCardConfigurationView()
+                                .onDisappear {
+                                    model.start()
+                                }
+                        } label: {
+                            ListIconView(image: Image(systemName: "creditcard"), color: Color(.systemOrange))
+                            Text("Smart card extension")
+                        }
                     }
-                }
-                // The Mac shows the app lock, AutoFill and the Ente account in the General tab of its Settings window.
-                AppLockSection()
-                PrivacySection()
-                AccountOrderSection()
-                BackupSection()
-                AutoFillSection()
-                AppleWatchSection()
-                EnteAccountSection()
+                    // The Mac shows the app lock, AutoFill and the Ente account in the General tab of its Settings window.
+                    AppLockSection()
+                    PrivacySection()
+                    AccountOrderSection()
+                    BackupSection()
+                    AutoFillSection()
+                    AppleWatchSection()
+                    EnteAccountSection()
                 #endif
             }
             #if os(iOS)
-            // On the Mac the Settings window is titled after the tab.
-            .navigationTitle(String(localized: "Configuration", comment: "Configuration navigation title"))
-            // Like most sheets. With a large title this one fails the accessibility audit on an iPad, whose sheets end
-            // above the bottom of the screen, at the largest text sizes, where the title also takes room from the rows.
-            .navigationBarTitleDisplayMode(.inline)
-            .accessibilityAction(.escape) { showConfiguration.toggle() }
+                // On the Mac the Settings window is titled after the tab.
+                .navigationTitle(String(localized: "Configuration", comment: "Configuration navigation title"))
+                // Like most sheets. With a large title this one fails the accessibility audit on an iPad, whose sheets end
+                // above the bottom of the screen, at the largest text sizes, where the title also takes room from the rows.
+                .navigationBarTitleDisplayMode(.inline)
+                .accessibilityAction(.escape) { showConfiguration.toggle() }
             #endif
             .toolbar {
                 #if os(iOS)
-                // A tab of the Settings window on the Mac, which has its own close button.
-                ToolbarItem(placement: .cancellationAction) {
-                    CloseButton { showConfiguration.toggle() }
-                }
+                    // A tab of the Settings window on the Mac, which has its own close button.
+                    ToolbarItem(placement: .cancellationAction) {
+                        CloseButton { showConfiguration.toggle() }
+                    }
                 #endif
                 // Always there, so scanning doesn't depend on discovering pull to refresh.
                 if DeviceCapabilities.supportsNFC {
@@ -241,40 +241,40 @@ private struct ConfigurationLink<Destination: View, Label: View>: View {
     @ViewBuilder let destination: () -> Destination
     @ViewBuilder let label: () -> Label
     #if os(macOS)
-    @State private var isPresented = false
+        @State private var isPresented = false
     #endif
 
     var body: some View {
         #if os(macOS)
-        Button {
-            isPresented = true
-        } label: {
-            HStack {
-                label()
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.tertiary)
-                    .accessibilityHidden(true)
+            Button {
+                isPresented = true
+            } label: {
+                HStack {
+                    label()
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.tertiary)
+                        .accessibilityHidden(true)
+                }
+                .contentShape(.rect)
             }
-            .contentShape(.rect)
-        }
-        .buttonStyle(.plain)
-        .sheet(isPresented: $isPresented) {
-            NavigationStack {
-                destination()
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            CloseButton { isPresented = false }
-                                .keyboardShortcut(.cancelAction)
+            .buttonStyle(.plain)
+            .sheet(isPresented: $isPresented) {
+                NavigationStack {
+                    destination()
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                CloseButton { isPresented = false }
+                                    .keyboardShortcut(.cancelAction)
+                            }
                         }
-                    }
+                }
+                .textScaledFrame(width: 480, height: 360)
+                .scaledBodyFont()
+                .appLockCover()
             }
-            .textScaledFrame(width: 480, height: 360)
-            .scaledBodyFont()
-            .appLockCover()
-        }
         #else
-        NavigationLink(destination: destination, label: label)
+            NavigationLink(destination: destination, label: label)
         #endif
     }
 }
@@ -287,10 +287,19 @@ private struct OATHStorageRow: View {
         VStack(alignment: .leading, spacing: 8) {
             LabeledContent {
                 if let used = storage.used, let free = storage.free {
-                    Text(String(localized: "\(used) of \(storage.capacity) used", comment: "YubiKey OATH storage. The placeholders are the number of accounts and how many fit."))
-                        .accessibilityValue(String(localized: "\(free) free", comment: "YubiKey OATH storage, for VoiceOver. The placeholder is the number of accounts that still fit."))
+                    Text(
+                        String(
+                            localized: "\(used) of \(storage.capacity) used",
+                            comment: "YubiKey OATH storage. The placeholders are the number of accounts and how many fit.")
+                    )
+                    .accessibilityValue(
+                        String(
+                            localized: "\(free) free",
+                            comment: "YubiKey OATH storage, for VoiceOver. The placeholder is the number of accounts that still fit."))
                 } else {
-                    Text(String(localized: "Locked with a password", comment: "YubiKey OATH storage of a YubiKey whose password isn't saved"))
+                    Text(
+                        String(localized: "Locked with a password", comment: "YubiKey OATH storage of a YubiKey whose password isn't saved")
+                    )
                 }
             } label: {
                 HStack {
@@ -305,10 +314,17 @@ private struct OATHStorageRow: View {
                     .tint(used >= storage.capacity ? Color(.systemRed) : Color(.systemPurple))
                     .accessibilityHidden(true)
                 if let free = storage.free {
-                    Text(free == 0 ? String(localized: "The YubiKey is full. Delete an account to add another.", comment: "YubiKey OATH storage when full")
-                         : String(localized: "Room for \(free) more accounts.", comment: "YubiKey OATH storage. The placeholder is the number of accounts that still fit."))
-                        .scaledFont(.footnote)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        free == 0
+                            ? String(
+                                localized: "The YubiKey is full. Delete an account to add another.",
+                                comment: "YubiKey OATH storage when full")
+                            : String(
+                                localized: "Room for \(free) more accounts.",
+                                comment: "YubiKey OATH storage. The placeholder is the number of accounts that still fit.")
+                    )
+                    .scaledFont(.footnote)
+                    .foregroundStyle(.secondary)
                 }
             }
         }
@@ -321,7 +337,7 @@ struct ListIconView: View {
     var image: Image
     var color: Color
     var padding: CGFloat = 4.3
-    
+
     var body: some View {
         image
             .resizable()
@@ -345,9 +361,7 @@ extension DeviceInfo {
         switch formFactor {
         case .usbAKeychain:
             let name: String
-            if version.major == 5 { name = "5" } else
-            if version.major < 4 { name = "NEO" }
-            else { name = "" }
+            if version.major == 5 { name = "5" } else if version.major < 4 { name = "NEO" } else { name = "" }
             deviceName = "YubiKey \(name) NFC"
             break
         case .usbCKeychain:
@@ -368,7 +382,7 @@ extension DeviceInfo {
             return deviceName
         }
     }
-    
+
     var deviceImage: Image? {
         switch formFactor {
         case .usbAKeychain:

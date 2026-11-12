@@ -23,10 +23,10 @@ import YubiKit
 @Observable class FIDOResetViewModel {
 
     var state: ResetState = .ready
-    
+
     enum ResetState: Equatable {
         case ready, success, error(Error)
-        
+
         static func == (lhs: FIDOResetViewModel.ResetState, rhs: FIDOResetViewModel.ResetState) -> Bool {
             switch (lhs, rhs) {
             case (.ready, .ready):
@@ -39,7 +39,7 @@ import YubiKit
                 return false
             }
         }
-        
+
         func isError() -> Bool {
             switch self {
             case (.error(_)):
@@ -49,7 +49,7 @@ import YubiKit
             }
         }
     }
-    
+
     @ObservationIgnored private var resetTask: Task<Void, Never>?
 
     func reset() {
@@ -60,13 +60,13 @@ import YubiKit
                 case is USBSmartCardConnection:
                     state = .error(FidoViewModelError.usbNotSupported)
                 #if os(iOS)
-                case let connection as NFCSmartCardConnection:
-                    await resetNFC(connection: connection)
+                    case let connection as NFCSmartCardConnection:
+                        await resetNFC(connection: connection)
                 #endif
                 default:
                     state = .error(String(localized: "Unknown error"))
                 }
-            } catch where error.isNFCCancelledByUser || error is CancellationError {
+            } catch  where error.isNFCCancelledByUser || error is CancellationError {
                 // The user dismissed the NFC sheet or cancelled the reset.
             } catch {
                 state = .error(LocalizedErrorWrapper(error: error))
@@ -81,28 +81,26 @@ import YubiKit
     init() {
         Logger.allocation.debug("FIDOresetViewModel: init")
     }
-    
+
     deinit {
         Logger.allocation.debug("FIDOresetViewModel: deinit")
     }
 }
 
-
 #if os(iOS)
-extension FIDOResetViewModel {
-    private func resetNFC(connection: NFCSmartCardConnection) async {
-        do {
-            let session = try await connection.fido2Session()
-            try await session.reset().value
-            let message = String(localized: "Reset FIDO application", comment: "FIDO reset NFC confirmation message")
-            ConnectionManager.shared.closeNFC(message: message)
-            state = .success
-        } catch {
-            let localizedError = LocalizedErrorWrapper(error: error)
-            ConnectionManager.shared.closeNFC(errorMessage: localizedError.localizedDescription)
-            state = .error(localizedError)
+    extension FIDOResetViewModel {
+        private func resetNFC(connection: NFCSmartCardConnection) async {
+            do {
+                let session = try await connection.fido2Session()
+                try await session.reset().value
+                let message = String(localized: "Reset FIDO application", comment: "FIDO reset NFC confirmation message")
+                ConnectionManager.shared.closeNFC(message: message)
+                state = .success
+            } catch {
+                let localizedError = LocalizedErrorWrapper(error: error)
+                ConnectionManager.shared.closeNFC(errorMessage: localizedError.localizedDescription)
+                state = .error(localizedError)
+            }
         }
     }
-}
 #endif
-

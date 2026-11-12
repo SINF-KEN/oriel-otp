@@ -17,7 +17,6 @@
 
 import SwiftUI
 
-
 struct AccountRowView<Accessory: View>: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -44,34 +43,37 @@ struct AccountRowView<Accessory: View>: View {
 
     // Mac lists are denser, with smaller text.
     #if os(macOS)
-    @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 28
-    @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 16
-    private let titleStyle = Font.TextStyle.body
-    private let subtitleStyle = Font.TextStyle.subheadline
-    private let codeStyle = Font.TextStyle.title3
-    @ScaledSize(relativeTo: .body) private var minimumNameWidth: CGFloat = 115
+        @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 28
+        @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 16
+        private let titleStyle = Font.TextStyle.body
+        private let subtitleStyle = Font.TextStyle.subheadline
+        private let codeStyle = Font.TextStyle.title3
+        @ScaledSize(relativeTo: .body) private var minimumNameWidth: CGFloat = 115
     #else
-    @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 40
-    @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 22
-    private let titleStyle = Font.TextStyle.subheadline
-    private let subtitleStyle = Font.TextStyle.footnote
-    private let codeStyle = Font.TextStyle.body
-    @ScaledSize(relativeTo: .subheadline) private var phoneMinimumNameWidth: CGFloat = 150
-    @ScaledSize(relativeTo: .subheadline) private var sidebarMinimumNameWidth: CGFloat = 110
-    @Environment(\.isInFoldedColumn) private var isInFoldedColumn
-    /// Less in the sidebar of an iPad or an iPhone Duo, whose width is limited, so an 8 digit code fits beside the name
-    /// like the others. By the device, as a sidebar's size class is compact.
-    private var minimumNameWidth: CGFloat {
-        UIDevice.current.userInterfaceIdiom == .pad || isInFoldedColumn ? sidebarMinimumNameWidth : phoneMinimumNameWidth
-    }
+        @ScaledSize(relativeTo: .body) private var iconSize: CGFloat = 40
+        @ScaledSize(relativeTo: .body) private var statusSize: CGFloat = 22
+        private let titleStyle = Font.TextStyle.subheadline
+        private let subtitleStyle = Font.TextStyle.footnote
+        private let codeStyle = Font.TextStyle.body
+        @ScaledSize(relativeTo: .subheadline) private var phoneMinimumNameWidth: CGFloat = 150
+        @ScaledSize(relativeTo: .subheadline) private var sidebarMinimumNameWidth: CGFloat = 110
+        @Environment(\.isInFoldedColumn) private var isInFoldedColumn
+        /// Less in the sidebar of an iPad or an iPhone Duo, whose width is limited, so an 8 digit code fits beside the name
+        /// like the others. By the device, as a sidebar's size class is compact.
+        private var minimumNameWidth: CGFloat {
+            UIDevice.current.userInterfaceIdiom == .pad || isInFoldedColumn ? sidebarMinimumNameWidth : phoneMinimumNameWidth
+        }
     #endif
     @ScaledSize(relativeTo: .title) private var barHeight: CGFloat = 3
     private let headlineCodeStyle = Font.TextStyle.title
 
     // Hierarchical so the row stays legible when the list highlights it as selected.
     private let pillColor = HierarchicalShapeStyle.secondary
-    
-    init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false, @ViewBuilder accessory: () -> Accessory) {
+
+    init(
+        account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false,
+        @ViewBuilder accessory: () -> Accessory
+    ) {
         self.account = account
         self.showsLocation = showsLocation
         self.copyCode = copyCode
@@ -89,7 +91,7 @@ struct AccountRowView<Accessory: View>: View {
             headlineRow
         }
         #if os(iOS)
-        .foregroundStyle(isSelected ? selectedColor : Color.primary)
+            .foregroundStyle(isSelected ? selectedColor : Color.primary)
         #endif
         .contentShape(Rectangle())
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
@@ -98,14 +100,21 @@ struct AccountRowView<Accessory: View>: View {
         // Access reach it without opening the row. Only on iOS: a Mac list row is a button, which takes its children
         // in, and the inner button's identifier would replace the row's.
         #if os(iOS)
-        .modifier(AccountRowAccessibility(account: account, showsLocation: showsLocation,
-                                          separatesCode: copyCode != nil && !isVoiceOverEnabled))
+            .modifier(
+                AccountRowAccessibility(
+                    account: account, showsLocation: showsLocation,
+                    separatesCode: copyCode != nil && !isVoiceOverEnabled))
         #else
-        .modifier(AccountRowAccessibility(account: account, showsLocation: showsLocation, separatesCode: false))
+            .modifier(AccountRowAccessibility(account: account, showsLocation: showsLocation, separatesCode: false))
         #endif
         #if os(iOS)
-        // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
-        .accessibilityHint(copyCode == nil || !isVoiceOverEnabled ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
+            // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
+            .accessibilityHint(
+                copyCode == nil || !isVoiceOverEnabled
+                    ? ""
+                    : String(
+                        localized: "Swipe up or down to copy the code",
+                        comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))
         #endif
         // Stable for UI tests and agents, e.g. "account-row.GitHub:alice@example.com", see docs/accessibility.md.
         .accessibilityIdentifier("account-row.\(account.accountId)")
@@ -175,13 +184,19 @@ struct AccountRowView<Accessory: View>: View {
                 .buttonStyle(.borderless)
                 .tint(isSelected ? selectedColor : nil)
                 #if os(iOS)
-                // For a pointer on an iPad.
-                .hoverEffect(.highlight)
+                    // For a pointer on an iPad.
+                    .hoverEffect(.highlight)
                 #endif
-                .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+                .accessibilityHint(
+                    String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar")
+                )
                 // Only reached without VoiceOver, when the row lets the code be an element of its own. Named after
                 // the account rather than the code, which changes every 30 seconds.
-                .accessibilityLabel(String(localized: "Copy code for \(account.title)", comment: "Voice Control and Switch Control name of the code in an account row, e.g. Copy code for GitHub"))
+                .accessibilityLabel(
+                    String(
+                        localized: "Copy code for \(account.title)",
+                        comment: "Voice Control and Switch Control name of the code in an account row, e.g. Copy code for GitHub")
+                )
                 .accessibilityInputLabels(VoiceControlNames.copyCode(of: account))
                 .accessibilityIdentifier("account-row.\(account.accountId).copy")
         } else {
@@ -229,7 +244,9 @@ struct AccountRowView<Accessory: View>: View {
         // names are in: "بنك · alice" in English, and "GitHub · علي" read from the right in Arabic.
         let mark = String.directionMark(rightToLeft: layoutDirection == .rightToLeft)
         let title = Text(mark + account.title.isolated).fontWeight(.semibold).foregroundStyle(.primary)
-        return Text("\(title) · \(Text(subTitle.isolated).foregroundStyle(secondaryStyle))", comment: "An account's issuer and name on one line, in the account list with larger text")
+        return Text(
+            "\(title) · \(Text(subTitle.isolated).foregroundStyle(secondaryStyle))",
+            comment: "An account's issuer and name on one line, in the account list with larger text")
     }
 
     private var headlineCode: some View {
@@ -263,9 +280,9 @@ struct AccountRowView<Accessory: View>: View {
     /// it: white would be unreadable on the light pink of dark mode.
     private var selectedColor: Color {
         #if os(iOS)
-        Color(.systemBackground)
+            Color(.systemBackground)
         #else
-        Color.white
+            Color.white
         #endif
     }
 
@@ -308,7 +325,7 @@ struct AccountRowView<Accessory: View>: View {
                 .foregroundStyle(HierarchicalShapeStyle.primary)
         }
         .padding(.all, 4)
-        .fixedSize() // keep the code on one line in a narrow sidebar; the title truncates instead
+        .fixedSize()  // keep the code on one line in a narrow sidebar; the title truncates instead
         .foregroundStyle(pillColor)
         .overlay {
             Capsule()
@@ -385,13 +402,18 @@ private struct AccountCodeStateValue: ViewModifier {
     let showsLocation: Bool
 
     func body(content: Content) -> some View {
-        content.accessibilityValue(showsLocation ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription : account.accessibilityCodeState)
+        content.accessibilityValue(
+            showsLocation
+                ? account.accessibilityCodeState + String.accessibilitySeparator + account.locationDescription
+                : account.accessibilityCodeState)
     }
 }
 
 extension AccountRowView where Accessory == EmptyView {
     init(account: Account, showsLocation: Bool = false, copyCode: (() -> Void)? = nil, isCopied: Bool = false, isSelected: Bool = false) {
-        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied, isSelected: isSelected) { EmptyView() }
+        self.init(account: account, showsLocation: showsLocation, copyCode: copyCode, isCopied: isCopied, isSelected: isSelected) {
+            EmptyView()
+        }
     }
 }
 
@@ -445,7 +467,8 @@ extension Account {
         if case .countingdown = state, let secondsLeft {
             return String(localized: "\(secondsLeft) seconds left", comment: "VoiceOver, time until the code changes")
         }
-        return requiresTouch ? String(localized: "Requires touch", comment: "Mac menu bar help")
+        return requiresTouch
+            ? String(localized: "Requires touch", comment: "Mac menu bar help")
             : String(localized: "Calculate to get a code", comment: "VoiceOver, an account whose code hasn't been calculated")
     }
 
@@ -455,7 +478,9 @@ extension Account {
         } else if isOnDevice {
             String(localized: "Stored on this device", comment: "Where an account is stored")
         } else if isPendingSync {
-            String(localized: "Stored in Ente Auth, not synced yet", comment: "Where an account is stored, for an Ente Auth account with changes that haven't been uploaded")
+            String(
+                localized: "Stored in Ente Auth, not synced yet",
+                comment: "Where an account is stored, for an Ente Auth account with changes that haven't been uploaded")
         } else {
             String(localized: "Stored in Ente Auth", comment: "Where an account is stored")
         }
@@ -506,19 +531,21 @@ struct BarProgressView<Style: ShapeStyle>: View {
             .mask {
                 // Drawn from the leading end by the layer itself, so it doesn't depend on whether SwiftUI mirrors the
                 // platform view: from the right in Arabic and Hebrew.
-                ProgressLayerView(kind: .bar, progress: progress, animate: animate && !reduceMotion,
-                                  rightToLeft: layoutDirection == .rightToLeft)
-                    .environment(\.layoutDirection, .leftToRight)
+                ProgressLayerView(
+                    kind: .bar, progress: progress, animate: animate && !reduceMotion,
+                    rightToLeft: layoutDirection == .rightToLeft
+                )
+                .environment(\.layoutDirection, .leftToRight)
             }
     }
 }
 
 #if os(iOS)
-private typealias PlatformView = UIView
-private typealias PlatformViewRepresentable = UIViewRepresentable
+    private typealias PlatformView = UIView
+    private typealias PlatformViewRepresentable = UIViewRepresentable
 #else
-private typealias PlatformView = NSView
-private typealias PlatformViewRepresentable = NSViewRepresentable
+    private typealias PlatformView = NSView
+    private typealias PlatformViewRepresentable = NSViewRepresentable
 #endif
 
 private struct ProgressLayerView: PlatformViewRepresentable {
@@ -529,11 +556,15 @@ private struct ProgressLayerView: PlatformViewRepresentable {
     var rightToLeft = false
 
     #if os(iOS)
-    func makeUIView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
-    func updateUIView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate, rightToLeft: rightToLeft) }
+        func makeUIView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
+        func updateUIView(_ view: ProgressLayerHostView, context: Context) {
+            view.update(progress: progress, animate: animate, rightToLeft: rightToLeft)
+        }
     #else
-    func makeNSView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
-    func updateNSView(_ view: ProgressLayerHostView, context: Context) { view.update(progress: progress, animate: animate, rightToLeft: rightToLeft) }
+        func makeNSView(context: Context) -> ProgressLayerHostView { ProgressLayerHostView(kind: kind) }
+        func updateNSView(_ view: ProgressLayerHostView, context: Context) {
+            view.update(progress: progress, animate: animate, rightToLeft: rightToLeft)
+        }
     #endif
 }
 
@@ -557,7 +588,7 @@ private final class ProgressLayerHostView: PlatformView {
         self.kind = kind
         super.init(frame: .zero)
         #if os(macOS)
-        wantsLayer = true
+            wantsLayer = true
         #endif
         shapeLayer.fillColor = kind == .bar ? CGColor(gray: 0, alpha: 1) : nil
         shapeLayer.strokeColor = kind == .pie ? CGColor(gray: 0, alpha: 1) : nil
@@ -571,22 +602,22 @@ private final class ProgressLayerHostView: PlatformView {
 
     private var hostLayer: CALayer {
         #if os(iOS)
-        layer
+            layer
         #else
-        layer!
+            layer!
         #endif
     }
 
     #if os(iOS)
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateShape()
-    }
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            updateShape()
+        }
     #else
-    override func layout() {
-        super.layout()
-        updateShape()
-    }
+        override func layout() {
+            super.layout()
+            updateShape()
+        }
     #endif
 
     private func updateShape() {
@@ -597,14 +628,15 @@ private final class ProgressLayerHostView: PlatformView {
         case .pie:
             // From the top round to the left. The y axis runs down on iOS, and up on the Mac unless the view is flipped.
             #if os(iOS)
-            let direction = -1.0
+                let direction = -1.0
             #else
-            let direction = isFlipped ? -1.0 : 1.0
+                let direction = isFlipped ? -1.0 : 1.0
             #endif
             let top = direction * .pi / 2
             let path = CGMutablePath()
-            path.addArc(center: CGPoint(x: bounds.midX, y: bounds.midY), radius: bounds.width / 4,
-                        startAngle: top, endAngle: top + direction * 2 * .pi, clockwise: direction < 0)
+            path.addArc(
+                center: CGPoint(x: bounds.midX, y: bounds.midY), radius: bounds.width / 4,
+                startAngle: top, endAngle: top + direction * 2 * .pi, clockwise: direction < 0)
             shapeLayer.path = path
             shapeLayer.lineWidth = bounds.width / 2
         case .bar:

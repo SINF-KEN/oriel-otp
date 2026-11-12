@@ -37,18 +37,24 @@ extension MainViewModel {
         passwordEntryContinuation = nil
         continuation?.resume(returning: password)
     }
-    
+
     /// Called by the save password dialog in MainView. `nil` means "Not now".
     func selectPasswordSaveType(_ type: PasswordSaveType?) {
         let handler = passwordSaveTypeHandler
         passwordSaveTypeHandler = nil
         handler?(type)
     }
-    
+
     /// Shows the password alert and returns the entered password, or nil if the user cancelled.
     private func requestPassword(isRetry: Bool) async -> String? {
-        ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Key is password protected", comment: "OATH NFC password protected key"))
-        passwordEntryMessage = isRetry ? String(localized: "Incorrect password. Re-enter password.", comment: "OATH password entry retry") : String(localized: "To prevent unauthorized access this YubiKey is protected with a password.", comment: "OATH password entry enter password")
+        ConnectionManager.shared.closeNFC(
+            errorMessage: String(localized: "Key is password protected", comment: "OATH NFC password protected key"))
+        passwordEntryMessage =
+            isRetry
+            ? String(localized: "Incorrect password. Re-enter password.", comment: "OATH password entry retry")
+            : String(
+                localized: "To prevent unauthorized access this YubiKey is protected with a password.",
+                comment: "OATH password entry enter password")
         // Only one password alert can be shown, an earlier request is treated as cancelled.
         cancelPasswordEntry()
         presentPasswordEntry = true
@@ -68,7 +74,8 @@ extension MainViewModel {
     /// Unlocks with the cached access key. Returns false if there is none or it didn't work.
     private func unlockWithCachedAccessKey() async -> Bool {
         guard let accessKey = await cachedAccessKey(),
-              let session = try? await OATHSessionHandler.shared.anySession() else { return false }
+            let session = try? await OATHSessionHandler.shared.anySession()
+        else { return false }
         return (try? await session.unlock(withAccessKey: accessKey)) != nil
     }
 
@@ -93,7 +100,7 @@ extension MainViewModel {
             self.sessionError = error
         }
     }
-    
+
     private func cachedAccessKey() async -> Data? {
         guard let session = try? await OATHSessionHandler.shared.anySession() else { return nil }
         let keyIdentifier = session.deviceId
@@ -117,7 +124,9 @@ extension MainViewModel {
                 self.passwordPreferences.setPasswordPreference(saveType: type, keyIdentifier: keyIdentifier)
                 if type == .save || type == .lock {
                     do {
-                        try self.accessKeySecureStore.setValue(accessKey, useAuthentication: self.passwordPreferences.useScreenLock(keyIdentifier: keyIdentifier), for: keyIdentifier)
+                        try self.accessKeySecureStore.setValue(
+                            accessKey, useAuthentication: self.passwordPreferences.useScreenLock(keyIdentifier: keyIdentifier),
+                            for: keyIdentifier)
                     } catch {
                         self.passwordPreferences.resetPasswordPreference(keyIdentifier: keyIdentifier)
                         self.sessionError = error

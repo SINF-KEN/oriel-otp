@@ -59,8 +59,9 @@ extension MainViewModel {
             }
             // The copy on the YubiKey is filed under the same tags.
             if !account.tags.isEmpty {
-                let id = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
-                                              period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
+                let id = OATHCredentialId.key(
+                    accountName: template.name, issuer: template.issuer,
+                    period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
                 do {
                     try self?.saveKeyTags(account.tags, for: id)
                 } catch {
@@ -78,7 +79,7 @@ extension MainViewModel {
             }
         }
     }
-    
+
     /// Removes the account from where it was moved from. Returns false, and shows the error, if it couldn't be.
     private func removeAfterMove(_ account: Account) -> Bool {
         do {
@@ -101,7 +102,10 @@ extension MainViewModel {
         case differentSecret
 
         var errorDescription: String? {
-            String(localized: "The YubiKey's code for this account isn't the same as the code of its copy in Ente Auth or on this device, so nothing was changed.", comment: "Error when changing a YubiKey account's touch setting")
+            String(
+                localized:
+                    "The YubiKey's code for this account isn't the same as the code of its copy in Ente Auth or on this device, so nothing was changed.",
+                comment: "Error when changing a YubiKey account's touch setting")
         }
     }
 
@@ -123,7 +127,8 @@ extension MainViewModel {
     /// account keeps its name.
     func setRequiresTouch(_ requiresTouch: Bool, of account: Account, completion: @escaping () -> Void) {
         guard let copy = knownCopy(of: account), let template = yubiKeyTemplate(of: copy),
-              let copyCode = calculatedCode(of: copy) else { return }
+            let copyCode = calculatedCode(of: copy)
+        else { return }
         Task {
             do {
                 let session = try await OATHSessionHandler.shared.anySession()
@@ -136,9 +141,10 @@ extension MainViewModel {
                 try await session.deleteCredential(account.credential)
                 try await session.addCredential(template: template, requiresTouch: requiresTouch)
                 await updateAccounts(using: session)
-                session.endNFC(message: requiresTouch
-                               ? String(localized: "Touch is now required", comment: "OATH NFC after turning on Require touch")
-                               : String(localized: "Touch is no longer required", comment: "OATH NFC after turning off Require touch"))
+                session.endNFC(
+                    message: requiresTouch
+                        ? String(localized: "Touch is now required", comment: "OATH NFC after turning on Require touch")
+                        : String(localized: "Touch is no longer required", comment: "OATH NFC after turning off Require touch"))
                 completion()
             } catch {
                 handle(error: error, retry: { self.setRequiresTouch(requiresTouch, of: account, completion: completion) })
@@ -159,9 +165,12 @@ extension MainViewModel {
             }
         }
     }
-    
+
     /// Adds several accounts in one YubiKey session, e.g. when importing. Accounts already on the YubiKey are skipped.
-    func addAccounts(_ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool, completion: @escaping (OATHSession.AddCredentialsResult) -> Void) {
+    func addAccounts(
+        _ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool,
+        completion: @escaping (OATHSession.AddCredentialsResult) -> Void
+    ) {
         Task {
             do {
                 let session = try await OATHSessionHandler.shared.anySession()
@@ -219,11 +228,12 @@ extension MainViewModel {
                 ConnectionManager.shared.closeNFC(message: String(localized: "Account renamed", comment: "OATH NFC account renamed"))
                 completion()
             } catch {
-                handle(error: error, retry: { self.renameAccount(account, issuer: issuer, accountName: accountName, completion: completion) })
+                handle(
+                    error: error, retry: { self.renameAccount(account, issuer: issuer, accountName: accountName, completion: completion) })
             }
         }
     }
-    
+
     /// Deletes the account from the YubiKey or this device, or moves an Ente Auth account to Ente's trash.
     func deleteAccount(_ account: Account, completion: @escaping () -> Void) {
         if case .ente(let id) = account.location {
@@ -264,7 +274,7 @@ extension MainViewModel {
             }
         }
     }
-    
+
     /// Deletes the accounts one after the other, as the YubiKey handles one command at a time.
     func deleteAccounts(_ accounts: [Account], completion: @escaping () -> Void) {
         guard let account = accounts.first else {

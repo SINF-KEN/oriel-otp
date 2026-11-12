@@ -66,7 +66,7 @@ final class SmartCardViewModel {
             do {
                 let connection = try await ConnectionManager.shared.nfcConnection()
                 await readCertificates(connection: connection)
-            } catch where error.isNFCCancelledByUser {
+            } catch  where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
             } catch {
                 certificatesCallback?(.failure(error))
@@ -80,7 +80,9 @@ final class SmartCardViewModel {
 
     func removeTokenCertificate(certificate: SecCertificate) {
         let result = tokenStorage.removeTokenCertificate(certificate: certificate)
-        result ? Logger.ctk.debug("Sucessfully removed certificate from keychain") : Logger.ctk.debug("Failed removing certificate from keychain!")
+        result
+            ? Logger.ctk.debug("Sucessfully removed certificate from keychain")
+            : Logger.ctk.debug("Failed removing certificate from keychain!")
     }
 
     func update() {
@@ -101,7 +103,8 @@ final class SmartCardViewModel {
                 }
             }
             certificatesCallback?(.success(certificates))
-            ConnectionManager.shared.closeNFC(message: String(localized: "Finished reading certificates", comment: "PIV extension NFC finished reading certs"))
+            ConnectionManager.shared.closeNFC(
+                message: String(localized: "Finished reading certificates", comment: "PIV extension NFC finished reading certs"))
         } catch {
             certificatesCallback?(.failure(error))
             ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)

@@ -70,28 +70,42 @@ struct AccountDetailView: View {
                 }
                 .scaledFont(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
-                .accessibilityLabel(String(localized: "Tags: \(account.tags.joined(separator: ", "))", comment: "Account details tags, for VoiceOver. The placeholder is a list of tags."))
+                .accessibilityLabel(
+                    String(
+                        localized: "Tags: \(account.tags.joined(separator: ", "))",
+                        comment: "Account details tags, for VoiceOver. The placeholder is a list of tags.")
+                )
                 .accessibilityIdentifier("account-details.tag-list")
             }
             if let id = autoFillID {
                 let websites = AutoFillAccountSync.shared.websites(for: id, issuer: account.credential.issuer)
                 Label {
-                    Text(websites.isEmpty ? String(localized: "No AutoFill websites", comment: "Account details without AutoFill websites")
-                         : websites.joined(separator: ", "))
+                    Text(
+                        websites.isEmpty
+                            ? String(localized: "No AutoFill websites", comment: "Account details without AutoFill websites")
+                            : websites.joined(separator: ", "))
                 } icon: {
                     Image(systemName: "key.fill")
                         .accessibilityHidden(true)
                 }
                 .scaledFont(.footnote)
                 .foregroundStyle(Color(.secondaryLabel))
-                .accessibilityLabel(String(localized: "AutoFill websites: \(websites.joined(separator: ", "))", comment: "Account details AutoFill websites, for VoiceOver. The placeholder is a list of websites."))
+                .accessibilityLabel(
+                    String(
+                        localized: "AutoFill websites: \(websites.joined(separator: ", "))",
+                        comment: "Account details AutoFill websites, for VoiceOver. The placeholder is a list of websites."))
             }
             if account.isOnYubiKey && model.cloud.isEnabled {
-                Text(String(localized: "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.", comment: "Account details of a YubiKey account while signed in to Ente Auth"))
-                    .scaledFont(.footnote)
-                    .foregroundStyle(Color(.secondaryLabel))
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 360)
+                Text(
+                    String(
+                        localized:
+                            "A YubiKey never gives its accounts back, so this account can't be copied to Ente Auth. To keep an account in both, add it again and choose YubiKey and Ente Auth.",
+                        comment: "Account details of a YubiKey account while signed in to Ente Auth")
+                )
+                .scaledFont(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 360)
             }
             AccountCodeButton(account: account)
                 .padding(.top, 12)
@@ -125,16 +139,21 @@ struct AccountDetailView: View {
                     .accessibilityInputLabels(VoiceControlNames.calculate)
                     .accessibilityIdentifier("account-details.calculate")
                     #if os(iOS)
-                    .keyboardShortcut("r")
+                        .keyboardShortcut("r")
                     #endif
                     .help(String(localized: "Calculate a new code", comment: "Toolbar help"))
                     .disabled(!account.enableRefresh)
                 }
                 Button(action: { account.isPinned.toggle() }) {
-                    Label(account.isPinned ? String(localized: "Unpin", comment: "Menu") : String(localized: "Pin", comment: "Menu"),
-                          systemImage: account.isPinned ? "pin.slash" : "pin")
+                    Label(
+                        account.isPinned ? String(localized: "Unpin", comment: "Menu") : String(localized: "Pin", comment: "Menu"),
+                        systemImage: account.isPinned ? "pin.slash" : "pin")
                 }
-                .help(account.isPinned ? String(localized: "Unpin the account", comment: "Mac row button help") : String(localized: "Pin the account to the top", comment: "Mac row button help"))
+                .help(
+                    account.isPinned
+                        ? String(localized: "Unpin the account", comment: "Mac row button help")
+                        : String(localized: "Pin the account to the top", comment: "Mac row button help")
+                )
                 .accessibilityIdentifier("account-details.pin")
             }
             ToolbarItemGroup(placement: .secondaryAction) {
@@ -159,23 +178,36 @@ struct AccountDetailView: View {
                 CopyToYubiKeyButtons(account: account)
                 if !account.isOnYubiKey {
                     Button(action: showQRCode) {
-                        Label(String(localized: "Show QR Code", comment: "Menu item that shows an account's QR code, to add it to another device"), systemImage: "qrcode")
+                        Label(
+                            String(
+                                localized: "Show QR Code", comment: "Menu item that shows an account's QR code, to add it to another device"
+                            ), systemImage: "qrcode")
                     }
                     .help(String(localized: "Show the account's QR code, to add it to another device or app", comment: "Toolbar help"))
                     .accessibilityIdentifier("account-details.qr-code")
                 }
                 if model.knownCopy(of: account) != nil {
                     let requiresTouch = account.requiresTouch
-                    Button(action: { model.setRequiresTouch(!requiresTouch, of: account) {
-                        toastPresenter.toast(message: requiresTouch
-                                             ? String(localized: "Touch is no longer required", comment: "OATH NFC after turning off Require touch")
-                                             : String(localized: "Touch is now required", comment: "OATH NFC after turning on Require touch"))
-                    } }) {
-                        Label(requiresTouch ? String(localized: "Don't Require Touch", comment: "Menu for a YubiKey account")
-                                            : String(localized: "Require Touch", comment: "Menu for a YubiKey account"),
-                              systemImage: "hand.tap")
+                    Button(action: {
+                        model.setRequiresTouch(!requiresTouch, of: account) {
+                            toastPresenter.toast(
+                                message: requiresTouch
+                                    ? String(localized: "Touch is no longer required", comment: "OATH NFC after turning off Require touch")
+                                    : String(localized: "Touch is now required", comment: "OATH NFC after turning on Require touch"))
+                        }
+                    }) {
+                        Label(
+                            requiresTouch
+                                ? String(localized: "Don't Require Touch", comment: "Menu for a YubiKey account")
+                                : String(localized: "Require Touch", comment: "Menu for a YubiKey account"),
+                            systemImage: "hand.tap")
                     }
-                    .help(String(localized: "Write the account to the YubiKey again from its copy in Ente Auth or on this device, with the new setting", comment: "Toolbar help"))
+                    .help(
+                        String(
+                            localized:
+                                "Write the account to the YubiKey again from its copy in Ente Auth or on this device, with the new setting",
+                            comment: "Toolbar help")
+                    )
                     .accessibilityIdentifier("account-details.require-touch")
                 }
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
@@ -212,9 +244,17 @@ struct AccountDetailView: View {
             }
         } message: {
             if account.isOnDevice {
-                Text(String(localized: "This deletes the account for good, as there is no other copy. You won’t be able to generate codes for it anymore.", comment: "Delete account alert for an account on this device"))
+                Text(
+                    String(
+                        localized:
+                            "This deletes the account for good, as there is no other copy. You won’t be able to generate codes for it anymore.",
+                        comment: "Delete account alert for an account on this device"))
             } else if account.isInEnte {
-                Text(String(localized: "This moves the account to the trash in Ente Auth on all your devices. You can restore it in the Ente Auth app.", comment: "Delete account alert for an account in Ente Auth"))
+                Text(
+                    String(
+                        localized:
+                            "This moves the account to the trash in Ente Auth on all your devices. You can restore it in the Ente Auth app.",
+                        comment: "Delete account alert for an account in Ente Auth"))
             } else {
                 Text("This removes the account from the YubiKey. You won’t be able to generate codes for it anymore.")
             }
@@ -283,9 +323,13 @@ private struct NextCodeLabel: View {
 
     var body: some View {
         let next = account.remaining > 0 ? account.displayedNextCode : nil
-        let label = Text(String(localized: "Next code: \(next ?? "888 888")", comment: "Account details, in the last seconds of a code. The placeholder is the next code, e.g. 123 456."))
-            .scaledFont(.callout) { $0.monospacedDigit() }
-            .foregroundStyle(Color(.secondaryLabel))
+        let label = Text(
+            String(
+                localized: "Next code: \(next ?? "888 888")",
+                comment: "Account details, in the last seconds of a code. The placeholder is the next code, e.g. 123 456.")
+        )
+        .scaledFont(.callout) { $0.monospacedDigit() }
+        .foregroundStyle(Color(.secondaryLabel))
         // Hidden rather than clear, which the accessibility audit would measure as text without contrast.
         if next == nil {
             label.hidden()
@@ -334,16 +378,20 @@ private struct AccountCodeButton: View {
         .buttonStyle(.plain)
         .accessibilityLabel(account.spokenCode)
         .accessibilityValue(account.accessibilityCodeState)
-        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        .accessibilityHint(
+            String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar")
+        )
         .accessibilityIdentifier("account-details.code")
         #if os(iOS)
-        // With a hardware keyboard, which the Mac has in its menu bar. Also for a pointer on an iPad.
-        .keyboardShortcut("c")
-        .hoverEffect(.highlight)
+            // With a hardware keyboard, which the Mac has in its menu bar. Also for a pointer on an iPad.
+            .keyboardShortcut("c")
+            .hoverEffect(.highlight)
         #endif
         // The label is the code itself, which can't be said to Voice Control.
-        .accessibilityInputLabels([String(localized: "Code", comment: "Voice Control name for the code in the account details"),
-                                   String(localized: "Copy code", comment: "Voice Control name for the Copy button")])
+        .accessibilityInputLabels([
+            String(localized: "Code", comment: "Voice Control name for the code in the account details"),
+            String(localized: "Copy code", comment: "Voice Control name for the Copy button")
+        ])
     }
 
     @ViewBuilder private var statusIcon: some View {
@@ -373,16 +421,22 @@ struct CopyToYubiKeyButtons: View {
                 Button(action: { Self.copy(account, moving: false, model: model, toastPresenter: toastPresenter) }) {
                     Label(String(localized: "Copy to YubiKey", comment: "Menu"), systemImage: "plus.square.on.square")
                 }
-                .help(account.isOnDevice ? String(localized: "Put the account on the YubiKey and keep it on this device", comment: "Toolbar help")
-                      : String(localized: "Put the account on the YubiKey and keep it in Ente Auth", comment: "Toolbar help"))
+                .help(
+                    account.isOnDevice
+                        ? String(localized: "Put the account on the YubiKey and keep it on this device", comment: "Toolbar help")
+                        : String(localized: "Put the account on the YubiKey and keep it in Ente Auth", comment: "Toolbar help")
+                )
                 .disabled(!canReachYubiKey)
             }
             if model.canCopyToYubiKey(account, moving: true) {
                 Button(action: { Self.copy(account, moving: true, model: model, toastPresenter: toastPresenter) }) {
                     Label(String(localized: "Move to YubiKey", comment: "Menu"), systemImage: "arrow.forward.square")
                 }
-                .help(account.isOnDevice ? String(localized: "Put the account on the YubiKey and delete it from this device", comment: "Toolbar help")
-                      : String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help"))
+                .help(
+                    account.isOnDevice
+                        ? String(localized: "Put the account on the YubiKey and delete it from this device", comment: "Toolbar help")
+                        : String(localized: "Put the account on the YubiKey and move it to the trash in Ente Auth", comment: "Toolbar help")
+                )
                 .disabled(!canReachYubiKey)
             }
             if model.canMoveToEnte(account) {
@@ -398,9 +452,12 @@ struct CopyToYubiKeyButtons: View {
         do {
             switch try model.moveToEnte(account) {
             case .moved:
-                toastPresenter.toast(message: String(localized: "Moved to Ente Auth", comment: "Toast after moving an account from this device to Ente Auth"))
+                toastPresenter.toast(
+                    message: String(localized: "Moved to Ente Auth", comment: "Toast after moving an account from this device to Ente Auth")
+                )
             case .alreadyInEnte:
-                toastPresenter.toast(message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
+                toastPresenter.toast(
+                    message: String(localized: "Already in Ente Auth", comment: "Toast when Ente Auth already has the account"))
             }
         } catch {
             model.sessionError = EnteSyncError(error)
@@ -412,12 +469,21 @@ struct CopyToYubiKeyButtons: View {
         model.copyToYubiKey(account, moving: moving) { result in
             switch result {
             case .copied:
-                toastPresenter.toast(message: String(localized: "Copied to the YubiKey", comment: "Toast after copying an Ente Auth account to the YubiKey"))
+                toastPresenter.toast(
+                    message: String(localized: "Copied to the YubiKey", comment: "Toast after copying an Ente Auth account to the YubiKey"))
             case .moved:
-                toastPresenter.toast(message: wasOnDevice ? String(localized: "Moved to the YubiKey", comment: "Toast after moving an account from this device to the YubiKey")
-                                     : String(localized: "Moved to the YubiKey. Ente Auth keeps it in the trash.", comment: "Toast after moving an Ente Auth account to the YubiKey"))
+                toastPresenter.toast(
+                    message: wasOnDevice
+                        ? String(
+                            localized: "Moved to the YubiKey", comment: "Toast after moving an account from this device to the YubiKey")
+                        : String(
+                            localized: "Moved to the YubiKey. Ente Auth keeps it in the trash.",
+                            comment: "Toast after moving an Ente Auth account to the YubiKey"))
             case .alreadyOnYubiKey:
-                toastPresenter.toast(message: String(localized: "The YubiKey already has an account with this name. Nothing was changed.", comment: "Toast when copying an Ente Auth account to a YubiKey that has one with the same name"))
+                toastPresenter.toast(
+                    message: String(
+                        localized: "The YubiKey already has an account with this name. Nothing was changed.",
+                        comment: "Toast when copying an Ente Auth account to a YubiKey that has one with the same name"))
             }
         }
     }

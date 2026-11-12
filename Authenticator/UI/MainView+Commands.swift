@@ -22,53 +22,55 @@ import SwiftUI
 extension MainView {
 
     #if os(macOS)
-    var selectedAccounts: [Account] {
-        model.accounts.filter { selectedAccountIDs.contains($0.accountId) }
-    }
-
-    var menuState: MainWindowMenuState {
-        let selection = selectedAccounts
-        return MainWindowMenuState(canAddAccount: true,
-                                   canRefresh: model.canRefresh,
-                                   canSearch: true,
-                                   selectionCount: selection.count,
-                                   isSelectionPinned: !selection.isEmpty && selection.allSatisfy(\.isPinned),
-                                   canRename: selection.count == 1 && selection[0].canRename,
-                                   canCopyToYubiKey: model.isKeyPluggedIn && selection.count == 1 && model.canCopyToYubiKey(selection[0], moving: false),
-                                   canMoveToYubiKey: model.isKeyPluggedIn && selection.count == 1 && model.canCopyToYubiKey(selection[0], moving: true))
-    }
-
-    /// Does what was chosen in the menu bar.
-    func perform(_ command: MainWindowCommands.Command) {
-        let selection = selectedAccounts
-        switch command {
-        case .addAccount:
-            addAccount()
-        case .syncFromEnte:
-            showEnteSync = true
-        case .refresh:
-            model.refresh()
-        case .search:
-            // The search field is on the list, so an account open over it closes first. Set again each time, as the
-            // field doesn't report back when it wasn't there to take the focus.
-            let delay = singleColumnPath.isEmpty ? Duration.zero : Self.navigationDelay
-            singleColumnPath = []
-            focusSearch(after: delay)
-        case .copyCode:
-            if let selectedAccount { toastPresenter.copyCode(of: selectedAccount) }
-        case .togglePin:
-            let pin = !selection.allSatisfy(\.isPinned)
-            selection.forEach { $0.isPinned = pin }
-        case .rename:
-            accountToRename = selectedAccount
-        case .copyToYubiKey, .moveToYubiKey:
-            if let selectedAccount {
-                CopyToYubiKeyButtons.copy(selectedAccount, moving: command == .moveToYubiKey, model: model, toastPresenter: toastPresenter)
-            }
-        case .delete:
-            accountsToDelete = selection
+        var selectedAccounts: [Account] {
+            model.accounts.filter { selectedAccountIDs.contains($0.accountId) }
         }
-    }
+
+        var menuState: MainWindowMenuState {
+            let selection = selectedAccounts
+            return MainWindowMenuState(
+                canAddAccount: true,
+                canRefresh: model.canRefresh,
+                canSearch: true,
+                selectionCount: selection.count,
+                isSelectionPinned: !selection.isEmpty && selection.allSatisfy(\.isPinned),
+                canRename: selection.count == 1 && selection[0].canRename,
+                canCopyToYubiKey: model.isKeyPluggedIn && selection.count == 1 && model.canCopyToYubiKey(selection[0], moving: false),
+                canMoveToYubiKey: model.isKeyPluggedIn && selection.count == 1 && model.canCopyToYubiKey(selection[0], moving: true))
+        }
+
+        /// Does what was chosen in the menu bar.
+        func perform(_ command: MainWindowCommands.Command) {
+            let selection = selectedAccounts
+            switch command {
+            case .addAccount:
+                addAccount()
+            case .syncFromEnte:
+                showEnteSync = true
+            case .refresh:
+                model.refresh()
+            case .search:
+                // The search field is on the list, so an account open over it closes first. Set again each time, as the
+                // field doesn't report back when it wasn't there to take the focus.
+                let delay = singleColumnPath.isEmpty ? Duration.zero : Self.navigationDelay
+                singleColumnPath = []
+                focusSearch(after: delay)
+            case .copyCode:
+                if let selectedAccount { toastPresenter.copyCode(of: selectedAccount) }
+            case .togglePin:
+                let pin = !selection.allSatisfy(\.isPinned)
+                selection.forEach { $0.isPinned = pin }
+            case .rename:
+                accountToRename = selectedAccount
+            case .copyToYubiKey, .moveToYubiKey:
+                if let selectedAccount {
+                    CopyToYubiKeyButtons.copy(
+                        selectedAccount, moving: command == .moveToYubiKey, model: model, toastPresenter: toastPresenter)
+                }
+            case .delete:
+                accountsToDelete = selection
+            }
+        }
     #endif
 
     func focusSearch() {

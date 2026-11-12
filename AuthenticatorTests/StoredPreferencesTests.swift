@@ -179,7 +179,7 @@ struct PasswordPreferencesTests {
         (PasswordSaveType.none, false, false),
         (.never, false, false),
         (.save, true, false),
-        (.lock, false, true),
+        (.lock, false, true)
     ])
     func saveTypeSelectsHowPasswordIsUsed(saveType: PasswordSaveType, usesSavedPassword: Bool, usesScreenLock: Bool) {
         defer { cleanUp(deviceId) }

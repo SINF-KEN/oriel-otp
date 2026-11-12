@@ -66,8 +66,11 @@ import YubiKit
     /// Keeps the accounts of a saved session on the device and syncs them.
     @ObservationIgnored private let cloud: EnteCloud
 
-    init(existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard,
-         session: URLSession = .ente, cloud: EnteCloud = .shared) {
+    init(
+        existingCredentialIds: Set<String>, capacity: Int? = nil, store: EnteSessionStore = EnteSessionStore(),
+        defaults: UserDefaults = .standard,
+        session: URLSession = .ente, cloud: EnteCloud = .shared
+    ) {
         self.existingCredentialIds = existingCredentialIds
         self.capacity = capacity
         self.store = store
@@ -179,7 +182,8 @@ import YubiKit
             // Signing in to another account, or without staying signed in, replaces the copy of the accounts on this
             // device, whose changes would be lost.
             if self.cloud.hasPendingChanges,
-               !(self.staySignedIn && self.canSaveSession && self.cloud.vault?.belongs(email: email, server: server) == true) {
+                !(self.staySignedIn && self.canSaveSession && self.cloud.vault?.belongs(email: email, server: server) == true)
+            {
                 throw EnteSyncError.unsyncedChanges
             }
             if let flow = self.flow, flow.needsPassword, flow.email == email, EnteAPIClient.isSameServer(flow.api.server, server) {
@@ -265,7 +269,8 @@ import YubiKit
             // used Ente Auth gets its key now, while the master key is there, so it stays signed in too.
             let authenticatorKey: Data?
             do {
-                authenticatorKey = saveSession
+                authenticatorKey =
+                    saveSession
                     ? try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
                     : try await EnteAuthenticatorSync.authenticatorKey(api: api, keys: keys)
                 try Task.checkCancellation()
@@ -437,9 +442,13 @@ enum EnteSyncError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .passkeyNotVerified:
-            return String(localized: "The passkey hasn't been verified yet. Verify it in the browser, then try again.", comment: "Ente sign in error")
+            return String(
+                localized: "The passkey hasn't been verified yet. Verify it in the browser, then try again.", comment: "Ente sign in error")
         case .unsyncedChanges:
-            return String(localized: "Some changes made on this device haven't been synced with Ente Auth yet. Sign in to the same account with Stay signed in on to sync them, or sign out in Settings to discard them.", comment: "Ente sign in error when signing in would replace changes that weren't uploaded")
+            return String(
+                localized:
+                    "Some changes made on this device haven't been synced with Ente Auth yet. Sign in to the same account with Stay signed in on to sync them, or sign out in Settings to discard them.",
+                comment: "Ente sign in error when signing in would replace changes that weren't uploaded")
         case .wrapped(let error):
             switch error {
             case let error as EnteLoginError:
@@ -453,7 +462,9 @@ enum EnteSyncError: Error, LocalizedError {
             case is EnteAPIError, is DecodingError:
                 return String(localized: "Ente's server sent an unexpected response.", comment: "Ente sign in error")
             case is EnteSRPError:
-                return String(localized: "The server could not prove it knows your password. Check the server address.", comment: "Ente sign in error")
+                return String(
+                    localized: "The server could not prove it knows your password. Check the server address.", comment: "Ente sign in error"
+                )
             case is EnteCryptoError:
                 return String(localized: "Your keys could not be derived. The device may be low on memory.", comment: "Ente sign in error")
             case let error as URLError:

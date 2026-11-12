@@ -42,31 +42,48 @@ enum OATHSessionError: Error, LocalizedError, Equatable {
         case .credentialAlreadyPresent(let issuer, let accountName):
             // Each name kept in its own direction, so an Arabic or Hebrew name doesn't take the sentence with it.
             let name = issuer.isEmpty ? accountName.isolated : "\(issuer.isolated), \(accountName.isolated)"
-            return String(localized: "There's already an account named \(name) on this YubiKey.", comment: "OATH add account duplicate error. The placeholder is the issuer and account name.")
+            return String(
+                localized: "There's already an account named \(name) on this YubiKey.",
+                comment: "OATH add account duplicate error. The placeholder is the issuer and account name.")
         case .credentialNotFound:
-            return String(localized: "The account could not be found on the YubiKey.", comment: "OATH error when an account is missing after renaming it")
+            return String(
+                localized: "The account could not be found on the YubiKey.",
+                comment: "OATH error when an account is missing after renaming it")
         case .otpEnabledError:
             return String(localized: "Yubico OTP enabled", comment: "OATH otp enabled error message")
         case .oathDisabledError:
-            return String(localized: "The OATH application is disabled or not supported on this YubiKey.", comment: "OATH disabled error message")
+            return String(
+                localized: "The OATH application is disabled or not supported on this YubiKey.", comment: "OATH disabled error message")
         case .connectionCancelled:
             return String(localized: "Connection cancelled by user", comment: "Internal error message not to be displayed to the user.")
         case .invalidDeviceInfo:
-            return String(localized: "Invalid device info received from YubiKey", comment: "Internal error message not to be displayed to the user.")
+            return String(
+                localized: "Invalid device info received from YubiKey", comment: "Internal error message not to be displayed to the user.")
         case .nfcNotSupported:
             return String(localized: "NFC not supported on this device", comment: "Internal error message not to be displayed to the user.")
         case .fipsKeyWithoutPassword:
-            return String(localized: "To add an account to a FIPS key, you must first set a password for the OATH application.", comment: "Error message when trying to add and OATH account to a FIPS key without a password.")
+            return String(
+                localized: "To add an account to a FIPS key, you must first set a password for the OATH application.",
+                comment: "Error message when trying to add and OATH account to a FIPS key without a password.")
         case .storageFull(let notAdded):
             let names = notAdded.map(\.isolated).formatted(.list(type: .and))
-            return String(localized: "The YubiKey is full. These accounts weren't added: \(names).", comment: "Import error. The placeholder is a list of account names.")
+            return String(
+                localized: "The YubiKey is full. These accounts weren't added: \(names).",
+                comment: "Import error. The placeholder is a list of account names.")
         case .unsupportedPeriod:
-            return String(localized: "No code can be calculated for this account: its name on the YubiKey starts with a number and a slash, which is read as an invalid period. Delete the account and add it again.",
-                          comment: "Error for a YubiKey account whose stored name starts with digits and a slash, e.g. 0/alice, written by another app")
+            return String(
+                localized:
+                    "No code can be calculated for this account: its name on the YubiKey starts with a number and a slash, which is read as an invalid period. Delete the account and add it again.",
+                comment:
+                    "Error for a YubiKey account whose stored name starts with digits and a slash, e.g. 0/alice, written by another app")
         case .otherYubiKey:
-            return String(localized: "This account is on another YubiKey. Connect the YubiKey it is on and try again.", comment: "Error when deleting or renaming an account after another YubiKey was connected")
+            return String(
+                localized: "This account is on another YubiKey. Connect the YubiKey it is on and try again.",
+                comment: "Error when deleting or renaming an account after another YubiKey was connected")
         case .yubiKeyNotReachable:
-            return String(localized: "The YubiKey couldn't be reached. Connect it again and try again.", comment: "Error when a YubiKey was unplugged before a change could be made")
+            return String(
+                localized: "The YubiKey couldn't be reached. Connect it again and try again.",
+                comment: "Error when a YubiKey was unplugged before a change could be made")
         }
     }
 }
@@ -119,26 +136,31 @@ final class OATHSessionHandler {
         let deviceInfo = await connection.deviceInfo()
         // Yubico OTP over USB makes the YubiKey act as a keyboard, which hides the on-screen keyboard on iPhone.
         if connection is USBSmartCardConnection && Platform.isPhone, let deviceInfo,
-           deviceInfo.config.isApplicationEnabled(.otp, over: .usb) && !SettingsConfig.isOTPOverUSBIgnored(deviceId: deviceInfo.serialNumber) {
+            deviceInfo.config.isApplicationEnabled(.otp, over: .usb)
+                && !SettingsConfig.isOTPOverUSBIgnored(deviceId: deviceInfo.serialNumber)
+        {
             throw OATHSessionError.otpEnabledError
         }
         do {
             return try await makeSession(connection: connection, type: .wired, deviceInfo: deviceInfo)
-        } catch where error.isApplicationNotSupported {
+        } catch  where error.isApplicationNotSupported {
             throw OATHSessionError.oathDisabledError
         }
     }
 
-    private func makeSession(connection: SmartCardConnection, type: OATHSession.ConnectionType, deviceInfo: DeviceInfo?) async throws -> OATHSession {
+    private func makeSession(connection: SmartCardConnection, type: OATHSession.ConnectionType, deviceInfo: DeviceInfo?) async throws
+        -> OATHSession
+    {
         let deviceId = try? await connection.legacyOATHDeviceId()
         let session = try await connection.oathSession(deviceInfo: deviceInfo)
         guard let deviceId else { throw OATHSessionError.invalidDeviceInfo }
-        let oathSession = OATHSession(session: session,
-                                      connection: connection,
-                                      type: type,
-                                      version: await session.version,
-                                      deviceId: deviceId,
-                                      isFipsKey: deviceInfo?.isFIPSCapable(FIPSCapability.oath) ?? false)
+        let oathSession = OATHSession(
+            session: session,
+            connection: connection,
+            type: type,
+            version: await session.version,
+            deviceId: deviceId,
+            isFipsKey: deviceInfo?.isFIPSCapable(FIPSCapability.oath) ?? false)
         currentSession = oathSession
         Task {
             _ = await ConnectionManager.shared.waitUntilClosed(connection)
@@ -240,7 +262,10 @@ final class OATHSession: Sendable {
     /// The key is FIPS capable for OATH, which requires a password before accounts can be added.
     let isFipsKey: Bool
 
-    fileprivate init(session: YubiKitOATHSession, connection: SmartCardConnection, type: ConnectionType, version: Version, deviceId: String, isFipsKey: Bool) {
+    fileprivate init(
+        session: YubiKitOATHSession, connection: SmartCardConnection, type: ConnectionType, version: Version, deviceId: String,
+        isFipsKey: Bool
+    ) {
         self.session = session
         self.connection = connection
         self.type = type
@@ -258,7 +283,8 @@ final class OATHSession: Sendable {
         let key = template.identifier
         let keys = credentials.map { String(data: $0.id, encoding: .utf8) }
         guard !keys.contains(key) else {
-            ConnectionManager.shared.closeNFC(errorMessage: String(localized: "Duplicate accounts!", comment: "OATH add credential duplicate accounts error"))
+            ConnectionManager.shared.closeNFC(
+                errorMessage: String(localized: "Duplicate accounts!", comment: "OATH add credential duplicate accounts error"))
             throw OATHSessionError.credentialAlreadyPresent(issuer: template.issuer ?? "", accountName: template.name)
         }
 
@@ -342,7 +368,8 @@ final class OATHSession: Sendable {
     func renameCredential(_ credential: Credential, issuer: String, accountName: String) async throws -> Credential {
         let newIssuer = issuer.isEmpty ? nil : issuer
         guard credential.hasUsablePeriod else { throw OATHSessionError.unsupportedPeriod }
-        let key = OATHCredentialId.key(accountName: accountName, issuer: newIssuer, period: credential.period, isTOTP: credential.type == .totp)
+        let key = OATHCredentialId.key(
+            accountName: accountName, issuer: newIssuer, period: credential.period, isTOTP: credential.type == .totp)
         guard OATHCredentialId.readsBack(key, period: credential.period, isTOTP: credential.type == .totp) else {
             throw CredentialTemplateError.periodLikeName
         }
@@ -365,7 +392,9 @@ final class OATHSession: Sendable {
         guard listed.allSatisfy(\.hasUsablePeriod) else {
             return listed.map { ($0, nil) }
         }
-        return try await session.calculateCredentialCodes(timestamp: timestamp).map { (Credential(yubiKitCredential: $0, deviceId: deviceId), $1?.otp) }
+        return try await session.calculateCredentialCodes(timestamp: timestamp).map {
+            (Credential(yubiKitCredential: $0, deviceId: deviceId), $1?.otp)
+        }
     }
 
     func calculate(credential: Credential, timestamp: Date = AppClock.now.addingTimeInterval(10)) async throws -> OTP {

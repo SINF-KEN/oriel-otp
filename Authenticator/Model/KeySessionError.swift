@@ -16,10 +16,9 @@
 
 import Foundation
 
-enum KeySessionError : Error {
+enum KeySessionError: Error {
     case noResponse
 }
-
 
 extension KeySessionError: LocalizedError {
     public var errorDescription: String? {

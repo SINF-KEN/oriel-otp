@@ -42,8 +42,9 @@ nonisolated struct EnteCode: Identifiable, Sendable {
     /// The id the account will have on the YubiKey, matching `Account.accountId`.
     var credentialId: String? {
         guard let template else { return nil }
-        return OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
-                                    period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
+        return OATHCredentialId.key(
+            accountName: template.name, issuer: template.issuer,
+            period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
     }
 }
 
@@ -53,8 +54,10 @@ nonisolated enum EnteCodeParser {
     static func parse(id: String, rawData: String) -> EnteCode? {
         let entry = EnteEntry(rawData: rawData)
         guard var components = entry.components else {
-            return EnteCode(id: id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
-                            template: nil, unsupportedReason: String(localized: "This account could not be read.", comment: "Ente import unreadable account"))
+            return EnteCode(
+                id: id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
+                template: nil,
+                unsupportedReason: String(localized: "This account could not be read.", comment: "Ente import unreadable account"))
         }
         guard !entry.isTrashed else { return nil }
 
@@ -68,18 +71,21 @@ nonisolated enum EnteCodeParser {
                 components.queryItems = components.queryItems?.filter { $0.name.lowercased() != "digits" }
                 guard let url = components.url else { throw CredentialTemplateError.type }
                 let parsed = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
-                template = try YubiKitOATHSession.CredentialTemplate(type: parsed.type, algorithm: parsed.algorithm, secret: parsed.secret,
-                                                                    issuer: "Steam", accountName: parsed.name, digits: 6)
+                template = try YubiKitOATHSession.CredentialTemplate(
+                    type: parsed.type, algorithm: parsed.algorithm, secret: parsed.secret,
+                    issuer: "Steam", accountName: parsed.name, digits: 6)
             } else {
                 components.host = components.host?.lowercased()
                 guard let url = components.url else { throw CredentialTemplateError.type }
                 template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
             }
-            return EnteCode(id: id, issuer: template.issuer, accountName: template.name, template: template, unsupportedReason: nil,
-                            otpAccount: otpAccount)
+            return EnteCode(
+                id: id, issuer: template.issuer, accountName: template.name, template: template, unsupportedReason: nil,
+                otpAccount: otpAccount)
         } catch {
-            return EnteCode(id: id, issuer: issuer, accountName: accountName, template: nil, unsupportedReason: error.localizedDescription,
-                            otpAccount: otpAccount)
+            return EnteCode(
+                id: id, issuer: issuer, accountName: accountName, template: nil, unsupportedReason: error.localizedDescription,
+                otpAccount: otpAccount)
         }
     }
 }
@@ -175,8 +181,9 @@ nonisolated enum EnteAuthenticatorSync {
         let encrypted = try EnteCrypto.secretBox(key, key: keys.masterKey)
         do {
             try await signedIn {
-                try await api.createAuthenticatorKey(token: keys.token, encryptedKey: encrypted.cipherText.base64EncodedString(),
-                                                     header: encrypted.nonce.base64EncodedString())
+                try await api.createAuthenticatorKey(
+                    token: keys.token, encryptedKey: encrypted.cipherText.base64EncodedString(),
+                    header: encrypted.nonce.base64EncodedString())
             }
             return key
         } catch EnteAPIError.http(statusCode: 409) {
@@ -190,7 +197,8 @@ nonisolated enum EnteAuthenticatorSync {
     static func authenticatorKey(api: EnteAPIClient, keys: EnteAccountKeys) async throws -> Data? {
         guard let key = try await signedIn({ try await api.authenticatorKey(token: keys.token) }) else { return nil }
         guard let encryptedKey = Data(enteBase64: key.encryptedKey), let nonce = Data(enteBase64: key.header),
-              let authenticatorKey = try? EnteCrypto.secretBoxOpen(encryptedKey, nonce: nonce, key: keys.masterKey) else {
+            let authenticatorKey = try? EnteCrypto.secretBoxOpen(encryptedKey, nonce: nonce, key: keys.masterKey)
+        else {
             throw EnteAuthenticatorSyncError.invalidKey
         }
         return authenticatorKey
@@ -201,8 +209,11 @@ nonisolated enum EnteAuthenticatorSync {
         try await decryptedEntities(api: api, token: token, authenticatorKey: authenticatorKey)
             .compactMap { id, rawData -> EnteCode? in
                 guard let rawData else {
-                    return EnteCode(id: id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
-                                    template: nil, unsupportedReason: String(localized: "This account could not be decrypted.", comment: "Ente import undecryptable account"))
+                    return EnteCode(
+                        id: id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
+                        template: nil,
+                        unsupportedReason: String(
+                            localized: "This account could not be decrypted.", comment: "Ente import undecryptable account"))
                 }
                 return EnteCodeParser.parse(id: id, rawData: rawData)
             }
@@ -210,15 +221,18 @@ nonisolated enum EnteAuthenticatorSync {
     }
 
     /// Returns the decrypted data of each entity, nil for an entity that couldn't be decrypted.
-    @concurrent static func decryptedEntities(api: EnteAPIClient, token: String, authenticatorKey: Data) async throws -> [(id: String, rawData: String?)] {
+    @concurrent static func decryptedEntities(api: EnteAPIClient, token: String, authenticatorKey: Data) async throws -> [(
+        id: String, rawData: String?
+    )] {
         try await allEntities(api: api, token: token).map { ($0.id, decrypt($0, authenticatorKey: authenticatorKey)) }
     }
 
     /// The plain text of an entity, nil if it is deleted or couldn't be decrypted.
     static func decrypt(_ entity: EnteAuthenticatorEntity, authenticatorKey: Data) -> String? {
         guard let encryptedData = entity.encryptedData.flatMap({ Data(enteBase64: $0) }),
-              let header = entity.header.flatMap({ Data(enteBase64: $0) }),
-              let decrypted = try? EnteCrypto.secretStreamDecrypt(encryptedData, header: header, key: authenticatorKey) else {
+            let header = entity.header.flatMap({ Data(enteBase64: $0) }),
+            let decrypted = try? EnteCrypto.secretStreamDecrypt(encryptedData, header: header, key: authenticatorKey)
+        else {
             return nil
         }
         return String(data: decrypted, encoding: .utf8)
@@ -252,7 +266,9 @@ nonisolated enum EnteAuthenticatorSync {
     /// left out, as this API has no way to ask for them.
     ///
     /// An entity with an `updatedAt` of 0 or less could never be asked for again, so such an answer is refused.
-    static func changes(api: EnteAPIClient, token: String, since sinceTime: Int64) async throws -> (entities: [EnteAuthenticatorEntity], latest: Int64) {
+    static func changes(api: EnteAPIClient, token: String, since sinceTime: Int64) async throws -> (
+        entities: [EnteAuthenticatorEntity], latest: Int64
+    ) {
         var latest = [String: EnteAuthenticatorEntity]()
         var sinceTime = sinceTime
         var largestPage = 0
@@ -273,7 +289,9 @@ nonisolated enum EnteAuthenticatorSync {
             pages += 1
             guard pages <= maxPages else { throw EnteAPIError.invalidResponse }
             let response = try await signedIn { try await api.authenticatorDiff(token: token, sinceTime: sinceTime, limit: limit) }
-            guard response.allSatisfy({ $0.updatedAt > 0 && isPlausible(updatedAt: $0.updatedAt) }) else { throw EnteAPIError.invalidResponse }
+            guard response.allSatisfy({ $0.updatedAt > 0 && isPlausible(updatedAt: $0.updatedAt) }) else {
+                throw EnteAPIError.invalidResponse
+            }
             // Ignores anything at or before `sinceTime`, so every page that is kept moves forward.
             let page = response.filter { $0.updatedAt > sinceTime }
             guard let maxUpdatedAt = page.map(\.updatedAt).max() else { break }
