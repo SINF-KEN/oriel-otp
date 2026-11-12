@@ -35,6 +35,8 @@ nonisolated enum KeychainService {
     static let deviceAccounts = "DeviceAccounts"
     static let tags = "Tags"
     static let favorites = "Favorites"
+    /// The key of the file with how often each account's code was copied, see `AccountUsage`.
+    static let usage = "Usage"
     static let autoFillWebsites = "AutoFill.Websites"
     static let autoFillAccounts = "AutoFill.Accounts"
     /// The app lock and its wrong attempts.

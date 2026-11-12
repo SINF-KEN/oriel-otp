@@ -114,6 +114,7 @@ extension ToastPresenter {
         } else {
             copyToClipboard(code)
         }
+        AccountUsage.shared.recordUse(of: account.accountId)
         // The row shows a checkmark for a moment, next to the toast.
         copiedAccountID = account.accountId
         copiedTask?.cancel()
