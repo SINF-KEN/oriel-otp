@@ -33,6 +33,8 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 - **Encrypted backup.** Save the accounts on this device to a file protected by a password, and restore it on this or
   another device. The file is Ente Auth's encrypted export, so Ente Auth opens it too. See
   [docs/backup.md](docs/backup.md).
+- **Move an account.** An account on this device or in Ente Auth shows its QR code, after the app lock, Face ID or
+  Touch ID, to add it to another device or app. A YubiKey never gives its secrets back, so its accounts can't.
 - **Import from other authenticators.** Google Authenticator's export QR codes (from a screenshot), and Aegis, 2FAS and
   Raivo exports without encryption, add their accounts to this device at once. So does a text file of otpauth links.
 - **OATH codes on a YubiKey (optional).** Time-based (TOTP) and counter-based (HOTP) codes, as used by most online services.

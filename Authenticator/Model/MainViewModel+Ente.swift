@@ -56,6 +56,12 @@ extension MainViewModel {
         return account
     }
 
+    /// The otpauth link of an account in Ente Auth or on this device, for its QR code. Nil for a YubiKey's, which the
+    /// YubiKey never gives the secret of.
+    func otpauthURL(for account: Account) -> URL? {
+        calculatedCode(of: account)?.otpauthURL
+    }
+
     /// The entry the app calculates an account's codes from.
     private func calculatedCode(of account: Account) -> EnteCloudCode? {
         switch account.location {

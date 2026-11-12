@@ -45,6 +45,8 @@ Accounts you save to **This device** are kept in a file in the app's storage, in
 
 ## Tags, hidden codes and Spotlight
 
+**Show QR Code** in the details of an account on this device or in Ente Auth shows the account, including its secret, as a QR code, to add it to another device or app. It asks for the app lock's code or password first, or for Face ID, Touch ID or the device passcode, and closes when the app leaves the foreground. The QR code isn't saved or sent anywhere.
+
 Tags you give accounts in Ente Auth or on this device are saved with the account, so tags of Ente Auth accounts are synced to Ente like their names. A YubiKey has no room for tags, so the tags of its accounts are kept in an encrypted file in the app's storage, with a key in the device keychain, excluded from backups.
 
 **Hide codes** only changes what the screen shows; it's kept in the app's preferences.
