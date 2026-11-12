@@ -71,6 +71,18 @@ final class ScreenshotTests: XCTestCase {
         try save("ente-accounts")
     }
 
+    /// The list with accounts saved on this device and no YubiKey, for the App Store listing, which says a YubiKey is
+    /// optional. Runs after `testScreenshots`, as it leaves the accounts on the simulator.
+    @MainActor func testWithoutAYubiKeyScreenshot() throws {
+        app.terminate()
+        app.launchArguments = ["-DemoDate", Self.demoDate, "-DemoUnplugged", "YES", "-DemoDeviceAccounts", "YES"]
+        app.launch()
+        let github = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "identifier BEGINSWITH 'account-row.device/'")).firstMatch
+        XCTAssertTrue(github.waitForExistence(timeout: 20), "The accounts on this device didn't show")
+        try save("accounts-without-yubikey")
+    }
+
     /// Writes a screenshot to `SCREENSHOT_DIR`, or attaches it to the test result when that isn't set.
     @MainActor private func save(_ name: String) throws {
         // Lets animations, like the countdown rings and sheet presentation, finish.
