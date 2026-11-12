@@ -77,6 +77,10 @@ WatchConnectivity also keeps the most recent list that was sent on the iPhone an
 The watch app makes no network connections. In its own settings storage it only keeps a note of accounts or a key it
 still has to delete, for when deleting failed while the watch was locked.
 
+The **Favorite Code** complication, if you add it to a watch face or the Smart Stack, reads the same keychain items,
+shared with the watch app's complication extension and nowhere else, to show the code of your first pinned account. Its
+code is marked private, so the watch face hides it while the watch is locked or off your wrist.
+
 Turning the switch off sends an empty list that replaces the previous one and makes the watch delete its copy.
 Signing out of Ente, or Ente ending the session, sends the list without the Ente Auth accounts, and deleting the last
 account sends an empty one. If the watch can't be reached at that moment, the iPhone sends it the next time it can.

@@ -16,6 +16,7 @@
 
 import Foundation
 import WatchConnectivity
+import WidgetKit
 
 /// The accounts sent by the iPhone, kept in the watch's keychain so codes work without the iPhone.
 ///
@@ -24,7 +25,12 @@ import WatchConnectivity
 /// or the app becomes active, until it gets it. Until then the accounts saved before stay.
 @Observable final class WatchAccountStore: NSObject {
 
-    private(set) var accounts: [OTPAccount]
+    private(set) var accounts: [OTPAccount] {
+        didSet {
+            // The complication shows the first pinned account.
+            if accounts != oldValue { WidgetCenter.shared.reloadTimelines(ofKind: "io.github.sinf-ken.OrielOTP.FavoriteCode") }
+        }
+    }
 
     @ObservationIgnored private let receiver: WatchAccountReceiver?
     /// The latest context couldn't be opened without the key.
