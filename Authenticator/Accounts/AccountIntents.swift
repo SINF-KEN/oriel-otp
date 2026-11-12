@@ -221,6 +221,7 @@ struct CopyCodeIntent: AppIntent {
         code = try CalculatedAccounts.code(for: account.id)
         #endif
         Platform.copy(code)
+        AccountUsage.shared.recordUse(of: account.id)
         // Asked for while the app was locked, the account came without its name.
         let title = CalculatedAccounts.entities().first { $0.id == account.id }?.title ?? account.title
         // The code isn't said, so it isn't read out or shown with Hide codes on. It is the result, for the next action.

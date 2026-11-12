@@ -120,7 +120,8 @@ extension MainView {
 
     /// The accounts with the selected tag, or all of them.
     var taggedAccounts: [Account] {
-        selectedTag == nil ? model.accounts : model.accounts.filter { $0.isTagged(selectedTag) }
+        let accounts = selectedTag == nil ? model.accounts : model.accounts.filter { $0.isTagged(selectedTag) }
+        return AccountUsage.shared.ordered(accounts, id: \.accountId)
     }
 
     private var pinnedAccounts: [Account] {
