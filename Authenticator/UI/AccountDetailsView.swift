@@ -154,6 +154,8 @@ struct AccountDetailView: View {
                 }
                 .help(String(localized: "File the account under tags", comment: "Toolbar help"))
                 .accessibilityIdentifier("account-details.tags")
+                ProtectCodeButton(account: account)
+                    .accessibilityIdentifier("account-details.protect")
                 CopyToYubiKeyButtons(account: account)
                 if !account.isOnYubiKey {
                     Button(action: showQRCode) {

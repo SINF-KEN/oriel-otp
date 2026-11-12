@@ -96,6 +96,17 @@ extension ToastPresenter {
 
     /// Copies the account's code, calculating a new one first if there's none or it has expired.
     func copyCode(of account: Account) {
+        guard ProtectedAccounts.shared.isProtected(account.accountId) else {
+            copyUnlockedCode(of: account)
+            return
+        }
+        Task {
+            guard await ProtectedAccounts.shared.unlock(account.accountId, title: account.title) else { return }
+            copyUnlockedCode(of: account)
+        }
+    }
+
+    private func copyUnlockedCode(of account: Account) {
         // With Hide codes on, tapping a code shows it too.
         CodeVisibility.shared.reveal(account.accountId)
         if account.state != .expired, let otp = account.otp?.code {
