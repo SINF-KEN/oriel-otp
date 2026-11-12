@@ -58,12 +58,25 @@ nonisolated public struct PasswordQueryable {
     let accessControl: SecAccessControlCreateFlags
     /// What the Touch ID or password prompt says it is for. Nil for the saved YubiKey password.
     let reason: String?
+    /// Whether the items get `accessControl` and the access group. Off on the simulator, whose keychain refuses them;
+    /// the tests turn it on to check what a device gets.
+    let appliesAccessControl: Bool
 
-    init(service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet, reason: String? = nil) {
+    static var deviceAppliesAccessControl: Bool {
+#if targetEnvironment(simulator)
+        false
+#else
+        true
+#endif
+    }
+
+    init(service: String, accessGroup: String? = nil, accessControl: SecAccessControlCreateFlags = .biometryCurrentSet, reason: String? = nil,
+         appliesAccessControl: Bool = deviceAppliesAccessControl) {
         self.service = service
         self.accessGroup = accessGroup
         self.accessControl = accessControl
         self.reason = reason
+        self.appliesAccessControl = appliesAccessControl
     }
 }
 
@@ -77,8 +90,7 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
         // the access control flags below and doesn't ask for the login password.
         query[String(kSecUseDataProtectionKeychain)] = true
 #endif
-// Access group if target environment is not simulator
-#if !targetEnvironment(simulator)
+        guard appliesAccessControl else { return query }
         if let accessGroup = accessGroup {
             query[String(kSecAttrAccessGroup)] = "\(APP_ID)." + accessGroup
         }
@@ -91,13 +103,11 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
             context.localizedReason = reason ?? String(localized: "Use the saved YubiKey password.", comment: "Face ID or Touch ID prompt for the saved OATH password of a YubiKey")
             query[String(kSecUseAuthenticationContext)] = context
         }
-#endif
         return query
     }
 
     func protection(useAuthentication: Bool) throws -> [String: Any] {
-#if !targetEnvironment(simulator)
-        if useAuthentication {
+        if useAuthentication && appliesAccessControl {
             var error: Unmanaged<CFError>?
             guard let accessControl = SecAccessControlCreateWithFlags(nil, // use the default allocator
                                                                       kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly,
@@ -108,7 +118,6 @@ nonisolated extension PasswordQueryable: SecureStoreQueryable {
             }
             return [String(kSecAttrAccessControl): accessControl]
         }
-#endif
         // Never in backups or on another device, and gone with the app.
         return [String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
     }

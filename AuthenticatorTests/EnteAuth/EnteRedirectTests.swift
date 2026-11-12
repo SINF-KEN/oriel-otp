@@ -62,6 +62,21 @@ struct EnteRedirectTests {
     @Test func theSessionKeepsNothingOnDiskAndChecksRedirects() {
         #expect(URLSession.ente.delegate is EnteRedirectGuard)
         #expect(URLSession.ente.configuration.urlCache?.diskCapacity ?? 0 == 0)
-        #expect(URLSession.ente.configuration.httpCookieStorage?.cookies?.isEmpty ?? true)
+    }
+
+    /// A cookie the server sets stays in the session's own store, in memory, and never reaches the app's shared store,
+    /// which is kept on disk. Fails if the session uses the default configuration.
+    @Test func cookiesStayOutOfTheSharedStore() throws {
+        let storage = try #require(URLSession.ente.configuration.httpCookieStorage)
+        #expect(storage !== HTTPCookieStorage.shared)
+        let url = try #require(URL(string: "https://cookie-test.ente.invalid/users/ott"))
+        let name = "OrielCookieTest-\(UUID().uuidString)"
+        let cookie = try #require(HTTPCookie(properties: [.name: name, .value: "1", .domain: "cookie-test.ente.invalid",
+                                                          .path: "/", .expires: Date().addingTimeInterval(3600)]))
+        storage.setCookies([cookie], for: url, mainDocumentURL: nil)
+        defer { storage.deleteCookie(cookie) }
+
+        #expect(storage.cookies(for: url)?.contains { $0.name == name } == true)
+        #expect(HTTPCookieStorage.shared.cookies(for: url)?.contains { $0.name == name } != true)
     }
 }

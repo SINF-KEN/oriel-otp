@@ -123,6 +123,7 @@ nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sen
     private var accounts: [AutoFillAccount]?
     private var saves = 0
     private var fails = false
+    private var failsLoading = false
 
     /// How many times the accounts were written.
     var saveCount: Int { lock.withLock { saves } }
@@ -131,8 +132,17 @@ nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sen
         set { lock.withLock { fails = newValue } }
     }
 
+    /// Loading throws `EncryptedFileError.unavailable`, as while the device is locked.
+    var failsToLoad: Bool {
+        get { lock.withLock { failsLoading } }
+        set { lock.withLock { failsLoading = newValue } }
+    }
+
     func load() throws -> [AutoFillAccount]? {
-        lock.withLock { accounts }
+        try lock.withLock {
+            if failsLoading { throw EncryptedFileError.unavailable }
+            return accounts
+        }
     }
 
     func save(_ accounts: [AutoFillAccount]) throws {

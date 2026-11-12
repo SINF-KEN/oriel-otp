@@ -101,13 +101,10 @@ final class TokenRequestViewModel {
     /// Throws ``TokenError/cancelled`` when there is nothing to show the user.
     func handleTokenRequest(_ userInfo: [AnyHashable: Any], password: String) async throws(TokenError) {
         Logger.ctk.yubilog("App: handleTokenRequest started")
-        guard let operationType = userInfo.operationType() else { Logger.ctk.error("No OperationType defined"); throw .cancelled }
-        guard let keyType = userInfo.keyType(),
-              let objectId = userInfo.objectId(),
-              let algorithm = userInfo.algorithm(),
-              let message = userInfo.data() else { Logger.ctk.error("No data to sign"); throw .cancelled }
+        guard let request = TokenRequest(userInfo: userInfo) else { Logger.ctk.error("Not a token request"); throw .cancelled }
+        let (operationType, keyType, objectId, algorithm, message) = (request.operation, request.keyType, request.objectID, request.algorithm, request.data)
         // The extension only takes an answer filed under the request it's waiting for.
-        guard let requestID = userInfo[TokenResponseStore.requestIDKey] as? String else { throw .cancelled }
+        let requestID = request.requestID
         let session: PIVSession
         let isNFCConnection: Bool
         do {
@@ -238,6 +235,11 @@ final class TokenRequestViewModel {
     private func verifySignature(_ signature: Data, data: Data, objectId: String, algorithm: SecKeyAlgorithm) -> Error? {
         guard let certificate = TokenCertificateStorage().getTokenCertificate(withObjectId: objectId) else { return "No certificate for objectId: \(objectId)" }
         guard let publicKey = certificate.publicKey() else { return "No public key in this certificate" }
+        return Self.verify(signature, data: data, publicKey: publicKey, algorithm: algorithm)
+    }
+
+    /// Nil when the signature is the key's, so the YubiKey signed with the key of the certificate the request was for.
+    static func verify(_ signature: Data, data: Data, publicKey: SecKey, algorithm: SecKeyAlgorithm) -> Error? {
         var error: Unmanaged<CFError>?
         let result = SecKeyVerifySignature(publicKey, algorithm, data as CFData, signature as CFData, &error);
         if !result {
@@ -249,11 +251,6 @@ final class TokenRequestViewModel {
             return nil
         }
     }
-}
-
-enum OperationType: String {
-    case signData = "signData"
-    case decryptData = "decryptData"
 }
 
 
@@ -287,14 +284,6 @@ extension TokenRequestViewModel {
         let deviceInfo = try await ConnectionManager.shared.nextWiredConnection().managementSession().getDeviceInfo()
         SettingsConfig.registerUSBCDeviceToIgnore(deviceId: deviceInfo.serialNumber)
     }
-}
-
-/// The type of the key in a PIV slot, as sent by the token extension.
-enum TokenKeyType: UInt8 {
-    case rsa1024 = 0x06
-    case rsa2048 = 0x07
-    case eccp256 = 0x11
-    case eccp384 = 0x14
 }
 
 private extension PIVSession {
@@ -385,31 +374,6 @@ nonisolated enum PIVPadding {
             throw "Failed to get the public key"
         }
         return (privateKey, publicKey)
-    }
-}
-
-private extension Dictionary where Key == AnyHashable, Value: Any {
-    func data() -> Data? {
-        return self["data"] as? Data
-    }
-
-    func objectId() -> String? {
-        return self["keyObjectID"] as? String
-    }
-
-    func keyType() -> TokenKeyType? {
-        guard let rawValue = self["keyType"] as? UInt8 ?? (self["keyType"] as? UInt).map({ UInt8(truncatingIfNeeded: $0) }) else { return nil }
-        return TokenKeyType(rawValue: rawValue)
-    }
-
-    func algorithm() -> SecKeyAlgorithm? {
-        guard let rawValue = self["algorithm"] as? String else { return nil }
-        return SecKeyAlgorithm(rawValue: rawValue as CFString)
-    }
-
-    func operationType() -> OperationType? {
-        guard let rawValue = self["operationType"] as? String else { return nil }
-        return OperationType.init(rawValue: rawValue)
     }
 }
 
