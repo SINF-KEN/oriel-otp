@@ -103,7 +103,7 @@ struct SyncDataLossTests {
         #expect(cloud.hasPendingChanges)
 
         let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults,
-                                      session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults), cloud: cloud)
+                                      session: OfflineURLProtocol.session, cloud: cloud)
         #expect(sheet.hasPendingChanges)
         sheet.signOut()
         while sheet.isBusy { await Task.yield() }
@@ -145,7 +145,7 @@ struct SyncDataLossTests {
         GatedURLProtocol.requestCount = 0
 
         let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults,
-                                      session: GatedURLProtocol.session, watch: WatchAccountSync(defaults: defaults), cloud: cloud)
+                                      session: GatedURLProtocol.session, cloud: cloud)
         sheet.usesOwnServer = true
         sheet.server = server.absoluteString + "/"
         sheet.email = email

@@ -176,11 +176,11 @@ struct EnteSessionStore {
     /// The copy of the accounts in the vault is deleted too, with changes that weren't uploaded yet.
     /// The request that ends the session on the server, if one was sent. Tests wait for it.
     @discardableResult
-    @MainActor func signOut(watch: WatchAccountSync = .shared, cloud: EnteCloud = .shared, session: URLSession = .ente) async -> Task<Void, Never>? {
+    @MainActor func signOut(cloud: EnteCloud = .shared, session: URLSession = .ente) async -> Task<Void, Never>? {
         let saved = savedAccount?.hasSession == true ? try? await read() : nil
         remove()
+        // Takes the accounts off the watch too, keeping the ones on this device.
         cloud.remove()
-        watch.disable()
         guard let saved, let api = try? EnteAPIClient(server: saved.server, session: session) else { return nil }
         return Task { try? await api.logout(token: saved.token) }
     }

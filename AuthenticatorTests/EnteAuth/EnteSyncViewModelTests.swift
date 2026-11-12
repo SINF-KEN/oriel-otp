@@ -32,7 +32,7 @@ struct EnteSyncViewModelTests {
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
         let watch = WatchAccountSync(defaults: defaults)
-        let model = EnteSyncViewModel(existingCredentialIds: existing, capacity: capacity, store: store, defaults: defaults, watch: watch,
+        let model = EnteSyncViewModel(existingCredentialIds: existing, capacity: capacity, store: store, defaults: defaults,
                                       cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch))
         model.codes = codes.map(code)
         return model

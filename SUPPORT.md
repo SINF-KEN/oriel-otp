@@ -122,11 +122,12 @@ The Mac app reads the YubiKey over USB: plug it in and the codes appear. It does
 
 ## Apple Watch
 
-The watch app shows the codes of your time-based Ente Auth accounts, without the iPhone nearby. It can't reach a
-YubiKey, so accounts that are only on the key aren't shown, nor are counter-based (HOTP) accounts.
+The watch app shows the codes of your time-based accounts on the iPhone and in Ente Auth, without the iPhone nearby.
+It can't reach a YubiKey, so accounts that are only on the key aren't shown, nor are counter-based (HOTP) accounts.
 
-To turn it on, choose **Sync from Ente Auth** on the iPhone, sign in with **Stay signed in** on, and turn on **Show
-Ente Auth accounts on Apple Watch**. Turning it off or signing out deletes the accounts from the watch.
+To turn it on, open **Configuration** on the iPhone and turn on **Show accounts on Apple Watch**. Ente Auth accounts
+are included while you stay signed in to Ente (**Stay signed in**). Turning it off deletes the accounts from the
+watch; signing out of Ente deletes the Ente Auth ones.
 
 ## Privacy
 

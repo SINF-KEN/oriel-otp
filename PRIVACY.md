@@ -41,7 +41,7 @@ On a server you host yourself, **Create account** sends the email address you en
 
 ## Accounts on this device
 
-Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device, unless you made a backup. **Back up accounts…** in the settings writes them, including their secrets, to a file encrypted with a password you choose, saved where you choose. The app doesn't keep the password or a copy of the file, and doesn't send it anywhere. Deleting an account removes it for good. AutoFill can fill in their codes (see below); the Apple Watch app doesn't use them.
+Accounts you save to **This device** are kept in a file in the app's storage, including their secrets. The file is encrypted with a random key kept in the device keychain, which never leaves the device and can be read while the device is unlocked. The file is excluded from backups and isn't synced to iCloud or sent anywhere, so these accounts are lost if you lose or erase the device, unless you made a backup. **Back up accounts…** in the settings writes them, including their secrets, to a file encrypted with a password you choose, saved where you choose. The app doesn't keep the password or a copy of the file, and doesn't send it anywhere. Deleting an account removes it for good. AutoFill can fill in their codes, and the Apple Watch app can show them (see below).
 
 ## Tags, hidden codes and Spotlight
 
@@ -59,10 +59,10 @@ If you turn on **App lock**, the app keeps the lock method you chose in the devi
 
 ## Optional Apple Watch app
 
-The Apple Watch app is off until you turn on **Show Ente Auth accounts on Apple Watch** under **Sync from Ente Auth**,
-which needs a saved Ente session. When it's on, the iPhone app sends your time-based Ente Auth accounts, including
-their secrets, to your paired Apple Watch with Apple's WatchConnectivity framework each time they are synced from
-Ente or changed in the app. Counter-based (HOTP) accounts are not sent.
+The Apple Watch app is off until you turn on **Show accounts on Apple Watch** under **Configuration**. When it's on,
+the iPhone app sends your time-based accounts saved to **This device**, and those of your Ente Auth account while you
+stay signed in, including their secrets, to your paired Apple Watch with Apple's WatchConnectivity framework each time
+they change or are synced from Ente. Counter-based (HOTP) accounts are not sent.
 
 This is different from the YubiKey: the watch keeps a copy of these secrets so it can calculate codes without the
 iPhone. They are stored in the watch's keychain, readable only while the watch is unlocked, and not synced to iCloud or
@@ -71,8 +71,9 @@ WatchConnectivity also keeps the most recent list that was sent on the iPhone an
 The watch app makes no network connections. In its own settings storage it only keeps a note of accounts or a key it
 still has to delete, for when deleting failed while the watch was locked.
 
-Turning the switch off, or signing out of Ente, sends an empty list that replaces the previous one and makes the
-watch delete its copy. If the watch can't be reached at that moment, the iPhone sends it the next time it can.
+Turning the switch off sends an empty list that replaces the previous one and makes the watch delete its copy.
+Signing out of Ente, or Ente ending the session, sends the list without the Ente Auth accounts, and deleting the last
+account sends an empty one. If the watch can't be reached at that moment, the iPhone sends it the next time it can.
 
 ## AutoFill
 
@@ -91,8 +92,8 @@ you choose are kept in a file protected like that copy, and excluded from backup
 ## Retention, deletion, and revoking access
 
 - To remove a saved Ente session from this device and sign out, choose **Sign out** under **Sync from Ente Auth** or in the Ente Auth section of the settings. This clears the locally saved token, key, email, server and the copy of your Ente Auth accounts right away, including changes not yet uploaded to Ente, then asks Ente to end the server session. If the server cannot be reached, the local session has already been removed; you may also revoke the session from your Ente account.
-- To remove the Ente Auth accounts from your Apple Watch, turn off **Show Ente Auth accounts on Apple Watch** or sign
-  out of Ente. Deleting the watch app also removes them.
+- To remove the accounts from your Apple Watch, turn off **Show accounts on Apple Watch**. Signing out of Ente removes
+  the Ente Auth ones. Deleting the watch app also removes them.
 - Signing out of Ente also deletes the AutoFill copy of your accounts and the websites chosen for them, and removes
   them from the system's AutoFill suggestions. Turning off AutoFill from Oriel OTP in the system settings removes the
   suggestions too.
