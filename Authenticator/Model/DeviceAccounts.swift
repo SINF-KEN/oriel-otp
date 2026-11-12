@@ -95,8 +95,9 @@ enum DeviceAccountsError: Error, LocalizedError {
     @ObservationIgnored var onChange: (() -> Void)?
 
     @ObservationIgnored private let storage: DeviceAccountStorage
-    /// The file couldn't be read yet, e.g. because the app was launched in the background on a locked device.
-    @ObservationIgnored private var isLocked = false
+    /// The file couldn't be read yet, e.g. because the app was launched in the background on a locked device. There
+    /// are no accounts until it can, which doesn't mean there are none.
+    @ObservationIgnored private(set) var isLocked = false
     /// The file can't be read at all, e.g. it was written by a later version of the app. It is set aside before the
     /// first save rather than written over.
     @ObservationIgnored private var isUnreadable = false
@@ -144,6 +145,14 @@ enum DeviceAccountsError: Error, LocalizedError {
         items.compactMap { item in
             EnteCloudCode(rawData: item.rawData).map { Account(id: item.id, code: $0) }
         }
+    }
+
+    /// The accounts as they're parsed off the main actor, for AutoFill: a copy of what's stored now.
+    var storedItems: [DeviceAccountItem] { items }
+
+    /// The accounts of `items` in the form AutoFill and the Apple Watch take, without data that can't be read.
+    nonisolated static func codes(of items: [DeviceAccountItem]) -> [EnteCode] {
+        items.compactMap { EnteCodeParser.parse(id: $0.id, rawData: $0.rawData) }
     }
 
     /// Adds an account, unless there is one with the same name.

@@ -7150,60 +7150,60 @@
         }
       }
     },
-    "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first." : {
+    "Fill in the codes of your time-based accounts in Ente Auth and on this device in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first." : {
       "comment" : "Mac AutoFill settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Setze die Codes Deiner zeitbasierten Ente-Auth-Konten in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt."
+            "value" : "Setze die Codes Deiner zeitbasierten Konten in Ente Auth und auf diesem Gerät in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remplissez les codes de vos comptes Ente Auth basés sur le temps dans Safari et d’autres apps. Chaque compte est proposé sur les sites web indiqués dans ses détails. Les codes des comptes de votre YubiKey ne peuvent pas être remplis. Si vous verrouillez l’app, elle est d’abord déverrouillée."
+            "value" : "Remplissez les codes de vos comptes basés sur le temps, dans Ente Auth et sur cet appareil, dans Safari et d’autres apps. Chaque compte est proposé sur les sites web indiqués dans ses détails. Les codes des comptes de votre YubiKey ne peuvent pas être remplis. Si vous verrouillez l’app, elle est d’abord déverrouillée."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Safariやほかのアプリで、時間ベースのEnte Authアカウントのコードを入力できます。各アカウントは、詳細にあるWebサイトで提案されます。YubiKeyのアカウントのコードは入力できません。アプリをロックしている場合は、先にロックを解除します。"
+            "value" : "Safariやほかのアプリで、Ente Authとこのデバイスにある時間ベースのアカウントのコードを入力できます。各アカウントは、詳細にあるWebサイトで提案されます。YubiKeyのアカウントのコードは入力できません。アプリをロックしている場合は、先にロックを解除します。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypĺňajte kódy časových účtov Ente Auth v Safari a iných aplikáciách. Každý účet sa navrhne na webových stránkach uvedených v jeho podrobnostiach. Kódy účtov na kľúči YubiKey nemožno vyplniť. Ak aplikáciu uzamknete, najprv sa odomkne."
+            "value" : "Vypĺňajte kódy časových účtov v Ente Auth a v tomto zariadení v Safari a iných aplikáciách. Každý účet sa navrhne na webových stránkach uvedených v jeho podrobnostiach. Kódy účtov na kľúči YubiKey nemožno vyplniť. Ak aplikáciu uzamknete, najprv sa odomkne."
           }
         }
       }
     },
-    "Fill in the codes of your time-based Ente Auth accounts in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes." : {
+    "Fill in the codes of your time-based accounts in Ente Auth and on this device in Safari and other apps. Each account is suggested on the websites in its details. Codes of accounts on your YubiKey can't be filled in. If you lock the app, it is unlocked first. In Settings, choose Oriel OTP for Set Up Codes In to add accounts from setup links and QR codes." : {
       "comment" : "AutoFill settings footer",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Setze die Codes Deiner zeitbasierten Ente-Auth-Konten in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt. Wähle in den Einstellungen Oriel OTP für „Codes einrichten in“, um Konten über Einrichtungslinks und QR-Codes hinzuzufügen."
+            "value" : "Setze die Codes Deiner zeitbasierten Konten in Ente Auth und auf diesem Gerät in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt. Wähle in den Einstellungen Oriel OTP für „Codes einrichten in“, um Konten über Einrichtungslinks und QR-Codes hinzuzufügen."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Remplissez les codes de vos comptes Ente Auth basés sur le temps dans Safari et d’autres apps. Chaque compte est proposé sur les sites web indiqués dans ses détails. Les codes des comptes de votre YubiKey ne peuvent pas être remplis. Si vous verrouillez l’app, elle est d’abord déverrouillée. Dans Réglages, choisissez Oriel OTP pour « Configurer les codes dans » afin d’ajouter des comptes depuis les liens et codes QR de configuration."
+            "value" : "Remplissez les codes de vos comptes basés sur le temps, dans Ente Auth et sur cet appareil, dans Safari et d’autres apps. Chaque compte est proposé sur les sites web indiqués dans ses détails. Les codes des comptes de votre YubiKey ne peuvent pas être remplis. Si vous verrouillez l’app, elle est d’abord déverrouillée. Dans Réglages, choisissez Oriel OTP pour « Configurer les codes dans » afin d’ajouter des comptes depuis les liens et codes QR de configuration."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Safariやほかのアプリで、時間ベースのEnte Authアカウントのコードを入力できます。各アカウントは、詳細にあるWebサイトで提案されます。YubiKeyのアカウントのコードは入力できません。アプリをロックしている場合は、先にロックを解除します。設定の「コードの設定に使用」でOriel OTPを選ぶと、設定用のリンクやQRコードからアカウントを追加できます。"
+            "value" : "Safariやほかのアプリで、Ente Authとこのデバイスにある時間ベースのアカウントのコードを入力できます。各アカウントは、詳細にあるWebサイトで提案されます。YubiKeyのアカウントのコードは入力できません。アプリをロックしている場合は、先にロックを解除します。設定の「コードの設定に使用」でOriel OTPを選ぶと、設定用のリンクやQRコードからアカウントを追加できます。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vypĺňajte kódy časových účtov Ente Auth v Safari a iných aplikáciách. Každý účet sa navrhne na webových stránkach uvedených v jeho podrobnostiach. Kódy účtov na kľúči YubiKey nemožno vyplniť. Ak aplikáciu uzamknete, najprv sa odomkne. Ak chcete pridávať účty z odkazov a QR kódov na nastavenie, v Nastaveniach vyberte Oriel OTP pre „Nastaviť kódy v“."
+            "value" : "Vypĺňajte kódy časových účtov v Ente Auth a v tomto zariadení v Safari a iných aplikáciách. Každý účet sa navrhne na webových stránkach uvedených v jeho podrobnostiach. Kódy účtov na kľúči YubiKey nemožno vyplniť. Ak aplikáciu uzamknete, najprv sa odomkne. Ak chcete pridávať účty z odkazov a QR kódov na nastavenie, v Nastaveniach vyberte Oriel OTP pre „Nastaviť kódy v“."
           }
         }
       }
