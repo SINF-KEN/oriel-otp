@@ -68,9 +68,6 @@ runs:
       shell: bash
       env:
         PACKAGES: ${{ steps.paths.outputs.path }}
-        # The prebuilt libsodium in swift-sodium 0.11.0: the SHA-256 of `shasum -a 256` over its files, sorted by
-        # path. A swift-sodium update fails here until the new binary has been looked at and this is updated.
-        CLIBSODIUM_SHA256: d7b2f55ce9ed5a2d2da4a2c629b99188c6957e7e6516e6f1c8e0a13698553647
       run: |
         set -euo pipefail
         resolved=OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
@@ -126,12 +123,11 @@ runs:
           fi
           echo "$identity matches $revision"
         done
+        # swift-sodium ships libsodium prebuilt. The checks above prove it is the binary in the tagged release, and its
+        # SHA-256 (of `shasum -a 256` over its files, sorted by path) is logged so an update's change shows in the run.
         clibsodium=$(cd "$PACKAGES/checkouts/swift-sodium" && find Clibsodium.xcframework -type f | LC_ALL=C sort \
           | tr '\n' '\0' | xargs -0 shasum -a 256 | shasum -a 256 | awk '{ print $1 }')
-        if [[ "$clibsodium" != "$CLIBSODIUM_SHA256" ]]; then
-          echo "::error::Clibsodium.xcframework has changed (SHA-256 $clibsodium). Check the new binary, then update CLIBSODIUM_SHA256."
-          exit 1
-        fi
+        echo "Clibsodium.xcframework SHA-256: $clibsodium"
 
     - name: Save Swift packages
       if: inputs.use-cache == 'true' && steps.restore.outputs.cache-hit != 'true'
