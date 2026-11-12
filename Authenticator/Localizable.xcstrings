@@ -289,6 +289,64 @@
         }
       }
     },
+    "Ask for %@ to Copy" : {
+      "comment" : "Menu. The placeholder is Face ID, Touch ID, Optic ID, Device passcode or Mac password.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zum Kopieren nach %@ fragen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Demander %@ pour copier"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "コピー時に%@を要求"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Na kopírovanie vyžadovať %@"
+          }
+        }
+      }
+    },
+    "Ask for this before showing or copying the code for %@." : {
+      "comment" : "Face ID or Touch ID prompt when protecting an account. The placeholder is the account's name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vor dem Anzeigen oder Kopieren des Codes für %@ danach fragen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Demander ceci avant d’afficher ou de copier le code de %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のコードを表示またはコピーする前に確認します。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pýtať sa na toto pred zobrazením alebo skopírovaním kódu pre %@."
+          }
+        }
+      }
+    },
     "Back up accounts" : {
       "comment" : "Backup navigation title",
       "localizations" : {
@@ -13645,6 +13703,35 @@
         }
       }
     },
+    "Show and copy the code for %@." : {
+      "comment" : "Face ID or Touch ID prompt before copying a protected account's code. The placeholder is the account's name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code für %@ anzeigen und kopieren."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Afficher et copier le code de %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のコードを表示してコピーします。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zobraziť a skopírovať kód pre %@."
+          }
+        }
+      }
+    },
     "Show in menu bar" : {
       "comment" : "Mac setting",
       "localizations" : {
@@ -14452,6 +14539,64 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pri zostaní prihlásený sa vaša relácia a kľúč, ktorý dešifruje vaše účty, uložia do kľúčenky, chránené Touch ID alebo heslom vášho Macu, takže môžete znova synchronizovať bez hesla. Samotné heslo sa nikdy neukladá."
+          }
+        }
+      }
+    },
+    "Stop Asking for %@" : {
+      "comment" : "Menu. The placeholder is Face ID, Touch ID, Optic ID, Device passcode or Mac password.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nicht mehr nach %@ fragen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ne plus demander %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@を求めない"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nepýtať sa na %@"
+          }
+        }
+      }
+    },
+    "Stop asking for this before showing or copying the code for %@." : {
+      "comment" : "Face ID or Touch ID prompt when no longer protecting an account. The placeholder is the account's name.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vor dem Anzeigen oder Kopieren des Codes für %@ nicht mehr danach fragen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ne plus demander ceci avant d’afficher ou de copier le code de %@."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@のコードを表示またはコピーする前の確認をやめます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Prestať sa na toto pýtať pred zobrazením alebo skopírovaním kódu pre %@."
           }
         }
       }
@@ -16504,6 +16649,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tieto certifikáty boli pridané na tento %@ a môžu ich používať iné aplikácie."
+          }
+        }
+      }
+    },
+    "This account asks for Face ID, Touch ID or the passcode. Copy its code in Oriel OTP." : {
+      "comment" : "Shortcuts error when checking the device owner for a protected account failed",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dieses Konto fragt nach Face ID, Touch ID oder dem Code. Kopiere seinen Code in Oriel OTP."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ce compte demande Face ID, Touch ID ou le code. Copiez son code dans Oriel OTP."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントにはFace ID、Touch ID、またはパスコードが必要です。Oriel OTPでコードをコピーしてください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tento účet vyžaduje Face ID, Touch ID alebo kód. Skopírujte jeho kód v Oriel OTP."
           }
         }
       }

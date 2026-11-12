@@ -27,6 +27,7 @@ import SwiftUI
     static let revealDuration = Duration.seconds(10)
 
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let protection: ProtectedAccounts
 
     var hidesCodes: Bool {
         didSet {
@@ -40,18 +41,20 @@ import SwiftUI
     private(set) var revealed: Set<String> = []
     @ObservationIgnored private var hideTasks: [String: Task<Void, Never>] = [:]
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, protection: ProtectedAccounts = .shared) {
         self.defaults = defaults
+        self.protection = protection
         hidesCodes = defaults.bool(forKey: Self.hidesCodesKey)
     }
 
+    /// A protected account's code only shows for a few seconds after Face ID or Touch ID, see `ProtectedAccounts`.
     func isShown(_ accountID: String) -> Bool {
-        !hidesCodes || revealed.contains(accountID)
+        revealed.contains(accountID) || (!hidesCodes && !protection.isProtected(accountID))
     }
 
-    /// Shows the code for a few seconds, if codes are hidden.
+    /// Shows the code for a few seconds, if codes are hidden or the account is protected.
     func reveal(_ accountID: String) {
-        guard hidesCodes else { return }
+        guard hidesCodes || protection.isProtected(accountID) else { return }
         revealed.insert(accountID)
         hideTasks[accountID]?.cancel()
         hideTasks[accountID] = Task { [weak self] in

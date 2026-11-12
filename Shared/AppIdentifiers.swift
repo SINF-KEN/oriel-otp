@@ -37,6 +37,8 @@ nonisolated enum KeychainService {
     static let favorites = "Favorites"
     /// The key of the file with how often each account's code was copied, see `AccountUsage`.
     static let usage = "Usage"
+    /// The key of the file with the accounts whose codes need Face ID or Touch ID, see `ProtectedAccounts`.
+    static let protectedAccounts = "ProtectedAccounts"
     static let autoFillWebsites = "AutoFill.Websites"
     static let autoFillAccounts = "AutoFill.Accounts"
     /// The app lock and its wrong attempts.

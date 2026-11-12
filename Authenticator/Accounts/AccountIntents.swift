@@ -139,6 +139,7 @@ struct AccountQuery: EntityStringQuery {
         case accountNotFound
         case locked
         case yubiKeyOnly
+        case protected
 
         var errorDescription: String? {
             switch self {
@@ -148,6 +149,8 @@ struct AccountQuery: EntityStringQuery {
                 String(localized: "Unlock Oriel OTP and try again.", comment: "Mac Shortcuts error when the app is locked")
             case .yubiKeyOnly:
                 String(localized: "Open Oriel OTP to get the codes of accounts on a YubiKey.", comment: "Shortcuts error on iOS for a YubiKey account")
+            case .protected:
+                String(localized: "This account asks for Face ID, Touch ID or the passcode. Copy its code in Oriel OTP.", comment: "Shortcuts error when checking the device owner for a protected account failed")
             }
         }
     }
@@ -210,6 +213,9 @@ struct CopyCodeIntent: AppIntent {
 
     @MainActor func perform() async throws -> some IntentResult & ReturnsValue<String> & ProvidesDialog {
         try await unlockApp()
+        // Asked for while the app was locked, the account came without its name.
+        let title = CalculatedAccounts.entities().first { $0.id == account.id }?.title ?? account.title
+        guard await ProtectedAccounts.shared.unlock(account.id, title: title) else { throw CalculatedAccounts.CodeError.protected }
         let code: String
         #if os(macOS)
         if account.isOnYubiKey {
@@ -222,8 +228,6 @@ struct CopyCodeIntent: AppIntent {
         #endif
         Platform.copy(code)
         AccountUsage.shared.recordUse(of: account.id)
-        // Asked for while the app was locked, the account came without its name.
-        let title = CalculatedAccounts.entities().first { $0.id == account.id }?.title ?? account.title
         // The code isn't said, so it isn't read out or shown with Hide codes on. It is the result, for the next action.
         return .result(value: code, dialog: IntentDialog(LocalizedStringResource("Copied the code for \(title).", comment: "Shortcuts result. The placeholder is the account's name.")))
     }
