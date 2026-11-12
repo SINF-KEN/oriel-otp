@@ -67,6 +67,10 @@ Following the [HIG for macOS](https://developer.apple.com/design/human-interface
   and clicking a code copies it.
 - **Density**: smaller row icons and text, and a larger code, sized for the Mac's 13 pt body text.
 - **Toasts** are a small banner at the bottom of the window.
+- **Quick Copy** (`QuickCopy`): with it on in Settings > General, ⌥⌘O opens a search panel over any app, like
+  Spotlight. Typing finds accounts by name, issuer or tag, the arrow keys choose one and Return copies its code. The
+  panel is a non-activating `NSPanel`, so the app in front stays there to paste into. The shortcut is a Carbon hot
+  key, which needs no Accessibility permission; if another app has it, the setting says so.
 - **Touch**: when a code needs a touch and the app isn't in front, e.g. when copying from the menu bar or Shortcuts,
   a notification asks for it (`TouchPrompt`), and is removed once the key was touched.
 

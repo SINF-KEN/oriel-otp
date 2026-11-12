@@ -28,11 +28,28 @@ struct AuthenticatorApp: App {
     @State var mainWindowState = MainWindowState.shared
     #endif
     @Environment(\.scenePhase) var scenePhase
-    @State var toastPresenter = ToastPresenter()
-    @State var notificationsViewModel = NotificationsViewModel()
-    @State var mainViewModel = MainViewModel(spotlight: .shared)
+    @State var toastPresenter: ToastPresenter
+    @State var notificationsViewModel: NotificationsViewModel
+    @State var mainViewModel: MainViewModel
 
     init() {
+        let toastPresenter = ToastPresenter()
+        let notificationsViewModel = NotificationsViewModel()
+        let mainViewModel = MainViewModel(spotlight: .shared)
+        _toastPresenter = State(initialValue: toastPresenter)
+        _notificationsViewModel = State(initialValue: notificationsViewModel)
+        _mainViewModel = State(initialValue: mainViewModel)
+        #if os(macOS)
+        // The Quick Copy panel is AppKit's, outside the scenes, so it gets the same objects here.
+        QuickCopy.shared.makeContent = {
+            AnyView(QuickCopyView()
+                .environment(toastPresenter)
+                .environment(notificationsViewModel)
+                .environment(mainViewModel)
+                .environment(MainWindowState.shared)
+                .appTextSize())
+        }
+        #endif
         // The requests to Ente have the email address in their URL and carry the vault. Nothing keeps them on disk,
         // which also empties what earlier versions left there.
         URLCache.shared.memoryCapacity = 0

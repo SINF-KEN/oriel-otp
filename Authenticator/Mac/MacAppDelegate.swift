@@ -46,6 +46,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
             Task { @MainActor in AppLock.shared.didBecomeActive() }
         }
+        QuickCopy.shared.applySetting()
     }
 
     // The Dock menu, in place of the Home Screen quick actions on iOS.
