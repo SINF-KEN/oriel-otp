@@ -10,7 +10,8 @@ The workflows are in `.github/workflows`:
 | `Accessibility` (`accessibility.yml`) | By hand | Accessibility audits on an iPhone and an iPad, see [accessibility.md](accessibility.md) |
 
 Every action is pinned to a commit SHA, with its version in a comment, and Dependabot (`.github/dependabot.yml`)
-updates the actions and the Swift packages weekly. The macOS jobs run on GitHub-hosted `xcode-27` runners.
+updates the actions (in the workflows and in the composite actions under `.github/actions`) and the Swift packages
+weekly. The macOS jobs run on GitHub-hosted `xcode-27` runners.
 
 ## Branch protection
 
@@ -97,13 +98,16 @@ with automatic resolution and updates turned off, for every workflow that builds
   - For a pin with a version, the package repository's tag for that version must point at the pinned revision
     (`git ls-remote`). Without this, the checks above only prove the files are those of the pinned commit, not that
     the commit is the release it is named after.
-  - swift-sodium ships libsodium prebuilt, as `Clibsodium.xcframework` in its repository. Its SHA-256 (of the
-    `shasum -a 256` list of its files, sorted by path) is recorded in the action as `CLIBSODIUM_SHA256`, so a
-    swift-sodium update fails until the new binary has been looked at and the value updated.
+  - swift-sodium ships libsodium prebuilt, as `Clibsodium.xcframework` in its repository. The checks above prove
+    it is the binary in the tagged release; its SHA-256 (of the `shasum -a 256` list of its files, sorted by path) is
+    printed in the step's log, so a Dependabot update that changes it can be seen without failing the build.
 
-BigInt is pinned to a commit rather than a release: `96fb3b17` ("Bump minimum watchOS to 9", attaswift/BigInt#140)
-fixes a deployment target warning in the watch build, which the warnings-as-errors setting turns into an error, and
-it's newer than the latest release, 6.0.1. Move the pin to a release tag once one includes it.
+BigInt follows its `master` branch rather than a release: `96fb3b17` ("Bump minimum watchOS to 9",
+attaswift/BigInt#140) fixes a deployment target warning in the watch build, which the warnings-as-errors setting turns
+into an error, and it's newer than the latest release, 6.0.1. Package.resolved still pins the commit, and Dependabot
+moves it to newer `master` commits. Switch to a version requirement once a release includes that fix.
+
+swift-sodium is required up to the next major version (`0.11.0..<1.0.0`), so Dependabot can offer 0.12 and later.
 
 ## TestFlight, Screenshots and Accessibility
 
