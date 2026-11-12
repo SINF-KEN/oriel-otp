@@ -121,7 +121,11 @@ struct PrivacySection: View {
         } header: {
             Text(String(localized: "Privacy", comment: "Settings section"))
         } footer: {
-            Text(String(localized: "Hidden codes show as dots until you tap one, which also copies it. In Spotlight, the names of your Ente Auth accounts and the accounts on this device can be searched for; their codes and secrets are never added.", comment: "Privacy settings footer"))
+            Text(
+                String(
+                    localized:
+                        "Hidden codes show as dots until you tap one, which also copies it. In Spotlight, the names of your Ente Auth accounts and the accounts on this device can be searched for; their codes and secrets are never added.",
+                    comment: "Privacy settings footer"))
         }
     }
 }

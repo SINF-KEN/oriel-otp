@@ -87,8 +87,9 @@ import YubiKit
                 let deviceInfo = try await connection.managementSession().getDeviceInfo()
                 self.deviceInfo = deviceInfo
                 self.oathStorage = await Self.oathStorage(connection: connection, deviceInfo: deviceInfo)
-                ConnectionManager.shared.closeNFC(message: String(localized: "Configuration read", comment: "NFC connection stopped message."))
-            } catch where error.isNFCCancelledByUser {
+                ConnectionManager.shared.closeNFC(
+                    message: String(localized: "Configuration read", comment: "NFC connection stopped message."))
+            } catch  where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
             } catch {
                 Logger.connection.error("ConfigurationviewModel: got error: \(error)")
@@ -106,11 +107,14 @@ import YubiKit
             let capacity = OATHSession.credentialCapacity(version: await session.version)
             do {
                 return OATHStorage(used: try await session.listCredentials().count, capacity: capacity)
-            } catch where error.isOATHAuthenticationRequired {
+            } catch  where error.isOATHAuthenticationRequired {
                 let preferences = PasswordPreferences()
                 guard let deviceId, preferences.useSavedPassword(keyIdentifier: deviceId),
-                      let accessKey: Data = try? await SecureStore(secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords)).getValue(for: deviceId),
-                      (try? await session.unlock(accessKey: accessKey)) != nil else {
+                    let accessKey: Data = try? await SecureStore(
+                        secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords)
+                    ).getValue(for: deviceId),
+                    (try? await session.unlock(accessKey: accessKey)) != nil
+                else {
                     return OATHStorage(used: nil, capacity: capacity)
                 }
                 return OATHStorage(used: try await session.listCredentials().count, capacity: capacity)

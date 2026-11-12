@@ -16,102 +16,105 @@
 
 #if os(iOS)
 
-import UIKit
-import XCTest
+    import UIKit
+    import XCTest
 
-/// Tapping the code in the account list copies it, and tapping the rest of the row opens the account, with the
-/// simulated YubiKey the screenshots use.
-final class TapToCopyTests: XCTestCase {
+    /// Tapping the code in the account list copies it, and tapping the rest of the row opens the account, with the
+    /// simulated YubiKey the screenshots use.
+    final class TapToCopyTests: XCTestCase {
 
-    /// 2027-01-01 00:00:12 UTC, like the screenshots.
-    private static let demoDate = "1798761612"
+        /// 2027-01-01 00:00:12 UTC, like the screenshots.
+        private static let demoDate = "1798761612"
 
-    private var app: XCUIApplication!
+        private var app: XCUIApplication!
 
-    @MainActor override func setUp() async throws {
-        continueAfterFailure = false
-        app = XCUIApplication()
+        @MainActor override func setUp() async throws {
+            continueAfterFailure = false
+            app = XCUIApplication()
+        }
+
+        /// The code is beside the name.
+        @MainActor func testTapCodeCopies() throws {
+            app.launchArguments = ["-DemoDate", Self.demoDate]
+            app.launch()
+            try assertTapCopies(codeAt: CGVector(dx: 0.8, dy: 0.5))
+        }
+
+        /// Above the code, which looks about 30 points tall, but has to take at least 44 to tap.
+        @MainActor func testTapJustAboveCodeCopies() throws {
+            app.launchArguments = ["-DemoDate", Self.demoDate]
+            app.launch()
+            try assertTapCopies(codeAt: CGVector(dx: 0.8, dy: 0.5), offsetBy: CGVector(dx: 0, dy: -24))
+        }
+
+        /// The code is below the name, in large type.
+        @MainActor func testTapCodeCopiesWithLargerText() throws {
+            app.launchArguments = [
+                "-DemoDate", Self.demoDate,
+                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"
+            ]
+            app.launch()
+            try assertTapCopies(codeAt: CGVector(dx: 0.3, dy: 0.6))
+        }
+
+        @MainActor func testTapNameOpensAccount() throws {
+            app.launchArguments = ["-DemoDate", Self.demoDate]
+            app.launch()
+            let row = try bankRow()
+            row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
+            XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 10), "The account didn't open")
+            XCTAssertFalse(app.staticTexts["Copied to clipboard"].exists, "Opening the account copied its code")
+        }
+
+        /// Without VoiceOver, the code is an element of its own, named after the account, so Voice Control ("Copy Bank",
+        /// "Show numbers"), Switch Control and Full Keyboard Access can copy it without opening the account.
+        @MainActor func testCodeIsItsOwnButtonForVoiceControl() throws {
+            app.launchArguments = ["-DemoDate", Self.demoDate]
+            app.launch()
+            _ = try bankRow()
+            let code = app.buttons["account-row.60/Bank:alice.copy"].firstMatch
+            XCTAssertTrue(code.waitForExistence(timeout: 10), "The code isn't a button of its own")
+            XCTAssertEqual(code.label, "Copy code for Bank")
+            let changeCount = UIPasteboard.general.changeCount
+            code.tap()
+            XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "No Copied to clipboard toast")
+            XCTAssertNotEqual(UIPasteboard.general.changeCount, changeCount, "Nothing was copied")
+            XCTAssertFalse(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 2), "Copying opened the account")
+        }
+
+        /// With a hardware keyboard on an iPad, which has no menu bar to find these in.
+        @MainActor func testHardwareKeyboardShortcuts() throws {
+            try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "For a hardware keyboard on an iPad")
+            app.launchArguments = ["-DemoDate", Self.demoDate]
+            app.launch()
+            let row = try bankRow()
+            row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
+            XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 10))
+            app.typeKey("c", modifierFlags: .command)
+            XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "⌘C didn't copy the code")
+            app.typeKey("f", modifierFlags: .command)
+            Thread.sleep(forTimeInterval: 1)
+            app.typeText("goo")
+            XCTAssertEqual(app.searchFields.firstMatch.value as? String, "goo", "⌘F didn't go to the search field")
+        }
+
+        @MainActor private func assertTapCopies(codeAt offset: CGVector, offsetBy points: CGVector = .zero) throws {
+            let row = try bankRow()
+            let changeCount = UIPasteboard.general.changeCount
+            row.coordinate(withNormalizedOffset: offset).withOffset(points).tap()
+            XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "No Copied to clipboard toast")
+            XCTAssertNotEqual(UIPasteboard.general.changeCount, changeCount, "Nothing was copied")
+            XCTAssertTrue(UIPasteboard.general.hasStrings, "Nothing was copied")
+            XCTAssertFalse(
+                app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 2), "Tapping the code opened the account")
+        }
+
+        /// The first account, which is on screen at every text size.
+        @MainActor private func bankRow() throws -> XCUIElement {
+            let bank = app.descendants(matching: .any)["account-row.60/Bank:alice"].firstMatch
+            XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
+            return bank
+        }
     }
-
-    /// The code is beside the name.
-    @MainActor func testTapCodeCopies() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate]
-        app.launch()
-        try assertTapCopies(codeAt: CGVector(dx: 0.8, dy: 0.5))
-    }
-
-    /// Above the code, which looks about 30 points tall, but has to take at least 44 to tap.
-    @MainActor func testTapJustAboveCodeCopies() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate]
-        app.launch()
-        try assertTapCopies(codeAt: CGVector(dx: 0.8, dy: 0.5), offsetBy: CGVector(dx: 0, dy: -24))
-    }
-
-    /// The code is below the name, in large type.
-    @MainActor func testTapCodeCopiesWithLargerText() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate,
-                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
-        app.launch()
-        try assertTapCopies(codeAt: CGVector(dx: 0.3, dy: 0.6))
-    }
-
-    @MainActor func testTapNameOpensAccount() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate]
-        app.launch()
-        let row = try bankRow()
-        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
-        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 10), "The account didn't open")
-        XCTAssertFalse(app.staticTexts["Copied to clipboard"].exists, "Opening the account copied its code")
-    }
-
-    /// Without VoiceOver, the code is an element of its own, named after the account, so Voice Control ("Copy Bank",
-    /// "Show numbers"), Switch Control and Full Keyboard Access can copy it without opening the account.
-    @MainActor func testCodeIsItsOwnButtonForVoiceControl() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate]
-        app.launch()
-        _ = try bankRow()
-        let code = app.buttons["account-row.60/Bank:alice.copy"].firstMatch
-        XCTAssertTrue(code.waitForExistence(timeout: 10), "The code isn't a button of its own")
-        XCTAssertEqual(code.label, "Copy code for Bank")
-        let changeCount = UIPasteboard.general.changeCount
-        code.tap()
-        XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "No Copied to clipboard toast")
-        XCTAssertNotEqual(UIPasteboard.general.changeCount, changeCount, "Nothing was copied")
-        XCTAssertFalse(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 2), "Copying opened the account")
-    }
-
-    /// With a hardware keyboard on an iPad, which has no menu bar to find these in.
-    @MainActor func testHardwareKeyboardShortcuts() throws {
-        try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "For a hardware keyboard on an iPad")
-        app.launchArguments = ["-DemoDate", Self.demoDate]
-        app.launch()
-        let row = try bankRow()
-        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
-        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 10))
-        app.typeKey("c", modifierFlags: .command)
-        XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "⌘C didn't copy the code")
-        app.typeKey("f", modifierFlags: .command)
-        Thread.sleep(forTimeInterval: 1)
-        app.typeText("goo")
-        XCTAssertEqual(app.searchFields.firstMatch.value as? String, "goo", "⌘F didn't go to the search field")
-    }
-
-    @MainActor private func assertTapCopies(codeAt offset: CGVector, offsetBy points: CGVector = .zero) throws {
-        let row = try bankRow()
-        let changeCount = UIPasteboard.general.changeCount
-        row.coordinate(withNormalizedOffset: offset).withOffset(points).tap()
-        XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 10), "No Copied to clipboard toast")
-        XCTAssertNotEqual(UIPasteboard.general.changeCount, changeCount, "Nothing was copied")
-        XCTAssertTrue(UIPasteboard.general.hasStrings, "Nothing was copied")
-        XCTAssertFalse(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 2), "Tapping the code opened the account")
-    }
-
-    /// The first account, which is on screen at every text size.
-    @MainActor private func bankRow() throws -> XCUIElement {
-        let bank = app.descendants(matching: .any)["account-row.60/Bank:alice"].firstMatch
-        XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
-        return bank
-    }
-}
 
 #endif

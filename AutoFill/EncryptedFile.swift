@@ -63,9 +63,9 @@ nonisolated struct EncryptedFile<Value: Codable> {
         let sealed = try ChaChaPoly.seal(try JSONEncoder().encode(value), using: key).combined
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         #if os(iOS)
-        try sealed.write(to: url, options: [.atomic, .completeFileProtection])
+            try sealed.write(to: url, options: [.atomic, .completeFileProtection])
         #else
-        try sealed.write(to: url, options: .atomic)
+            try sealed.write(to: url, options: .atomic)
         #endif
         var url = url
         var values = URLResourceValues()
@@ -73,7 +73,8 @@ nonisolated struct EncryptedFile<Value: Codable> {
         do {
             try url.setResourceValues(values)
         } catch {
-            Logger.system.error("Couldn't exclude \(url.lastPathComponent, privacy: .public) from backups: \(error.localizedDescription, privacy: .public)")
+            Logger.system.error(
+                "Couldn't exclude \(url.lastPathComponent, privacy: .public) from backups: \(error.localizedDescription, privacy: .public)")
         }
     }
 

@@ -64,7 +64,9 @@ enum DeviceAccountsError: Error, LocalizedError {
     case unavailable
 
     var errorDescription: String? {
-        String(localized: "The accounts on this device can't be read right now. Unlock the device and try again.", comment: "Error when changing an account on this device")
+        String(
+            localized: "The accounts on this device can't be read right now. Unlock the device and try again.",
+            comment: "Error when changing an account on this device")
     }
 }
 
@@ -157,8 +159,9 @@ enum DeviceAccountsError: Error, LocalizedError {
 
     /// Adds an account, unless there is one with the same name.
     func add(_ template: YubiKitOATHSession.CredentialTemplate) throws -> AddResult {
-        let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
-                                                period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
+        let credentialId = OATHCredentialId.key(
+            accountName: template.name, issuer: template.issuer,
+            period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
         let isPresent = items.contains { EnteCodeParser.parse(id: $0.id, rawData: $0.rawData)?.credentialId == credentialId }
         guard !isPresent else { return .alreadyPresent }
         let rawData = String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self)
@@ -195,7 +198,8 @@ enum DeviceAccountsError: Error, LocalizedError {
             for rawData in rawData {
                 let code = EnteCloudCode(rawData: rawData)
                 let isPresent = items.contains { item in
-                    item.rawData == rawData || code.map { code in EnteCloudCode(rawData: item.rawData)?.isSameAccount(as: code) == true } == true
+                    item.rawData == rawData
+                        || code.map { code in EnteCloudCode(rawData: item.rawData)?.isSameAccount(as: code) == true } == true
                 }
                 if !isPresent {
                     items.append(DeviceAccountItem(id: UUID().uuidString.lowercased(), rawData: rawData))
@@ -267,7 +271,9 @@ enum DeviceAccountsError: Error, LocalizedError {
     }
 
     private func edit(_ id: String, _ change: (inout EnteEntryEditor) -> Void) throws {
-        guard let index = items.firstIndex(where: { $0.id == id }), var editor = EnteEntryEditor(rawData: items[index].rawData) else { return }
+        guard let index = items.firstIndex(where: { $0.id == id }), var editor = EnteEntryEditor(rawData: items[index].rawData) else {
+            return
+        }
         change(&editor)
         guard let rawData = editor.rawData, rawData != items[index].rawData else { return }
         try update { $0[index].rawData = rawData }

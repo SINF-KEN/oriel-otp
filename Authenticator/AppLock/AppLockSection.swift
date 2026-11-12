@@ -27,8 +27,10 @@ struct AppLockSection: View {
 
     var body: some View {
         Section {
-            Picker(String(localized: "Lock with", comment: "App lock setting"),
-                   selection: Binding(get: { lock.method }, set: { method in Task { await requestChange(to: method) } })) {
+            Picker(
+                String(localized: "Lock with", comment: "App lock setting"),
+                selection: Binding(get: { lock.method }, set: { method in Task { await requestChange(to: method) } })
+            ) {
                 Group {
                     Text(String(localized: "Off", comment: "App lock method")).tag(AppLockMethod.off)
                     if AppLock.canUseDeviceOwner || lock.method == .device {
@@ -41,9 +43,11 @@ struct AppLockSection: View {
                 .scaledBodyFont()
             }
             if lock.method.hasSecret {
-                Button(lock.method == .password
-                       ? String(localized: "Change password", comment: "App lock setting button")
-                       : String(localized: "Change code", comment: "App lock setting button")) {
+                Button(
+                    lock.method == .password
+                        ? String(localized: "Change password", comment: "App lock setting button")
+                        : String(localized: "Change code", comment: "App lock setting button")
+                ) {
                     Task { await requestChange(to: lock.method) }
                 }
             }
@@ -51,9 +55,17 @@ struct AppLockSection: View {
             Text(String(localized: "App lock", comment: "App lock settings section header"))
         } footer: {
             #if os(macOS)
-            Text(String(localized: "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there.", comment: "Mac app lock settings footer"))
+                Text(
+                    String(
+                        localized:
+                            "Asked for when the app opens, the screen locks or the Mac sleeps. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there.",
+                        comment: "Mac app lock settings footer"))
             #else
-            Text(String(localized: "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there.", comment: "App lock settings footer"))
+                Text(
+                    String(
+                        localized:
+                            "Asked for when the app opens or comes back from the background. A forgotten code or password can't be recovered: the only way back in is to delete the app, which deletes the accounts saved to This device. Accounts on a YubiKey or in Ente Auth stay there.",
+                        comment: "App lock settings footer"))
             #endif
         }
         .sheet(item: $change) { change in
@@ -131,8 +143,10 @@ private struct AppLockChangeView: View {
                         return true
                     }
                 case .new, .mismatch, .easyToGuess:
-                    AppLockSecretEntry(method: change.to, prompt: newStepPrompt, checksRetryDate: false,
-                                       minimumPasswordLength: Self.minimumPasswordLength) { secret in
+                    AppLockSecretEntry(
+                        method: change.to, prompt: newStepPrompt, checksRetryDate: false,
+                        minimumPasswordLength: Self.minimumPasswordLength
+                    ) { secret in
                         guard change.to != .password || secret.count >= Self.minimumPasswordLength else { return false }
                         if change.to.codeLength != nil, AppLockConfiguration.isEasyToGuess(code: secret) {
                             step = .easyToGuess
@@ -167,7 +181,7 @@ private struct AppLockChangeView: View {
             }
         }
         #if os(macOS)
-        .textScaledFrame(width: 420, height: 560)
+            .textScaledFrame(width: 420, height: 560)
         #endif
         .interactiveDismissDisabled()
     }
@@ -181,13 +195,18 @@ private struct AppLockChangeView: View {
     private var newPrompt: String {
         change.to == .password
             ? String(localized: "Choose a password of at least 4 characters", comment: "App lock change prompt")
-            : String(localized: "Choose a \(change.to.codeLength ?? 0)-digit code", comment: "App lock change prompt. The placeholder is 4 or 6.")
+            : String(
+                localized: "Choose a \(change.to.codeLength ?? 0)-digit code", comment: "App lock change prompt. The placeholder is 4 or 6."
+            )
     }
 
     private var newStepPrompt: String {
         switch step {
         case .mismatch: mismatchPrompt
-        case .easyToGuess: String(localized: "This code is too easy to guess. Choose another code.", comment: "App lock change prompt after a code such as 1234 or 1111")
+        case .easyToGuess:
+            String(
+                localized: "This code is too easy to guess. Choose another code.",
+                comment: "App lock change prompt after a code such as 1234 or 1111")
         default: newPrompt
         }
     }

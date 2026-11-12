@@ -55,11 +55,13 @@ final class ManagementViewModel {
             watchForDisconnect(of: connection)
             let transport: DeviceTransport = connection.isNFC ? .nfc : .usb
             let deviceInfo = try await connection.managementSession().getDeviceInfo()
-            ConnectionManager.shared.closeNFC(message: String(localized: "Read YubiKey OTP configuration", comment: "Settings OTP configuration read"))
-            return OTPConfiguration(isEnabled: deviceInfo.config.isApplicationEnabled(.otp, over: transport),
-                                    isSupported: deviceInfo.isApplicationSupported(.otp, over: transport),
-                                    isConfigurationLocked: deviceInfo.isConfigLocked,
-                                    transport: transport)
+            ConnectionManager.shared.closeNFC(
+                message: String(localized: "Read YubiKey OTP configuration", comment: "Settings OTP configuration read"))
+            return OTPConfiguration(
+                isEnabled: deviceInfo.config.isApplicationEnabled(.otp, over: transport),
+                isSupported: deviceInfo.isApplicationSupported(.otp, over: transport),
+                isConfigurationLocked: deviceInfo.isConfigLocked,
+                transport: transport)
         } catch {
             ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)
             throw error
@@ -85,8 +87,9 @@ final class ManagementViewModel {
             let config = try await session.getDeviceInfo().config
             let newConfig = enabled ? config.enable(application: .otp, over: transport) : config.disable(application: .otp, over: transport)
             try await session.updateDeviceConfig(newConfig, reboot: false)
-            ConnectionManager.shared.closeNFC(message: String(localized: "New OTP configuration saved", comment: "Settings OTP configuration saved"))
-        } catch where isNFCConnection {
+            ConnectionManager.shared.closeNFC(
+                message: String(localized: "New OTP configuration saved", comment: "Settings OTP configuration saved"))
+        } catch  where isNFCConnection {
             ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)
         }
     }

@@ -24,8 +24,10 @@ extension MainViewModel {
 
     /// Saves an account where the add account sheet was asked to put it: on this device, on the YubiKey and then
     /// possibly in Ente Auth too, or only in Ente Auth. `toast` shows what happened; errors go to `sessionError`.
-    func saveNewAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool,
-                        to destinations: AccountDestinations, toast: @escaping (String) -> Void) {
+    func saveNewAccount(
+        _ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool,
+        to destinations: AccountDestinations, toast: @escaping (String) -> Void
+    ) {
         if destinations.contains(.device) {
             saveToDevice(template, toast: toast)
         } else if destinations.contains(.yubiKey) {
@@ -42,8 +44,10 @@ extension MainViewModel {
     }
 
     /// Puts several accounts on the YubiKey, e.g. from a Google Authenticator export scanned in the add account sheet.
-    func importToYubiKey(_ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool,
-                         toast: @escaping (String) -> Void) {
+    func importToYubiKey(
+        _ templates: [YubiKitOATHSession.CredentialTemplate], requiresTouch: Bool,
+        toast: @escaping (String) -> Void
+    ) {
         guard !templates.isEmpty else { return }
         addAccounts(templates, requiresTouch: requiresTouch) { [weak self] result in
             if let error = result.error {
@@ -54,9 +58,15 @@ extension MainViewModel {
                 }
             }
             // One sentence each, so translators can word and order them as their language needs.
-            let message = result.alreadyPresent.isEmpty
-                ? String(localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts.")
-                : String(localized: "Added \(result.added.count) accounts. \(result.alreadyPresent.count) were already on the YubiKey.", comment: "Import result. The placeholders are the number of accounts added and the number that were already on the YubiKey.")
+            let message =
+                result.alreadyPresent.isEmpty
+                ? String(
+                    localized: "Added \(result.added.count) accounts.", comment: "Import result. The placeholder is the number of accounts."
+                )
+                : String(
+                    localized: "Added \(result.added.count) accounts. \(result.alreadyPresent.count) were already on the YubiKey.",
+                    comment:
+                        "Import result. The placeholders are the number of accounts added and the number that were already on the YubiKey.")
             toast(message)
         }
     }

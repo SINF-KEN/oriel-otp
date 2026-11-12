@@ -64,9 +64,12 @@ import Testing
         return "otpauth-migration://offline?data=\(encoded)"
     }
 
-    private func googleAccount(name: String, issuer: String, algorithm: UInt64 = 1, digits: UInt64 = 1, type: UInt64 = 2,
-                               counter: UInt64? = nil) -> Data {
-        var data = field(1, Self.secret) + field(2, Data(name.utf8)) + field(3, Data(issuer.utf8))
+    private func googleAccount(
+        name: String, issuer: String, algorithm: UInt64 = 1, digits: UInt64 = 1, type: UInt64 = 2,
+        counter: UInt64? = nil
+    ) -> Data {
+        var data =
+            field(1, Self.secret) + field(2, Data(name.utf8)) + field(3, Data(issuer.utf8))
             + field(4, algorithm) + field(5, digits) + field(6, type)
         if let counter { data += field(7, counter) }
         return data
@@ -76,7 +79,7 @@ import Testing
         let link = migrationLink([
             googleAccount(name: "GitHub:alice@example.com", issuer: "GitHub"),
             googleAccount(name: "bob", issuer: "Bank", algorithm: 2, digits: 2),
-            googleAccount(name: "carol", issuer: "", type: 1, counter: 7),
+            googleAccount(name: "carol", issuer: "", type: 1, counter: 7)
         ])
         let urls = try AuthenticatorImport.otpauthURLs(fromText: link)
         #expect(urls.count == 3)
@@ -213,8 +216,10 @@ import Testing
     }
 
     @Test func aColonInANameDoesNotMoveTheIssuer() throws {
-        let url = try #require(AuthenticatorImport.otpauthURL(type: "totp", issuer: "Work: Mail", name: "alice", secret: "JBSWY3DPEHPK3PXP",
-                                                              algorithm: nil, digits: nil, period: nil, counter: nil))
+        let url = try #require(
+            AuthenticatorImport.otpauthURL(
+                type: "totp", issuer: "Work: Mail", name: "alice", secret: "JBSWY3DPEHPK3PXP",
+                algorithm: nil, digits: nil, period: nil, counter: nil))
         #expect(try account(url).accountName == "alice")
     }
 
@@ -222,9 +227,10 @@ import Testing
 
     @Test func importedAccountsAreAddedOnceToThisDevice() throws {
         let device = DeviceAccounts(storage: MemoryDeviceStorage())
-        let urls = try AuthenticatorImport.otpauthURLs(fromText: migrationLink([
-            googleAccount(name: "alice", issuer: "GitHub"), googleAccount(name: "bob", issuer: "Bank"),
-        ]))
+        let urls = try AuthenticatorImport.otpauthURLs(
+            fromText: migrationLink([
+                googleAccount(name: "alice", issuer: "GitHub"), googleAccount(name: "bob", issuer: "Bank")
+            ]))
         #expect(try device.restore(backupLines: urls) == DeviceAccounts.RestoreResult(added: 2))
         #expect(try device.restore(backupLines: urls) == DeviceAccounts.RestoreResult(alreadyPresent: 2))
         #expect(device.accounts.count == 2)

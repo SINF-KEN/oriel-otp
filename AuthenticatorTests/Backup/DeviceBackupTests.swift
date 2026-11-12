@@ -23,7 +23,8 @@ import YubiKit
 
     /// Made with PyNaCl the way Ente Auth makes its encrypted export, not with this app's code: Argon2id with 64 MiB
     /// and 2 passes over "correct horse battery", then one final secretstream message.
-    private static let enteExport = Data("""
+    private static let enteExport = Data(
+        """
         {"version": 1, "kdfParams": {"memLimit": 67108864, "opsLimit": 2, "salt": "AAECAwQFBgcICQoLDA0ODw=="}, \
         "encryptedData": "+asgMob07PK81by+HSfUkly51SFUiqWz4IIwzSiHIW9Eb7Q06xVIszedoijgR2nqfbhZo4XKm+ZTA9WYxwLYuWWa9xCOorTGhIUdTz/2Pjc4BcBpxbnjeoPM4GaY/ff3ReJGg2J9uhz3RBNovrYPub6rVUHK8V5gYic5oxRiyCWclB9Hcj/9tpzjJZOqlbC8BsEsxRI7TS9e4BhC24ijKmh1qnPmlOvZEf7ngWW4xgyYku2Q0WHFpuaoixLGThnElBCFQH60kfSgU9xDDtcBSqkf0e4wAecfFVsDp3tdbw==", \
         "encryptionNonce": "JCJqXS7Cqemn+NY6xlcoVy8QT+/usKHw"}
@@ -32,7 +33,8 @@ import YubiKit
 
     private func template(_ issuer: String, hotp: Bool = false) throws -> YubiKitOATHSession.CredentialTemplate {
         let kind = hotp ? "hotp" : "totp"
-        let url = try #require(URL(string: "otpauth://\(kind)/\(issuer):alice?secret=JBSWY3DPEHPK3PXP&issuer=\(issuer)" + (hotp ? "&counter=0" : "")))
+        let url = try #require(
+            URL(string: "otpauth://\(kind)/\(issuer):alice?secret=JBSWY3DPEHPK3PXP&issuer=\(issuer)" + (hotp ? "&counter=0" : "")))
         return try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
     }
 
@@ -95,8 +97,9 @@ import YubiKit
         #expect(try device.add(template("GitHub")) == .added)
         #expect(try device.add(template("Bank", hotp: true)) == .added)
         // A name with what a line of the backup can't hold as it is.
-        let odd = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha256, secret: Data(repeating: 7, count: 20),
-                                                           issuer: "A, B & C #1", accountName: "é+x@example.com", digits: 8)
+        let odd = try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 30), algorithm: .sha256, secret: Data(repeating: 7, count: 20),
+            issuer: "A, B & C #1", accountName: "é+x@example.com", digits: 8)
         #expect(try device.add(odd) == .added)
         let github = try #require(device.accounts.first { $0.code.issuer == "GitHub" })
         try device.setPinned(github.id, true)
@@ -139,13 +142,14 @@ import YubiKit
         _ = try #require(device.nextHOTPCode(id))
         _ = try #require(device.nextHOTPCode(id))
 
-        let result = try device.restore(backupLines: lines + [
-            "otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitLab",
-            // The same name with another secret is another account.
-            "otpauth://hotp/Bank:alice?secret=GEZDGNBVGY3TQOJQ&issuer=Bank&counter=0",
-            "otpauth://totp/Old:alice?secret=JBSWY3DPEHPK3PXP&issuer=Old&codeDisplay=%7B%22trashed%22%3Atrue%7D",
-            "not an account",
-        ])
+        let result = try device.restore(
+            backupLines: lines + [
+                "otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitLab",
+                // The same name with another secret is another account.
+                "otpauth://hotp/Bank:alice?secret=GEZDGNBVGY3TQOJQ&issuer=Bank&counter=0",
+                "otpauth://totp/Old:alice?secret=JBSWY3DPEHPK3PXP&issuer=Old&codeDisplay=%7B%22trashed%22%3Atrue%7D",
+                "not an account"
+            ])
         #expect(result == .init(added: 2, alreadyPresent: 1, skipped: 2))
         // The codes before the counter here have been shown.
         #expect(DeviceAccounts(storage: storage).accounts.first { $0.id == id }?.code.counter == 2)

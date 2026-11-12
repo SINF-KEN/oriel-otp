@@ -27,17 +27,27 @@ enum EnteSignUpError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notAllowedOnEnte:
-            return String(localized: "Accounts can't be created on Ente's servers here. Create one in Ente's apps, or use a server you host yourself.", comment: "Ente account creation error")
+            return String(
+                localized:
+                    "Accounts can't be created on Ente's servers here. Create one in Ente's apps, or use a server you host yourself.",
+                comment: "Ente account creation error")
         case .registrationDisabled:
-            return String(localized: "This server doesn't allow new accounts. Turn registration on in its settings, then try again.", comment: "Ente account creation error")
+            return String(
+                localized: "This server doesn't allow new accounts. Turn registration on in its settings, then try again.",
+                comment: "Ente account creation error")
         case .accountExists:
-            return String(localized: "This server already has an account with this email. Sign in instead.", comment: "Ente account creation error")
+            return String(
+                localized: "This server already has an account with this email. Sign in instead.", comment: "Ente account creation error")
         case .passwordTooShort:
-            return String(localized: "Use at least \(EnteSignUp.minimumPasswordLength) characters for your password.", comment: "Ente account creation error. The placeholder is the number of characters.")
+            return String(
+                localized: "Use at least \(EnteSignUp.minimumPasswordLength) characters for your password.",
+                comment: "Ente account creation error. The placeholder is the number of characters.")
         case .passwordsDiffer:
             return String(localized: "The passwords don't match.", comment: "Ente account creation error")
         case .notVerified:
-            return String(localized: "The server didn't save the account as expected. Try signing in, or create it again with another email.", comment: "Ente account creation error")
+            return String(
+                localized: "The server didn't save the account as expected. Try signing in, or create it again with another email.",
+                comment: "Ente account creation error")
         }
     }
 }
@@ -120,8 +130,9 @@ enum EnteSignUp {
         let client = EnteSRPClient(identity: keys.srpUserID, password: keys.loginKey, salt: keys.srpSalt)
         let setup: (setupID: String, srpB: Data)
         do {
-            setup = try await api.setUpSRP(token: token, srpUserID: keys.srpUserID, srpSalt: keys.srpSalt,
-                                           srpVerifier: keys.srpVerifier, srpA: client.publicKey)
+            setup = try await api.setUpSRP(
+                token: token, srpUserID: keys.srpUserID, srpSalt: keys.srpSalt,
+                srpVerifier: keys.srpVerifier, srpA: client.publicKey)
         } catch EnteAPIError.http(statusCode: 400) {
             throw SRPAlreadySetUp()
         }

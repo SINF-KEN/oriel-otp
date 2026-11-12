@@ -28,8 +28,10 @@ nonisolated private final class OversizedBodyServer: URLProtocol, @unchecked Sen
 
     override func startLoading() {
         guard let url = request.url,
-              let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "HTTP/1.1",
-                                             headerFields: ["Content-Type": "application/json"]) else { return }
+            let response = HTTPURLResponse(
+                url: url, statusCode: 200, httpVersion: "HTTP/1.1",
+                headerFields: ["Content-Type": "application/json"])
+        else { return }
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
         let chunk = Data(repeating: 0x20, count: 1024 * 1024)
         for _ in 0..<64 {
@@ -54,4 +56,3 @@ struct EnteResponseSizeLimitTests {
         }
     }
 }
-

@@ -17,19 +17,18 @@
 
 import SwiftUI
 
-
 struct YubiOtpRowView: View {
 
     @Environment(ToastPresenter.self) var toastPresenter
     var otp: String
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    
+
     var body: some View {
         HStack {
             Image("securitykey")
                 // The accent is dark in light mode and light in dark mode, the background color is the opposite.
                 .foregroundStyle(Color(.systemBackground))
-                .frame(width:40, height: 40)
+                .frame(width: 40, height: 40)
                 .background(Color.accentColor)
                 .clipShape(.circle)
                 .padding(.trailing, 5)
@@ -44,7 +43,7 @@ struct YubiOtpRowView: View {
             }
         }
         .listRowSeparator(.hidden)
-        .background(Color(.systemBackground)) // without the background set, taps outside the Texts will be ignored
+        .background(Color(.systemBackground))  // without the background set, taps outside the Texts will be ignored
         .onTapGesture {
             toastPresenter.copyToClipboard(otp)
         }
@@ -55,7 +54,9 @@ struct YubiOtpRowView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "Yubico OTP"))
         .accessibilityAddTraits(.isButton)
-        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        .accessibilityHint(
+            String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar")
+        )
         .accessibilityAction { toastPresenter.copyToClipboard(otp) }
     }
 }

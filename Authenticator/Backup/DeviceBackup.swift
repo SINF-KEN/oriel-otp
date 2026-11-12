@@ -31,13 +31,18 @@ enum DeviceBackupError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .notABackup:
-            String(localized: "This file isn't a backup made by Oriel OTP or an encrypted export from Ente Auth.", comment: "Backup restore error")
+            String(
+                localized: "This file isn't a backup made by Oriel OTP or an encrypted export from Ente Auth.",
+                comment: "Backup restore error")
         case .unsupported:
             String(localized: "This backup was made in a way this version of the app can't read.", comment: "Backup restore error")
         case .wrongPassword:
             String(localized: "The password is wrong, or the file is damaged.", comment: "Backup restore error")
         case .notEnoughMemory:
-            String(localized: "This device doesn't have enough free memory to open this backup. Close other apps and try again, or restore it on another device.", comment: "Backup restore error")
+            String(
+                localized:
+                    "This device doesn't have enough free memory to open this backup. Close other apps and try again, or restore it on another device.",
+                comment: "Backup restore error")
         case .noAccounts:
             String(localized: "There are no accounts on this device to back up.", comment: "Backup error")
         }
@@ -91,8 +96,9 @@ nonisolated enum DeviceBackup {
         var plainText = Data(lines.map { $0 + "\n" }.joined().utf8)
         defer { plainText.wipe() }
         let (header, cipherText) = try EnteCrypto.secretStreamEncrypt(plainText, key: derived.key)
-        let file = File(version: 1, kdfParams: .init(memLimit: derived.memLimit, opsLimit: derived.opsLimit, salt: derived.salt.base64EncodedString()),
-                        encryptedData: cipherText.base64EncodedString(), encryptionNonce: header.base64EncodedString())
+        let file = File(
+            version: 1, kdfParams: .init(memLimit: derived.memLimit, opsLimit: derived.opsLimit, salt: derived.salt.base64EncodedString()),
+            encryptedData: cipherText.base64EncodedString(), encryptionNonce: header.base64EncodedString())
         return try JSONEncoder().encode(file)
     }
 
@@ -100,8 +106,9 @@ nonisolated enum DeviceBackup {
     /// is slow and memory hungry by design: call it off the main actor.
     static func decrypt(_ data: Data, password: String) throws -> [String] {
         guard data.count <= maximumFileSize, let file = try? JSONDecoder().decode(File.self, from: data),
-              let salt = Data(base64Encoded: file.kdfParams.salt), let cipherText = Data(base64Encoded: file.encryptedData),
-              let header = Data(base64Encoded: file.encryptionNonce) else { throw DeviceBackupError.notABackup }
+            let salt = Data(base64Encoded: file.kdfParams.salt), let cipherText = Data(base64Encoded: file.encryptedData),
+            let header = Data(base64Encoded: file.encryptionNonce)
+        else { throw DeviceBackupError.notABackup }
         // The limits aren't authenticated: ones outside what Ente's apps use could keep the app busy for minutes.
         guard file.version == 1, EnteCrypto.isAllowed(opsLimit: file.kdfParams.opsLimit, memLimit: file.kdfParams.memLimit) else {
             throw DeviceBackupError.unsupported
@@ -109,8 +116,9 @@ nonisolated enum DeviceBackup {
         // Running out of memory on iOS ends the app rather than failing.
         guard EnteCrypto.hasMemory(for: file.kdfParams.memLimit) else { throw DeviceBackupError.notEnoughMemory }
         do {
-            var key = try EnteCrypto.deriveKeyEncryptionKey(password: password, salt: salt, opsLimit: file.kdfParams.opsLimit,
-                                                            memLimit: file.kdfParams.memLimit)
+            var key = try EnteCrypto.deriveKeyEncryptionKey(
+                password: password, salt: salt, opsLimit: file.kdfParams.opsLimit,
+                memLimit: file.kdfParams.memLimit)
             defer { key.wipe() }
             var plainText = try EnteCrypto.secretStreamDecrypt(cipherText, header: header, key: key)
             defer { plainText.wipe() }
@@ -134,8 +142,9 @@ nonisolated enum DeviceBackup {
     /// escaped like Ente's export does. Nil for data that can't be read, which no app could restore.
     static func line(forRawData rawData: String) -> String? {
         guard let json = EnteEntryEditor(rawData: rawData)?.rawData,
-              let url = try? JSONDecoder().decode(String.self, from: Data(json.utf8)),
-              !url.contains(where: \.isNewline) else { return nil }
+            let url = try? JSONDecoder().decode(String.self, from: Data(json.utf8)),
+            !url.contains(where: \.isNewline)
+        else { return nil }
         return url.replacingOccurrences(of: ",", with: "%2C")
     }
 

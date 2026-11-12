@@ -82,9 +82,11 @@ import YubiKit
     /// the first save rather than written over: it may hold accounts that were never uploaded.
     @ObservationIgnored private var isVaultUnreadable = false
 
-    init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
-         watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil, device: DeviceAccounts? = nil,
-         serverClock: EnteServerClock = EnteServerClock()) {
+    init(
+        store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
+        watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil, device: DeviceAccounts? = nil,
+        serverClock: EnteServerClock = EnteServerClock()
+    ) {
         self.store = store
         self.storage = storage
         self.urlSession = session
@@ -212,8 +214,11 @@ import YubiKit
     nonisolated private static func codes(in vault: EnteVault?) -> [EnteCode] {
         (vault?.items ?? []).compactMap { item -> EnteCode? in
             guard let rawData = item.rawData else {
-                return EnteCode(id: item.id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
-                                template: nil, unsupportedReason: String(localized: "This account could not be decrypted.", comment: "Ente import undecryptable account"))
+                return EnteCode(
+                    id: item.id, issuer: nil, accountName: String(localized: "Unknown account", comment: "Ente import unreadable account"),
+                    template: nil,
+                    unsupportedReason: String(
+                        localized: "This account could not be decrypted.", comment: "Ente import undecryptable account"))
             }
             return EnteCodeParser.parse(id: item.id, rawData: rawData)
         }
@@ -400,8 +405,9 @@ import YubiKit
             if let entityID = item.entityID {
                 do {
                     try await EnteAuthenticatorSync.signedIn {
-                        try await api.updateAuthenticatorEntity(token: session.token, id: entityID, encryptedData: encrypted.encryptedData,
-                                                                header: encrypted.header)
+                        try await api.updateAuthenticatorEntity(
+                            token: session.token, id: entityID, encryptedData: encrypted.encryptedData,
+                            header: encrypted.header)
                     }
                 } catch EnteAPIError.http(statusCode: 404) {
                     // Deleted on another device since the pull. Deleting wins over the change made here.
@@ -413,8 +419,9 @@ import YubiKit
                 try update { $0.markUploaded(id, rawData: rawData, created: nil) }
             } else {
                 let created = try await EnteAuthenticatorSync.signedIn {
-                    try await api.createAuthenticatorEntity(token: session.token, encryptedData: encrypted.encryptedData,
-                                                            header: encrypted.header)
+                    try await api.createAuthenticatorEntity(
+                        token: session.token, encryptedData: encrypted.encryptedData,
+                        header: encrypted.header)
                 }
                 guard generation == self.generation else { throw CancellationError() }
                 try update { $0.markUploaded(id, rawData: rawData, created: created) }
@@ -423,7 +430,8 @@ import YubiKit
     }
 
     @concurrent private static func decrypt(_ entities: [EnteAuthenticatorEntity], authenticatorKey: Data)
-        async -> [(entity: EnteAuthenticatorEntity, rawData: String?)] {
+        async -> [(entity: EnteAuthenticatorEntity, rawData: String?)]
+    {
         entities.map { ($0, EnteAuthenticatorSync.decrypt($0, authenticatorKey: authenticatorKey)) }
     }
 
@@ -499,8 +507,9 @@ import YubiKit
     /// Adds an account to the vault and uploads it, unless the vault has one with the same name.
     func add(_ template: YubiKitOATHSession.CredentialTemplate) throws -> AddResult {
         guard vault != nil else { throw EnteAuthenticatorSyncError.signedOut }
-        let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,
-                                                period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
+        let credentialId = OATHCredentialId.key(
+            accountName: template.name, issuer: template.issuer,
+            period: UInt(template.type.period ?? 0), isTOTP: template.type.period != nil)
         guard !codes.contains(where: { $0.credentialId == credentialId }) else { return .alreadyPresent }
         return try insert(rawData: String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self))
     }
@@ -510,7 +519,8 @@ import YubiKit
     func add(rawData: String) throws -> AddResult {
         guard vault != nil else { throw EnteAuthenticatorSyncError.signedOut }
         if let credentialId = EnteCodeParser.parse(id: "", rawData: rawData)?.credentialId,
-           codes.contains(where: { $0.credentialId == credentialId }) {
+            codes.contains(where: { $0.credentialId == credentialId })
+        {
             return .alreadyPresent
         }
         return try insert(rawData: rawData)

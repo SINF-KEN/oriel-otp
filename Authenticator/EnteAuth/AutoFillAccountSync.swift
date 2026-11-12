@@ -65,10 +65,12 @@ import Foundation
 
     /// `updatesSystem` is off in the tests, which mustn't change the device's AutoFill suggestions.
     /// `providerIsEnabled` tells whether AutoFill from Oriel OTP is on.
-    init(storage: AutoFillStorage = AutoFillFile(), websitesURL: URL = defaultWebsitesURL,
-         websitesKeychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.autoFillWebsites),
-         defaults: UserDefaults = .standard, updatesSystem: Bool = true,
-         providerIsEnabled: @escaping @Sendable () async -> Bool = { await ASCredentialIdentityStore.shared.state().isEnabled }) {
+    init(
+        storage: AutoFillStorage = AutoFillFile(), websitesURL: URL = defaultWebsitesURL,
+        websitesKeychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.autoFillWebsites),
+        defaults: UserDefaults = .standard, updatesSystem: Bool = true,
+        providerIsEnabled: @escaping @Sendable () async -> Bool = { await ASCredentialIdentityStore.shared.state().isEnabled }
+    ) {
         self.storage = storage
         websitesFile = EncryptedFile(url: websitesURL, keychain: websitesKeychain)
         self.defaults = defaults
@@ -165,8 +167,10 @@ import Foundation
         }
     }
 
-    @concurrent nonisolated private static func read(_ codes: @Sendable () -> [EnteCode], websitesFile: EncryptedFile<[String: [String]]>?) async
-        -> (accounts: [OTPAccount], websites: Result<[String: [String]]?, Error>?) {
+    @concurrent nonisolated private static func read(_ codes: @Sendable () -> [EnteCode], websitesFile: EncryptedFile<[String: [String]]>?)
+        async
+        -> (accounts: [OTPAccount], websites: Result<[String: [String]]?, Error>?)
+    {
         let accounts = WatchAccountSync.accounts(from: codes(), favorites: FavoritesStorage().readFavorites())
         return (accounts, websitesFile.map { file in Result { try file.load() } })
     }

@@ -81,10 +81,12 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
     mutating func merge(_ pulled: [(entity: EnteAuthenticatorEntity, rawData: String?)], latest: Int64) {
         // By id too, as they come from a dictionary: new accounts are listed in the same order on every device.
         for (entity, rawData) in pulled.sorted(by: { ($0.entity.updatedAt, $0.entity.id) < ($1.entity.updatedAt, $1.entity.id) }) {
-            let index = items.firstIndex { $0.entityID == entity.id }
+            let index =
+                items.firstIndex { $0.entityID == entity.id }
                 // An item whose upload reached the server although its answer didn't, maybe changed since.
                 ?? items.firstIndex { item in
-                    item.entityID == nil && rawData != nil && !entity.isDeleted && (item.uploadedRawData == rawData || item.rawData == rawData)
+                    item.entityID == nil && rawData != nil && !entity.isDeleted
+                        && (item.uploadedRawData == rawData || item.rawData == rawData)
                 }
                 // The same, changed on another device before this one saw it: still the account uploaded from here,
                 // which the secret tells. Without this it would be listed twice, with two HOTP counters.
@@ -97,8 +99,10 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
                 continue
             }
             guard let index else {
-                items.append(EnteVaultItem(id: entity.id, entityID: entity.id, rawData: rawData, serverUpdatedAt: entity.updatedAt,
-                                           isPending: false))
+                items.append(
+                    EnteVaultItem(
+                        id: entity.id, entityID: entity.id, rawData: rawData, serverUpdatedAt: entity.updatedAt,
+                        isPending: false))
                 continue
             }
             var item = items[index]
@@ -145,7 +149,8 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
     /// the change leaves it as it was.
     mutating func edit(_ id: String, _ change: (inout EnteEntryEditor) -> Void) -> Bool {
         guard let index = items.firstIndex(where: { $0.id == id }), let rawData = items[index].rawData,
-              var editor = EnteEntryEditor(rawData: rawData) else { return false }
+            var editor = EnteEntryEditor(rawData: rawData)
+        else { return false }
         change(&editor)
         guard let newRawData = editor.rawData, newRawData != rawData else { return false }
         items[index].rawData = newRawData
@@ -185,8 +190,9 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
     /// secret on another device starts at the counter that device set.
     private static func keepingHigherCounter(of local: String?, in pulled: String) -> String {
         guard let local, let localEditor = EnteEntryEditor(rawData: local), let localCounter = localEditor.counter,
-              var editor = EnteEntryEditor(rawData: pulled), localEditor.isHOTP, editor.isHOTP,
-              let secret = editor.secret, localEditor.secret == secret, localCounter > editor.counter ?? 0 else { return pulled }
+            var editor = EnteEntryEditor(rawData: pulled), localEditor.isHOTP, editor.isHOTP,
+            let secret = editor.secret, localEditor.secret == secret, localCounter > editor.counter ?? 0
+        else { return pulled }
         editor.counter = localCounter
         return editor.rawData ?? pulled
     }
@@ -194,7 +200,8 @@ nonisolated struct EnteVault: Codable, Sendable, Equatable {
     /// Whether both entities are of the same kind and calculate their codes from the same secret.
     private static func isSameSecret(_ first: String, _ second: String) -> Bool {
         guard let first = EnteEntryEditor(rawData: first), let second = EnteEntryEditor(rawData: second),
-              let secret = first.secret, !secret.isEmpty else { return false }
+            let secret = first.secret, !secret.isEmpty
+        else { return false }
         return secret == second.secret && first.isHOTP == second.isHOTP
     }
 }
@@ -260,7 +267,9 @@ nonisolated struct EnteEntryEditor {
     /// The counter of a HOTP account, nil if it has none or it isn't a whole number.
     var counter: UInt64? {
         get {
-            Self.value(of: "counter", in: components).flatMap { OTPAuthURLParser.integer("counter", in: ["counter": $0], default: UInt64(0)) }
+            Self.value(of: "counter", in: components).flatMap {
+                OTPAuthURLParser.integer("counter", in: ["counter": $0], default: UInt64(0))
+            }
         }
         set { Self.set("counter", to: newValue.map(String.init), in: &components) }
     }
@@ -329,7 +338,8 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
         guard let components = entry.components, !entry.isTrashed else { return nil }
         if components.host?.lowercased() == "hotp" {
             guard let items = OTPAuthURLParser.parameters(of: components),
-                  let secret = items["secret"].flatMap(OTPAuthURLParser.base32Decode), !secret.isEmpty else { return nil }
+                let secret = items["secret"].flatMap(OTPAuthURLParser.base32Decode), !secret.isEmpty
+            else { return nil }
             let algorithm: OTPAccount.Algorithm
             switch items["algorithm"]?.uppercased() ?? "SHA1" {
             case "SHA1", "": algorithm = .sha1
@@ -341,18 +351,22 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
             // The counter is moved on once its code has been shown, which the largest one can't be.
             guard let counter = OTPAuthURLParser.integer("counter", in: items, default: UInt64(0)), counter < .max else { return nil }
             let (issuer, accountName) = OTPAuthURLParser.label(of: components)
-            self.init(issuer: issuer, accountName: accountName, kind: .hotp, secret: secret, algorithm: algorithm, digits: digits,
-                      period: 0, counter: counter, isPinned: entry.isPinned, tags: entry.tags, iconID: entry.iconID)
+            self.init(
+                issuer: issuer, accountName: accountName, kind: .hotp, secret: secret, algorithm: algorithm, digits: digits,
+                period: 0, counter: counter, isPinned: entry.isPinned, tags: entry.tags, iconID: entry.iconID)
         } else {
             guard let account = OTPAuthURLParser.account(id: "", components: components, isPinned: entry.isPinned) else { return nil }
-            self.init(issuer: account.issuer, accountName: account.accountName, kind: account.kind == .steam ? .steam : .totp,
-                      secret: account.secret, algorithm: account.algorithm, digits: account.digits, period: account.period,
-                      counter: 0, isPinned: account.isPinned, tags: entry.tags, iconID: entry.iconID)
+            self.init(
+                issuer: account.issuer, accountName: account.accountName, kind: account.kind == .steam ? .steam : .totp,
+                secret: account.secret, algorithm: account.algorithm, digits: account.digits, period: account.period,
+                counter: 0, isPinned: account.isPinned, tags: entry.tags, iconID: entry.iconID)
         }
     }
 
-    private init(issuer: String?, accountName: String, kind: Kind, secret: Data, algorithm: OTPAccount.Algorithm, digits: Int,
-                 period: Int, counter: UInt64, isPinned: Bool, tags: [String], iconID: String?) {
+    private init(
+        issuer: String?, accountName: String, kind: Kind, secret: Data, algorithm: OTPAccount.Algorithm, digits: Int,
+        period: Int, counter: UInt64, isPinned: Bool, tags: [String], iconID: String?
+    ) {
         self.issuer = issuer
         self.accountName = accountName
         self.kind = kind
@@ -375,8 +389,9 @@ nonisolated struct EnteCloudCode: Sendable, Equatable {
 
     /// The time-based code valid at `date` and when it is valid. HOTP codes are calculated with `hotpCode()`.
     func code(at date: Date) -> (code: String, validity: DateInterval) {
-        let account = OTPAccount(id: "", kind: kind == .steam ? .steam : .totp, issuer: issuer, accountName: accountName, secret: secret,
-                                 algorithm: algorithm, digits: digits, period: max(1, period), isPinned: isPinned)
+        let account = OTPAccount(
+            id: "", kind: kind == .steam ? .steam : .totp, issuer: issuer, accountName: accountName, secret: secret,
+            algorithm: algorithm, digits: digits, period: max(1, period), isPinned: isPinned)
         let period = Double(max(1, period))
         let start = (max(0, date.timeIntervalSince1970) / period).rounded(.down) * period
         return (OTPGenerator.code(for: account, at: date), DateInterval(start: Date(timeIntervalSince1970: start), duration: period))
@@ -400,9 +415,14 @@ enum EnteVaultError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unreadable:
-            return String(localized: "The copy of your Ente Auth accounts on this device couldn't be read. It was kept, and the accounts are downloaded again from Ente Auth.", comment: "Error when the file with the Ente accounts on the device can't be decrypted")
+            return String(
+                localized:
+                    "The copy of your Ente Auth accounts on this device couldn't be read. It was kept, and the accounts are downloaded again from Ente Auth.",
+                comment: "Error when the file with the Ente accounts on the device can't be decrypted")
         case .unavailable:
-            return String(localized: "Your Ente Auth accounts on this device can't be read right now. Unlock the device and try again.", comment: "Error when the file with the Ente accounts on the device can't be read yet")
+            return String(
+                localized: "Your Ente Auth accounts on this device can't be read right now. Unlock the device and try again.",
+                comment: "Error when the file with the Ente accounts on the device can't be read yet")
         }
     }
 }

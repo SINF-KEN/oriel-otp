@@ -118,7 +118,7 @@ struct AccountOrderSection: View {
                 .sheet(isPresented: $showsCheckup) {
                     AccountCheckupView()
                         #if os(macOS)
-                        .frame(minWidth: 480, minHeight: 420)
+                            .frame(minWidth: 480, minHeight: 420)
                         #endif
                 }
         } header: {

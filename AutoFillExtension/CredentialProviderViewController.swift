@@ -24,10 +24,10 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
     private let model = AutoFillModel()
 
     #if os(macOS)
-    override func loadView() {
-        view = NSView()
-        preferredContentSize = NSSize(width: 420, height: 520)
-    }
+        override func loadView() {
+            view = NSView()
+            preferredContentSize = NSSize(width: 420, height: 520)
+        }
     #endif
 
     override func viewDidLoad() {
@@ -35,20 +35,20 @@ final class CredentialProviderViewController: ASCredentialProviderViewController
         model.fill = { [weak self] in self?.fill($0) }
         model.cancel = { [weak self] in self?.cancel(.userCanceled) }
         #if os(iOS)
-        let host = UIHostingController(rootView: AutoFillView(model: model))
+            let host = UIHostingController(rootView: AutoFillView(model: model))
         #else
-        let host = NSHostingController(rootView: AutoFillView(model: model))
+            let host = NSHostingController(rootView: AutoFillView(model: model))
         #endif
         addChild(host)
         host.view.frame = view.bounds
         #if os(iOS)
-        host.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            host.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         #else
-        host.view.autoresizingMask = [.width, .height]
+            host.view.autoresizingMask = [.width, .height]
         #endif
         view.addSubview(host.view)
         #if os(iOS)
-        host.didMove(toParent: self)
+            host.didMove(toParent: self)
         #endif
     }
 

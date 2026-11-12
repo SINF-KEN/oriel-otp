@@ -23,8 +23,9 @@ import YubiKit
 extension MainViewModel {
 
     func deviceAccount(id: String, code: EnteCloudCode) -> Account {
-        let credential = OATHSession.Credential(type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
-                                                period: UInt(code.period))
+        let credential = OATHSession.Credential(
+            type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
+            period: UInt(code.period))
         let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
         let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .device(id: id))
         account.onPinnedChange = { [weak self] account in

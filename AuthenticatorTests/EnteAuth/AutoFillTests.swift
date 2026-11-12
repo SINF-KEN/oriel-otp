@@ -40,7 +40,7 @@ struct AutoFillWebsitesTests {
         // Anyone can register a site under these.
         ("github.io", []),
         ("co.uk", []),
-        ("alice.github.io", ["alice.github.io"]),
+        ("alice.github.io", ["alice.github.io"])
     ])
     func guessesTheWebsiteFromTheIssuer(issuer: String, websites: [String]) {
         #expect(AutoFillWebsites.guess(issuer: issuer) == websites)
@@ -50,30 +50,32 @@ struct AutoFillWebsitesTests {
         #expect(AutoFillWebsites.guess(issuer: nil) == [])
     }
 
-    @Test(arguments: [
-        ("Mastodon", "mastodon.com"),
-        ("Home Assistant", "homeassistant.com"),
-        ("GitHub", nil),
-        ("accounts.google.com", nil),
-        ("github.io", nil),
-        ("ミクシィ", nil),
-        ("A", nil),
-    ] as [(String, String?)])
+    @Test(
+        arguments: [
+            ("Mastodon", "mastodon.com"),
+            ("Home Assistant", "homeassistant.com"),
+            ("GitHub", nil),
+            ("accounts.google.com", nil),
+            ("github.io", nil),
+            ("ミクシィ", nil),
+            ("A", nil)
+        ] as [(String, String?)])
     func suggestsAWebsiteForANameToBeConfirmed(issuer: String, suggestion: String?) {
         #expect(AutoFillWebsites.suggestion(issuer: issuer) == suggestion)
     }
 
-    @Test(arguments: [
-        ("https://www.GitHub.com/login", "github.com"),
-        ("example.com.", "example.com"),
-        (" login.example.co.uk ", "login.example.co.uk"),
-        ("github", nil),
-        ("git hub.com", nil),
-        ("co.uk", nil),
-        ("https://www.github.io/", nil),
-        ("alice.github.io", "alice.github.io"),
-        ("", nil),
-    ] as [(String, String?)])
+    @Test(
+        arguments: [
+            ("https://www.GitHub.com/login", "github.com"),
+            ("example.com.", "example.com"),
+            (" login.example.co.uk ", "login.example.co.uk"),
+            ("github", nil),
+            ("git hub.com", nil),
+            ("co.uk", nil),
+            ("https://www.github.io/", nil),
+            ("alice.github.io", "alice.github.io"),
+            ("", nil)
+        ] as [(String, String?)])
     func normalizesTypedWebsites(text: String, website: String?) {
         #expect(AutoFillWebsites.normalized(text) == website)
     }
@@ -89,10 +91,12 @@ struct AutoFillWebsitesTests {
         let accounts = [
             Self.account("1", issuer: "Example", websites: ["example.com"]),
             Self.account("2", issuer: "Mobile", websites: ["m.example.com"]),
-            Self.account("3", issuer: "Other", websites: ["other.com"]),
+            Self.account("3", issuer: "Other", websites: ["other.com"])
         ]
-        let services = [ASCredentialServiceIdentifier(identifier: "https://m.example.com/login", type: .URL),
-                        ASCredentialServiceIdentifier(identifier: "example.com", type: .domain)]
+        let services = [
+            ASCredentialServiceIdentifier(identifier: "https://m.example.com/login", type: .URL),
+            ASCredentialServiceIdentifier(identifier: "example.com", type: .domain)
+        ]
         let (matching, others) = AutoFillWebsites.sorted(accounts, for: services)
         #expect(matching.map(\.id) == ["2", "1"])
         #expect(others.map(\.id) == ["3"])
@@ -106,15 +110,18 @@ struct AutoFillWebsitesTests {
     }
 
     @Test func suggestsEachWebsiteWithTheAccountsName() {
-        let identities = AutoFillIdentities.identities(for: [Self.account("1", issuer: "Example", websites: ["example.com", "example.org"])])
+        let identities = AutoFillIdentities.identities(for: [Self.account("1", issuer: "Example", websites: ["example.com", "example.org"])]
+        )
         #expect(identities.map(\.serviceIdentifier.identifier) == ["example.com", "example.org"])
         #expect(identities.allSatisfy { $0.label == "Example (alice)" && $0.recordIdentifier == "1" })
     }
 
     static func account(_ id: String, issuer: String, websites: [String]) -> AutoFillAccount {
-        AutoFillAccount(account: OTPAccount(id: id, kind: .totp, issuer: issuer, accountName: "alice", secret: Data("secret".utf8),
-                                            algorithm: .sha1, digits: 6, period: 30, isPinned: false),
-                        websites: websites)
+        AutoFillAccount(
+            account: OTPAccount(
+                id: id, kind: .totp, issuer: issuer, accountName: "alice", secret: Data("secret".utf8),
+                algorithm: .sha1, digits: 6, period: 30, isPinned: false),
+            websites: websites)
     }
 }
 
@@ -187,8 +194,9 @@ struct AutoFillAccountSyncTests {
 
     private func sync(keychain: EncryptedFileKey? = nil) -> AutoFillAccountSync {
         let provider = provider
-        return AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults,
-                                   updatesSystem: false, providerIsEnabled: { provider.isEnabled })
+        return AutoFillAccountSync(
+            storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults,
+            updatesSystem: false, providerIsEnabled: { provider.isEnabled })
     }
 
     private func update(_ sync: AutoFillAccountSync, with codes: [EnteCode] = Self.codes) async {
@@ -202,12 +210,13 @@ struct AutoFillAccountSyncTests {
 
     private static let codes = [
         code("github", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"),
-        code("bank", "otpauth://hotp/Bank:alice?secret=JBSWY3DPEHPK3PXP&issuer=Bank&counter=3"),
+        code("bank", "otpauth://hotp/Bank:alice?secret=JBSWY3DPEHPK3PXP&issuer=Bank&counter=3")
     ]
 
     private func template(_ issuer: String) throws -> YubiKitOATHSession.CredentialTemplate {
-        try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
-                                                  issuer: issuer, accountName: "alice", digits: 6)
+        try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 30), algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+            issuer: issuer, accountName: "alice", digits: 6)
     }
 
     /// The accounts on this device are filled in too, without an Ente account, and stay when Ente is signed out of.
@@ -215,9 +224,10 @@ struct AutoFillAccountSyncTests {
         let sync = sync()
         let device = DeviceAccounts(storage: MemoryDeviceStorage())
         let defaults = makeTestDefaults()
-        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                              storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
-                              watch: WatchAccountSync(defaults: defaults), autoFill: sync, device: device)
+        let cloud = EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+            storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
+            watch: WatchAccountSync(defaults: defaults), autoFill: sync, device: device)
         let model = MainViewModel(cloud: cloud, device: device)
         _ = try model.addDeviceAccount(template("GitLab"))
         await sync.finishWriting()
@@ -242,9 +252,10 @@ struct AutoFillAccountSyncTests {
         let deviceStorage = MemoryDeviceStorage()
         let defaults = makeTestDefaults()
         func cloud(autoFill: AutoFillAccountSync, device: DeviceAccounts) -> EnteCloud {
-            EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                      storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
-                      watch: WatchAccountSync(defaults: defaults), autoFill: autoFill, device: device)
+            EnteCloud(
+                store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+                storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
+                watch: WatchAccountSync(defaults: defaults), autoFill: autoFill, device: device)
         }
         let sync = sync()
         let device = DeviceAccounts(storage: deviceStorage)

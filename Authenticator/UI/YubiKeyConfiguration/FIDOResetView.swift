@@ -17,14 +17,17 @@
 
 import SwiftUI
 
-fileprivate let resetMessageText = String(localized: "Your credentials, as well as any PIN set, will be removed from this YubiKey. Make sure to first disable these from their respective web sites to avoid being locked out of your accounts.")
+fileprivate let resetMessageText = String(
+    localized:
+        "Your credentials, as well as any PIN set, will be removed from this YubiKey. Make sure to first disable these from their respective web sites to avoid being locked out of your accounts."
+)
 
 struct FIDOResetView: View {
-    
+
     var completion: (() -> Void)
     @Environment(\.dismiss) private var dismiss
     @State var model = FIDOResetViewModel()
-    
+
     @State var presentConfirmAlert = false
     @State var presentErrorAlert = false
     @State var progress = 0.0
@@ -49,31 +52,38 @@ struct FIDOResetView: View {
         }
         .navigationTitle(Text("Reset FIDO"))
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Warning!", isPresented: $presentConfirmAlert, presenting: model, actions: { model in
-            Button(role: .destructive) {
-                presentConfirmAlert.toggle()
-                model.reset()
-            } label: {
-                Text("Reset")
-            }
-            Button(role: .cancel) {
-                presentConfirmAlert.toggle()
-            } label: {
-                Text("Cancel")
-            }
-        }, message: { _ in
-            Text("This will irrevocably delete all U2F and FIDO2 accounts, including passkeys, from your YubiKey.")
-        })
-        .alert(errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: {
-            Button(role: .cancel) {
-                errorMessage = nil
-                if model.state.isError() {
-                    dismiss()
+        .alert(
+            "Warning!", isPresented: $presentConfirmAlert, presenting: model,
+            actions: { model in
+                Button(role: .destructive) {
+                    presentConfirmAlert.toggle()
+                    model.reset()
+                } label: {
+                    Text("Reset")
                 }
-            } label: {
-                Text("OK")
+                Button(role: .cancel) {
+                    presentConfirmAlert.toggle()
+                } label: {
+                    Text("Cancel")
+                }
+            },
+            message: { _ in
+                Text("This will irrevocably delete all U2F and FIDO2 accounts, including passkeys, from your YubiKey.")
             }
-        })        
+        )
+        .alert(
+            errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert,
+            actions: {
+                Button(role: .cancel) {
+                    errorMessage = nil
+                    if model.state.isError() {
+                        dismiss()
+                    }
+                } label: {
+                    Text("OK")
+                }
+            }
+        )
         .onChange(of: model.state) { _, _ in
             updateState()
         }
@@ -85,7 +95,7 @@ struct FIDOResetView: View {
             completion()
         }
     }
-    
+
     func updateState() {
         withAnimation(.unlessReduceMotion) {
             switch model.state {
@@ -96,7 +106,8 @@ struct FIDOResetView: View {
                 self.progress = 1.0
                 self.keyHasBeenReset = true
                 self.enableResetButton = false
-                self.messageText = String(localized: "The FIDO application of your YubiKey has been reset to factory defaults.", comment: "FIDO reset view")
+                self.messageText = String(
+                    localized: "The FIDO application of your YubiKey has been reset to factory defaults.", comment: "FIDO reset view")
                 self.image = Image(systemName: "checkmark.circle")
                 self.imageColor = Color(.systemGreen)
             case .error(let error):

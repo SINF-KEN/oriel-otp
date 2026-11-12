@@ -37,7 +37,10 @@ struct EnteSyncView: View {
         case email, password, code, server
     }
 
-    init(existingCredentialIds: Set<String>, capacity: Int?, canAddToYubiKey: Bool, onImport: @escaping ([YubiKitOATHSession.CredentialTemplate], Bool) -> Void) {
+    init(
+        existingCredentialIds: Set<String>, capacity: Int?, canAddToYubiKey: Bool,
+        onImport: @escaping ([YubiKitOATHSession.CredentialTemplate], Bool) -> Void
+    ) {
         _model = State(initialValue: EnteSyncViewModel(existingCredentialIds: existingCredentialIds, capacity: capacity))
         self.canAddToYubiKey = canAddToYubiKey
         self.onImport = onImport
@@ -65,7 +68,7 @@ struct EnteSyncView: View {
             .scrollDismissesKeyboard(.immediately)
             .disabled(model.isBusy)
             #if os(macOS)
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
             .navigationTitle(String(localized: "Ente Auth", comment: "Ente sync navigation title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -86,13 +89,23 @@ struct EnteSyncView: View {
             }
             .errorAlert(error: $model.error)
             // Like the one in Settings: signing out deletes the copy of the accounts, with changes not synced yet.
-            .confirmationDialog(String(localized: "Sign out of Ente?", comment: "Ente sign out confirmation"), isPresented: $isConfirmingSignOut) {
+            .confirmationDialog(
+                String(localized: "Sign out of Ente?", comment: "Ente sign out confirmation"), isPresented: $isConfirmingSignOut
+            ) {
                 Button(String(localized: "Sign out", comment: "Ente sign out button"), role: .destructive) { model.signOut() }
             } message: {
                 if model.hasPendingChanges {
-                    Text(String(localized: "The session, the key and the copy of your accounts are deleted from this device. Some changes made here haven't been synced with Ente Auth yet and will be lost.", comment: "Ente sign out confirmation message with changes that weren't uploaded"))
+                    Text(
+                        String(
+                            localized:
+                                "The session, the key and the copy of your accounts are deleted from this device. Some changes made here haven't been synced with Ente Auth yet and will be lost.",
+                            comment: "Ente sign out confirmation message with changes that weren't uploaded"))
                 } else {
-                    Text(String(localized: "The session, the key and the copy of your accounts are deleted from this device. Your accounts stay in Ente Auth.", comment: "Ente sign out confirmation message"))
+                    Text(
+                        String(
+                            localized:
+                                "The session, the key and the copy of your accounts are deleted from this device. Your accounts stay in Ente Auth.",
+                            comment: "Ente sign out confirmation message"))
                 }
             }
         }
@@ -127,14 +140,19 @@ struct EnteSyncView: View {
                     .disabled(!model.canSignIn)
                     .accessibilityIdentifier("ente.sign-in")
             } header: {
-                Text(model.usesOwnServer
-                     ? String(localized: "Sign in to your server", comment: "Ente sign in section header for a self-hosted server")
-                     : String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
+                Text(
+                    model.usesOwnServer
+                        ? String(localized: "Sign in to your server", comment: "Ente sign in section header for a self-hosted server")
+                        : String(localized: "Sign in to Ente Auth", comment: "Ente sign in section header"))
             } footer: {
                 if model.isDerivingKeys {
                     derivingKeysText
                 } else {
-                    Text(String(localized: "Your email and sign-in requests are sent to Ente, or to your own server. Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too.", comment: "Ente sign in footer"))
+                    Text(
+                        String(
+                            localized:
+                                "Your email and sign-in requests are sent to Ente, or to your own server. Your Ente Auth accounts are end-to-end encrypted and only decrypted on this device, and your password never leaves it. If you stay signed in, the accounts are kept on this device and listed with your YubiKey's, and accounts you add, rename, pin or delete here are changed in Ente Auth too.",
+                            comment: "Ente sign in footer"))
                 }
             }
 
@@ -144,9 +162,17 @@ struct EnteSyncView: View {
                         .accessibilityIdentifier("ente.stay-signed-in")
                 } footer: {
                     #if os(macOS)
-                    Text(String(localized: "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your password, which is never stored.", comment: "Mac Ente sign in stay signed in footer"))
+                        Text(
+                            String(
+                                localized:
+                                    "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Touch ID or your Mac's password, so you can sync again without your password, which is never stored.",
+                                comment: "Mac Ente sign in stay signed in footer"))
                     #else
-                    Text(String(localized: "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored.", comment: "Ente sign in stay signed in footer"))
+                        Text(
+                            String(
+                                localized:
+                                    "Staying signed in keeps your session and the key that decrypts your accounts in the keychain, protected by Face ID or Touch ID, so you can sync again without your password, which is never stored.",
+                                comment: "Ente sign in stay signed in footer"))
                     #endif
                 }
             }
@@ -165,17 +191,23 @@ struct EnteSyncView: View {
             }
             .accessibilityIdentifier("ente.server-choice")
             if model.usesOwnServer {
-                TextField(String(localized: "Server address", comment: "Ente sign in server field"), text: $model.server, prompt: serverPrompt)
-                    .accessibilityIdentifier("ente.server")
-                    .keyboardType(.URL)
-                    .textContentType(.URL)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .submitLabel(.next)
-                    .focused($focusedField, equals: .server)
-                    .onSubmit { focusedField = .email }
+                TextField(
+                    String(localized: "Server address", comment: "Ente sign in server field"), text: $model.server, prompt: serverPrompt
+                )
+                .accessibilityIdentifier("ente.server")
+                .keyboardType(.URL)
+                .textContentType(.URL)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .submitLabel(.next)
+                .focused($focusedField, equals: .server)
+                .onSubmit { focusedField = .email }
                 if let server = model.signUpServer {
-                    Button(String(localized: "Create an account on this server", comment: "Ente button that opens account creation on a self-hosted server")) {
+                    Button(
+                        String(
+                            localized: "Create an account on this server",
+                            comment: "Ente button that opens account creation on a self-hosted server")
+                    ) {
                         isCreatingAccount = true
                     }
                     .accessibilityIdentifier("ente.create-account")
@@ -184,7 +216,11 @@ struct EnteSyncView: View {
                         EnteSignUpView(server: server, email: model.email) { model.email = $0 }
                             .appLockCover()
                     }
-                    Button(String(localized: "Delete an account on this server", comment: "Ente button that opens account deletion on a self-hosted server"), role: .destructive) {
+                    Button(
+                        String(
+                            localized: "Delete an account on this server",
+                            comment: "Ente button that opens account deletion on a self-hosted server"), role: .destructive
+                    ) {
                         isDeletingAccount = true
                     }
                     .accessibilityIdentifier("ente.delete-account")
@@ -196,9 +232,15 @@ struct EnteSyncView: View {
             }
         } footer: {
             if model.usesOwnServer {
-                Text(String(localized: "The address of the Ente server you host, the one its apps use, like https://auth.example.com. Your email and sign-in requests only go to that server.", comment: "Ente sign in footer for a self-hosted server"))
+                Text(
+                    String(
+                        localized:
+                            "The address of the Ente server you host, the one its apps use, like https://auth.example.com. Your email and sign-in requests only go to that server.",
+                        comment: "Ente sign in footer for a self-hosted server"))
             } else {
-                Text(String(localized: "Choose My own server if you host Ente yourself.", comment: "Ente sign in footer for Ente's own server"))
+                Text(
+                    String(
+                        localized: "Choose My own server if you host Ente yourself.", comment: "Ente sign in footer for Ente's own server"))
             }
         }
         .onChange(of: model.usesOwnServer) { _, ownServer in
@@ -208,9 +250,9 @@ struct EnteSyncView: View {
 
     private var serverPrompt: Text {
         #if os(macOS)
-        Text(verbatim: "")
+            Text(verbatim: "")
         #else
-        Text(verbatim: "https://auth.example.com")
+            Text(verbatim: "https://auth.example.com")
         #endif
     }
 
@@ -222,7 +264,11 @@ struct EnteSyncView: View {
         } header: {
             Text(String(localized: "Signed in to Ente Auth", comment: "Ente saved session header"))
         } footer: {
-            Text(String(localized: "Your Ente Auth accounts are kept on this device, encrypted, and listed with your YubiKey's, so their codes work offline. They are synced with Ente when the app opens, after each change and when you refresh the list. Choose Sync accounts to pick ones to add to your YubiKey.", comment: "Ente saved session footer"))
+            Text(
+                String(
+                    localized:
+                        "Your Ente Auth accounts are kept on this device, encrypted, and listed with your YubiKey's, so their codes work offline. They are synced with Ente when the app opens, after each change and when you refresh the list. Choose Sync accounts to pick ones to add to your YubiKey.",
+                    comment: "Ente saved session footer"))
         }
     }
 
@@ -239,7 +285,10 @@ struct EnteSyncView: View {
             if model.isDerivingKeys {
                 derivingKeysText
             } else {
-                Text(String(localized: "Enter the verification code Ente sent to \(model.email.isolated).", comment: "Ente email code footer. The placeholder is the email address."))
+                Text(
+                    String(
+                        localized: "Enter the verification code Ente sent to \(model.email.isolated).",
+                        comment: "Ente email code footer. The placeholder is the email address."))
             }
         }
     }
@@ -267,14 +316,18 @@ struct EnteSyncView: View {
                         if let url = model.passkeyURL { openURL(url) }
                     }
                     .disabled(model.passkeyURL == nil)
-                    Button(String(localized: "I have verified the passkey", comment: "Ente passkey continue button")) { model.checkPasskey() }
+                    Button(String(localized: "I have verified the passkey", comment: "Ente passkey continue button")) {
+                        model.checkPasskey()
+                    }
                 } header: {
                     Text(String(localized: "Passkey", comment: "Ente passkey header"))
                 } footer: {
                     if model.isDerivingKeys {
                         derivingKeysText
                     } else {
-                        Text(String(localized: "Verify your passkey on Ente's website, then come back here.", comment: "Ente passkey footer"))
+                        Text(
+                            String(localized: "Verify your passkey on Ente's website, then come back here.", comment: "Ente passkey footer")
+                        )
                     }
                 }
             }
@@ -312,15 +365,20 @@ struct EnteSyncView: View {
             storageSection
             Section {
                 ForEach(model.codes) { code in
-                    EnteCodeRow(code: code,
-                                isSelected: model.selection.contains(code.id),
-                                isOnYubiKey: model.isOnYubiKey(code)) {
+                    EnteCodeRow(
+                        code: code,
+                        isSelected: model.selection.contains(code.id),
+                        isOnYubiKey: model.isOnYubiKey(code)
+                    ) {
                         model.toggleSelection(code)
                     }
                 }
             } header: {
                 HStack {
-                    Text(String(localized: "\(model.codes.count) accounts in Ente Auth", comment: "Ente sync accounts header. The placeholder is the number of accounts."))
+                    Text(
+                        String(
+                            localized: "\(model.codes.count) accounts in Ente Auth",
+                            comment: "Ente sync accounts header. The placeholder is the number of accounts."))
                     Spacer()
                     if !model.canSelectMore && !model.selection.isEmpty {
                         Button(String(localized: "Select none", comment: "Ente sync deselect all")) { model.selectNone() }
@@ -333,7 +391,11 @@ struct EnteSyncView: View {
                 if !canAddToYubiKey {
                     Text(String(localized: "Insert your YubiKey to add the accounts.", comment: "Ente sync no YubiKey footer"))
                 } else {
-                    Text(String(localized: "The selected accounts are added to your YubiKey. Accounts with the same name as one on the YubiKey are skipped.", comment: "Ente sync accounts footer"))
+                    Text(
+                        String(
+                            localized:
+                                "The selected accounts are added to your YubiKey. Accounts with the same name as one on the YubiKey are skipped.",
+                            comment: "Ente sync accounts footer"))
                 }
             }
             Section {
@@ -352,7 +414,9 @@ struct EnteSyncView: View {
         if model.selection.isEmpty {
             String(localized: "Add", comment: "Ente sync add selected accounts to YubiKey")
         } else {
-            String(localized: "Add \(model.selection.count)", comment: "Ente sync add selected accounts to YubiKey. The placeholder is the number of selected accounts.")
+            String(
+                localized: "Add \(model.selection.count)",
+                comment: "Ente sync add selected accounts to YubiKey. The placeholder is the number of selected accounts.")
         }
     }
 
@@ -360,17 +424,32 @@ struct EnteSyncView: View {
     @ViewBuilder private var storageSection: some View {
         if let freeSpaces = model.freeSpaces, let capacity = model.capacity {
             Section {
-                LabeledContent(String(localized: "Space on YubiKey", comment: "Ente sync free space label"),
-                               value: String(localized: "\(freeSpaces) of \(capacity) free", comment: "Ente sync free space. The placeholders are the free and total number of accounts the YubiKey can hold."))
+                LabeledContent(
+                    String(localized: "Space on YubiKey", comment: "Ente sync free space label"),
+                    value: String(
+                        localized: "\(freeSpaces) of \(capacity) free",
+                        comment: "Ente sync free space. The placeholders are the free and total number of accounts the YubiKey can hold."))
             } footer: {
                 if freeSpaces == 0 {
-                    Text(String(localized: "The YubiKey is full. Delete accounts from it to make room.", comment: "Ente sync YubiKey full footer"))
+                    Text(
+                        String(
+                            localized: "The YubiKey is full. Delete accounts from it to make room.",
+                            comment: "Ente sync YubiKey full footer"))
                 } else if model.isSelectionTooLarge {
-                    Label(String(localized: "Too many accounts selected. Deselect \(model.selection.count - freeSpaces) so they all fit on the YubiKey.", comment: "Ente sync selection too large warning. The placeholder is how many accounts to deselect."),
-                          systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                    Label(
+                        String(
+                            localized:
+                                "Too many accounts selected. Deselect \(model.selection.count - freeSpaces) so they all fit on the YubiKey.",
+                            comment: "Ente sync selection too large warning. The placeholder is how many accounts to deselect."),
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .foregroundStyle(.orange)
                 } else if model.importableCodes.count > freeSpaces {
-                    Text(String(localized: "Not all accounts fit on the YubiKey, so only the first ones are selected. Pick the ones you need most.", comment: "Ente sync free space footer"))
+                    Text(
+                        String(
+                            localized:
+                                "Not all accounts fit on the YubiKey, so only the first ones are selected. Pick the ones you need most.",
+                            comment: "Ente sync free space footer"))
                 }
             }
         }
@@ -417,16 +496,16 @@ private struct EnteCodeRow: View {
                     }
                 }
                 #if os(macOS)
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
                 #endif
             }
             #if os(macOS)
-            .contentShape(Rectangle())
+                .contentShape(Rectangle())
             #endif
         }
         #if os(macOS)
-        // A whole row that toggles, rather than a bordered push button.
-        .buttonStyle(.plain)
+            // A whole row that toggles, rather than a bordered push button.
+            .buttonStyle(.plain)
         #endif
         .disabled(code.template == nil)
         .accessibilityAddTraits(isSelected ? .isSelected : [])

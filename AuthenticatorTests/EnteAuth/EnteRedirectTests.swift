@@ -25,7 +25,7 @@ struct EnteRedirectTests {
     @Test(arguments: [
         "https://api.ente.io/v2/users/ott",
         "HTTPS://API.ENTE.IO/users/ott",
-        "https://api.ente.io:443/users/ott",
+        "https://api.ente.io:443/users/ott"
     ]) func aRedirectOnTheSameServerIsFollowed(destination: String) {
         #expect(EnteRedirectGuard.allows(from: URL(string: Self.origin), to: URL(string: destination)))
     }
@@ -36,7 +36,7 @@ struct EnteRedirectTests {
         "https://api.ente.io.evil.example/users/ott",
         "https://api.ente.io:8443/users/ott",
         "https://evil.example@evil.example/users/ott",
-        "ftp://api.ente.io/users/ott",
+        "ftp://api.ente.io/users/ott"
     ]) func aRedirectAnywhereElseIsRefused(destination: String) {
         #expect(!EnteRedirectGuard.allows(from: URL(string: Self.origin), to: URL(string: destination)))
     }
@@ -71,8 +71,11 @@ struct EnteRedirectTests {
         #expect(storage !== HTTPCookieStorage.shared)
         let url = try #require(URL(string: "https://cookie-test.ente.invalid/users/ott"))
         let name = "OrielCookieTest-\(UUID().uuidString)"
-        let cookie = try #require(HTTPCookie(properties: [.name: name, .value: "1", .domain: "cookie-test.ente.invalid",
-                                                          .path: "/", .expires: Date().addingTimeInterval(3600)]))
+        let cookie = try #require(
+            HTTPCookie(properties: [
+                .name: name, .value: "1", .domain: "cookie-test.ente.invalid",
+                .path: "/", .expires: Date().addingTimeInterval(3600)
+            ]))
         storage.setCookies([cookie], for: url, mainDocumentURL: nil)
         defer { storage.deleteCookie(cookie) }
 

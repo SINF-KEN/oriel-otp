@@ -20,9 +20,9 @@ import Observation
 import YubiKit
 
 enum FidoViewModelError: Error, LocalizedError {
-    
+
     case usbNotSupported, locked, pinsDoNotMatch
-    
+
     public var errorDescription: String? {
         switch self {
         case .pinsDoNotMatch:
@@ -36,16 +36,16 @@ enum FidoViewModelError: Error, LocalizedError {
 }
 
 @Observable class FIDOPINViewModel {
-    
+
     var state: PINState = .unknown
     var isProcessing: Bool = false
     var pincomplexity: Bool = false
     var minPinLength: UInt = 4
-    
+
     enum PINState: Equatable {
-        
+
         case unknown, notSet, set, error(Error), keyRemoved, didSet, didChange
-        
+
         static func == (lhs: FIDOPINViewModel.PINState, rhs: FIDOPINViewModel.PINState) -> Bool {
             switch (lhs, rhs) {
             case (.unknown, .unknown):
@@ -66,7 +66,7 @@ enum FidoViewModelError: Error, LocalizedError {
                 return false
             }
         }
-        
+
         func isBlocked() -> Bool {
             if case .pinAuthBlocked = ctapError { return true }
             return false
@@ -143,7 +143,7 @@ enum FidoViewModelError: Error, LocalizedError {
                         state = .set
                     }
                 }
-            } catch where error.isNFCCancelledByUser {
+            } catch  where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
             } catch {
                 let error = LocalizedErrorWrapper(error: error)

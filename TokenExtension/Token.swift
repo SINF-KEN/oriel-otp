@@ -19,7 +19,7 @@ import CryptoTokenKit
 class Token: TKToken, TKTokenDelegate {
 
     func createSession(_ token: TKToken) throws -> TKTokenSession {
-        return TokenSession(token:self)
+        return TokenSession(token: self)
     }
 
 }

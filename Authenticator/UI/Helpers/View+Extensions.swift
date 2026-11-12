@@ -17,7 +17,6 @@
 
 import SwiftUI
 
-
 extension View {
     @ViewBuilder func refreshable(enabled: Bool, action: @escaping () async -> Void) -> some View {
         if enabled {
@@ -85,101 +84,105 @@ struct ReservedRegionAvoidingModifier: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
         #if os(iOS)
-        if #available(iOS 27.1, *) {
-            GeometryReader { proxy in
-                let clearRect = CGRect(origin: .zero, size: proxy.size)
-                    .largestClearRect(avoiding: proxy.reservedRegions(kind: .occlusion).map(\.frame),
-                                      folds: proxy.reservedRegions(kind: .division).map(\.frame))
-                content.padding(EdgeInsets(top: clearRect.minY,
-                                           leading: clearRect.minX,
-                                           bottom: proxy.size.height - clearRect.maxY,
-                                           trailing: proxy.size.width - clearRect.maxX))
+            if #available(iOS 27.1, *) {
+                GeometryReader { proxy in
+                    let clearRect = CGRect(origin: .zero, size: proxy.size)
+                        .largestClearRect(
+                            avoiding: proxy.reservedRegions(kind: .occlusion).map(\.frame),
+                            folds: proxy.reservedRegions(kind: .division).map(\.frame))
+                    content.padding(
+                        EdgeInsets(
+                            top: clearRect.minY,
+                            leading: clearRect.minX,
+                            bottom: proxy.size.height - clearRect.maxY,
+                            trailing: proxy.size.width - clearRect.maxX))
+                }
+            } else {
+                content
             }
-        } else {
-            content
-        }
         #else
-        // Mac windows have no reserved regions.
-        content
+            // Mac windows have no reserved regions.
+            content
         #endif
     }
 }
 
 #if os(iOS)
-/// Gives its content the width of the split view's account column on a display with a fold, the inner display of an
-/// iPhone Duo, and nil on any other display.
-struct FoldedColumnWidthReader<Content: View>: View {
+    /// Gives its content the width of the split view's account column on a display with a fold, the inner display of an
+    /// iPhone Duo, and nil on any other display.
+    struct FoldedColumnWidthReader<Content: View>: View {
 
-    /// When the fold runs across both columns, leaving room for the details.
-    private let minimumWidth: CGFloat = 320
+        /// When the fold runs across both columns, leaving room for the details.
+        private let minimumWidth: CGFloat = 320
 
-    @ViewBuilder let content: (CGFloat?) -> Content
+        @ViewBuilder let content: (CGFloat?) -> Content
 
-    var body: some View {
-        if #available(iOS 27.1, *) {
-            GeometryReader { proxy in
-                // Also while it's flat, when the fold isn't active, so the layout doesn't change as the device bends.
-                content(proxy.reservedRegions(kind: .division, options: .includeInactive).first.map { fold in
-                    // Up to the fold when it runs between the columns. The split view adds the safe area to this.
-                    let isBetweenColumns = fold.frame.height > fold.frame.width
-                    return isBetweenColumns ? max(proxy.size.width - fold.frame.maxX, minimumWidth) : minimumWidth
-                })
+        var body: some View {
+            if #available(iOS 27.1, *) {
+                GeometryReader { proxy in
+                    // Also while it's flat, when the fold isn't active, so the layout doesn't change as the device bends.
+                    content(
+                        proxy.reservedRegions(kind: .division, options: .includeInactive).first.map { fold in
+                            // Up to the fold when it runs between the columns. The split view adds the safe area to this.
+                            let isBetweenColumns = fold.frame.height > fold.frame.width
+                            return isBetweenColumns ? max(proxy.size.width - fold.frame.maxX, minimumWidth) : minimumWidth
+                        })
+                }
+            } else {
+                content(nil)
             }
-        } else {
-            content(nil)
         }
     }
-}
 
-extension EnvironmentValues {
-    /// Whether this is the account column beside the fold, see `FoldedColumnWidthReader`.
-    @Entry var isInFoldedColumn = false
-}
-
-/// Goes in the split view's account column. SwiftUI's split view has no setting for these, so they're set on the
-/// `UISplitViewController` it's made of.
-struct FoldedSplitViewAdapter: UIViewControllerRepresentable {
-
-    let isOnFold: Bool
-
-    func makeUIViewController(context: Context) -> Controller {
-        Controller()
+    extension EnvironmentValues {
+        /// Whether this is the account column beside the fold, see `FoldedColumnWidthReader`.
+        @Entry var isInFoldedColumn = false
     }
 
-    func updateUIViewController(_ controller: Controller, context: Context) {
-        controller.isOnFold = isOnFold
+    /// Goes in the split view's account column. SwiftUI's split view has no setting for these, so they're set on the
+    /// `UISplitViewController` it's made of.
+    struct FoldedSplitViewAdapter: UIViewControllerRepresentable {
+
+        let isOnFold: Bool
+
+        func makeUIViewController(context: Context) -> Controller {
+            Controller()
+        }
+
+        func updateUIViewController(_ controller: Controller, context: Context) {
+            controller.isOnFold = isOnFold
+        }
+
+        final class Controller: UIViewController {
+
+            var isOnFold = false {
+                didSet { apply() }
+            }
+            private var appliedIsOnFold: Bool?
+
+            override func didMove(toParent parent: UIViewController?) {
+                super.didMove(toParent: parent)
+                apply()
+            }
+
+            override func viewWillAppear(_ animated: Bool) {
+                super.viewWillAppear(animated)
+                apply()
+            }
+
+            // Only when it changes, so the sidebar button can still hide the list.
+            private func apply() {
+                guard let splitViewController, appliedIsOnFold != isOnFold else { return }
+                appliedIsOnFold = isOnFold
+                // On the right of the fold, in reach of the right hand. The leading edge already is with right-to-left text.
+                let isLeftToRight = traitCollection.layoutDirection == .leftToRight
+                splitViewController.primaryEdge = isOnFold && isLeftToRight ? .trailing : .leading
+                // Both columns from the start, as a fold across them would otherwise leave the list hidden.
+                splitViewController.preferredSplitBehavior = isOnFold ? .tile : .automatic
+                splitViewController.preferredDisplayMode = isOnFold ? .oneBesideSecondary : .automatic
+            }
+        }
     }
-
-    final class Controller: UIViewController {
-
-        var isOnFold = false {
-            didSet { apply() }
-        }
-        private var appliedIsOnFold: Bool?
-
-        override func didMove(toParent parent: UIViewController?) {
-            super.didMove(toParent: parent)
-            apply()
-        }
-
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            apply()
-        }
-
-        // Only when it changes, so the sidebar button can still hide the list.
-        private func apply() {
-            guard let splitViewController, appliedIsOnFold != isOnFold else { return }
-            appliedIsOnFold = isOnFold
-            // On the right of the fold, in reach of the right hand. The leading edge already is with right-to-left text.
-            let isLeftToRight = traitCollection.layoutDirection == .leftToRight
-            splitViewController.primaryEdge = isOnFold && isLeftToRight ? .trailing : .leading
-            // Both columns from the start, as a fold across them would otherwise leave the list hidden.
-            splitViewController.preferredSplitBehavior = isOnFold ? .tile : .automatic
-            splitViewController.preferredDisplayMode = isOnFold ? .oneBesideSecondary : .automatic
-        }
-    }
-}
 #endif
 
 // The filled and plain action buttons of the Yubico OTP screens, in glass on iOS 26 and later.
@@ -205,21 +208,30 @@ extension View {
 /// shorter or more natural ones, e.g. "Tap Plus" for the + button.
 enum VoiceControlNames {
     static var addAccount: [String] {
-        [String(localized: "Add account"), String(localized: "Add", comment: "Voice Control name for the Add account button"),
-         String(localized: "Plus", comment: "Voice Control name for the Add account button, after its + symbol"),
-         String(localized: "New account", comment: "Voice Control name for the Add account button")]
+        [
+            String(localized: "Add account"), String(localized: "Add", comment: "Voice Control name for the Add account button"),
+            String(localized: "Plus", comment: "Voice Control name for the Add account button, after its + symbol"),
+            String(localized: "New account", comment: "Voice Control name for the Add account button")
+        ]
     }
     static var scanNFC: [String] {
-        [String(localized: "Scan NFC YubiKey"), String(localized: "Scan", comment: "Voice Control name for the Scan NFC YubiKey button"),
-         String(localized: "NFC", comment: "Voice Control name for the Scan NFC YubiKey button"),
-         String(localized: "Scan YubiKey", comment: "Voice Control name for the Scan NFC YubiKey button")]
+        [
+            String(localized: "Scan NFC YubiKey"), String(localized: "Scan", comment: "Voice Control name for the Scan NFC YubiKey button"),
+            String(localized: "NFC", comment: "Voice Control name for the Scan NFC YubiKey button"),
+            String(localized: "Scan YubiKey", comment: "Voice Control name for the Scan NFC YubiKey button")
+        ]
     }
     static var refresh: [String] {
-        [String(localized: "Refresh", comment: "Mac toolbar"), String(localized: "Reload", comment: "Voice Control name for the Refresh button")]
+        [
+            String(localized: "Refresh", comment: "Mac toolbar"),
+            String(localized: "Reload", comment: "Voice Control name for the Refresh button")
+        ]
     }
     static var calculate: [String] {
-        [String(localized: "Calculate", comment: "Menu"), String(localized: "Refresh", comment: "Mac toolbar"),
-         String(localized: "New code", comment: "Voice Control name for the Calculate button")]
+        [
+            String(localized: "Calculate", comment: "Menu"), String(localized: "Refresh", comment: "Mac toolbar"),
+            String(localized: "New code", comment: "Voice Control name for the Calculate button")
+        ]
     }
     static var copy: [String] {
         [String(localized: "Copy", comment: "Menu"), String(localized: "Copy code", comment: "Voice Control name for the Copy button")]
@@ -227,13 +239,18 @@ enum VoiceControlNames {
     /// "Copy GitHub" and "Copy code GitHub" for the code in an account's row.
     @MainActor static func copyCode(of account: Account) -> [String] {
         account.voiceControlNames.flatMap { name in
-            [String(localized: "Copy \(name)", comment: "Voice Control name for the code in an account row, e.g. Copy GitHub"),
-             String(localized: "Copy code \(name)", comment: "Voice Control name for the code in an account row, e.g. Copy code GitHub")]
+            [
+                String(localized: "Copy \(name)", comment: "Voice Control name for the code in an account row, e.g. Copy GitHub"),
+                String(localized: "Copy code \(name)", comment: "Voice Control name for the code in an account row, e.g. Copy code GitHub")
+            ]
         }
     }
     static var syncFromEnte: [String] {
-        [String(localized: "Sync from Ente Auth", comment: "Main view menu item"), String(localized: "Sync", comment: "Voice Control name for the Sync from Ente Auth button"),
-         String(localized: "Ente Auth", comment: "Ente sync navigation title")]
+        [
+            String(localized: "Sync from Ente Auth", comment: "Main view menu item"),
+            String(localized: "Sync", comment: "Voice Control name for the Sync from Ente Auth button"),
+            String(localized: "Ente Auth", comment: "Ente sync navigation title")
+        ]
     }
     static var configuration: [String] {
         [String(localized: "Configuration"), String(localized: "Settings", comment: "Voice Control name for the Configuration button")]
@@ -242,8 +259,11 @@ enum VoiceControlNames {
         [String(localized: "About"), String(localized: "Help", comment: "Smart card extension help button")]
     }
     static var enterManually: [String] {
-        [String(localized: "Enter manually", comment: "Scan QR code add manually button"), String(localized: "Manual", comment: "Voice Control name for the Enter manually button"),
-         String(localized: "Keyboard", comment: "Voice Control name for the Enter manually button, after its keyboard symbol")]
+        [
+            String(localized: "Enter manually", comment: "Scan QR code add manually button"),
+            String(localized: "Manual", comment: "Voice Control name for the Enter manually button"),
+            String(localized: "Keyboard", comment: "Voice Control name for the Enter manually button, after its keyboard symbol")
+        ]
     }
 }
 
@@ -302,12 +322,12 @@ extension Font {
     /// The text style, grown by the Mac's text size.
     static func scaled(_ style: TextStyle, by scale: CGFloat) -> Font {
         #if os(macOS)
-        guard scale != 1 else { return .system(style) }
-        let size = NSFont.preferredFont(forTextStyle: style.nsTextStyle).pointSize * scale
-        // The Mac's headline is the body size in bold.
-        return .system(size: size, weight: style == .headline ? .bold : .regular)
+            guard scale != 1 else { return .system(style) }
+            let size = NSFont.preferredFont(forTextStyle: style.nsTextStyle).pointSize * scale
+            // The Mac's headline is the body size in bold.
+            return .system(size: size, weight: style == .headline ? .bold : .regular)
         #else
-        .system(style)
+            .system(style)
         #endif
     }
 }
@@ -333,11 +353,11 @@ private struct ScaledBodyFontModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         #if os(macOS)
-        content
-            .font(textScale == 1 ? nil : .scaled(.body, by: textScale))
-            .textScaledControlSize(textScale)
+            content
+                .font(textScale == 1 ? nil : .scaled(.body, by: textScale))
+                .textScaledControlSize(textScale)
         #else
-        content
+            content
         #endif
     }
 }
@@ -356,27 +376,27 @@ private struct ScaledButtonLabelsModifier: ViewModifier {
 
     @ViewBuilder func body(content: Content) -> some View {
         #if os(macOS)
-        if textScale != 1 {
-            content.buttonStyle(ScaledLabelButtonStyle())
-        } else {
-            content
-        }
+            if textScale != 1 {
+                content.buttonStyle(ScaledLabelButtonStyle())
+            } else {
+                content
+            }
         #else
-        content
+            content
         #endif
     }
 }
 
 #if os(macOS)
-/// The standard button, with the label at the Mac's text size.
-private struct ScaledLabelButtonStyle: PrimitiveButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        Button(role: configuration.role, action: configuration.trigger) {
-            configuration.label.scaledBodyFont()
+    /// The standard button, with the label at the Mac's text size.
+    private struct ScaledLabelButtonStyle: PrimitiveButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            Button(role: configuration.role, action: configuration.trigger) {
+                configuration.label.scaledBodyFont()
+            }
+            .buttonStyle(.automatic)
         }
-        .buttonStyle(.automatic)
     }
-}
 #endif
 
 private struct ScaledFontModifier: ViewModifier {
@@ -413,8 +433,9 @@ private struct TextScaledFrameModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if minWidth != nil || minHeight != nil {
-            content.frame(minWidth: scaled(minWidth, \.width), idealWidth: scaled(idealWidth, \.width),
-                          minHeight: scaled(minHeight, \.height), idealHeight: scaled(idealHeight, \.height))
+            content.frame(
+                minWidth: scaled(minWidth, \.width), idealWidth: scaled(idealWidth, \.width),
+                minHeight: scaled(minHeight, \.height), idealHeight: scaled(idealHeight, \.height))
         } else {
             content.frame(width: scaled(width, \.width), height: scaled(height, \.height))
         }
@@ -423,11 +444,11 @@ private struct TextScaledFrameModifier: ViewModifier {
     private func scaled(_ size: CGFloat?, _ dimension: KeyPath<CGSize, CGFloat>) -> CGFloat? {
         guard let size, textScale != 1 else { return size }
         #if os(macOS)
-        // Leaves room for the menu bar, the Dock and the window's title bar.
-        let screen = (NSScreen.main?.visibleFrame.size ?? CGSize(width: 1280, height: 800))[keyPath: dimension] - 80
-        return max(size, min(size * textScale, screen))
+            // Leaves room for the menu bar, the Dock and the window's title bar.
+            let screen = (NSScreen.main?.visibleFrame.size ?? CGSize(width: 1280, height: 800))[keyPath: dimension] - 80
+            return max(size, min(size * textScale, screen))
         #else
-        return size
+            return size
         #endif
     }
 }
@@ -451,48 +472,48 @@ struct SettingsList<Content: View>: View {
 
     var body: some View {
         #if os(macOS)
-        Form { content }
-            .formStyle(.grouped)
-            .scaledButtonLabels()
+            Form { content }
+                .formStyle(.grouped)
+                .scaledButtonLabels()
         #else
-        List { content }
+            List { content }
         #endif
     }
 }
 
 #if os(macOS)
-/// A size that grows with the Mac's text size, like `@ScaledMetric` does with Dynamic Type on iOS.
-@propertyWrapper struct ScaledSize: DynamicProperty {
-    @Environment(\.textScale) private var textScale
-    private let size: CGFloat
+    /// A size that grows with the Mac's text size, like `@ScaledMetric` does with Dynamic Type on iOS.
+    @propertyWrapper struct ScaledSize: DynamicProperty {
+        @Environment(\.textScale) private var textScale
+        private let size: CGFloat
 
-    init(wrappedValue: CGFloat, relativeTo textStyle: Font.TextStyle = .body) {
-        size = wrappedValue
+        init(wrappedValue: CGFloat, relativeTo textStyle: Font.TextStyle = .body) {
+            size = wrappedValue
+        }
+
+        var wrappedValue: CGFloat { size * textScale }
     }
 
-    var wrappedValue: CGFloat { size * textScale }
-}
-
-private extension Font.TextStyle {
-    var nsTextStyle: NSFont.TextStyle {
-        switch self {
-        case .largeTitle: .largeTitle
-        case .title: .title1
-        case .title2: .title2
-        case .title3: .title3
-        case .headline: .headline
-        case .subheadline: .subheadline
-        case .callout: .callout
-        case .footnote: .footnote
-        case .caption: .caption1
-        case .caption2: .caption2
-        default: .body
+    private extension Font.TextStyle {
+        var nsTextStyle: NSFont.TextStyle {
+            switch self {
+            case .largeTitle: .largeTitle
+            case .title: .title1
+            case .title2: .title2
+            case .title3: .title3
+            case .headline: .headline
+            case .subheadline: .subheadline
+            case .callout: .callout
+            case .footnote: .footnote
+            case .caption: .caption1
+            case .caption2: .caption2
+            default: .body
+            }
         }
     }
-}
 #else
-/// `@ScaledMetric`, which on the Mac is a size that grows with the app's own text size instead.
-typealias ScaledSize = ScaledMetric<CGFloat>
+    /// `@ScaledMetric`, which on the Mac is a size that grows with the app's own text size instead.
+    typealias ScaledSize = ScaledMetric<CGFloat>
 #endif
 
 extension View {
@@ -501,11 +522,11 @@ extension View {
     /// `prompt` for its placeholder, and draws the box. On iOS the row's look already says it can be edited.
     @ViewBuilder func formRowTextBox() -> some View {
         #if os(macOS)
-        labelsHidden()
-            .textFieldStyle(.roundedBorder)
-            .multilineTextAlignment(.leading)
+            labelsHidden()
+                .textFieldStyle(.roundedBorder)
+                .multilineTextAlignment(.leading)
         #else
-        self
+            self
         #endif
     }
 }

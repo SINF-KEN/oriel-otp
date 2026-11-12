@@ -27,12 +27,15 @@ struct AccountTests {
         var isSet = false
     }
 
-    private func account(validFor seconds: TimeInterval = 30, connectionType: OrielOTP.OATHSession.ConnectionType = .nfc,
-                         requestRefresh: @escaping (Account) -> Void = { _ in }) -> Account {
+    private func account(
+        validFor seconds: TimeInterval = 30, connectionType: OrielOTP.OATHSession.ConnectionType = .nfc,
+        requestRefresh: @escaping (Account) -> Void = { _ in }
+    ) -> Account {
         let credential = OrielOTP.OATHSession.Credential(type: .totp, issuer: "GitHub", accountName: "alice", period: 30)
         let otp = OrielOTP.OATHSession.OTP(code: "123456", validity: DateInterval(start: .now, duration: seconds))
-        return Account(credential: credential, code: otp, keyVersion: Version("5.4.0")!, requestRefresh: requestRefresh,
-                       connectionType: connectionType, isPinned: false)
+        return Account(
+            credential: credential, code: otp, keyVersion: Version("5.4.0")!, requestRefresh: requestRefresh,
+            connectionType: connectionType, isPinned: false)
     }
 
     /// Whether changing the account in `change` tells a view that read it in `read` to update.
@@ -51,12 +54,14 @@ struct AccountTests {
 
     @Test func theCountdownOnlyUpdatesViewsThatShowIt() {
         let account = account()
-        #expect(!invalidates({
-            _ = account.formattedCode
-            _ = account.spokenCode
-            _ = account.isCountingDown
-            _ = account.canCopyCode
-        }, by: { account.updateState() }))
+        #expect(
+            !invalidates(
+                {
+                    _ = account.formattedCode
+                    _ = account.spokenCode
+                    _ = account.isCountingDown
+                    _ = account.canCopyCode
+                }, by: { account.updateState() }))
         #expect(invalidates({ _ = account.remaining }, by: { account.updateState() }))
     }
 
@@ -93,9 +98,11 @@ struct AccountTests {
 
     private func account(endingIn seconds: TimeInterval) -> Account {
         let credential = OrielOTP.OATHSession.Credential(type: .totp, issuer: "GitHub", accountName: "alice", period: 30)
-        let otp = OrielOTP.OATHSession.OTP(code: "123456", validity: DateInterval(start: .now.addingTimeInterval(seconds - 30), duration: 30))
-        return Account(credential: credential, code: otp, keyVersion: Version("0.0.0")!, requestRefresh: { _ in },
-                       connectionType: .wired, isPinned: false, location: .device(id: "a"))
+        let otp = OrielOTP.OATHSession.OTP(
+            code: "123456", validity: DateInterval(start: .now.addingTimeInterval(seconds - 30), duration: 30))
+        return Account(
+            credential: credential, code: otp, keyVersion: Version("0.0.0")!, requestRefresh: { _ in },
+            connectionType: .wired, isPinned: false, location: .device(id: "a"))
     }
 
     @Test func theNextCodeShowsInTheLastSeconds() {

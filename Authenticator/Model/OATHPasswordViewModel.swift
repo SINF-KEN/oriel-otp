@@ -21,9 +21,9 @@ import Observation
 import YubiKit
 
 enum OATHViewModelError: Error, LocalizedError {
-    
+
     case wrongPassword, passwordsDoNotMatch
-    
+
     public var errorDescription: String? {
         switch self {
         case .wrongPassword:
@@ -35,15 +35,15 @@ enum OATHViewModelError: Error, LocalizedError {
 }
 
 @Observable class OATHPasswordViewModel {
-    
+
     var state: PasswordState = .unknown
     var isProcessing: Bool = false
     var isFipsKey: Bool = false
-    
+
     enum PasswordState: Equatable {
-        
+
         case unknown, notSet, set, error(Error), keyRemoved, didSet, didChange, didRemove
-        
+
         static func == (lhs: OATHPasswordViewModel.PasswordState, rhs: OATHPasswordViewModel.PasswordState) -> Bool {
             switch (lhs, rhs) {
             case (.unknown, .unknown):
@@ -66,7 +66,7 @@ enum OATHViewModelError: Error, LocalizedError {
                 return false
             }
         }
-        
+
         func isError() -> Bool {
             switch self {
             case (.error(_)):
@@ -91,7 +91,7 @@ enum OATHViewModelError: Error, LocalizedError {
             }
         }
     }
-    
+
     init() {
         Logger.allocation.debug("OATHPasswordViewModel: init")
     }
@@ -122,12 +122,12 @@ enum OATHViewModelError: Error, LocalizedError {
                 do {
                     _ = try await session.listCredentials()
                     state = .notSet
-                } catch where error.isOATHAuthenticationRequired {
+                } catch  where error.isOATHAuthenticationRequired {
                     state = .set
                 } catch {
-                    state = .error(error) // If we got this far the error is pretty exotic so bailing out like this is ok.
+                    state = .error(error)  // If we got this far the error is pretty exotic so bailing out like this is ok.
                 }
-            } catch where error.isNFCCancelledByUser {
+            } catch  where error.isNFCCancelledByUser {
                 // The user dismissed the NFC sheet.
             } catch {
                 let error = LocalizedErrorWrapper(error: error)
@@ -201,7 +201,9 @@ enum OATHViewModelError: Error, LocalizedError {
                     try await session.deleteAccessKey()
                 }
                 self.state = newPassword != nil ? .didSet : .didRemove
-                ConnectionManager.shared.closeNFC(message: newPassword != nil ? String(localized: "Password has been changed") : String(localized: "Password has been removed"))
+                ConnectionManager.shared.closeNFC(
+                    message: newPassword != nil
+                        ? String(localized: "Password has been changed") : String(localized: "Password has been removed"))
             } catch {
                 self.state = .error(error)
                 ConnectionManager.shared.closeNFC(errorMessage: LocalizedErrorWrapper(error: error).localizedDescription)

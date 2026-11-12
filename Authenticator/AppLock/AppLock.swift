@@ -71,7 +71,7 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
     /// the most common first, so these go first.
     private static let commonCodes: Set<String> = [
         "0852", "1004", "1984", "2000", "2001", "2020", "2580", "5683", "7410", "8520", "9630",
-        "112233", "123321", "147258", "159753", "258456", "520520", "654456", "789456",
+        "112233", "123321", "147258", "159753", "258456", "520520", "654456", "789456"
     ]
 
     /// Whether a code is among the first ones tried when guessing: all the same digit, a run up or down like 1234 or
@@ -127,10 +127,11 @@ nonisolated struct AppLockConfiguration: Codable, Sendable, Equatable {
         let password = Array(secret.precomposedStringWithCanonicalMapping.utf8).map { CChar(bitPattern: $0) }
         var derived = [UInt8](repeating: 0, count: 32)
         let status = salt.withUnsafeBytes { salt in
-            CCKeyDerivationPBKDF(CCPBKDFAlgorithm(kCCPBKDF2), password, password.count,
-                                 salt.bindMemory(to: UInt8.self).baseAddress, salt.count,
-                                 CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256), UInt32(rounds),
-                                 &derived, derived.count)
+            CCKeyDerivationPBKDF(
+                CCPBKDFAlgorithm(kCCPBKDF2), password, password.count,
+                salt.bindMemory(to: UInt8.self).baseAddress, salt.count,
+                CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256), UInt32(rounds),
+                &derived, derived.count)
         }
         precondition(status == kCCSuccess, "PBKDF2 failed")
         return Data(derived)
@@ -169,21 +170,28 @@ nonisolated struct AppLockProtectedData: Sendable {
     /// without those.
     static let app = AppLockProtectedData(
         exists: {
-            let files = [URL.applicationSupportDirectory.appending(components: "DeviceAccounts", "Accounts"),
-                         URL.applicationSupportDirectory.appending(components: "EnteAuth", "Vault"),
-                         URL.applicationSupportDirectory.appending(components: "Tags", "YubiKeyTags"),
-                         URL.applicationSupportDirectory.appending(components: "Favorites", "Favorites"),
-                         URL.applicationSupportDirectory.appending(components: "AutoFill", "Websites")]
+            let files =
+                [
+                    URL.applicationSupportDirectory.appending(components: "DeviceAccounts", "Accounts"),
+                    URL.applicationSupportDirectory.appending(components: "EnteAuth", "Vault"),
+                    URL.applicationSupportDirectory.appending(components: "Tags", "YubiKeyTags"),
+                    URL.applicationSupportDirectory.appending(components: "Favorites", "Favorites"),
+                    URL.applicationSupportDirectory.appending(components: "AutoFill", "Websites")
+                ]
                 + [AppGroup.containerURL?.appending(components: "AutoFill", "Accounts")].compactMap { $0 }
             return files.contains { FileManager.default.fileExists(atPath: $0.path(percentEncoded: false)) }
         },
         forget: {
-            for service in [KeychainService.deviceAccounts, KeychainService.enteVault, KeychainService.tags,
-                            KeychainService.favorites, KeychainService.autoFillWebsites, KeychainService.autoFillAccounts,
-                            KeychainService.enteSession, KeychainService.oathPasswords] {
-                let query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
-                                            String(kSecAttrService): service,
-                                            String(kSecUseDataProtectionKeychain): true]
+            for service in [
+                KeychainService.deviceAccounts, KeychainService.enteVault, KeychainService.tags,
+                KeychainService.favorites, KeychainService.autoFillWebsites, KeychainService.autoFillAccounts,
+                KeychainService.enteSession, KeychainService.oathPasswords
+            ] {
+                let query: [String: Any] = [
+                    String(kSecClass): kSecClassGenericPassword,
+                    String(kSecAttrService): service,
+                    String(kSecUseDataProtectionKeychain): true
+                ]
                 SecItemDelete(query as CFDictionary)
             }
         })
@@ -258,7 +266,8 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 /// the device owner confirms it with Face ID, Touch ID or the device passcode, and the keychain items that would open
 /// those files, or reach the accounts in Ente Auth, are deleted with it: files kept aside and put back can't be read.
 @MainActor @Observable final class AppLock {
-    static let shared = Bundle.main.bundleURL.pathExtension == "appex"
+    static let shared =
+        Bundle.main.bundleURL.pathExtension == "appex"
         // The AutoFill extension can't tell which installation of the app saved the lock, the app forgets an earlier
         // one's when it starts.
         ? AppLock(defaults: AppGroup.defaults, keepsSavedLock: true)
@@ -302,14 +311,18 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
     var method: AppLockMethod { configuration?.method ?? .off }
 
     /// With `keepsSavedLock`, a lock in the keychain is used even if this installation didn't save it.
-    init(storage: AppLockStorage = AppLockKeychain(),
-         defaults: UserDefaults = .standard,
-         keepsSavedLock: Bool = false,
-         now: @escaping () -> Date = Date.init,
-         uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
-         deviceOwnerIsAvailable: @escaping () -> Bool = { AppLock.canUseDeviceOwner },
-         authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = { await AppLock.evaluateDeviceOwner(reason: $0) },
-         protectedData: AppLockProtectedData = .app) {
+    init(
+        storage: AppLockStorage = AppLockKeychain(),
+        defaults: UserDefaults = .standard,
+        keepsSavedLock: Bool = false,
+        now: @escaping () -> Date = Date.init,
+        uptime: @escaping () -> TimeInterval = AppLock.deviceUptime,
+        deviceOwnerIsAvailable: @escaping () -> Bool = { AppLock.canUseDeviceOwner },
+        authenticateDeviceOwner: @escaping @MainActor (String) async -> KeychainAuthentication? = {
+            await AppLock.evaluateDeviceOwner(reason: $0)
+        },
+        protectedData: AppLockProtectedData = .app
+    ) {
         self.storage = storage
         self.protectedData = protectedData
         self.defaults = defaults
@@ -426,7 +439,8 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
     func unlockWithDeviceOwner() async {
         guard isLocked, method == .device, !isAuthenticating else { return }
         isAuthenticating = true
-        let authentication = await authenticateDeviceOwner(String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
+        let authentication = await authenticateDeviceOwner(
+            String(localized: "Unlock Oriel OTP", comment: "Face ID reason when unlocking the app"))
         isAuthenticating = false
         guard let authentication else { return }
         if isUnconfirmedLock { forgetSavedLock() }
@@ -464,12 +478,14 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
 
     /// Asks for Face ID, Touch ID or the device passcode before the lock is changed from or to the device method.
     func verifyDeviceOwner() async -> Bool {
-        await authenticateDeviceOwner(String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
+        await authenticateDeviceOwner(
+            String(localized: "Change how Oriel OTP is locked", comment: "Face ID reason when changing the app lock")) != nil
     }
 
     /// Asks for Face ID, Touch ID or the device passcode before an account's QR code, which holds its secret, is shown.
     func verifyDeviceOwnerForQRCode() async -> Bool {
-        await authenticateDeviceOwner(String(localized: "Show the account's QR code", comment: "Face ID reason when showing an account's QR code")) != nil
+        await authenticateDeviceOwner(
+            String(localized: "Show the account's QR code", comment: "Face ID reason when showing an account's QR code")) != nil
     }
 
     /// Asks for Face ID, Touch ID or the device passcode before the secrets of the accounts on this device are
@@ -549,9 +565,9 @@ nonisolated struct KeychainAuthentication: @unchecked Sendable {
         case .opticID: return "Optic ID"
         default:
             #if os(macOS)
-            return String(localized: "Mac password", comment: "App lock method on a Mac without Touch ID")
+                return String(localized: "Mac password", comment: "App lock method on a Mac without Touch ID")
             #else
-            return String(localized: "Device passcode", comment: "App lock method on a device without Face ID or Touch ID")
+                return String(localized: "Device passcode", comment: "App lock method on a device without Face ID or Touch ID")
             #endif
         }
     }

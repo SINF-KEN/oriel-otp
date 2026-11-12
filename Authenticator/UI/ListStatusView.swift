@@ -18,7 +18,7 @@
 import SwiftUI
 
 struct ListStatusView<Actions: View>: View {
-    
+
     let image: Image
     let message: String
     /// The image is a colored drawing rather than a symbol, which is sized by the font.
@@ -29,7 +29,7 @@ struct ListStatusView<Actions: View>: View {
     /// The list's height, which the view fills.
     @Environment(\.containerSize.height) private var height
     @ScaledSize(relativeTo: .largeTitle) private var imageSize: CGFloat = 100
-    
+
     var body: some View {
         HStack {
             Spacer()
@@ -81,11 +81,15 @@ struct ListStatusView<Actions: View>: View {
 }
 
 struct WhatsNewView: View {
-    
+
     /// One sentence, so translators can put the link's words where their language needs them. The words between the
     /// asterisks are shown in the label color, the rest in the secondary color.
     var text: AttributedString {
-        var text = AttributedString(localized: "See **what's new** in this version", comment: "Button below the account list. Keep the asterisks around the words that open the version history; they're shown brighter, not bold.")
+        var text = AttributedString(
+            localized: "See **what's new** in this version",
+            comment:
+                "Button below the account list. Keep the asterisks around the words that open the version history; they're shown brighter, not bold."
+        )
         for run in text.runs {
             if run.inlinePresentationIntent?.contains(.stronglyEmphasized) == true {
                 text[run.range].foregroundColor = .label
@@ -96,7 +100,7 @@ struct WhatsNewView: View {
         }
         return text
     }
-    
+
     @Binding var showWhatsNew: Bool
 
     var body: some View {

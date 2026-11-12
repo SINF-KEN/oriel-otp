@@ -23,8 +23,9 @@ import YubiKit
 extension MainViewModel {
 
     func cloudAccount(id: String, code: EnteCloudCode, isPending: Bool) -> Account {
-        let credential = OATHSession.Credential(type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
-                                                period: UInt(code.period))
+        let credential = OATHSession.Credential(
+            type: code.kind == .hotp ? .hotp : .totp, issuer: code.issuer, accountName: code.accountName,
+            period: UInt(code.period))
         let otp = code.kind == .hotp ? nil : code.code(at: AppClock.now)
         // Calculated like on a YubiKey that is plugged in: a new code is calculated when one expires.
         let account = calculatedAccount(credential: credential, otp: otp, code: code, location: .ente(id: id))
@@ -40,11 +41,14 @@ extension MainViewModel {
         return account
     }
 
-    func calculatedAccount(credential: OATHSession.Credential, otp: (code: String, validity: DateInterval)?, code: EnteCloudCode,
-                                   location: Account.Location) -> Account {
-        let account = Account(credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
-                              keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
-                              connectionType: .wired, isPinned: code.isPinned, location: location)
+    func calculatedAccount(
+        credential: OATHSession.Credential, otp: (code: String, validity: DateInterval)?, code: EnteCloudCode,
+        location: Account.Location
+    ) -> Account {
+        let account = Account(
+            credential: credential, code: otp.map { OATHSession.OTP(code: $0.code, validity: $0.validity) },
+            keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
+            connectionType: .wired, isPinned: code.isPinned, location: location)
         Self.updateDisplay(of: account, from: code)
         if code.kind != .hotp {
             // Looked up each time, as the account can be kept when its entry changes.

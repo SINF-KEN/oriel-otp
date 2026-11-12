@@ -17,7 +17,7 @@
 
 import CoreGraphics
 #if canImport(UIKit)
-import UIKit
+    import UIKit
 #endif
 
 extension CGRect {
@@ -57,12 +57,13 @@ extension CGRect {
 }
 
 #if canImport(UIKit)
-extension UIView {
-    // The largest part of the bounds that the fold and the camera housing leave clear, on devices that reserve regions.
-    var boundsClearOfReservedRegions: CGRect {
-        guard #available(iOS 27.1, *) else { return bounds }
-        return bounds.largestClearRect(avoiding: reservedRegions(kind: .occlusion).map(\.frame),
-                                       folds: reservedRegions(kind: .division).map(\.frame))
+    extension UIView {
+        // The largest part of the bounds that the fold and the camera housing leave clear, on devices that reserve regions.
+        var boundsClearOfReservedRegions: CGRect {
+            guard #available(iOS 27.1, *) else { return bounds }
+            return bounds.largestClearRect(
+                avoiding: reservedRegions(kind: .occlusion).map(\.frame),
+                folds: reservedRegions(kind: .division).map(\.frame))
+        }
     }
-}
 #endif

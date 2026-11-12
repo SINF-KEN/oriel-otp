@@ -21,14 +21,14 @@ import Testing
 @testable import OrielOTP
 
 #if os(macOS)
-// On the Mac the data protection keychain needs a provisioned keychain access group, which ad-hoc signed CI builds
-// don't have.
-nonisolated private let hasKeychainAccessGroup: Bool = {
-    guard let task = SecTaskCreateFromSelf(nil) else { return false }
-    return SecTaskCopyValueForEntitlement(task, "keychain-access-groups" as CFString, nil) != nil
-}()
+    // On the Mac the data protection keychain needs a provisioned keychain access group, which ad-hoc signed CI builds
+    // don't have.
+    nonisolated private let hasKeychainAccessGroup: Bool = {
+        guard let task = SecTaskCreateFromSelf(nil) else { return false }
+        return SecTaskCopyValueForEntitlement(task, "keychain-access-groups" as CFString, nil) != nil
+    }()
 #else
-nonisolated private let hasKeychainAccessGroup = true
+    nonisolated private let hasKeychainAccessGroup = true
 #endif
 
 // The tests share one keychain service, so they must not run in parallel. It's named for this run, and emptied after

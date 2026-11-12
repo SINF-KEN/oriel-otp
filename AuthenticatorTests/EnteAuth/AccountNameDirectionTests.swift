@@ -44,9 +44,9 @@ struct AccountNameDirectionTests {
     }
 
     @Test func otherDigitsBecomeASCII() {
-        #expect("١٢٣٤٥٦".asciiDigits == "123456") // Arabic-Indic
-        #expect("۰۹".asciiDigits == "09") // Persian
-        #expect("१२".asciiDigits == "12") // Devanagari
+        #expect("١٢٣٤٥٦".asciiDigits == "123456")  // Arabic-Indic
+        #expect("۰۹".asciiDigits == "09")  // Persian
+        #expect("१२".asciiDigits == "12")  // Devanagari
         #expect("12 ab-٣".asciiDigits == "12 ab-3")
         // Not decimal digits, so left alone.
         #expect("½²".asciiDigits == "½²")

@@ -18,7 +18,7 @@
 import SwiftUI
 
 struct OATHResetView: View {
-    
+
     @State var model = OATHResetViewModel()
     @State var presentConfirmAlert = false
     @State var presentErrorAlert = false
@@ -26,7 +26,7 @@ struct OATHResetView: View {
     @State var error: Error? = nil
     @State var image = Image(systemName: "exclamationmark.triangle")
     @State var imageColor = Color(.systemRed)
-    
+
     var body: some View {
         SettingsView(image: image, imageColor: imageColor) {
             Text(String(localized: "Reset OATH application")).scaledFont(.title2).bold()
@@ -44,21 +44,25 @@ struct OATHResetView: View {
         }
         .navigationTitle(Text("Reset OATH"))
         .navigationBarTitleDisplayMode(.inline)
-        .alert("Warning!", isPresented: $presentConfirmAlert, presenting: model, actions: { model in
-            Button(role: .destructive) {
-                presentConfirmAlert.toggle()
-                model.reset()
-            } label: {
-                Text("Reset")
+        .alert(
+            "Warning!", isPresented: $presentConfirmAlert, presenting: model,
+            actions: { model in
+                Button(role: .destructive) {
+                    presentConfirmAlert.toggle()
+                    model.reset()
+                } label: {
+                    Text("Reset")
+                }
+                Button(role: .cancel) {
+                    presentConfirmAlert.toggle()
+                } label: {
+                    Text("Cancel")
+                }
+            },
+            message: { _ in
+                Text("This will irrevocably delete all OATH TOTP/HOTP accounts from your YubiKey.")
             }
-            Button(role: .cancel) {
-                presentConfirmAlert.toggle()
-            } label: {
-                Text("Cancel")
-            }
-        }, message: { _ in
-            Text("This will irrevocably delete all OATH TOTP/HOTP accounts from your YubiKey.")
-        })
+        )
         .errorAlert(error: $error)
         .onChange(of: model.state) { _, state in
             withAnimation(.unlessReduceMotion) {

@@ -15,212 +15,217 @@
  */
 #if os(macOS)
 
-import SwiftUI
+    import SwiftUI
 
-/// The menu bar extra's panel: the accounts, or the lock screen while the app is locked.
-///
-/// The lock screen replaces the accounts rather than covering them, so the panel fits it and keeps the system's
-/// background, which would show the accounts through a cover.
-struct MenuBarView: View {
+    /// The menu bar extra's panel: the accounts, or the lock screen while the app is locked.
+    ///
+    /// The lock screen replaces the accounts rather than covering them, so the panel fits it and keeps the system's
+    /// background, which would show the accounts through a cover.
+    struct MenuBarView: View {
 
-    var body: some View {
-        if AppLock.shared.isLocked {
-            ScrollView {
-                AppLockPrompt()
-                    .padding(16)
+        var body: some View {
+            if AppLock.shared.isLocked {
+                ScrollView {
+                    AppLockPrompt()
+                        .padding(16)
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                // Tall enough for the number pad at the default text size.
+                .frame(maxHeight: 640)
+                .fixedSize(horizontal: false, vertical: true)
+                .textScaledFrame(width: 300)
+                .scaledBodyFont()
+            } else {
+                MenuBarAccountsView()
             }
-            .scrollBounceBehavior(.basedOnSize)
-            // Tall enough for the number pad at the default text size.
-            .frame(maxHeight: 640)
-            .fixedSize(horizontal: false, vertical: true)
-            .textScaledFrame(width: 300)
-            .scaledBodyFont()
-        } else {
-            MenuBarAccountsView()
         }
     }
-}
 
-/// The pinned accounts, or all of them when none are pinned. Clicking one copies its code.
-///
-/// It connects to the YubiKey while it's open if the main window isn't, and lets go of it again when it closes.
-struct MenuBarAccountsView: View {
+    /// The pinned accounts, or all of them when none are pinned. Clicking one copies its code.
+    ///
+    /// It connects to the YubiKey while it's open if the main window isn't, and lets go of it again when it closes.
+    struct MenuBarAccountsView: View {
 
-    @Environment(MainViewModel.self) private var model
-    @Environment(ToastPresenter.self) private var toastPresenter
-    @Environment(MainWindowState.self) private var mainWindow
-    @Environment(\.openWindow) private var openWindow
-    @State private var copiedAccountID: String?
-    @State private var startedModel = false
+        @Environment(MainViewModel.self) private var model
+        @Environment(ToastPresenter.self) private var toastPresenter
+        @Environment(MainWindowState.self) private var mainWindow
+        @Environment(\.openWindow) private var openWindow
+        @State private var copiedAccountID: String?
+        @State private var startedModel = false
 
-    private var accounts: [Account] {
-        model.pinnedAccounts.isEmpty ? model.accounts : model.pinnedAccounts
-    }
+        private var accounts: [Account] {
+            model.pinnedAccounts.isEmpty ? model.accounts : model.pinnedAccounts
+        }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            if !model.hasAccounts {
-                if model.isKeyPluggedIn {
-                    Label {
-                        Text(String(localized: "Reading YubiKey…", comment: "Mac menu bar"))
-                    } icon: {
-                        InsertKeyIcon()
-                    }
-                    .foregroundStyle(.secondary)
-                    .padding(8)
-                } else {
-                    Text(String(localized: "No accounts yet", comment: "Account list without accounts"))
+        var body: some View {
+            VStack(alignment: .leading, spacing: 0) {
+                if !model.hasAccounts {
+                    if model.isKeyPluggedIn {
+                        Label {
+                            Text(String(localized: "Reading YubiKey…", comment: "Mac menu bar"))
+                        } icon: {
+                            InsertKeyIcon()
+                        }
                         .foregroundStyle(.secondary)
                         .padding(8)
-                }
-            } else if accounts.isEmpty {
-                Text("No accounts on YubiKey")
-                    .foregroundStyle(.secondary)
-                    .padding(8)
-            } else {
-                ScrollView {
-                    VStack(spacing: 0) {
-                        ForEach(accounts, id: \.id) { account in
-                            MenuBarAccountRow(account: account, isCopied: copiedAccountID == account.accountId) {
-                                copy(account)
+                    } else {
+                        Text(String(localized: "No accounts yet", comment: "Account list without accounts"))
+                            .foregroundStyle(.secondary)
+                            .padding(8)
+                    }
+                } else if accounts.isEmpty {
+                    Text("No accounts on YubiKey")
+                        .foregroundStyle(.secondary)
+                        .padding(8)
+                } else {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            ForEach(accounts, id: \.id) { account in
+                                MenuBarAccountRow(account: account, isCopied: copiedAccountID == account.accountId) {
+                                    copy(account)
+                                }
                             }
                         }
                     }
+                    .frame(maxHeight: 420)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
-                .frame(maxHeight: 420)
-                .fixedSize(horizontal: false, vertical: true)
+                Divider()
+                    .padding(.vertical, 4)
+                MenuBarButton(String(localized: "Open Oriel OTP", comment: "Mac menu bar")) {
+                    openWindow(id: AppWindow.main)
+                    NSApp.activate()
+                }
+                SettingsLink {
+                    MenuBarRowLabel(title: String(localized: "Settings…", comment: "Mac menu bar"))
+                }
+                .buttonStyle(.plain)
+                MenuBarButton(String(localized: "Quit Oriel OTP", comment: "Mac menu bar")) {
+                    NSApp.terminate(nil)
+                }
             }
-            Divider()
-                .padding(.vertical, 4)
-            MenuBarButton(String(localized: "Open Oriel OTP", comment: "Mac menu bar")) {
-                openWindow(id: AppWindow.main)
-                NSApp.activate()
+            .padding(6)
+            .textScaledFrame(width: 300)
+            .onAppear {
+                // Counting down also while the main window is covered and its countdowns are paused.
+                model.setCountdownsVisible(true, in: .menuBar)
+                guard !mainWindow.isVisible, !model.isStarted else { return }
+                startedModel = true
+                ConnectionManager.shared.resumeWiredConnections()
+                model.start()
             }
-            SettingsLink {
-                MenuBarRowLabel(title: String(localized: "Settings…", comment: "Mac menu bar"))
-            }
-            .buttonStyle(.plain)
-            MenuBarButton(String(localized: "Quit Oriel OTP", comment: "Mac menu bar")) {
-                NSApp.terminate(nil)
+            .onDisappear {
+                model.setCountdownsVisible(false, in: .menuBar)
+                guard startedModel, !mainWindow.isVisible else { return }
+                startedModel = false
+                model.stop()
+                Task { await model.closeConnections() }
             }
         }
-        .padding(6)
-        .textScaledFrame(width: 300)
-        .onAppear {
-            // Counting down also while the main window is covered and its countdowns are paused.
-            model.setCountdownsVisible(true, in: .menuBar)
-            guard !mainWindow.isVisible, !model.isStarted else { return }
-            startedModel = true
-            ConnectionManager.shared.resumeWiredConnections()
-            model.start()
-        }
-        .onDisappear {
-            model.setCountdownsVisible(false, in: .menuBar)
-            guard startedModel, !mainWindow.isVisible else { return }
-            startedModel = false
-            model.stop()
-            Task { await model.closeConnections() }
+
+        private func copy(_ account: Account) {
+            toastPresenter.copyCode(of: account)
+            copiedAccountID = account.accountId
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                if copiedAccountID == account.accountId {
+                    copiedAccountID = nil
+                }
+            }
         }
     }
 
-    private func copy(_ account: Account) {
-        toastPresenter.copyCode(of: account)
-        copiedAccountID = account.accountId
-        Task {
-            try? await Task.sleep(for: .seconds(2))
-            if copiedAccountID == account.accountId {
-                copiedAccountID = nil
-            }
-        }
-    }
-}
+    private struct MenuBarAccountRow: View {
+        let account: Account
+        let isCopied: Bool
+        let action: () -> Void
+        @State private var isHovering = false
 
-private struct MenuBarAccountRow: View {
-    let account: Account
-    let isCopied: Bool
-    let action: () -> Void
-    @State private var isHovering = false
-
-    var body: some View {
-        Button(action: action) {
-            HStack {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(account.title.leftToRightIfAddress)
-                        .lineLimit(1)
-                    account.subTitle.map {
-                        Text($0.leftToRightIfAddress)
-                            .scaledFont(.caption)
-                            .foregroundStyle(isHovering ? .primary : .secondary)
+        var body: some View {
+            Button(action: action) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(account.title.leftToRightIfAddress)
                             .lineLimit(1)
+                        account.subTitle.map {
+                            Text($0.leftToRightIfAddress)
+                                .scaledFont(.caption)
+                                .foregroundStyle(isHovering ? .primary : .secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                    Spacer()
+                    if isCopied {
+                        Label(String(localized: "Copied", comment: "Mac menu bar"), systemImage: "checkmark")
+                            .labelStyle(.titleAndIcon)
+                    } else if account.requiresTouch && account.otp == nil {
+                        Image(systemName: "hand.tap")
+                            .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
+                    } else {
+                        Text(account.displayedCode ?? "*** ***")
+                            .scaledFont(.body) { $0.monospacedDigit().bold() }
+                            .privacySensitive()
                     }
                 }
-                Spacer()
-                if isCopied {
-                    Label(String(localized: "Copied", comment: "Mac menu bar"), systemImage: "checkmark")
-                        .labelStyle(.titleAndIcon)
-                } else if account.requiresTouch && account.otp == nil {
-                    Image(systemName: "hand.tap")
-                        .help(String(localized: "Requires touch", comment: "Mac menu bar help"))
-                } else {
-                    Text(account.displayedCode ?? "*** ***")
-                        .scaledFont(.body) { $0.monospacedDigit().bold() }
-                        .privacySensitive()
-                }
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
+                .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
+                .contentShape(Rectangle())
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
-            .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .onHover { isHovering = $0 }
-        .accessibilityLabel(([account.title] + [account.subTitle].compactMap { $0 }).joined(separator: String.accessibilitySeparator))
-        .accessibilityValue(isCopied ? String(localized: "Copied", comment: "Mac menu bar")
-                            : account.requiresTouch && account.otp == nil ? String(localized: "Requires touch", comment: "Mac menu bar help")
-                            : account.spokenCode)
-        .accessibilityHint(String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
-    }
-}
-
-private extension Color {
-    /// Text on the accent color: white on the dark red of light mode, dark on the light pink of dark mode, where white
-    /// would be unreadable.
-    static let onAccent = Color(nsColor: .textBackgroundColor)
-}
-
-private struct MenuBarButton: View {
-    let title: String
-    let action: () -> Void
-
-    init(_ title: String, action: @escaping () -> Void) {
-        self.title = title
-        self.action = action
-    }
-
-    var body: some View {
-        Button(action: action) {
-            MenuBarRowLabel(title: title)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-/// A row below the accounts, highlighted under the pointer like a menu item.
-private struct MenuBarRowLabel: View {
-    let title: String
-    @State private var isHovering = false
-
-    var body: some View {
-        Text(title)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
-            .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
             .onHover { isHovering = $0 }
+            .accessibilityLabel(([account.title] + [account.subTitle].compactMap { $0 }).joined(separator: String.accessibilitySeparator))
+            .accessibilityValue(
+                isCopied
+                    ? String(localized: "Copied", comment: "Mac menu bar")
+                    : account.requiresTouch && account.otp == nil
+                        ? String(localized: "Requires touch", comment: "Mac menu bar help")
+                        : account.spokenCode
+            )
+            .accessibilityHint(
+                String(localized: "Copies the code", comment: "Accessibility hint for a code in the account list or the Mac menu bar"))
+        }
     }
-}
+
+    private extension Color {
+        /// Text on the accent color: white on the dark red of light mode, dark on the light pink of dark mode, where white
+        /// would be unreadable.
+        static let onAccent = Color(nsColor: .textBackgroundColor)
+    }
+
+    private struct MenuBarButton: View {
+        let title: String
+        let action: () -> Void
+
+        init(_ title: String, action: @escaping () -> Void) {
+            self.title = title
+            self.action = action
+        }
+
+        var body: some View {
+            Button(action: action) {
+                MenuBarRowLabel(title: title)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    /// A row below the accounts, highlighted under the pointer like a menu item.
+    private struct MenuBarRowLabel: View {
+        let title: String
+        @State private var isHovering = false
+
+        var body: some View {
+            Text(title)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .foregroundStyle(isHovering ? Color.onAccent : Color.primary)
+                .background(isHovering ? Color.accentColor : Color.clear, in: RoundedRectangle(cornerRadius: 5))
+                .contentShape(Rectangle())
+                .onHover { isHovering = $0 }
+        }
+    }
 
 #endif

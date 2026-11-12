@@ -46,8 +46,10 @@ nonisolated struct AutoFillFile: AutoFillStorage {
         AppGroup.containerURL?.appending(components: "AutoFill", "Accounts")
     }
 
-    init(url: URL? = defaultURL,
-         keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.autoFillAccounts, group: .shared)) {
+    init(
+        url: URL? = defaultURL,
+        keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.autoFillAccounts, group: .shared)
+    ) {
         file = url.map { EncryptedFile(url: $0, keychain: keychain) }
     }
 

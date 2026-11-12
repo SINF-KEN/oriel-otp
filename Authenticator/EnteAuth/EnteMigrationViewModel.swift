@@ -73,7 +73,10 @@ import Foundation
     @ObservationIgnored private let cloud: EnteCloud
     @ObservationIgnored private var task: Task<Void, Never>?
 
-    init(store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard, session: URLSession = .ente, cloud: EnteCloud = .shared) {
+    init(
+        store: EnteSessionStore = EnteSessionStore(), defaults: UserDefaults = .standard, session: URLSession = .ente,
+        cloud: EnteCloud = .shared
+    ) {
         self.store = store
         self.defaults = defaults
         self.session = session
@@ -138,8 +141,9 @@ import Foundation
                 return
             }
             self.cloud.use(saved)
-            self.source = SignedInAccount(api: sourceAPI, email: saved.email, token: saved.token,
-                                          authenticatorKey: saved.authenticatorKey, isSaved: true)
+            self.source = SignedInAccount(
+                api: sourceAPI, email: saved.email, token: saved.token,
+                authenticatorKey: saved.authenticatorKey, isSaved: true)
             try await self.continueToTarget()
         }
     }
@@ -329,7 +333,9 @@ import Foundation
             guard !cloud.hasPendingChanges else { throw EnteMigrationError.changedWhileMoving }
         }
         guard let key = account.authenticatorKey else { return [] }
-        return try await EnteAuthenticatorSync.decryptedEntities(api: account.api, token: account.token, authenticatorKey: key).map { $0.rawData }
+        return try await EnteAuthenticatorSync.decryptedEntities(api: account.api, token: account.token, authenticatorKey: key).map {
+            $0.rawData
+        }
     }
 
     // MARK: - Sessions

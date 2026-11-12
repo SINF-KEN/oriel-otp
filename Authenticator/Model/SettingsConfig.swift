@@ -26,7 +26,7 @@ class SettingsConfig {
     static private let showWhatsNewCounter = "showWhatsNewCounter"
     static private let showWhatsNewCounterAppVersion = "showWhatsNewCounterAppVersion"
     static private let ignoreUSBCWithOTP = "ignoreUSBCWithOTP"
-    
+
     /// Whether "What's new" is shown, the first 3 launches of each version. Worked out once per launch: a view's body
     /// reads it on every render, which counted renders rather than launches.
     static let showWhatsNewText: Bool = {
@@ -39,7 +39,7 @@ class SettingsConfig {
         UserDefaults.standard.set(counter + 1, forKey: showWhatsNewCounter)
         return true
     }()
-    
+
     static var showNFCSwipeHint: Bool {
         get {
             let counter = UserDefaults.standard.integer(forKey: showNFCSwipeHintCounter)
@@ -52,7 +52,7 @@ class SettingsConfig {
             }
         }
     }
-    
+
     static var isBypassTouchEnabled: Bool {
         get {
             return UserDefaults.standard.bool(forKey: bypassTouch)
@@ -61,7 +61,7 @@ class SettingsConfig {
             UserDefaults.standard.set(newValue, forKey: bypassTouch)
         }
     }
-    
+
     static var isNFCOnAppLaunchEnabled: Bool {
         get {
             return UserDefaults.standard.bool(forKey: nfcOnAppLaunch)
@@ -70,7 +70,7 @@ class SettingsConfig {
             UserDefaults.standard.set(newValue, forKey: nfcOnAppLaunch)
         }
     }
-    
+
     static func isOTPOverUSBIgnored(deviceId: UInt) -> Bool {
         guard let list = UserDefaults.standard.array(forKey: ignoreUSBCWithOTP) as? [UInt] else { return false }
         return list.contains(deviceId)

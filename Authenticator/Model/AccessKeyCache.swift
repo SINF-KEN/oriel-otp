@@ -17,21 +17,21 @@
 import Foundation
 
 struct AccessKeyCache {
-    
-    let timeToLive = TimeInterval(5*60)
-    
+
+    let timeToLive = TimeInterval(5 * 60)
+
     struct AccessKey {
         let timeStamp: Date
         let accessKey: Data
-        
+
         init(_ accessKey: Data, timeStamp: Date = Date()) {
             self.accessKey = accessKey
             self.timeStamp = timeStamp
         }
     }
-    
+
     private var cache = [String: AccessKey]()
-    
+
     // Reading a key restarts its time to live. `now` is only passed by the tests.
     mutating func accessKey(forKey index: String, now: Date = Date()) -> Data? {
         guard let possibleAccessKey = cache[index] else { return nil }
@@ -43,7 +43,7 @@ struct AccessKeyCache {
             return nil
         }
     }
-    
+
     mutating func setAccessKey(_ accessKey: Data, forKey index: String, now: Date = Date()) {
         cache[index] = AccessKey(accessKey, timeStamp: now)
     }

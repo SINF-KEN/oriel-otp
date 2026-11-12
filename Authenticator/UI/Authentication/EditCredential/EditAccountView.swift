@@ -33,7 +33,7 @@ struct EditView: View {
     @State private var showEmptyNameAlert = false
     @FocusState private var focusedField: Field?
 
-    init(account: Account, viewModel: MainViewModel, showEditing: Binding<Bool> ) {
+    init(account: Account, viewModel: MainViewModel, showEditing: Binding<Bool>) {
         self.account = account
         self.viewModel = viewModel
         _showEditing = showEditing
@@ -83,7 +83,7 @@ struct EditView: View {
                 }
             }
             .alert(String(localized: "Account not set", comment: "Rename credential alert"), isPresented: $showEmptyNameAlert) {
-                Button("OK", role: .cancel) { }
+                Button("OK", role: .cancel) {}
             } message: {
                 Text(String(localized: "Account name can not be empty", comment: "Rename credential alert"))
             }

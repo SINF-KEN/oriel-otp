@@ -23,10 +23,10 @@ import YubiKit
 @Observable class OATHResetViewModel {
 
     var state: ResetState = .ready
-    
+
     enum ResetState: Equatable {
         case ready, success, error(Error)
-        
+
         static func == (lhs: OATHResetViewModel.ResetState, rhs: OATHResetViewModel.ResetState) -> Bool {
             switch (lhs, rhs) {
             case (.ready, .ready):
@@ -40,7 +40,7 @@ import YubiKit
             }
         }
     }
-    
+
     init() {
         Logger.allocation.debug("ResetOATHViewModel: init")
     }
@@ -53,7 +53,9 @@ import YubiKit
                 let connection = try await ConnectionManager.shared.anyConnection()
                 let session = try await YubiKitOATHSession.makeSession(connection: connection)
                 try await session.reset()
-                let message = String(localized: "OATH accounts deleted and OATH application reset to factory defaults.", comment: "OATH reset confirmation message")
+                let message = String(
+                    localized: "OATH accounts deleted and OATH application reset to factory defaults.",
+                    comment: "OATH reset confirmation message")
                 ConnectionManager.shared.closeNFC(message: message)
                 self.state = .success
             } catch {

@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-
 import SwiftUI
 
 struct VersionHistoryView: View {
-    
+
     @Environment(\.dismiss) private var dismiss
     var presentedFromMainView: Bool
     private static var changes: [Change] = { [Change].init(withChangesFrom: "VersionHistory.plist") ?? [Change]() }()
-    
+
     var body: some View {
         SettingsList {
             if presentedFromMainView {
@@ -69,14 +68,14 @@ struct VersionHistoryRowView: View {
     let releaseDate: Date
     let note: String?
     let bullets: [String]
-    
+
     let dateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.doesRelativeDateFormatting = true
         return dateFormatter
     }()
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -108,7 +107,7 @@ fileprivate extension Array where Element == Change {
             let resource = withChangesFrom.split(separator: ".").first,
             let fileExtension = withChangesFrom.split(separator: ".").last,
             let url = Bundle.main.url(forResource: String(resource), withExtension: String(fileExtension)),
-            let changes = NSArray(contentsOf: url) as? [[String:Any]]
+            let changes = NSArray(contentsOf: url) as? [[String: Any]]
         else { return nil }
         self = changes.map { Change($0) }.compactMap { $0 }
     }
@@ -121,8 +120,8 @@ fileprivate struct Change: Identifiable {
     let date: Date
     let text: String?
     let rows: [String]
-    
-    init?(_ dictionary: [String:Any]) {
+
+    init?(_ dictionary: [String: Any]) {
         guard
             let version = dictionary["version"] as? String,
             let text = dictionary["changes"] as? String,

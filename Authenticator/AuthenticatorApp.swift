@@ -19,13 +19,13 @@ import SwiftUI
 
 @main
 struct AuthenticatorApp: App {
-    
+
     #if os(iOS)
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+        @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #else
-    @NSApplicationDelegateAdaptor(MacAppDelegate.self) var appDelegate
-    @State var menuBar = MenuBarSetting.shared
-    @State var mainWindowState = MainWindowState.shared
+        @NSApplicationDelegateAdaptor(MacAppDelegate.self) var appDelegate
+        @State var menuBar = MenuBarSetting.shared
+        @State var mainWindowState = MainWindowState.shared
     #endif
     @Environment(\.scenePhase) var scenePhase
     @State var toastPresenter: ToastPresenter
@@ -40,124 +40,125 @@ struct AuthenticatorApp: App {
         _notificationsViewModel = State(initialValue: notificationsViewModel)
         _mainViewModel = State(initialValue: mainViewModel)
         #if os(macOS)
-        // The Quick Copy panel is AppKit's, outside the scenes, so it gets the same objects here.
-        QuickCopy.shared.makeContent = {
-            AnyView(QuickCopyView()
-                .environment(toastPresenter)
-                .environment(notificationsViewModel)
-                .environment(mainViewModel)
-                .environment(MainWindowState.shared)
-                .appTextSize())
-        }
+            // The Quick Copy panel is AppKit's, outside the scenes, so it gets the same objects here.
+            QuickCopy.shared.makeContent = {
+                AnyView(
+                    QuickCopyView()
+                        .environment(toastPresenter)
+                        .environment(notificationsViewModel)
+                        .environment(mainViewModel)
+                        .environment(MainWindowState.shared)
+                        .appTextSize())
+            }
         #endif
         // The requests to Ente have the email address in their URL and carry the vault. Nothing keeps them on disk,
         // which also empties what earlier versions left there.
         URLCache.shared.memoryCapacity = 0
         URLCache.shared.diskCapacity = 0
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
-        if SimulatedYubiKey.isEnabled {
-            FakeEnteServer.install()
-            SimulatedYubiKey.addDemoDeviceAccountsIfAsked()
-        }
-        #if os(macOS)
-        WindowSnapshots.scheduleIfRequested()
-        WindowSnapshots.resizeMainWindowIfRequested()
-        #endif
+            if SimulatedYubiKey.isEnabled {
+                FakeEnteServer.install()
+                SimulatedYubiKey.addDemoDeviceAccountsIfAsked()
+            }
+            #if os(macOS)
+                WindowSnapshots.scheduleIfRequested()
+                WindowSnapshots.resizeMainWindowIfRequested()
+            #endif
         #endif
         WatchAccountSync.shared.activate()
     }
-    
+
     var body: some Scene {
         #if os(iOS)
-        WindowGroup {
-            MainView()
-                .toast(isPresenting: $toastPresenter.isPresenting, message: toastPresenter.message)
-                .fullScreenCover(isPresented: $notificationsViewModel.presentDisableOTP) {
-                    DisableOTPView()
-                }
-            .fullScreenCover(isPresented: $notificationsViewModel.showPIVTokenView) {
-                TokenRequestView(userInfo: notificationsViewModel.userInfo)
+            WindowGroup {
+                MainView()
+                    .toast(isPresenting: $toastPresenter.isPresenting, message: toastPresenter.message)
+                    .fullScreenCover(isPresented: $notificationsViewModel.presentDisableOTP) {
+                        DisableOTPView()
+                    }
+                    .fullScreenCover(isPresented: $notificationsViewModel.showPIVTokenView) {
+                        TokenRequestView(userInfo: notificationsViewModel.userInfo)
+                    }
+                    // Read here rather than in the closure, which SwiftUI can call off the main actor, and which would crash
+                    // if it was isolated to it, as it is by default in `body`.
+                    .transaction { @Sendable [disablesAnimations = notificationsViewModel.showPIVTokenView] transaction in
+                        transaction.disablesAnimations = disablesAnimations
+                    }
+                    .navigationViewStyle(.stack)
+                    .environment(toastPresenter)
+                    .environment(notificationsViewModel)
+                    .environment(mainViewModel)
             }
-            // Read here rather than in the closure, which SwiftUI can call off the main actor, and which would crash
-            // if it was isolated to it, as it is by default in `body`.
-            .transaction { @Sendable [disablesAnimations = notificationsViewModel.showPIVTokenView] transaction in
-                transaction.disablesAnimations = disablesAnimations
-            }
-            .navigationViewStyle(.stack)
-            .environment(toastPresenter)
-            .environment(notificationsViewModel)
-            .environment(mainViewModel)
-        }
         #else
-        // One window: the accounts all come from the one YubiKey, so a second window would only show the same list.
-        Window(Text(verbatim: "Oriel OTP"), id: AppWindow.main) {
-            MainView()
-                .toast(isPresenting: $toastPresenter.isPresenting, message: toastPresenter.message)
-                .sheet(isPresented: $notificationsViewModel.presentDisableOTP) {
-                    DisableOTPView()
-                        .scaledBodyFont()
-                        .appLockCover()
-                }
-                .appLockCover()
-                .withAppEnvironment(self)
-                .appTextSize(scalesContent: false)
-        }
-        .defaultSize(width: 900, height: 600)
-        .commands {
-            // Show Sidebar, and Show Toolbar and Customize Toolbar, in the View menu.
-            SidebarCommands()
-            ToolbarCommands()
-            MainCommands()
-            TextSizeCommands()
-        }
+            // One window: the accounts all come from the one YubiKey, so a second window would only show the same list.
+            Window(Text(verbatim: "Oriel OTP"), id: AppWindow.main) {
+                MainView()
+                    .toast(isPresenting: $toastPresenter.isPresenting, message: toastPresenter.message)
+                    .sheet(isPresented: $notificationsViewModel.presentDisableOTP) {
+                        DisableOTPView()
+                            .scaledBodyFont()
+                            .appLockCover()
+                    }
+                    .appLockCover()
+                    .withAppEnvironment(self)
+                    .appTextSize(scalesContent: false)
+            }
+            .defaultSize(width: 900, height: 600)
+            .commands {
+                // Show Sidebar, and Show Toolbar and Customize Toolbar, in the View menu.
+                SidebarCommands()
+                ToolbarCommands()
+                MainCommands()
+                TextSizeCommands()
+            }
 
-        Settings {
-            MacSettingsView()
-                .appLockCover()
-                .withAppEnvironment(self)
-                .appTextSize()
-        }
+            Settings {
+                MacSettingsView()
+                    .appLockCover()
+                    .withAppEnvironment(self)
+                    .appTextSize()
+            }
 
-        Window(String(localized: "About Oriel OTP", comment: "Mac app menu"), id: AppWindow.about) {
-            AboutView()
-                .textScaledFrame(width: 420, height: 560)
-                .appTextSize()
-        }
-        .windowResizability(.contentSize)
-        .defaultPosition(.center)
-        // Opened from the app and Help menus, not listed in the Window menu.
-        .commandsRemoved()
+            Window(String(localized: "About Oriel OTP", comment: "Mac app menu"), id: AppWindow.about) {
+                AboutView()
+                    .textScaledFrame(width: 420, height: 560)
+                    .appTextSize()
+            }
+            .windowResizability(.contentSize)
+            .defaultPosition(.center)
+            // Opened from the app and Help menus, not listed in the Window menu.
+            .commandsRemoved()
 
-        Window(String(localized: "How It Works", comment: "Mac Help menu"), id: AppWindow.tutorial) {
-            TutorialView()
-                .textScaledFrame(minWidth: 420, minHeight: 560)
-                .appTextSize()
-        }
-        .defaultSize(width: 480, height: 620)
-        .defaultPosition(.center)
-        // Opened from the app and Help menus, not listed in the Window menu.
-        .commandsRemoved()
+            Window(String(localized: "How It Works", comment: "Mac Help menu"), id: AppWindow.tutorial) {
+                TutorialView()
+                    .textScaledFrame(minWidth: 420, minHeight: 560)
+                    .appTextSize()
+            }
+            .defaultSize(width: 480, height: 620)
+            .defaultPosition(.center)
+            // Opened from the app and Help menus, not listed in the Window menu.
+            .commandsRemoved()
 
-        MenuBarExtra(isInserted: $menuBar.isShown) {
-            MenuBarView()
-                .withAppEnvironment(self)
-                .appTextSize()
-        } label: {
-            Image("MenuBarIcon")
-                .accessibilityLabel(Text(verbatim: "Oriel OTP"))
-        }
-        .menuBarExtraStyle(.window)
+            MenuBarExtra(isInserted: $menuBar.isShown) {
+                MenuBarView()
+                    .withAppEnvironment(self)
+                    .appTextSize()
+            } label: {
+                Image("MenuBarIcon")
+                    .accessibilityLabel(Text(verbatim: "Oriel OTP"))
+            }
+            .menuBarExtraStyle(.window)
         #endif
     }
 }
 
 #if os(macOS)
-private extension View {
-    func withAppEnvironment(_ app: AuthenticatorApp) -> some View {
-        environment(app.toastPresenter)
-            .environment(app.notificationsViewModel)
-            .environment(app.mainViewModel)
-            .environment(app.mainWindowState)
+    private extension View {
+        func withAppEnvironment(_ app: AuthenticatorApp) -> some View {
+            environment(app.toastPresenter)
+                .environment(app.notificationsViewModel)
+                .environment(app.mainViewModel)
+                .environment(app.mainWindowState)
+        }
     }
-}
 #endif

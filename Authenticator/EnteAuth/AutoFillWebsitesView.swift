@@ -45,31 +45,49 @@ struct AutoFillWebsitesView: View {
                 Section {
                     ForEach($websites) { $website in
                         // Boxed on iOS too: with no placeholder, a new row would otherwise look like nothing was added.
-                        TextField(String(localized: "Website", comment: "AutoFill website field, for VoiceOver"), text: $website.text, prompt: Text(verbatim: ""))
-                            .formRowTextBox()
-                            .textFieldStyle(.roundedBorder)
-                            .textInputAutocapitalization(.never)
-                            .keyboardType(.URL)
-                            .textContentType(.URL)
-                            .autocorrectionDisabled()
-                            .environment(\.layoutDirection, .leftToRight)
+                        TextField(
+                            String(localized: "Website", comment: "AutoFill website field, for VoiceOver"), text: $website.text,
+                            prompt: Text(verbatim: "")
+                        )
+                        .formRowTextBox()
+                        .textFieldStyle(.roundedBorder)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.URL)
+                        .textContentType(.URL)
+                        .autocorrectionDisabled()
+                        .environment(\.layoutDirection, .leftToRight)
                     }
                     .onDelete { websites.remove(atOffsets: $0) }
                     Button(String(localized: "Add website", comment: "AutoFill websites button")) {
                         websites.append(Website(text: ""))
                     }
                 } footer: {
-                    Text(String(localized: "AutoFill suggests this account's code on these websites and their subdomains. Without a website, choose the code from the list of codes instead.", comment: "AutoFill websites footer"))
+                    Text(
+                        String(
+                            localized:
+                                "AutoFill suggests this account's code on these websites and their subdomains. Without a website, choose the code from the list of codes instead.",
+                            comment: "AutoFill websites footer"))
                 }
                 if let suggestion = AutoFillWebsites.suggestion(issuer: issuer),
-                   !websites.contains(where: { AutoFillWebsites.normalized($0.text) == suggestion }) {
+                    !websites.contains(where: { AutoFillWebsites.normalized($0.text) == suggestion })
+                {
                     // Made up from the account's name, so it is only used once the user adds it.
                     Section {
-                        Button(String(localized: "Add \(suggestion)", comment: "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com.")) {
+                        Button(
+                            String(
+                                localized: "Add \(suggestion)",
+                                comment:
+                                    "AutoFill websites button. The placeholder is a website made up from the account's name, e.g. mastodon.com."
+                            )
+                        ) {
                             websites.append(Website(text: suggestion))
                         }
                     } footer: {
-                        Text(String(localized: "Add it only if it's where you sign in to this account. Codes aren't suggested on a website until you add it.", comment: "AutoFill websites footer below a website made up from the account's name"))
+                        Text(
+                            String(
+                                localized:
+                                    "Add it only if it's where you sign in to this account. Codes aren't suggested on a website until you add it.",
+                                comment: "AutoFill websites footer below a website made up from the account's name"))
                     }
                 }
                 if autoFill.hasChosenWebsites(for: id) {
@@ -100,11 +118,16 @@ struct AutoFillWebsitesView: View {
                     ConfirmButton(String(localized: "Save")) { save() }
                 }
             }
-            .alert(String(localized: "Not a website", comment: "AutoFill websites alert"),
-                   isPresented: Binding(get: { invalidWebsite != nil }, set: { if !$0 { invalidWebsite = nil } })) {
+            .alert(
+                String(localized: "Not a website", comment: "AutoFill websites alert"),
+                isPresented: Binding(get: { invalidWebsite != nil }, set: { if !$0 { invalidWebsite = nil } })
+            ) {
                 Button("OK", role: .cancel) {}
             } message: {
-                Text(String(localized: "Enter a domain such as example.com instead of “\(invalidWebsite ?? "")”.", comment: "AutoFill websites alert. The placeholder is what was typed."))
+                Text(
+                    String(
+                        localized: "Enter a domain such as example.com instead of “\(invalidWebsite ?? "")”.",
+                        comment: "AutoFill websites alert. The placeholder is what was typed."))
             }
         }
     }

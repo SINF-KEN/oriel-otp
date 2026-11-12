@@ -66,7 +66,8 @@ struct EntityReadingTests {
     }
 
     @Test func theURLsSettingsWinForTheListAndTheEditor() throws {
-        let object = #"{"rawData":"otpauth://totp/A:b?secret=JBSWY3DPEHPK3PXP&codeDisplay=%7B%22pinned%22%3Afalse%2C%22trashed%22%3Afalse%7D","display":{"pinned":true,"trashed":true}}"#
+        let object =
+            #"{"rawData":"otpauth://totp/A:b?secret=JBSWY3DPEHPK3PXP&codeDisplay=%7B%22pinned%22%3Afalse%2C%22trashed%22%3Afalse%7D","display":{"pinned":true,"trashed":true}}"#
         let editor = try #require(EnteEntryEditor(rawData: object))
         let entry = EnteEntry(rawData: object)
         #expect(entry.isPinned == editor.isPinned)
@@ -75,9 +76,11 @@ struct EntityReadingTests {
     }
 
     /// These were read as 6 digits, 30 seconds or counter 0, which gives wrong codes.
-    @Test(arguments: ["totp/A:b?secret=\(secretA)&digits=eight", "totp/A:b?secret=\(secretA)&period=60.0",
-                      "totp/A:b?secret=\(secretA)&digits=", "totp/A:b?secret=\(secretA)&period=%2B30",
-                      "hotp/A:b?secret=\(secretA)&counter=abc", "hotp/A:b?secret=\(secretA)&digits=6.0"])
+    @Test(arguments: [
+        "totp/A:b?secret=\(secretA)&digits=eight", "totp/A:b?secret=\(secretA)&period=60.0",
+        "totp/A:b?secret=\(secretA)&digits=", "totp/A:b?secret=\(secretA)&period=%2B30",
+        "hotp/A:b?secret=\(secretA)&counter=abc", "hotp/A:b?secret=\(secretA)&digits=6.0"
+    ])
     func aValueThatIsntAWholeNumberIsRefused(path: String) {
         #expect(EnteCloudCode(rawData: entry("otpauth://" + path)) == nil)
     }
@@ -156,7 +159,11 @@ nonisolated final class FailingReadVaultStorage: EnteVaultStorage, @unchecked Se
     }
 
     func load() throws -> EnteVault? { throw error }
-    func save(_ vault: EnteVault) throws { lock.withLock { saved.append(vault); events.append("save") } }
+    func save(_ vault: EnteVault) throws {
+        lock.withLock {
+            saved.append(vault); events.append("save")
+        }
+    }
     func remove() { lock.withLock { events.append("remove") } }
     func setAside() throws { lock.withLock { events.append("setAside") } }
 }
@@ -168,7 +175,8 @@ nonisolated final class FailingReadVaultStorage: EnteVaultStorage, @unchecked Se
     private func cloud(storage: EnteVaultStorage) throws -> EnteCloud {
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
         return EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
     }
 
@@ -235,7 +243,8 @@ nonisolated private final class SameTimeDiffStub: URLProtocol, @unchecked Sendab
         let since = query.first { $0.name == "sinceTime" }?.value.flatMap { Int64($0) } ?? 0
         let limit = query.first { $0.name == "limit" }?.value.flatMap { Int($0) } ?? 500
         Self.limits.append(limit)
-        let diff: [[String: Any]] = Self.updatedAt > since
+        let diff: [[String: Any]] =
+            Self.updatedAt > since
             ? (0..<min(Self.count, limit)).map { ["id": "e\($0)", "isDeleted": false, "updatedAt": NSNumber(value: Self.updatedAt)] }
             : []
         let data = (try? JSONSerialization.data(withJSONObject: ["diff": diff])) ?? Data()
@@ -323,8 +332,9 @@ struct SmallReviewFixesTests {
         let key = WatchSyncKey.generate()
         keyItem.write(key.data)
         let receiver = WatchAccountReceiver(accountsItem: accountsItem, keyItem: keyItem, defaults: defaults)
-        let account = OTPAccount(id: "1", kind: .totp, issuer: "GitHub", accountName: "alice", secret: Data(base32Encoded: secretA)!,
-                                 algorithm: .sha1, digits: 6, period: 30, isPinned: false)
+        let account = OTPAccount(
+            id: "1", kind: .totp, issuer: "GitHub", accountName: "alice", secret: Data(base32Encoded: secretA)!,
+            algorithm: .sha1, digits: 6, period: 30, isPinned: false)
         _ = receiver.apply(try WatchAccountsMessage.context(for: [account], key: key))
 
         keyItem.isLocked = true
