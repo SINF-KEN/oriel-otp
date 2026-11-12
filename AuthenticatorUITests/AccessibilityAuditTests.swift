@@ -92,11 +92,13 @@ final class AccessibilityAuditTests: XCTestCase {
         XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try audit("account list", types)
 
-        // The toast and the checkmark that show for a moment after a code is copied.
+        // The checkmark a row shows after its code is copied, once the toast over the navigation bar has gone.
         let copy = app.buttons["account-row.60/Bank:alice.copy"].firstMatch
         XCTAssertTrue(copy.waitForExistence(timeout: 20), "The code isn't a button of its own")
         copy.tap()
-        XCTAssertTrue(app.staticTexts["Copied to clipboard"].firstMatch.waitForExistence(timeout: 5), "The toast didn't show")
+        let toast = app.staticTexts["Copied to clipboard"].firstMatch
+        XCTAssertTrue(toast.waitForExistence(timeout: 5), "The toast didn't show")
+        XCTAssertTrue(toast.waitForNonExistence(timeout: 15), "The toast didn't go away")
         try audit("copied code", types)
 
         // On the name, near the top: at the larger sizes the middle of the row is the code, which copies it.
