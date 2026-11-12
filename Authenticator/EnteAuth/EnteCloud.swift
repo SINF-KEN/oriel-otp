@@ -246,7 +246,8 @@ import YubiKit
             if !isVaultLocked {
                 removeFile()
             }
-            autoFill?.remove()
+            // Keeps the accounts on this device.
+            updateAutoFill()
             return
         }
         replaceVault(with: nil)
@@ -445,13 +446,16 @@ import YubiKit
         }
     }
 
-    /// AutoFill uses what is in the vault, also while the session is locked: the codes are calculated on the device.
-    private func updateAutoFill() {
-        if let vault {
-            autoFill?.update { Self.codes(in: vault) }
-        } else {
+    /// AutoFill uses what is in the vault, also while the session is locked, and the accounts on this device: the codes
+    /// are calculated on the device. Called again when the accounts on this device change.
+    func updateAutoFill() {
+        let deviceItems = device?.storedItems ?? []
+        if vault == nil && deviceItems.isEmpty {
             autoFill?.remove()
+            return
         }
+        let vault = vault
+        autoFill?.update { Self.codes(in: vault) + DeviceAccounts.codes(of: deviceItems) }
     }
 
     /// Syncs when the network comes back with changes waiting to be uploaded.

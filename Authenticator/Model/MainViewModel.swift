@@ -114,7 +114,10 @@ import YubiKit
         self.favorites = favoritesStorage.readFavorites()
         self.keyTags = tagsStorage.read()
         cloud.onChange = { [weak self] in self?.updateCloudAccounts() }
-        device.onChange = { [weak self] in self?.updateDeviceAccounts() }
+        device.onChange = { [weak self] in
+            self?.updateDeviceAccounts()
+            self?.cloud.updateAutoFill()
+        }
         updateCloudAccounts()
         updateDeviceAccounts()
     }

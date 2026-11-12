@@ -170,9 +170,10 @@ gives.
 > paired). The demo accounts appear on the watch within a few seconds. Turning the switch off deletes them from the
 > watch.
 >
-> AutoFill: the app includes an AutoFill extension that fills in the codes of Ente Auth accounts in Safari and other
-> apps; it doesn't use the YubiKey. To test it, choose **Sync from Ente Auth** in the account list menu, turn on **Stay
-> signed in** and sign in with the demo account. Under Configuration > AutoFill, tap **Turn on AutoFill** and turn on
+> AutoFill: the app includes an AutoFill extension that fills in the codes of accounts in Ente Auth and on this device
+> in Safari and other apps; it doesn't use the YubiKey. To test it, add an account with **Add account** and **This
+> device**, or choose **Sync from Ente Auth** in the account list menu, turn on **Stay signed in** and sign in with the
+> demo account. Under Configuration > AutoFill, tap **Turn on AutoFill** and turn on
 > Oriel OTP in the system's AutoFill settings if asked. Then open a page with a verification code field in Safari, on
 > a website in the account's details (**AutoFill websites** on the account changes them), and choose the suggested
 > code above the keyboard. Codes of accounts on the YubiKey aren't offered.

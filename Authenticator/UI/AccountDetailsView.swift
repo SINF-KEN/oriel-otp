@@ -225,9 +225,13 @@ struct AccountDetailView: View {
     }
 
     /// The id AutoFill knows a time-based Ente Auth account by, nil for the accounts it can't fill in.
+    /// The id of the account in AutoFill: a time-based one in Ente Auth or on this device.
     private var autoFillID: String? {
-        guard case .ente(let id) = account.location, account.credential.type == .totp else { return nil }
-        return id
+        guard account.credential.type == .totp else { return nil }
+        switch account.location {
+        case .ente(let id), .device(let id): return id
+        case .yubiKey: return nil
+        }
     }
 
     private var autoFillWebsitesButton: some View {

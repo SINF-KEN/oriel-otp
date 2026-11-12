@@ -146,6 +146,14 @@ enum DeviceAccountsError: Error, LocalizedError {
         }
     }
 
+    /// The accounts as they're parsed off the main actor, for AutoFill: a copy of what's stored now.
+    var storedItems: [DeviceAccountItem] { items }
+
+    /// The accounts of `items` in the form AutoFill and the Apple Watch take, without data that can't be read.
+    nonisolated static func codes(of items: [DeviceAccountItem]) -> [EnteCode] {
+        items.compactMap { EnteCodeParser.parse(id: $0.id, rawData: $0.rawData) }
+    }
+
     /// Adds an account, unless there is one with the same name.
     func add(_ template: YubiKitOATHSession.CredentialTemplate) throws -> AddResult {
         let credentialId = OATHCredentialId.key(accountName: template.name, issuer: template.issuer,

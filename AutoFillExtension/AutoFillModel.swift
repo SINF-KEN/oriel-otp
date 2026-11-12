@@ -23,7 +23,7 @@ import Observation
     enum Problem: Equatable {
         /// The accounts can't be read until the device is unlocked.
         case unavailable
-        /// There are no time-based Ente Auth accounts in the app.
+        /// There are no time-based accounts in Ente Auth or on this device in the app.
         case noAccounts
         /// The file can't be decrypted, e.g. after the device was restored from a backup.
         case unreadable

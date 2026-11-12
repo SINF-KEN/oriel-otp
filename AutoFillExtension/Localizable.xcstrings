@@ -320,31 +320,31 @@
         }
       }
     },
-    "Oriel OTP fills in the codes of the time-based Ente Auth accounts it keeps on this device. Sign in to Ente Auth in the app to use them here. The accounts on your YubiKey can't be used for AutoFill." : {
+    "Oriel OTP fills in the codes of its time-based accounts in Ente Auth and on this device. Add one in the app, or sign in to Ente Auth there, to use it here. The accounts on your YubiKey can't be used for AutoFill." : {
       "comment" : "AutoFill without accounts",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTP setzt die Codes der zeitbasierten Ente-Auth-Konten ein, die es auf diesem Gerät speichert. Melde Dich in der App bei Ente Auth an, um sie hier zu verwenden. Die Konten auf Deinem YubiKey können nicht für das automatische Ausfüllen verwendet werden."
+            "value" : "Oriel OTP setzt die Codes seiner zeitbasierten Konten in Ente Auth und auf diesem Gerät ein. Füge in der App ein Konto hinzu oder melde Dich dort bei Ente Auth an, um es hier zu verwenden. Die Konten auf Deinem YubiKey können nicht für das automatische Ausfüllen verwendet werden."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTP remplit les codes des comptes Ente Auth basés sur le temps qu’il conserve sur cet appareil. Connectez-vous à Ente Auth dans l’app pour les utiliser ici. Les comptes de votre YubiKey ne peuvent pas être utilisés pour le remplissage automatique."
+            "value" : "Oriel OTP remplit les codes de ses comptes basés sur le temps, dans Ente Auth et sur cet appareil. Ajoutez un compte dans l’app, ou connectez-vous à Ente Auth dans l’app, pour l’utiliser ici. Les comptes de votre YubiKey ne peuvent pas être utilisés pour le remplissage automatique."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTPは、このデバイスに保存している時間ベースのEnte Authアカウントのコードを入力します。ここで使うには、アプリでEnte Authにサインインしてください。YubiKeyのアカウントは自動入力に使えません。"
+            "value" : "Oriel OTPは、Ente Authとこのデバイスにある時間ベースのアカウントのコードを入力します。ここで使うには、アプリでアカウントを追加するか、Ente Authにサインインしてください。YubiKeyのアカウントは自動入力に使えません。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTP vypĺňa kódy časových účtov Ente Auth, ktoré uchováva v tomto zariadení. Ak ich chcete používať tu, prihláste sa v aplikácii do Ente Auth. Účty na kľúči YubiKey nemožno použiť na automatické vypĺňanie."
+            "value" : "Oriel OTP vypĺňa kódy svojich časových účtov v Ente Auth a v tomto zariadení. Ak ich chcete používať tu, pridajte v aplikácii účet alebo sa v nej prihláste do Ente Auth. Účty na kľúči YubiKey nemožno použiť na automatické vypĺňanie."
           }
         }
       }

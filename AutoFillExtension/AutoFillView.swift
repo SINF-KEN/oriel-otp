@@ -100,7 +100,7 @@ private struct AutoFillListView: View {
             Text(String(localized: "Unlock your device to use your accounts.", comment: "AutoFill before the device was first unlocked"))
                 .foregroundStyle(.secondary)
         case .noAccounts:
-            Text(String(localized: "Oriel OTP fills in the codes of the time-based Ente Auth accounts it keeps on this device. Sign in to Ente Auth in the app to use them here. The accounts on your YubiKey can't be used for AutoFill.", comment: "AutoFill without accounts"))
+            Text(String(localized: "Oriel OTP fills in the codes of its time-based accounts in Ente Auth and on this device. Add one in the app, or sign in to Ente Auth there, to use it here. The accounts on your YubiKey can't be used for AutoFill.", comment: "AutoFill without accounts"))
                 .foregroundStyle(.secondary)
         case .unreadable:
             Text(String(localized: "Open Oriel OTP to use your accounts here again.", comment: "AutoFill when its copy of the accounts can't be read"))
