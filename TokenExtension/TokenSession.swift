@@ -24,20 +24,6 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     var signSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when signing starts
     var decryptSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when decryption starts
     
-    // These cases match TokenKeyType in the app
-    enum KeyType: UInt8 {
-        case rsa1024 = 0x06
-        case rsa2048 = 0x07
-        case eccp256 = 0x11
-        case eccp384 = 0x14
-        case unknown = 0x00
-    }
-    
-    enum OperationType: String {
-        case signData = "signData"
-        case decryptData = "decryptData"
-    }
-
     func tokenSession(_ session: TKTokenSession, beginAuthFor operation: TKTokenOperation, constraint: Any) throws -> TKTokenAuthOperation {
         Logger.ctk.yubilog("Extension: beginAuthFor operation: \(String(describing: operation)), constraint: \(String(describing: constraint))")
         // Insert code here to create an instance of TKTokenAuthOperation based on the specified operation and constraint.
@@ -85,28 +71,13 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             throw "No key for you!"
         }
         
-        var possibleKeyType: KeyType? = nil
-        if key.keyType == kSecAttrKeyTypeRSA as String {
-            if key.keySizeInBits == 1024 {
-                possibleKeyType = .rsa1024
-            } else if key.keySizeInBits == 2048 {
-                possibleKeyType = .rsa2048
-            }
-        } else if key.keyType == kSecAttrKeyTypeECSECPrimeRandom as String {
-            if key.keySizeInBits == 256 {
-                possibleKeyType = .eccp256
-            } else if key.keySizeInBits == 384 {
-                possibleKeyType = .eccp384
-            }
-        }
-        
-        guard let keyType = possibleKeyType, let secKeyAlgorithm = algorithm.secKeyAlgorithm else {
+        guard let keyType = TokenKeyType(keyType: key.keyType, keySizeInBits: key.keySizeInBits), let secKeyAlgorithm = algorithm.secKeyAlgorithm else {
             throw NSError(domain: TKErrorDomain, code: TKError.Code.canceledByUser.rawValue, userInfo: nil)
         }
 
         Logger.ctk.yubilog("Extension: sending notification for keyObjectID: \(objectId)")
         let requestID = TokenResponseStore.newRequestID()
-        sendNotificationWithData(dataToSign, keyObjectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID)
+        sendNotification(for: TokenRequest(operation: .signData, data: dataToSign, objectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID))
 
         let loopEndTime = Date(timeIntervalSinceNow: 95)
         var runLoop = true
@@ -156,27 +127,12 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             throw "No key for you!"
         }
         
-        var possibleKeyType: KeyType? = nil
-        if key.keyType == kSecAttrKeyTypeRSA as String {
-            if key.keySizeInBits == 1024 {
-                possibleKeyType = .rsa1024
-            } else if key.keySizeInBits == 2048 {
-                possibleKeyType = .rsa2048
-            }
-        } else if key.keyType == kSecAttrKeyTypeECSECPrimeRandom as String {
-            if key.keySizeInBits == 256 {
-                possibleKeyType = .eccp256
-            } else if key.keySizeInBits == 384 {
-                possibleKeyType = .eccp384
-            }
-        }
-        
-        guard let keyType = possibleKeyType, let secKeyAlgorithm = algorithm.secKeyAlgorithm else {
+        guard let keyType = TokenKeyType(keyType: key.keyType, keySizeInBits: key.keySizeInBits), let secKeyAlgorithm = algorithm.secKeyAlgorithm else {
             throw NSError(domain: TKErrorDomain, code: TKError.Code.canceledByUser.rawValue, userInfo: nil)
         }
 
         let requestID = TokenResponseStore.newRequestID()
-        sendNotificationWithEncryptedData(ciphertext, keyObjectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID)
+        sendNotification(for: TokenRequest(operation: .decryptData, data: ciphertext, objectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID))
 
         let loopEndTime = Date(timeIntervalSinceNow: 95)
         var runLoop = true
@@ -258,42 +214,24 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         center.removeAllPendingNotificationRequests()
     }
     
-    // Send local notification with data to sign
-    private func sendNotificationWithData(_ data: Data, keyObjectID: String, keyType: KeyType, algorithm: SecKeyAlgorithm, requestID: String) {
-            cancelAllNotifications()
-        let categoryID = OperationType.signData.rawValue
-        let content = UNMutableNotificationContent()
-        content.title = String(localized: "YubiKey required")
-        content.body = String(localized: "Tap here to complete the request using your YubiKey.")
-        content.categoryIdentifier = categoryID
-        content.userInfo = ["operationType": categoryID, "data": data, "keyObjectID": keyObjectID, "algorithm": algorithm.rawValue, "keyType": keyType.rawValue,
-                            TokenResponseStore.requestIDKey: requestID]
-        content.sound = UNNotificationSound.default
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        
-        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Oriel OTP"), options: .foreground)
-        let category = UNNotificationCategory(identifier: categoryID, actions: [show], intentIdentifiers: [])
-
-        let center = UNUserNotificationCenter.current()
-        center.setNotificationCategories([category])
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-        center.add(request)
-    }
-    
-    // Send local notification with encryption data
-    private func sendNotificationWithEncryptedData(_ cipherData: Data, keyObjectID: String, keyType: KeyType, algorithm: SecKeyAlgorithm, requestID: String) {
+    /// Asks the user to open the app, which does what the request says with the YubiKey.
+    private func sendNotification(for request: TokenRequest) {
         cancelAllNotifications()
-        let categoryID = OperationType.decryptData.rawValue
+        let categoryID = request.operation.rawValue
         let content = UNMutableNotificationContent()
         content.title = String(localized: "YubiKey required")
-        content.body = String(localized: "Tap here to complete the decryption request using your YubiKey.")
+        switch request.operation {
+        case .signData:
+            content.body = String(localized: "Tap here to complete the request using your YubiKey.")
+        case .decryptData:
+            content.body = String(localized: "Tap here to complete the decryption request using your YubiKey.")
+        }
         content.categoryIdentifier = categoryID
-        content.userInfo = ["operationType": categoryID, "data": cipherData, "keyObjectID": keyObjectID, "algorithm": algorithm.rawValue, "keyType": keyType.rawValue,
-                            TokenResponseStore.requestIDKey: requestID]
+        content.userInfo = request.userInfo
         content.sound = UNNotificationSound.default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 0.1, repeats: false)
-        
-        let show = UNNotificationAction(identifier: categoryID, title:  String(localized: "Launch Oriel OTP"), options: .foreground)
+
+        let show = UNNotificationAction(identifier: categoryID, title: String(localized: "Launch Oriel OTP"), options: .foreground)
         let category = UNNotificationCategory(identifier: categoryID, actions: [show], intentIdentifiers: [])
 
         let center = UNUserNotificationCenter.current()
