@@ -1,0 +1,93 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Favorite Code" : {
+      "comment" : "Watch complication name",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lieblingscode"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Code favori"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "お気に入りのコード"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Obľúbený kód"
+          }
+        }
+      }
+    },
+    "No accounts" : {
+      "comment" : "Watch complication without accounts",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keine Konten"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Aucun compte"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントなし"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Žiadne účty"
+          }
+        }
+      }
+    },
+    "The code of your first pinned account." : {
+      "comment" : "Watch complication description",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der Code deines ersten angehefteten Kontos."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le code de votre premier compte épinglé."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "最初にピン留めしたアカウントのコード。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kód vášho prvého pripnutého účtu."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
