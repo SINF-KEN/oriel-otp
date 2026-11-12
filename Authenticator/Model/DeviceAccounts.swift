@@ -95,8 +95,9 @@ enum DeviceAccountsError: Error, LocalizedError {
     @ObservationIgnored var onChange: (() -> Void)?
 
     @ObservationIgnored private let storage: DeviceAccountStorage
-    /// The file couldn't be read yet, e.g. because the app was launched in the background on a locked device.
-    @ObservationIgnored private var isLocked = false
+    /// The file couldn't be read yet, e.g. because the app was launched in the background on a locked device. There
+    /// are no accounts until it can, which doesn't mean there are none.
+    @ObservationIgnored private(set) var isLocked = false
     /// The file can't be read at all, e.g. it was written by a later version of the app. It is set aside before the
     /// first save rather than written over.
     @ObservationIgnored private var isUnreadable = false

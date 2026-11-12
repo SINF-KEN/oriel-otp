@@ -226,6 +226,42 @@ struct AutoFillAccountSyncTests {
         #expect(try storage.load() == nil)
     }
 
+    /// A launch in the background on a locked device can't read the accounts on this device yet. That isn't taken for
+    /// none: they stay in AutoFill with their chosen websites, and are written again once they can be read.
+    @Test func keepsTheAccountsOnThisDeviceWhileTheyCantBeRead() async throws {
+        let deviceStorage = MemoryDeviceStorage()
+        let defaults = makeTestDefaults()
+        func cloud(autoFill: AutoFillAccountSync, device: DeviceAccounts) -> EnteCloud {
+            EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+                      storage: InMemoryVaultStorage(), session: OfflineURLProtocol.session,
+                      watch: WatchAccountSync(defaults: defaults), autoFill: autoFill, device: device)
+        }
+        let sync = sync()
+        let device = DeviceAccounts(storage: deviceStorage)
+        let model = MainViewModel(cloud: cloud(autoFill: sync, device: device), device: device)
+        _ = try model.addDeviceAccount(template("GitLab"))
+        await sync.finishWriting()
+        let id = try #require(try storage.load()?.first?.id)
+        sync.setWebsites(["git.example.com"], for: id)
+        await sync.finishWriting()
+
+        deviceStorage.loadError = EncryptedFileError.unavailable
+        let relaunched = self.sync()
+        let lockedDevice = DeviceAccounts(storage: deviceStorage)
+        #expect(lockedDevice.isLocked)
+        let relaunchedCloud = cloud(autoFill: relaunched, device: lockedDevice)
+        await relaunched.finishWriting()
+        #expect(try storage.load()?.map(\.id) == [id])
+        #expect(self.sync().hasChosenWebsites(for: id))
+
+        // Unlocked, they're read and written again, with the websites chosen for them.
+        deviceStorage.loadError = nil
+        lockedDevice.onChange = { relaunchedCloud.updateAutoFill() }
+        lockedDevice.loadIfLocked()
+        await relaunched.finishWriting()
+        #expect(try storage.load()?.first?.websites == ["git.example.com"])
+    }
+
     @Test func writesTheTimeBasedAccountsWithTheirGuessedWebsites() async throws {
         await update(sync())
         let accounts = try #require(try storage.load())

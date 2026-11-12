@@ -449,6 +449,10 @@ import YubiKit
     /// AutoFill uses what is in the vault, also while the session is locked, and the accounts on this device: the codes
     /// are calculated on the device. Called again when the accounts on this device change.
     func updateAutoFill() {
+        // Until the accounts on this device can be read, e.g. after a launch in the background on a locked device, they
+        // look like none, and writing that would take them out of AutoFill with the websites chosen for them. They're
+        // written once they can be read, as `DeviceAccounts.loadIfLocked` calls its `onChange`.
+        guard device?.isLocked != true else { return }
         let deviceItems = device?.storedItems ?? []
         if vault == nil && deviceItems.isEmpty {
             autoFill?.remove()

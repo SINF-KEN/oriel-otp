@@ -224,8 +224,8 @@ struct AccountDetailView: View {
         }
     }
 
-    /// The id AutoFill knows a time-based Ente Auth account by, nil for the accounts it can't fill in.
-    /// The id of the account in AutoFill: a time-based one in Ente Auth or on this device.
+    /// The id AutoFill knows the account by: a time-based one in Ente Auth or on this device. Nil for the accounts it
+    /// can't fill in.
     private var autoFillID: String? {
         guard account.credential.type == .totp else { return nil }
         switch account.location {
