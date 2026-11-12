@@ -95,9 +95,14 @@ struct AccountRowView<Accessory: View>: View {
         // One element for VoiceOver, read as issuer, name and code, then the time left and where it's stored. The
         // code is copied with the row's Copy action, the first of its actions. Without VoiceOver, the code is an
         // element of its own, so Voice Control ("Copy GitHub", "Show numbers"), Switch Control and Full Keyboard
-        // Access reach it without opening the row.
+        // Access reach it without opening the row. Only on iOS: a Mac list row is a button, which takes its children
+        // in, and the inner button's identifier would replace the row's.
+        #if os(iOS)
         .modifier(AccountRowAccessibility(account: account, showsLocation: showsLocation,
                                           separatesCode: copyCode != nil && !isVoiceOverEnabled))
+        #else
+        .modifier(AccountRowAccessibility(account: account, showsLocation: showsLocation, separatesCode: false))
+        #endif
         #if os(iOS)
         // Copy is one of the row's actions, which VoiceOver doesn't list unless asked.
         .accessibilityHint(copyCode == nil || !isVoiceOverEnabled ? "" : String(localized: "Swipe up or down to copy the code", comment: "VoiceOver hint for an account in the list, whose Copy action is one of its actions"))

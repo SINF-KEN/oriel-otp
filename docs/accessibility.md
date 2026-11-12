@@ -28,9 +28,10 @@ Icon buttons answer to their title and to shorter names, e.g. "Tap Plus" or "Tap
 for Scan NFC YubiKey. A row answers to its issuer ("Tap GitHub"). Text fields are named after their row, not their
 placeholder.
 
-Without VoiceOver, the code in a row is a button of its own, named "Copy code for GitHub", so "Copy GitHub" or "Copy
-code GitHub" copies it without opening the account, and "Show numbers" and "Show grid" reach it. Switch Control and
-Full Keyboard Access move to it as well. "Tap GitHub" still opens the account.
+On iOS without VoiceOver, the code in a row is a button of its own, named "Copy code for GitHub", so "Copy GitHub" or
+"Copy code GitHub" copies it without opening the account, and "Show numbers" and "Show grid" reach it. Switch Control
+and Full Keyboard Access move to it as well. "Tap GitHub" still opens the account. On the Mac a row is a button that
+can't hold another, so it stays one element; the row's Copy button appears when the pointer is over it.
 
 ## Larger Text
 
@@ -151,7 +152,7 @@ where there are many of a kind:
 | Screen | Identifiers |
 | --- | --- |
 | Account list | `accounts.add-account`, `accounts.empty-add-account`, `accounts.scan-nfc`, `accounts.refresh` (Mac), `accounts.sync-from-ente` (the button in the empty list), `accounts.search`, `accounts.tag-filter`, `accounts.about`, `accounts.configuration` |
-| A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth; its code, without VoiceOver: `account-row.<account id>.copy` |
+| A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth; its code, on iOS without VoiceOver: `account-row.<account id>.copy` |
 | Account details | `account-details.code`, `account-details.next-code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete`, `account-details.tags`, `account-details.tag-list`, `account-details.autofill-websites`, `account-details.toolbar-autofill-websites` |
 | Tags | `tags.new-tag` |
 | Add account | `add-account.issuer`, `add-account.account-name`, `add-account.secret`, `add-account.save`, `add-account.enter-manually` |
