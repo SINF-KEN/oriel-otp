@@ -30,8 +30,10 @@ tagged, so the workflow tests the tag push and doesn't also run for the `release
 - **`dependency-review`** runs on pull requests and fails on a vulnerability of moderate severity or higher in a
   changed dependency.
 - **`test`** (iOS):
-  1. Lints a few files with `swift-format --strict`. The older files don't follow the configuration, so the lint is
-     limited to the files listed in the workflow rather than reformatting the whole repository.
+  1. Lints all the Swift code with `swift-format --strict --recursive`. To fix what it finds, run
+     `xcrun swift-format format --configuration .swift-format -i -r -p` with the folders listed in the workflow. The
+     commit that reformatted everything is in `.git-blame-ignore-revs`, which GitHub's blame skips; locally, run
+     `git config blame.ignoreRevsFile .git-blame-ignore-revs` once.
   2. Checks that the project file, plists, entitlements, the four privacy manifests and the schemes are well formed
      (`plutil -lint` and `xmllint`, not what the manifests declare), that every `Package.resolved` pin has a
      40-character revision, and that the 12 build configurations (6 targets, Debug and Release) keep complete strict
