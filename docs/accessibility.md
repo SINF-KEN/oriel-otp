@@ -152,7 +152,7 @@ where there are many of a kind:
 | --- | --- |
 | Account list | `accounts.add-account`, `accounts.empty-add-account`, `accounts.scan-nfc`, `accounts.refresh` (Mac), `accounts.sync-from-ente` (the button in the empty list), `accounts.search`, `accounts.tag-filter`, `accounts.about`, `accounts.configuration` |
 | A row | `account-row.<account id>`: the YubiKey's credential id, e.g. `account-row.GitHub:alice@example.com` or `account-row.60/Bank:alice`, or `ente/<item id>` for Ente Auth; its code, without VoiceOver: `account-row.<account id>.copy` |
-| Account details | `account-details.code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete`, `account-details.tags`, `account-details.tag-list`, `account-details.autofill-websites`, `account-details.toolbar-autofill-websites` |
+| Account details | `account-details.code`, `account-details.next-code`, `account-details.copy`, `account-details.calculate`, `account-details.pin`, `account-details.rename`, `account-details.delete`, `account-details.tags`, `account-details.tag-list`, `account-details.autofill-websites`, `account-details.toolbar-autofill-websites` |
 | Tags | `tags.new-tag` |
 | Add account | `add-account.issuer`, `add-account.account-name`, `add-account.secret`, `add-account.save`, `add-account.enter-manually` |
 | Ente sync | `ente.email`, `ente.password`, `ente.sign-in`, `ente.server`, `ente.server-choice`, `ente.stay-signed-in`, `ente.add`, `ente.create-account`, `ente.migrate`, `ente.delete-account` |

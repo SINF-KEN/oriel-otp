@@ -75,9 +75,9 @@ import SwiftUI
 
 extension ToastPresenter {
     
-    func copyToClipboard(_ value: String) {
+    func copyToClipboard(_ value: String, message: String? = nil) {
         Platform.copy(value)
-        toast(message: String(localized: "Copied to clipboard", comment: "Toast copied to clipboard message"))
+        toast(message: message ?? String(localized: "Copied to clipboard", comment: "Toast copied to clipboard message"))
         Platform.notify(.success)
     }
 
@@ -95,7 +95,12 @@ extension ToastPresenter {
     }
 
     private func copyCode(_ code: String, of account: Account) {
-        copyToClipboard(code)
+        // A code about to change may be too late by the time it's pasted, so the toast says so.
+        if let secondsLeft = account.secondsLeft, secondsLeft <= Account.nextCodeLead, account.otp?.code == code {
+            copyToClipboard(code, message: String(localized: "Copied. A new code comes in \(secondsLeft) seconds.", comment: "Toast after copying a code that is about to change. The placeholder is a number of seconds, 5 or less."))
+        } else {
+            copyToClipboard(code)
+        }
         // The row shows a checkmark for a moment, next to the toast.
         copiedAccountID = account.accountId
         copiedTask?.cancel()

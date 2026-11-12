@@ -66,6 +66,12 @@ final class NoYubiKeyTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Stored on this device"].firstMatch.exists)
         attachScreenshot("account-details")
 
+        // In the last seconds of each code, the next one shows under it. Longer than the 30 seconds a code lasts.
+        let next = app.staticTexts["account-details.next-code"].firstMatch
+        XCTAssertTrue(next.waitForExistence(timeout: 35), "The next code didn't show before the code changed")
+        XCTAssertTrue(next.label.hasPrefix("Next code: "))
+        attachScreenshot("next-code")
+
         // Leaves the simulator as it was, and the delete alert is what says there's no other copy.
         app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch.tap()
         // The More menu's items are the system's, which don't keep their identifiers.

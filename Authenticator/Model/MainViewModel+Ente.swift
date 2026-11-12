@@ -46,7 +46,23 @@ extension MainViewModel {
                               keyVersion: Version("0.0.0")!, requestRefresh: { [weak self] in self?.calculateCode(for: $0) },
                               connectionType: .wired, isPinned: code.isPinned, location: location)
         Self.updateDisplay(of: account, from: code)
+        if code.kind != .hotp {
+            // Looked up each time, as the account can be kept when its entry changes.
+            account.codeAtDate = { [weak self, weak account] date in
+                guard let self, let account else { return nil }
+                return self.calculatedCode(of: account)?.code(at: date).code
+            }
+        }
         return account
+    }
+
+    /// The entry the app calculates an account's codes from.
+    private func calculatedCode(of account: Account) -> EnteCloudCode? {
+        switch account.location {
+        case .yubiKey: nil
+        case .ente: cloudCodes[account.accountId]
+        case .device: deviceCodes[account.accountId]
+        }
     }
 
     /// The tags and icon, which can change without the account being made again.
