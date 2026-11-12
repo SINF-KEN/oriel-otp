@@ -463,6 +463,107 @@
         }
       }
     },
+    "Copied. A new code comes in %lld seconds." : {
+      "comment" : "Toast after copying a code that is about to change. The placeholder is a number of seconds, 5 or less.",
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kopiert. In %lld Sekunde kommt ein neuer Code."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Kopiert. In %lld Sekunden kommt ein neuer Code."
+                }
+              }
+            }
+          }
+        },
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copied. A new code comes in %lld second."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copied. A new code comes in %lld seconds."
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copié. Un nouveau code arrive dans %lld seconde."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Copié. Un nouveau code arrive dans %lld secondes."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "plural" : {
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "コピーしました。%lld 秒後に新しいコードになります。"
+                }
+              }
+            }
+          }
+        },
+        "sk" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Skopírované. Nový kód príde o %lld sekundu."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Skopírované. Nový kód príde o %lld sekundy."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Skopírované. Nový kód príde o %lld sekundy."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Skopírované. Nový kód príde o %lld sekúnd."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Couldn't be read: %lld" : {
       "comment" : "Backup restore result. The placeholder is a number of accounts.",
       "localizations" : {
@@ -8861,6 +8962,35 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Nový štítok"
+          }
+        }
+      }
+    },
+    "Next code: %@" : {
+      "comment" : "Account details, in the last seconds of a code. The placeholder is the next code, e.g. 123 456.",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächster Code: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code suivant : %@"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のコード: %@"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ďalší kód: %@"
           }
         }
       }

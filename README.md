@@ -46,7 +46,8 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
 - **Everyday use.** Search, pin favorites, tap a code to copy it, rename and delete accounts, Steam codes, and an optional
-  password for the YubiKey's OATH application. Accounts show the icon of their service, from
+  password for the YubiKey's OATH application. In the last 5 seconds of a code, the account's details show the next
+  one for accounts the app calculates codes for, and copying says when the code changes. Accounts show the icon of their service, from
   [Simple Icons](https://simpleicons.org), or the one chosen in Ente Auth.
 - **Tags.** File accounts under tags and show one tag's accounts. Tags of Ente Auth accounts sync with Ente Auth; a
   YubiKey has no room for them, so the tags of its accounts stay on this device.

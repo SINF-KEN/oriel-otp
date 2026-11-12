@@ -88,6 +88,11 @@ extension Account {
         CodeVisibility.shared.isShown(accountId)
     }
 
+    /// The next code, while the current one is about to change, unless codes are hidden. See `formattedNextCode`.
+    @MainActor var displayedNextCode: String? {
+        isCodeShown ? formattedNextCode : nil
+    }
+
     /// The code as the list and the details show it: the code, dots while codes are hidden, or nil while there's none.
     @MainActor var displayedCode: String? {
         guard let formattedCode else { return nil }

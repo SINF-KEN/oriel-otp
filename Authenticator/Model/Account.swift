@@ -189,14 +189,30 @@ import YubiKit
     /// The code to show, or none while there's no code or it has expired.
     var formattedCode: String? {
         guard let otp, canCopyCode else { return nil }
-        if self.credential.isSteam {
-            return otp.code
-        } else {
-            // make it pretty by splitting in halves
-            var formattedCode = otp.code
-            formattedCode.insert(" ", at:  formattedCode.index(formattedCode.startIndex, offsetBy: formattedCode.count / 2))
-            return formattedCode
-        }
+        return format(otp.code)
+    }
+
+    /// Splits a code in halves to make it easier to read, except Steam's, which are letters.
+    private func format(_ code: String) -> String {
+        guard !credential.isSteam else { return code }
+        var formattedCode = code
+        formattedCode.insert(" ", at: formattedCode.index(formattedCode.startIndex, offsetBy: formattedCode.count / 2))
+        return formattedCode
+    }
+
+    /// Calculates the code at a time, for the time-based accounts whose codes the app calculates: in Ente Auth and on
+    /// this device. Nil for the YubiKey's accounts, whose next code the YubiKey can't be asked for ahead of time.
+    @ObservationIgnored var codeAtDate: ((Date) -> String?)?
+
+    /// How long before a code changes the next one is shown, so the one about to expire isn't copied.
+    static let nextCodeLead = 5
+
+    /// The code after this one, formatted, while this one has `nextCodeLead` seconds or less left. Reads the time, so
+    /// only a view that shows the countdown should read it.
+    var formattedNextCode: String? {
+        guard let secondsLeft, secondsLeft <= Self.nextCodeLead, canCopyCode, let end = otp?.validity.end,
+              let next = codeAtDate?(end) else { return nil }
+        return format(next)
     }
     
     /// Whole seconds until a time-based code changes, rounded up so it reads 1 until the code has expired.

@@ -90,4 +90,35 @@ struct AccountTests {
         #expect(await iterator.next() != nil)
         _ = account
     }
+
+    private func account(endingIn seconds: TimeInterval) -> Account {
+        let credential = OrielOTP.OATHSession.Credential(type: .totp, issuer: "GitHub", accountName: "alice", period: 30)
+        let otp = OrielOTP.OATHSession.OTP(code: "123456", validity: DateInterval(start: .now.addingTimeInterval(seconds - 30), duration: 30))
+        return Account(credential: credential, code: otp, keyVersion: Version("0.0.0")!, requestRefresh: { _ in },
+                       connectionType: .wired, isPinned: false, location: .device(id: "a"))
+    }
+
+    @Test func theNextCodeShowsInTheLastSeconds() {
+        let account = account(endingIn: 3)
+        var askedFor: Date?
+        account.codeAtDate = { date in
+            askedFor = date
+            return "654321"
+        }
+        #expect(account.formattedNextCode == "654 321")
+        // The code of the next period, which starts when this one ends.
+        #expect(askedFor == account.otp?.validity.end)
+    }
+
+    @Test func theNextCodeIsntShownEarlier() {
+        let account = account(endingIn: 20)
+        account.codeAtDate = { _ in "654321" }
+        #expect(account.formattedNextCode == nil)
+    }
+
+    @Test func aYubiKeyAccountHasNoNextCode() {
+        let account = account(endingIn: 3)
+        #expect(account.codeAtDate == nil)
+        #expect(account.formattedNextCode == nil)
+    }
 }
