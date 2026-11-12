@@ -152,7 +152,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Deinen Code ein"
+            "value" : "Gib deinen Code ein"
           }
         },
         "fr" : {
@@ -181,7 +181,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Dein Passwort ein"
+            "value" : "Gib dein Passwort ein"
           }
         },
         "fr" : {
@@ -268,7 +268,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Keine Konten passen zu Deiner Suche."
+            "value" : "Keine Konten passen zu deiner Suche."
           }
         },
         "fr" : {
@@ -297,7 +297,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öffne Oriel OTP, um Deine Konten hier wieder zu verwenden."
+            "value" : "Öffne Oriel OTP, um deine Konten hier wieder zu verwenden."
           }
         },
         "fr" : {
@@ -326,7 +326,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Oriel OTP setzt die Codes seiner zeitbasierten Konten in Ente Auth und auf diesem Gerät ein. Füge in der App ein Konto hinzu oder melde Dich dort bei Ente Auth an, um es hier zu verwenden. Die Konten auf Deinem YubiKey können nicht für das automatische Ausfüllen verwendet werden."
+            "value" : "Oriel OTP setzt die Codes seiner zeitbasierten Konten in Ente Auth und auf diesem Gerät ein. Füge in der App ein Konto hinzu oder melde dich dort bei Ente Auth an, um es hier zu verwenden. Die Konten auf deinem YubiKey können nicht für das automatische Ausfüllen verwendet werden."
           }
         },
         "fr" : {
@@ -558,7 +558,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entsperre Dein Gerät, um Deine Konten zu verwenden."
+            "value" : "Entsperre dein Gerät, um deine Konten zu verwenden."
           }
         },
         "fr" : {

@@ -34,7 +34,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tippe hier, um die Entschlüsselungsanfrage mit Deinem YubiKey abzuschließen."
+            "value" : "Tippe hier, um die Entschlüsselungsanfrage mit deinem YubiKey abzuschließen."
           }
         },
         "fr" : {
@@ -62,7 +62,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tippe hier, um die Anfrage mit Deinem YubiKey abzuschließen."
+            "value" : "Tippe hier, um die Anfrage mit deinem YubiKey abzuschließen."
           }
         },
         "fr" : {
