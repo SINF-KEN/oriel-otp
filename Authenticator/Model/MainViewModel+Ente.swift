@@ -68,7 +68,7 @@ extension MainViewModel {
     }
 
     /// The entry the app calculates an account's codes from.
-    private func calculatedCode(of account: Account) -> EnteCloudCode? {
+    func calculatedCode(of account: Account) -> EnteCloudCode? {
         switch account.location {
         case .yubiKey: nil
         case .ente: cloudCodes[account.accountId]
