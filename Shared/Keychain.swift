@@ -39,7 +39,8 @@ nonisolated enum SharedKeychain {
     /// Nil in a build without a team, where there are no access groups.
     static let accessGroup: String? = {
         guard let group = Bundle.main.object(forInfoDictionaryKey: accessGroupKey) as? String,
-              let team = group.split(separator: ".").first, team.count == 10, !group.contains("$(") else { return nil }
+            let team = group.split(separator: ".").first, team.count == 10, !group.contains("$(")
+        else { return nil }
         return group
     }()
 
@@ -118,11 +119,13 @@ nonisolated struct KeychainItem: Sendable {
 
     /// Finds the item, in whichever group it is.
     var query: [String: Any] {
-        [String(kSecClass): kSecClassGenericPassword,
-         String(kSecAttrService): service,
-         String(kSecAttrAccount): account,
-         // The Mac has a second, file-based keychain. Use the same data protection keychain as on iOS.
-         String(kSecUseDataProtectionKeychain): true]
+        [
+            String(kSecClass): kSecClassGenericPassword,
+            String(kSecAttrService): service,
+            String(kSecAttrAccount): account,
+            // The Mac has a second, file-based keychain. Use the same data protection keychain as on iOS.
+            String(kSecUseDataProtectionKeychain): true
+        ]
     }
 
     /// Nil when there is no item.
@@ -154,8 +157,10 @@ nonisolated struct KeychainItem: Sendable {
             guard status == errSecSuccess || status == errSecItemNotFound else { throw KeychainError(status) }
             return
         }
-        let attributes: [String: Any] = [String(kSecValueData): data,
-                                         String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
+        let attributes: [String: Any] = [
+            String(kSecValueData): data,
+            String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        ]
         var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
             var item = query.merging(attributes) { _, new in new }
@@ -173,8 +178,10 @@ nonisolated struct KeychainItem: Sendable {
     }
 
     /// The protection of items that can go into backups and onto other devices.
-    private static let leavesTheDevice: Set<String> = [kSecAttrAccessibleWhenUnlocked as String,
-                                                       kSecAttrAccessibleAfterFirstUnlock as String]
+    private static let leavesTheDevice: Set<String> = [
+        kSecAttrAccessibleWhenUnlocked as String,
+        kSecAttrAccessibleAfterFirstUnlock as String
+    ]
 
     private func repair(attributes: [String: Any]?) {
         if let accessible = attributes?[String(kSecAttrAccessible)] as? String, Self.leavesTheDevice.contains(accessible) {
