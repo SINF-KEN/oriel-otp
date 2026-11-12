@@ -132,6 +132,7 @@
 		5A0C00000000000000000004 /* Exceptions for "Authenticator" folder in "TokenExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Model/TokenRequest.swift,
 				"Model/TokenResponseStore.swift",
 			);
 			target = 5155426E2656706F00B19C59 /* TokenExtension */;

@@ -72,6 +72,11 @@ struct EnteSessionStore {
     let canSave: Bool
 
     init(service: String = KeychainService.enteSession, defaults: UserDefaults = .standard) {
+        self.init(keychain: SecureStore(secureStoreQueryable: Self.queryable(service: service)), defaults: defaults, canSave: Self.deviceCanSave)
+    }
+
+    /// How the session is kept in the keychain: behind Face ID or Touch ID, or on the Mac Touch ID or the Mac's password.
+    static func queryable(service: String, appliesAccessControl: Bool = PasswordQueryable.deviceAppliesAccessControl) -> PasswordQueryable {
         #if os(macOS)
         // Not every Mac has Touch ID, so the Mac's password unlocks the session too.
         let accessControl: SecAccessControlCreateFlags = .userPresence
@@ -79,8 +84,7 @@ struct EnteSessionStore {
         let accessControl: SecAccessControlCreateFlags = .biometryCurrentSet
         #endif
         let reason = String(localized: "Use your saved Ente Auth sign-in.", comment: "Face ID or Touch ID prompt for the saved Ente session")
-        self.init(keychain: SecureStore(secureStoreQueryable: PasswordQueryable(service: service, accessControl: accessControl, reason: reason)),
-                  defaults: defaults, canSave: Self.deviceCanSave)
+        return PasswordQueryable(service: service, accessControl: accessControl, reason: reason, appliesAccessControl: appliesAccessControl)
     }
 
     init(keychain: EnteSessionKeychain, defaults: UserDefaults, canSave: Bool) {
