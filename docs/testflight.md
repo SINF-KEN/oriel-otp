@@ -84,3 +84,4 @@ that includes it:
 | OrielOTPWidgets (iOS) | `io.github.sinf-ken.OrielOTP.Widgets` | App Groups (`group.io.github.sinf-ken.OrielOTP`), Keychain Sharing |
 | OrielOTPComplications (watchOS) | `io.github.sinf-ken.OrielOTP.watchkitapp.Complications` | Keychain Sharing |
 | OrielOTPWatch (watchOS) | `io.github.sinf-ken.OrielOTP.watchkitapp` (existing) | Keychain Sharing, added for the complication |
+| SafariExtension (iOS and macOS) | `io.github.sinf-ken.OrielOTP.SafariExtension` | App Groups (`group.io.github.sinf-ken.OrielOTP`), Keychain Sharing |

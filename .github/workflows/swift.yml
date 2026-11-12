@@ -82,7 +82,7 @@ jobs:
         run: |
           xcrun swift-format lint --configuration .swift-format --strict --recursive --parallel \
             Authenticator AuthenticatorTests AuthenticatorUITests AutoFill AutoFillExtension TokenExtension Shared \
-            OrielOTPWatch tools Widgets Complications
+            OrielOTPWatch tools Widgets Complications SafariExtension
 
       - name: Validate project metadata
         run: |
@@ -109,14 +109,18 @@ jobs:
             OrielOTPWatch/OrielOTPWatch.entitlements \
             Complications/Info.plist \
             Complications/OrielOTPComplications.entitlements \
-            Complications/PrivacyInfo.xcprivacy
+            Complications/PrivacyInfo.xcprivacy \
+            SafariExtension/Info.plist \
+            SafariExtension/SafariExtension.entitlements \
+            SafariExtension/SafariExtension-macOS.entitlements \
+            SafariExtension/PrivacyInfo.xcprivacy
           xmllint --noout OrielOTP.xcodeproj/xcshareddata/xcschemes/OrielOTP.xcscheme
           xmllint --noout OrielOTP.xcodeproj/xcshareddata/xcschemes/OrielOTPWatch.xcscheme
           jq -e '(.version == 3) and (.pins | length > 0) and all(.pins[]; (.identity | length > 0) and (.state.version == null or (.state.version | length > 0)) and (.state.revision | length == 40))' \
             OrielOTP.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved >/dev/null
-          # 8 targets, each with a Debug and a Release configuration.
-          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 16
-          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 16
+          # 9 targets, each with a Debug and a Release configuration.
+          test "$(grep -c 'SWIFT_STRICT_CONCURRENCY = complete;' OrielOTP.xcodeproj/project.pbxproj)" -eq 18
+          test "$(grep -c 'SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;' OrielOTP.xcodeproj/project.pbxproj)" -eq 18
 
       # A translation that reads an argument as the wrong type crashes the app; see the script for what it checks.
       - name: Check translation format specifiers

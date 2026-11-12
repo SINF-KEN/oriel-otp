@@ -1,0 +1,23 @@
+{
+    "manifest_version": 3,
+    "name": "Oriel OTP",
+    "description": "Fills in the verification code of a website from Oriel OTP.",
+    "version": "1.0",
+    "icons": {
+        "48": "icon-48.png",
+        "96": "icon-96.png",
+        "128": "icon-128.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "js": ["content.js"],
+            "matches": ["https://*/*"],
+            "run_at": "document_idle",
+            "all_frames": true
+        }
+    ],
+    "permissions": ["nativeMessaging"]
+}

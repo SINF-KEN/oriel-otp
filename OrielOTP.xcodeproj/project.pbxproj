@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5AFE0000000000000000000B /* SafariExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5AFE0000000000000000000A /* SafariExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C0B1A700000000000000000B /* OrielOTPComplications.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C0B1A700000000000000000A /* OrielOTPComplications.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D1D6E700000000000000000B /* OrielOTPWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D1D6E700000000000000000A /* OrielOTPWidgets.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		515542722656706F00B19C59 /* CryptoTokenKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 515542712656706F00B19C59 /* CryptoTokenKit.framework */; };
@@ -69,6 +70,13 @@
 			remoteGlobalIDString = C0B1A7000000000000000001;
 			remoteInfo = OrielOTPComplications;
 		};
+		5AFE0000000000000000000D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 818866AB22DFD729006BC0A8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5AFE00000000000000000001;
+			remoteInfo = SafariExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -80,6 +88,7 @@
 			files = (
 				5155427D2656707000B19C59 /* TokenExtension.appex in Embed Foundation Extensions */,
 				AF110000000000000000000B /* AutoFillExtension.appex in Embed Foundation Extensions */,
+				5AFE0000000000000000000B /* SafariExtension.appex in Embed Foundation Extensions */,
 				D1D6E700000000000000000B /* OrielOTPWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -122,6 +131,7 @@
 		AF110000000000000000000A /* AutoFillExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AutoFillExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1D6E700000000000000000A /* OrielOTPWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrielOTPWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0B1A700000000000000000A /* OrielOTPComplications.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OrielOTPComplications.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5AFE0000000000000000000A /* SafariExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SafariExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -221,6 +231,23 @@
 			);
 			target = A7C400000000000000000004 /* OrielOTPWatch */;
 		};
+		5AFE00000000000000000011 /* Exceptions for "SafariExtension" folder in "SafariExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				"SafariExtension-macOS.entitlements",
+				SafariExtension.entitlements,
+			);
+			target = 5AFE00000000000000000001 /* SafariExtension */;
+		};
+		5AFE00000000000000000012 /* Exceptions for "Authenticator" folder in "SafariExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"AppLock/AppLock.swift",
+				"Model/SecureStore/SecureStoreError.swift",
+			);
+			target = 5AFE00000000000000000001 /* SafariExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -268,6 +295,7 @@
 				5A0C00000000000000000002 /* Exceptions for "Authenticator" folder in "AutoFillExtension" target */,
 				5A0C00000000000000000003 /* Exceptions for "Authenticator" folder in "OrielOTPWatch" target */,
 				5A0C00000000000000000004 /* Exceptions for "Authenticator" folder in "TokenExtension" target */,
+				5AFE00000000000000000012 /* Exceptions for "Authenticator" folder in "SafariExtension" target */,
 			);
 			path = Authenticator;
 			sourceTree = "<group>";
@@ -302,6 +330,14 @@
 				C0B1A7000000000000000011 /* Exceptions for "Complications" folder in "OrielOTPComplications" target */,
 			);
 			path = Complications;
+			sourceTree = "<group>";
+		};
+		5AFE00000000000000000010 /* SafariExtension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5AFE00000000000000000011 /* Exceptions for "SafariExtension" folder in "SafariExtension" target */,
+			);
+			path = SafariExtension;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -368,6 +404,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AFE00000000000000000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -393,6 +436,7 @@
 				AF1100000000000000000011 /* AutoFillExtension */,
 				AF1100000000000000000010 /* AutoFill */,
 				A7C400000000000000000001 /* Shared */,
+				5AFE00000000000000000010 /* SafariExtension */,
 				D1D6E7000000000000000010 /* Widgets */,
 				A7C400000000000000000002 /* OrielOTPWatch */,
 				C0B1A7000000000000000010 /* Complications */,
@@ -409,6 +453,7 @@
 				5C3E00000000000000000002 /* OrielOTPUITests.xctest */,
 				5155426F2656706F00B19C59 /* TokenExtension.appex */,
 				AF110000000000000000000A /* AutoFillExtension.appex */,
+				5AFE0000000000000000000A /* SafariExtension.appex */,
 				A7C400000000000000000003 /* OrielOTPWatch.app */,
 				C0B1A700000000000000000A /* OrielOTPComplications.appex */,
 				D1D6E700000000000000000A /* OrielOTPWidgets.appex */,
@@ -480,6 +525,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5AFE0000000000000000000E /* PBXTargetDependency */,
 				D1D6E700000000000000000E /* PBXTargetDependency */,
 				5155427C2656707000B19C59 /* PBXTargetDependency */,
 				A7C40000000000000000000F /* PBXTargetDependency */,
@@ -608,6 +654,28 @@
 			productReference = C0B1A700000000000000000A /* OrielOTPComplications.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		5AFE00000000000000000001 /* SafariExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5AFE00000000000000000005 /* Build configuration list for PBXNativeTarget "SafariExtension" */;
+			buildPhases = (
+				5AFE00000000000000000002 /* Sources */,
+				5AFE00000000000000000003 /* Frameworks */,
+				5AFE00000000000000000004 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A7C400000000000000000001 /* Shared */,
+				AF1100000000000000000010 /* AutoFill */,
+				5AFE00000000000000000010 /* SafariExtension */,
+			);
+			name = SafariExtension;
+			productName = SafariExtension;
+			productReference = 5AFE0000000000000000000A /* SafariExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -647,6 +715,9 @@
 					AF1100000000000000000001 = {
 						CreatedOnToolsVersion = 27.2;
 					};
+					5AFE00000000000000000001 = {
+						CreatedOnToolsVersion = 27.2;
+					};
 					D1D6E7000000000000000001 = {
 						CreatedOnToolsVersion = 27.2;
 					};
@@ -681,6 +752,7 @@
 				A7C400000000000000000004 /* OrielOTPWatch */,
 				C0B1A7000000000000000001 /* OrielOTPComplications */,
 				AF1100000000000000000001 /* AutoFillExtension */,
+				5AFE00000000000000000001 /* SafariExtension */,
 				D1D6E7000000000000000001 /* OrielOTPWidgets */,
 			);
 		};
@@ -737,6 +809,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C0B1A7000000000000000004 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5AFE00000000000000000004 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -802,6 +881,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5AFE00000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -842,6 +928,11 @@
 			isa = PBXTargetDependency;
 			target = C0B1A7000000000000000001 /* OrielOTPComplications */;
 			targetProxy = C0B1A700000000000000000D /* PBXContainerItemProxy */;
+		};
+		5AFE0000000000000000000E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5AFE00000000000000000001 /* SafariExtension */;
+			targetProxy = 5AFE0000000000000000000D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1517,6 +1608,91 @@
 			};
 			name = Release;
 		};
+5AFE00000000000000000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = SafariExtension/SafariExtension.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "SafariExtension/SafariExtension-macOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 207;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = XW69FY82W3;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = SafariExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.SafariExtension";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=macosx*]" = "io.github.sinf-ken.OrielOTP.debug.SafariExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+5AFE00000000000000000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = SafariExtension/SafariExtension.entitlements;
+				"CODE_SIGN_ENTITLEMENTS[sdk=macosx*]" = "SafariExtension/SafariExtension-macOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 207;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = XW69FY82W3;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = SafariExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.github.sinf-ken.OrielOTP.SafariExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1597,6 +1773,15 @@
 			buildConfigurations = (
 				C0B1A7000000000000000006 /* Debug */,
 				C0B1A7000000000000000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5AFE00000000000000000005 /* Build configuration list for PBXNativeTarget "SafariExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5AFE00000000000000000006 /* Debug */,
+				5AFE00000000000000000007 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
