@@ -290,6 +290,7 @@ extension MainView {
             copyButton(account)
             pinButton(account)
             tagsButton(account)
+            ProtectCodeButton(account: account)
             CopyToYubiKeyButtons(account: account)
             Divider()
             deleteButton(account)
@@ -307,6 +308,7 @@ extension MainView {
                 Button(String(localized: "Rename", comment: "Menu")) { accountToRename = account }
             }
             tagsButton(account)
+            ProtectCodeButton(account: account)
             if showsRowActions {
                 deleteButton(account)
             }
