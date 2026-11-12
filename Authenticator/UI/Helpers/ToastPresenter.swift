@@ -60,7 +60,10 @@ import SwiftUI
     private func present(_ message: String, duration: Duration?) {
         self.message = message
         isPresenting = true
-        AccessibilityNotification.Announcement(message).post()
+        // High priority, so VoiceOver doesn't cut it off to read what changed on screen, e.g. a row's new code.
+        var announcement = AttributedString(message)
+        announcement.accessibilitySpeechAnnouncementPriority = .high
+        AccessibilityNotification.Announcement(announcement).post()
         guard var duration else { return }
         // About ten characters a second, so "Moved to the YubiKey. Ente Auth keeps it in the trash." stays 6 seconds.
         duration = max(duration, .milliseconds(message.count * 100))
@@ -74,7 +77,17 @@ import SwiftUI
 }
 
 extension ToastPresenter {
-    
+
+    /// How long a row shows its checkmark. Debug builds take `-CopiedSeconds <seconds>`, so the accessibility audit
+    /// has time to check the copied state.
+    static var copiedDuration: Duration {
+        #if DEBUG
+        let seconds = UserDefaults.standard.double(forKey: "CopiedSeconds")
+        if seconds > 0 { return .seconds(seconds) }
+        #endif
+        return .seconds(1.5)
+    }
+
     func copyToClipboard(_ value: String, message: String? = nil) {
         Platform.copy(value)
         toast(message: message ?? String(localized: "Copied to clipboard", comment: "Toast copied to clipboard message"))
@@ -105,7 +118,7 @@ extension ToastPresenter {
         copiedAccountID = account.accountId
         copiedTask?.cancel()
         copiedTask = Task { [weak self] in
-            try await Task.sleep(for: .seconds(1.5))
+            try await Task.sleep(for: Self.copiedDuration)
             self?.copiedAccountID = nil
         }
     }
