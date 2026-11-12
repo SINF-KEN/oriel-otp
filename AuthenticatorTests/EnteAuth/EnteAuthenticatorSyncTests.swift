@@ -363,7 +363,7 @@ struct EnteAuthenticatorSyncTests {
         let watch = WatchAccountSync(defaults: defaults)
         let session = URLSession.stubbed([EnteMockURLProtocol.self])
         let cloud = EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch)
-        let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session, watch: watch,
+        let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session,
                                       cloud: cloud)
         sheet.useSavedSession()
         while sheet.isBusy { await Task.yield() }

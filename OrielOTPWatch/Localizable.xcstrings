@@ -131,31 +131,31 @@
         }
       }
     },
-    "Turn on Apple Watch in Oriel OTP on your iPhone, under Sync from Ente Auth." : {
-      "comment" : "Watch empty state. 'Sync from Ente Auth' is the name of the menu item on the iPhone.",
+    "Turn on Show accounts on Apple Watch in Oriel OTP on your iPhone, under Configuration." : {
+      "comment" : "Watch empty state. 'Show accounts on Apple Watch' is the name of the switch, and 'Configuration' the name of the screen it's on, on the iPhone.",
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Aktiviere die Apple Watch in Oriel OTP auf deinem iPhone, unter „Aus Ente Auth synchronisieren“."
+            "value" : "Aktiviere „Konten auf der Apple Watch zeigen“ in Oriel OTP auf deinem iPhone, unter „Konfiguration“."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Activez l’Apple Watch dans Oriel OTP sur votre iPhone, sous « Synchroniser depuis Ente Auth »."
+            "value" : "Activez « Afficher les comptes sur l’Apple Watch » dans Oriel OTP sur votre iPhone, sous « Configuration »."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "iPhone の Oriel OTP で「Ente Auth から同期」を開き、Apple Watch をオンにしてください。"
+            "value" : "iPhone の Oriel OTP で「設定」を開き、「Apple Watch にアカウントを表示」をオンにしてください。"
           }
         },
         "sk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Zapnite Apple Watch v Oriel OTP na iPhone, v časti „Synchronizovať z Ente Auth“."
+            "value" : "Zapnite „Zobraziť účty na Apple Watch“ v Oriel OTP na iPhone, v časti „Nastavenie“."
           }
         }
       }
