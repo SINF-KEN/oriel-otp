@@ -70,15 +70,6 @@ struct AccountTests {
         #expect(account.formattedCode == nil)
     }
 
-    /// Waits for the flag rather than for a set time, so a slow machine doesn't fail the test.
-    private func waitFor(_ flag: Flag, timeout: Duration = .seconds(10)) async throws -> Bool {
-        let deadline = ContinuousClock.now + timeout
-        while !flag.isSet, ContinuousClock.now < deadline {
-            try await Task.sleep(for: .milliseconds(20))
-        }
-        return flag.isSet
-    }
-
     @Test func aNewCodeReplacesTheRefreshOfTheOldOne() async throws {
         let flag = Flag()
         let account = account(validFor: 0.05, connectionType: .wired) { _ in flag.isSet = true }
@@ -88,10 +79,15 @@ struct AccountTests {
         #expect(!flag.isSet)
     }
 
-    @Test func aCodeIsRefreshedWhenItExpires() async throws {
-        let flag = Flag()
-        let account = account(validFor: 0.05, connectionType: .wired) { _ in flag.isSet = true }
-        #expect(try await waitFor(flag))
+    /// Waits for the refresh itself, not for a flag polled against a deadline. The test and the refresh both run on
+    /// the main actor, and while other tests keep it busy past the deadline, both resume together once it frees up: a
+    /// poll that ran first failed the test though the refresh was about to run. The time limit catches a missing one.
+    @Test(.timeLimit(.minutes(1)))
+    func aCodeIsRefreshedWhenItExpires() async {
+        let (refreshes, refreshed) = AsyncStream.makeStream(of: Void.self)
+        let account = account(validFor: 0.05, connectionType: .wired) { _ in refreshed.yield() }
+        var iterator = refreshes.makeAsyncIterator()
+        #expect(await iterator.next() != nil)
         _ = account
     }
 }
