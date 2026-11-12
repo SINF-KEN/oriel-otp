@@ -164,6 +164,20 @@ struct AccountDetailView: View {
                     .help(String(localized: "Show the account's QR code, to add it to another device or app", comment: "Toolbar help"))
                     .accessibilityIdentifier("account-details.qr-code")
                 }
+                if model.knownCopy(of: account) != nil {
+                    let requiresTouch = account.requiresTouch
+                    Button(action: { model.setRequiresTouch(!requiresTouch, of: account) {
+                        toastPresenter.toast(message: requiresTouch
+                                             ? String(localized: "Touch is no longer required", comment: "OATH NFC after turning off Require touch")
+                                             : String(localized: "Touch is now required", comment: "OATH NFC after turning on Require touch"))
+                    } }) {
+                        Label(requiresTouch ? String(localized: "Don't Require Touch", comment: "Menu for a YubiKey account")
+                                            : String(localized: "Require Touch", comment: "Menu for a YubiKey account"),
+                              systemImage: "hand.tap")
+                    }
+                    .help(String(localized: "Write the account to the YubiKey again from its copy in Ente Auth or on this device, with the new setting", comment: "Toolbar help"))
+                    .accessibilityIdentifier("account-details.require-touch")
+                }
                 Button(role: .destructive, action: { showDeleteConfirmation = true }) {
                     Label(String(localized: "Delete", comment: "Menu"), systemImage: "trash")
                 }
