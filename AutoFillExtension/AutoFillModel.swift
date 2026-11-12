@@ -49,7 +49,7 @@ import Observation
         do {
             accounts = try storage.load() ?? []
             problem = accounts.isEmpty ? .noAccounts : nil
-        } catch AutoFillStoreError.unavailable {
+        } catch EncryptedFileError.unavailable {
             accounts = []
             problem = .unavailable
         } catch {

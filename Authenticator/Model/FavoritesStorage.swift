@@ -32,7 +32,7 @@ nonisolated class FavoritesStorage: NSObject {
         URL.applicationSupportDirectory.appending(components: "Favorites", "Favorites")
     }
 
-    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey(service: "Favorites"), defaults: UserDefaults = .standard) {
+    init(url: URL = defaultURL, keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.favorites), defaults: UserDefaults = .standard) {
         file = EncryptedFile(url: url, keychain: keychain)
         self.defaults = defaults
     }

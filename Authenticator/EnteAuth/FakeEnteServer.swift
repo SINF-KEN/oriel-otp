@@ -70,8 +70,8 @@ nonisolated final class FakeEnteServer: URLProtocol, @unchecked Sendable {
     /// Routes requests to the demo server here and preselects it on the sign in screen.
     static func install() {
         URLProtocol.registerClass(FakeEnteServer.self)
-        if UserDefaults.standard.string(forKey: "EnteAuth.ServerURL") == nil {
-            UserDefaults.standard.set(server.absoluteString, forKey: "EnteAuth.ServerURL")
+        if UserDefaults.standard.string(forKey: DefaultsKey.enteServer) == nil {
+            UserDefaults.standard.set(server.absoluteString, forKey: DefaultsKey.enteServer)
         }
     }
 

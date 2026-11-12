@@ -48,7 +48,7 @@ nonisolated struct DeviceAccountFile: DeviceAccountStorage {
         URL.applicationSupportDirectory.appending(components: "DeviceAccounts", "Accounts")
     }
 
-    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey(service: "DeviceAccounts")) {
+    init(url: URL = defaultURL, keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.deviceAccounts)) {
         file = EncryptedFile(url: url, keychain: keychain)
     }
 
@@ -110,7 +110,7 @@ enum DeviceAccountsError: Error, LocalizedError {
         do {
             items = try storage.load() ?? []
             isLocked = false
-        } catch EnteVaultError.unreadable {
+        } catch EncryptedFileError.unreadable {
             // Its key is gone or it is damaged, which reading it again won't change.
             items = []
             isLocked = false

@@ -178,12 +178,12 @@ nonisolated struct AppLockProtectedData: Sendable {
             return files.contains { FileManager.default.fileExists(atPath: $0.path(percentEncoded: false)) }
         },
         forget: {
-            for service in ["DeviceAccounts", "EnteAuth.Vault", "Tags", "Favorites", "AutoFill.Websites", "AutoFill.Accounts",
-                            "EnteAuth", "OATH"] {
-                var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword, String(kSecAttrService): service]
-                #if os(macOS)
-                query[String(kSecUseDataProtectionKeychain)] = true
-                #endif
+            for service in [KeychainService.deviceAccounts, KeychainService.enteVault, KeychainService.tags,
+                            KeychainService.favorites, KeychainService.autoFillWebsites, KeychainService.autoFillAccounts,
+                            KeychainService.enteSession, KeychainService.oathPasswords] {
+                let query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
+                                            String(kSecAttrService): service,
+                                            String(kSecUseDataProtectionKeychain): true]
                 SecItemDelete(query as CFDictionary)
             }
         })
@@ -196,14 +196,9 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     private static let configurationAccount = "configuration"
     private static let attemptsAccount = "attempts"
 
-    private func query(account: String) -> [String: Any] {
-        var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
-                                    String(kSecAttrService): "AppLock",
-                                    String(kSecAttrAccount): account]
-        #if os(macOS)
-        query[String(kSecUseDataProtectionKeychain)] = true
-        #endif
-        return query
+    /// In the group shared with the AutoFill extension, which locks with it too.
+    private func item(_ account: String) -> KeychainItem {
+        KeychainItem(service: KeychainService.appLock, account: account, group: .shared)
     }
 
     func load() throws -> AppLockConfiguration? {
@@ -224,46 +219,16 @@ nonisolated struct AppLockKeychain: AppLockStorage {
     }
 
     private func read(account: String) throws -> Data? {
-        var query = query(account: account)
-        query[String(kSecReturnData)] = true
-        query[String(kSecMatchLimit)] = kSecMatchLimitOne
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        switch status {
-        case errSecSuccess:
-            guard let data = result as? Data else { throw SecureStoreError.dataCastError }
-            return data
-        case errSecItemNotFound:
-            return nil
-        case errSecInteractionNotAllowed:
+        do {
+            return try item(account).data()
+        } catch .unavailable {
             throw AppLockUnavailableError()
-        default:
-            throw Self.error(status)
         }
     }
 
     /// Updates the item in place, so a change that fails leaves the old lock rather than none.
     private func write(_ data: Data?, account: String) throws {
-        let query = query(account: account)
-        guard let data else {
-            let status = SecItemDelete(query as CFDictionary)
-            guard status == errSecSuccess || status == errSecItemNotFound else { throw Self.error(status) }
-            return
-        }
-        let attributes: [String: Any] = [String(kSecValueData): data,
-                                         String(kSecAttrAccessible): kSecAttrAccessibleWhenUnlockedThisDeviceOnly]
-        var status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
-        if status == errSecItemNotFound {
-            // In the group shared with the AutoFill extension, which locks with it too.
-            var item = query.merging(attributes) { _, new in new }
-            SharedKeychain.addAccessGroup(to: &item)
-            status = SecItemAdd(item as CFDictionary, nil)
-        }
-        guard status == errSecSuccess else { throw Self.error(status) }
-    }
-
-    private static func error(_ status: OSStatus) -> Error {
-        SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
+        try item(account).setData(data)
     }
 }
 

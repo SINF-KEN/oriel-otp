@@ -136,7 +136,7 @@ nonisolated final class InMemoryAutoFillStorage: AutoFillStorage, @unchecked Sen
 
     func save(_ accounts: [AutoFillAccount]) throws {
         try lock.withLock {
-            if fails { throw AutoFillStoreError.unavailable }
+            if fails { throw EncryptedFileError.unavailable }
             saves += 1
             self.accounts = accounts.isEmpty ? nil : accounts
         }
@@ -174,7 +174,7 @@ struct AutoFillAccountSyncTests {
     private let websitesKey = InMemoryVaultKey()
     private let provider = ProviderState()
 
-    private func sync(keychain: EnteVaultKeychain? = nil) -> AutoFillAccountSync {
+    private func sync(keychain: EncryptedFileKey? = nil) -> AutoFillAccountSync {
         let provider = provider
         return AutoFillAccountSync(storage: storage, websitesURL: websitesURL, websitesKeychain: keychain ?? websitesKey, defaults: defaults,
                                    updatesSystem: false, providerIsEnabled: { provider.isEnabled })
@@ -352,8 +352,8 @@ struct AutoFillAccountSyncTests {
 }
 
 /// A keychain that can't be read, like while the device is locked.
-private nonisolated struct LockedVaultKey: EnteVaultKeychain {
-    func existingKey() throws -> SymmetricKey? { throw EnteVaultError.unavailable }
-    func createKey() throws -> SymmetricKey { throw EnteVaultError.unavailable }
+private nonisolated struct LockedVaultKey: EncryptedFileKey {
+    func existingKey() throws -> SymmetricKey? { throw EncryptedFileError.unavailable }
+    func createKey() throws -> SymmetricKey { throw EncryptedFileError.unavailable }
     func removeKey() {}
 }

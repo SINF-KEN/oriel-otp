@@ -69,7 +69,7 @@ import YubiKit
     }
 
     @ObservationIgnored var accessKeyMemoryCache = AccessKeyCache()
-    let accessKeySecureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: "OATH"))
+    let accessKeySecureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords))
     let passwordPreferences = PasswordPreferences()
     
     // Resumed with the password the user entered in the password alert, nil if they cancelled.

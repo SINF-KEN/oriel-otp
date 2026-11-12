@@ -19,15 +19,6 @@ import CryptoTokenKit
 import UserNotifications
 import OSLog
 
-extension Logger {
-    private static let subsystem = "io.github.sinf-ken.OrielOTP.TokenExtension"
-    static let ctk = Logger(subsystem: subsystem, category: "CTK")
-
-    func yubilog(_ message: String) {
-        self.debug("YUBICO_DEBUG: \(message)")
-    }
-}
-
 class TokenSession: TKTokenSession, TKTokenSessionDelegate {
 
     var signSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when signing starts
@@ -130,7 +121,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
                 reset()
                 return signedData
             }
-            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: "canceledByUser") {
+            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: TokenSessionPolicy.canceledByUserKey) {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -200,7 +191,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
                 reset()
                 return decryptedData
             }
-            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: "canceledByUser") {
+            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: TokenSessionPolicy.canceledByUserKey) {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -234,10 +225,10 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     private func reset() {
         cancelAllNotifications()
         if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier) {
-            userDefaults.removeObject(forKey: "canceledByUser")
+            userDefaults.removeObject(forKey: TokenSessionPolicy.canceledByUserKey)
             // Older versions handed the data over in UserDefaults; clear anything left behind.
-            userDefaults.removeObject(forKey: "signedData")
-            userDefaults.removeObject(forKey: "decryptedData")
+            userDefaults.removeObject(forKey: TokenResponseKind.signed.rawValue)
+            userDefaults.removeObject(forKey: TokenResponseKind.decrypted.rawValue)
         }
         do {
             try tokenResponseStore?.removeAll()

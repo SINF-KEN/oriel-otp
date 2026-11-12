@@ -422,99 +422,6 @@ nonisolated extension EnteVaultStorage {
     func recoverSetAside(_ keep: (EnteVault) throws -> Void) {}
 }
 
-/// The key the vault file is encrypted with.
-nonisolated protocol EnteVaultKeychain: Sendable {
-    func existingKey() throws -> SymmetricKey?
-    func createKey() throws -> SymmetricKey
-    func removeKey()
-}
-
-/// A value kept in a file encrypted with ChaChaPoly, with a random key in the keychain that is only readable on this
-/// device while it is unlocked. The file is excluded from backups, which couldn't decrypt it anyway.
-nonisolated struct EncryptedFile<Value: Codable> {
-
-    let url: URL
-    let keychain: EnteVaultKeychain
-
-    func load() throws -> Value? {
-        guard FileManager.default.fileExists(atPath: url.path) else { return nil }
-        guard let key = try keychain.existingKey() else { throw EnteVaultError.unreadable }
-        let data: Data
-        do {
-            data = try Data(contentsOf: url)
-        } catch {
-            // Its data protection keeps it closed while the device is locked.
-            throw EnteVaultError.unavailable
-        }
-        do {
-            let box = try ChaChaPoly.SealedBox(combined: data)
-            return try JSONDecoder().decode(Value.self, from: try ChaChaPoly.open(box, using: key))
-        } catch {
-            throw EnteVaultError.unreadable
-        }
-    }
-
-    func save(_ value: Value) throws {
-        let key = try keychain.existingKey() ?? keychain.createKey()
-        let sealed = try ChaChaPoly.seal(try JSONEncoder().encode(value), using: key).combined
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        #if os(iOS)
-        try sealed.write(to: url, options: [.atomic, .completeFileProtection])
-        #else
-        try sealed.write(to: url, options: .atomic)
-        #endif
-        var url = url
-        var values = URLResourceValues()
-        values.isExcludedFromBackup = true
-        do {
-            try url.setResourceValues(values)
-        } catch {
-            Logger.system.error("Couldn't exclude \(url.lastPathComponent, privacy: .public) from backups: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    func remove() {
-        try? FileManager.default.removeItem(at: url)
-        keychain.removeKey()
-    }
-
-    private static var setAsidePrefix: String { "Unreadable-" }
-
-    /// Moves a file that couldn't be read out of the way, so saving doesn't write over it. It stays next to the new
-    /// one with the same key, so a version of the app that can read it, e.g. the one that wrote it before a
-    /// downgrade, still can: see `recoverSetAside`.
-    func setAside() throws {
-        guard FileManager.default.fileExists(atPath: url.path) else { return }
-        let folder = url.deletingLastPathComponent()
-        let stamp = Int(Date().timeIntervalSince1970)
-        var target = folder.appending(path: "\(Self.setAsidePrefix)\(stamp)")
-        var copy = 1
-        // Two files set aside in the same second mustn't fail the second move.
-        while FileManager.default.fileExists(atPath: target.path) {
-            copy += 1
-            target = folder.appending(path: "\(Self.setAsidePrefix)\(stamp)-\(copy)")
-        }
-        try FileManager.default.moveItem(at: url, to: target)
-    }
-
-    /// Hands over the value of each file set aside that can be read now, oldest first, and deletes the file unless
-    /// `keep` throws. A file that still can't be read stays: it may be the only copy of what is in it.
-    func recoverSetAside(_ keep: (Value) throws -> Void) {
-        let folder = url.deletingLastPathComponent()
-        guard let names = try? FileManager.default.contentsOfDirectory(atPath: folder.path) else { return }
-        for name in names.filter({ $0.hasPrefix(Self.setAsidePrefix) }).sorted() {
-            let file = EncryptedFile(url: folder.appending(path: name), keychain: keychain)
-            guard let value = try? file.load() else { continue }
-            do {
-                try keep(value)
-                try FileManager.default.removeItem(at: file.url)
-            } catch {
-                continue
-            }
-        }
-    }
-}
-
 /// Keeps the Ente vault in an encrypted file.
 nonisolated struct EnteVaultFile: EnteVaultStorage {
 
@@ -524,75 +431,21 @@ nonisolated struct EnteVaultFile: EnteVaultStorage {
         URL.applicationSupportDirectory.appending(components: "EnteAuth", "Vault")
     }
 
-    init(url: URL = defaultURL, keychain: EnteVaultKeychain = EnteVaultKeychainKey()) {
+    init(url: URL = defaultURL, keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.enteVault)) {
         file = EncryptedFile(url: url, keychain: keychain)
     }
 
-    func load() throws -> EnteVault? { try file.load() }
+    func load() throws -> EnteVault? {
+        do {
+            return try file.load()
+        } catch EncryptedFileError.unreadable {
+            throw EnteVaultError.unreadable
+        } catch EncryptedFileError.unavailable {
+            throw EnteVaultError.unavailable
+        }
+    }
     func save(_ vault: EnteVault) throws { try file.save(vault) }
     func remove() { file.remove() }
     func setAside() throws { try file.setAside() }
     func recoverSetAside(_ keep: (EnteVault) throws -> Void) { file.recoverSetAside(keep) }
-}
-
-/// The vault key in the keychain: `WhenUnlockedThisDeviceOnly`, so it never leaves the device and can be read
-/// without Face ID or Touch ID, like the codes of any authenticator app.
-nonisolated struct EnteVaultKeychainKey: EnteVaultKeychain {
-
-    private let service: String
-    private let account = "key"
-
-    init(service: String = "EnteAuth.Vault") {
-        self.service = service
-    }
-
-    private var query: [String: Any] {
-        var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword,
-                                    String(kSecAttrService): service,
-                                    String(kSecAttrAccount): account]
-        #if os(macOS)
-        query[String(kSecUseDataProtectionKeychain)] = true
-        #endif
-        return query
-    }
-
-    func existingKey() throws -> SymmetricKey? {
-        var query = query
-        query[String(kSecReturnData)] = true
-        query[String(kSecReturnAttributes)] = true
-        query[String(kSecMatchLimit)] = kSecMatchLimitOne
-        var result: AnyObject?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
-        switch status {
-        case errSecSuccess:
-            let item = result as? [String: Any]
-            guard let data = item?[String(kSecValueData)] as? Data else { throw SecureStoreError.dataCastError }
-            // A key added before the app had a keychain group of its own is where the AutoFill extension can read it.
-            SharedKeychain.moveToAppGroup(self.query, attributes: item)
-            return SymmetricKey(data: data)
-        case errSecItemNotFound:
-            return nil
-        case errSecInteractionNotAllowed:
-            throw EnteVaultError.unavailable
-        default:
-            throw SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
-        }
-    }
-
-    func createKey() throws -> SymmetricKey {
-        let key = SymmetricKey(size: .bits256)
-        var query = query
-        query[String(kSecValueData)] = key.withUnsafeBytes { Data($0) }
-        query[String(kSecAttrAccessible)] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        SecItemDelete(self.query as CFDictionary)
-        let status = SecItemAdd(query as CFDictionary, nil)
-        guard status == errSecSuccess else {
-            throw SecureStoreError.unhandledError(message: SecCopyErrorMessageString(status, nil) as String? ?? String(status))
-        }
-        return key
-    }
-
-    func removeKey() {
-        SecItemDelete(query as CFDictionary)
-    }
 }

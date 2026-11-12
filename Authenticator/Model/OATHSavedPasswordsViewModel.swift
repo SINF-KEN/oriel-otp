@@ -31,7 +31,7 @@ import Observation
     func clearPasswords() {
         
         let passwordPreferences = PasswordPreferences()
-        let secureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: "OATH"))
+        let secureStore = SecureStore(secureStoreQueryable: PasswordQueryable(service: KeychainService.oathPasswords))
         passwordPreferences.resetPasswordPreferenceForAll()
         do {
             try secureStore.removeAllValues()

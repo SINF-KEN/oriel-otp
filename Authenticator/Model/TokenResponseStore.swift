@@ -16,7 +16,9 @@ nonisolated enum TokenSessionOperation: Sendable {
 
 /// Small shared policies keep the app and extension in agreement about their file handoff and supported actions.
 nonisolated enum TokenSessionPolicy {
-    static let appGroupIdentifier = "group.io.github.sinf-ken.OrielOTP"
+    static let appGroupIdentifier = AppIdentifier.appGroup
+    /// Set in the app group's defaults when the request was canceled in the app.
+    static let canceledByUserKey = "canceledByUser"
 
     static func supports(_ operation: TokenSessionOperation) -> Bool {
         switch operation {

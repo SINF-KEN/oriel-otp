@@ -78,7 +78,7 @@ import Foundation
     #if os(iOS)
         init(
             session: (any WatchSession)? = WCSession.isSupported() ? WCSession.default : nil,
-            keyItem: any WatchKeychainItem = SystemKeychainItem(service: "OrielOTP.WatchSyncKey", account: "key"),
+            keyItem: any WatchKeychainItem = KeychainItem(service: KeychainService.watchSyncKey, account: "key"),
             defaults: UserDefaults = .standard
         ) {
             self.session = session

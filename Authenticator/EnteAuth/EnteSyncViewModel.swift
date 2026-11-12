@@ -27,7 +27,7 @@ import YubiKit
         case accounts
     }
 
-    static let serverKey = "EnteAuth.ServerURL"
+    static let serverKey = DefaultsKey.enteServer
 
     var phase: Phase
     var email = ""
