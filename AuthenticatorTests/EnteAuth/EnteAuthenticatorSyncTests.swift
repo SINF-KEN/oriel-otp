@@ -299,6 +299,81 @@ struct EnteAuthenticatorSyncTests {
         #expect(EnteMockURLProtocol.requests.map(\.url?.path) == ["/users/srp/attributes", "/users/ott"])
     }
 
+    /// An account changed here that was deleted on another device since the last pull: the server answers the upload
+    /// with 404, and deleting wins.
+    @MainActor @Test func aChangeToAnAccountDeletedElsewhereRemovesIt() async throws {
+        let authenticatorKey = EnteCrypto.randomBytes(32)
+        let existing = [try entity("a", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub", key: authenticatorKey, updatedAt: 1)]
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.bodies = []
+        EnteMockURLProtocol.handler = { request in
+            switch (request.httpMethod, request.url?.path) {
+            case ("GET", "/authenticator/entity/diff"):
+                let sinceTime = request.url?.query?.contains("sinceTime=0") == true
+                return (200, try! JSONSerialization.data(withJSONObject: ["diff": sinceTime ? existing : []]))
+            default:
+                return (404, Data())
+            }
+        }
+        let session = EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t", authenticatorKey: authenticatorKey)
+        let defaults = makeTestDefaults()
+        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+                              storage: InMemoryVaultStorage(), session: URLSession.stubbed([EnteMockURLProtocol.self]),
+                              watch: WatchAccountSync(defaults: defaults))
+        cloud.use(session)
+        try await cloud.syncNow()
+        #expect(cloud.vault?.items.map(\.id) == ["a"])
+
+        try cloud.rename("a", issuer: "GitHub", accountName: "bob")
+        try await cloud.syncNow()
+        #expect(EnteMockURLProtocol.requests.contains { $0.httpMethod == "PUT" && $0.url?.path == "/authenticator/entity" })
+        #expect(cloud.vault?.items.isEmpty == true)
+        #expect(cloud.error == nil)
+    }
+
+    /// The token only ever goes to the server it was given by: a vault from another server isn't synced with it.
+    @MainActor @Test func aVaultOfAnotherServerIsNotSyncedWithTheSession() async throws {
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.bodies = []
+        EnteMockURLProtocol.handler = { _ in (200, try! JSONSerialization.data(withJSONObject: ["diff": []])) }
+        let defaults = makeTestDefaults()
+        let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
+        try store.save(EnteSavedSession(server: URL(string: "https://other.test")!, email: "a@b.c", token: "t",
+                                        authenticatorKey: EnteCrypto.randomBytes(32)))
+        let storage = InMemoryVaultStorage()
+        try storage.save(EnteVault(email: "a@b.c", server: URL(string: "https://ente.test")!))
+        let cloud = EnteCloud(store: store, storage: storage, session: URLSession.stubbed([EnteMockURLProtocol.self]),
+                              watch: WatchAccountSync(defaults: defaults))
+        await cloud.sync()
+        #expect(EnteMockURLProtocol.requests.allSatisfy { $0.url?.host == "other.test" })
+        #expect(!EnteMockURLProtocol.requests.contains { $0.url?.host == "ente.test" })
+    }
+
+    /// The sync sheet reads the accounts from the saved session's server, not from the one typed on the sign-in screen,
+    /// which the token wasn't made for.
+    @MainActor @Test func savedCodesAreReadFromTheSavedSessionsServer() async throws {
+        EnteMockURLProtocol.requests = []
+        EnteMockURLProtocol.bodies = []
+        EnteMockURLProtocol.handler = { _ in (200, try! JSONSerialization.data(withJSONObject: ["diff": []])) }
+        let defaults = makeTestDefaults()
+        defaults.set("https://typed.test", forKey: DefaultsKey.enteServer)
+        let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
+        try store.save(EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t",
+                                        authenticatorKey: EnteCrypto.randomBytes(32)))
+        let watch = WatchAccountSync(defaults: defaults)
+        let session = URLSession.stubbed([EnteMockURLProtocol.self])
+        let cloud = EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch)
+        let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session, watch: watch,
+                                      cloud: cloud)
+        sheet.useSavedSession()
+        while sheet.isBusy { await Task.yield() }
+
+        let tokenRequests = EnteMockURLProtocol.requests.filter { $0.value(forHTTPHeaderField: "X-Auth-Token") == "t" }
+        #expect(!tokenRequests.isEmpty)
+        #expect(tokenRequests.allSatisfy { $0.url?.host == "ente.test" })
+        #expect(!EnteMockURLProtocol.requests.contains { $0.url?.host == "typed.test" })
+    }
+
     @MainActor @Test func addsEncryptedAccount() async throws {
         let authenticatorKey = EnteCrypto.randomBytes(32)
         let existing = [try entity("a", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP", key: authenticatorKey, updatedAt: 1)]
