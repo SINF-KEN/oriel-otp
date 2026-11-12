@@ -57,6 +57,7 @@ struct AuthenticatorApp: App {
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
         if SimulatedYubiKey.isEnabled {
             FakeEnteServer.install()
+            SimulatedYubiKey.addDemoDeviceAccountsIfAsked()
         }
         #if os(macOS)
         WindowSnapshots.scheduleIfRequested()
