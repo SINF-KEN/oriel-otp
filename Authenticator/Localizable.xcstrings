@@ -115,6 +115,93 @@
       },
       "shouldTranslate" : false
     },
+    "A secret on a YubiKey can't be copied off it. These accounts are in Ente Auth or on this device, and a YubiKey can hold them." : {
+      "comment" : "Account check-up section footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ein Geheimnis auf einem YubiKey kann nicht von ihm kopiert werden. Diese Konten sind in Ente Auth oder auf diesem Gerät, und ein YubiKey kann sie speichern."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un secret sur une YubiKey ne peut pas en être copié. Ces comptes sont dans Ente Auth ou sur cet appareil, et une YubiKey peut les contenir."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKey上のシークレットは外部にコピーできません。これらのアカウントはEnte Authまたはこのデバイスにあり、YubiKeyに保存できます。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tajný kľúč na YubiKey sa z neho nedá skopírovať. Tieto účty sú v Ente Auth alebo v tomto zariadení a YubiKey ich dokáže uchovať."
+          }
+        }
+      }
+    },
+    "Account Check-Up" : {
+      "comment" : "Account check-up title",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten-Check"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vérification des comptes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントチェック"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kontrola účtov"
+          }
+        }
+      }
+    },
+    "Account Check-Up…" : {
+      "comment" : "Account list setting button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Konten-Check…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vérification des comptes…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "アカウントチェック…"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kontrola účtov…"
+          }
+        }
+      }
+    },
     "Account List" : {
       "comment" : "Settings section",
       "localizations" : {
@@ -676,6 +763,35 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Could Be on Your YubiKey" : {
+      "comment" : "Account check-up section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Könnte auf deinem YubiKey sein"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pourraient être sur votre YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKeyに保存できるアカウント"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mohli by byť na vašom YubiKey"
           }
         }
       }
@@ -8359,6 +8475,35 @@
       },
       "comment" : "Keychain error"
     },
+    "Kept More Than Once" : {
+      "comment" : "Account check-up section",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mehrfach gespeichert"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Enregistrés plusieurs fois"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重複して保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uložené viackrát"
+          }
+        }
+      }
+    },
     "Key is password protected" : {
       "comment" : "OATH NFC password protected key",
       "localizations" : {
@@ -10006,6 +10151,35 @@
         }
       }
     },
+    "Nothing to fix. Each account is kept once, and the ones that fit on a YubiKey are on it." : {
+      "comment" : "Account check-up without findings",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nichts zu tun. Jedes Konto ist nur einmal gespeichert, und die, die auf einen YubiKey passen, sind darauf."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rien à corriger. Chaque compte n’est enregistré qu’une fois, et ceux qui tiennent sur une YubiKey y sont."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "修正する項目はありません。各アカウントは1か所にだけ保存され、YubiKeyに入るものはYubiKeyにあります。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nie je čo opraviť. Každý účet je uložený raz a tie, ktoré sa zmestia na YubiKey, sú na ňom."
+          }
+        }
+      }
+    },
     "Notifications disabled" : {
       "comment" : "PIV extension notifications alert title",
       "localizations" : {
@@ -11608,6 +11782,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Certifikáty verejného kľúča na %@"
+          }
+        }
+      }
+    },
+    "Put on YubiKey" : {
+      "comment" : "Account check-up button",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Auf YubiKey speichern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mettre sur la YubiKey"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "YubiKeyに保存"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Uložiť na YubiKey"
           }
         }
       }
@@ -15957,6 +16160,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PIN kód nespĺňa požiadavky tohto kľúča YubiKey."
+          }
+        }
+      }
+    },
+    "The same name or secret in more than one place. If they're the same account, keep the one you use and delete the others." : {
+      "comment" : "Account check-up section footer",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Derselbe Name oder dasselbe Geheimnis an mehreren Orten. Wenn es dasselbe Konto ist, behalte das, das du verwendest, und lösche die anderen."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le même nom ou secret à plusieurs endroits. S’il s’agit du même compte, gardez celui que vous utilisez et supprimez les autres."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "同じ名前またはシークレットが複数の場所にあります。同じアカウントなら、使っているものを残して他を削除してください。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Rovnaký názov alebo tajný kľúč na viacerých miestach. Ak ide o ten istý účet, ponechajte ten, ktorý používate, a ostatné vymažte."
           }
         }
       }

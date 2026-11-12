@@ -62,6 +62,11 @@ extension MainViewModel {
         calculatedCode(of: account)?.otpauthURL
     }
 
+    /// The secret of an account in Ente Auth or on this device. A YubiKey never gives its secrets back.
+    func secret(of account: Account) -> Data? {
+        calculatedCode(of: account)?.secret
+    }
+
     /// The entry the app calculates an account's codes from.
     private func calculatedCode(of account: Account) -> EnteCloudCode? {
         switch account.location {
