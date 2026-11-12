@@ -80,7 +80,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Halte Deinen YubiKey an Dein Gerät, um per NFC Codes abzurufen und Konten hinzuzufügen."
+            "value" : "Halte deinen YubiKey an dein Gerät, um per NFC Codes abzurufen und Konten hinzuzufügen."
           }
         },
         "en" : {
@@ -152,7 +152,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mit Face ID entsperrst Du die App, wenn Du sie sperrst, sowie die auf diesem Gerät gespeicherten YubiKey-Passwörter und Deine optionale Ente-Auth-Sitzung."
+            "value" : "Mit Face ID entsperrst du die App, wenn du sie sperrst, sowie die auf diesem Gerät gespeicherten YubiKey-Passwörter und deine optionale Ente-Auth-Sitzung."
           }
         },
         "en" : {
