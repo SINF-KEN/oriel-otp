@@ -93,6 +93,9 @@ struct AccountDetailView: View {
             }
             AccountCodeButton(account: account)
                 .padding(.top, 12)
+            if account.codeAtDate != nil {
+                NextCodeLabel(account: account)
+            }
             Spacer()
             Spacer()
         }
@@ -229,6 +232,27 @@ struct AccountDetailView: View {
 
 /// The code with its countdown. A view of its own so the countdown only redraws this: redrawing the details would
 /// rebuild their toolbar every second, and on the Mac that makes the tooltip of the button under the pointer blink.
+/// The next code, in the last seconds of the current one, so the one about to expire isn't the one typed. Its own
+/// view, as it reads the countdown every second. Its height is kept while it's empty, so the screen doesn't move.
+private struct NextCodeLabel: View {
+    let account: Account
+
+    var body: some View {
+        let next = account.remaining > 0 ? account.displayedNextCode : nil
+        let label = Text(String(localized: "Next code: \(next ?? "888 888")", comment: "Account details, in the last seconds of a code. The placeholder is the next code, e.g. 123 456."))
+            .scaledFont(.callout) { $0.monospacedDigit() }
+            .foregroundStyle(Color(.secondaryLabel))
+        // Hidden rather than clear, which the accessibility audit would measure as text without contrast.
+        if next == nil {
+            label.hidden()
+        } else {
+            label
+                .privacySensitive()
+                .accessibilityIdentifier("account-details.next-code")
+        }
+    }
+}
+
 private struct AccountCodeButton: View {
 
     @Environment(ToastPresenter.self) private var toastPresenter
