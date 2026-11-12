@@ -854,6 +854,35 @@
         }
       }
     },
+    "Don't Require Touch" : {
+      "comment" : "Menu for a YubiKey account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keine Berührung verlangen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ne plus exiger le toucher"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タッチを不要にする"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nevyžadovať dotyk"
+          }
+        }
+      }
+    },
     "Encrypting your accounts. This can take a few seconds." : {
       "comment" : "Backup progress",
       "localizations" : {
@@ -12596,6 +12625,35 @@
         }
       }
     },
+    "Require Touch" : {
+      "comment" : "Menu for a YubiKey account",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Berührung verlangen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Exiger le toucher"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タッチを必須にする"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Vyžadovať dotyk"
+          }
+        }
+      }
+    },
     "Requires touch" : {
       "comment" : "Mac menu bar help",
       "localizations" : {
@@ -16914,6 +16972,35 @@
         }
       }
     },
+    "The YubiKey's code for this account isn't the same as the code of its copy in Ente Auth or on this device, so nothing was changed." : {
+      "comment" : "Error when changing a YubiKey account's touch setting",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Der Code des YubiKey für dieses Konto stimmt nicht mit dem Code seiner Kopie in Ente Auth oder auf diesem Gerät überein, daher wurde nichts geändert."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le code de la YubiKey pour ce compte n’est pas le même que celui de sa copie dans Ente Auth ou sur cet appareil, donc rien n’a été modifié."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "このアカウントのYubiKeyのコードが、Ente Authまたはこのデバイス上のコピーのコードと一致しないため、何も変更されませんでした。"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kód YubiKey pre tento účet sa nezhoduje s kódom jeho kópie v Ente Auth alebo v tomto zariadení, preto sa nič nezmenilo."
+          }
+        }
+      }
+    },
     "There are no accounts in Ente Auth." : {
       "comment" : "Ente sync no accounts",
       "localizations" : {
@@ -18030,6 +18117,64 @@
         }
       }
     },
+    "Touch is no longer required" : {
+      "comment" : "OATH NFC after turning off Require touch",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Berührung ist nicht mehr erforderlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le toucher n’est plus requis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タッチが不要になりました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dotyk už nie je povinný"
+          }
+        }
+      }
+    },
+    "Touch is now required" : {
+      "comment" : "OATH NFC after turning on Require touch",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Berührung ist jetzt erforderlich"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Le toucher est maintenant requis"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "タッチが必要になりました"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dotyk je teraz povinný"
+          }
+        }
+      }
+    },
     "Touch key time out." : {
       "localizations" : {
         "de" : {
@@ -19092,6 +19237,35 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Kým je YubiKey vložený, klávesnica na obrazovke sa nezobrazí. Ak chcete zobraziť klávesnicu, musíte vybrať YubiKey a potom ho znova vložiť."
+          }
+        }
+      }
+    },
+    "Write the account to the YubiKey again from its copy in Ente Auth or on this device, with the new setting" : {
+      "comment" : "Toolbar help",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Das Konto mit der neuen Einstellung aus seiner Kopie in Ente Auth oder auf diesem Gerät erneut auf den YubiKey schreiben"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Réécrire le compte sur la YubiKey à partir de sa copie dans Ente Auth ou sur cet appareil, avec le nouveau réglage"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ente Authまたはこのデバイス上のコピーから、新しい設定でアカウントをYubiKeyに書き込み直します"
+          }
+        },
+        "sk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Znova zapísať účet na YubiKey z jeho kópie v Ente Auth alebo v tomto zariadení s novým nastavením"
           }
         }
       }

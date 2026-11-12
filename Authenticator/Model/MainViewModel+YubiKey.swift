@@ -94,6 +94,58 @@ extension MainViewModel {
         }
     }
 
+    // MARK: Changing an account's settings on the YubiKey
+
+    enum RewriteError: LocalizedError {
+        /// The YubiKey's code isn't the copy's, so their secrets differ and writing the copy would change the account.
+        case differentSecret
+
+        var errorDescription: String? {
+            String(localized: "The YubiKey's code for this account isn't the same as the code of its copy in Ente Auth or on this device, so nothing was changed.", comment: "Error when changing a YubiKey account's touch setting")
+        }
+    }
+
+    /// The copy of a time-based YubiKey account in Ente Auth or on this device, with the same name and period. The
+    /// YubiKey never gives a secret back, so an account's settings can only be changed by writing it again from such a
+    /// copy.
+    func knownCopy(of account: Account) -> Account? {
+        guard account.isOnYubiKey, account.credential.type != .hotp else { return nil }
+        return accounts.first {
+            !$0.isOnYubiKey && $0.credential.type == account.credential.type && $0.credential.id == account.credential.id
+                && yubiKeyTemplate(of: $0) != nil
+        }
+    }
+
+    /// Turns Require touch on or off by deleting the account from the YubiKey and adding it again from its copy.
+    ///
+    /// The YubiKey first calculates a code, which has to be the copy's code for the same time: otherwise the copy has
+    /// another secret, and writing it would change which codes the account gives. The tags and pin stay, as the
+    /// account keeps its name.
+    func setRequiresTouch(_ requiresTouch: Bool, of account: Account, completion: @escaping () -> Void) {
+        guard let copy = knownCopy(of: account), let template = yubiKeyTemplate(of: copy),
+              let copyCode = calculatedCode(of: copy) else { return }
+        Task {
+            do {
+                let session = try await OATHSessionHandler.shared.anySession()
+                let otp = try await session.calculate(credential: account.credential)
+                guard copyCode.code(at: otp.validity.start.addingTimeInterval(1)).code == otp.code else {
+                    session.endNFC()
+                    sessionError = RewriteError.differentSecret
+                    return
+                }
+                try await session.deleteCredential(account.credential)
+                try await session.addCredential(template: template, requiresTouch: requiresTouch)
+                await updateAccounts(using: session)
+                session.endNFC(message: requiresTouch
+                               ? String(localized: "Touch is now required", comment: "OATH NFC after turning on Require touch")
+                               : String(localized: "Touch is no longer required", comment: "OATH NFC after turning off Require touch"))
+                completion()
+            } catch {
+                handle(error: error, retry: { self.setRequiresTouch(requiresTouch, of: account, completion: completion) })
+            }
+        }
+    }
+
     /// Adds an account to the YubiKey. The completion is called only if the account was added.
     func addAccount(_ template: YubiKitOATHSession.CredentialTemplate, requiresTouch: Bool, completion: (() -> Void)? = nil) {
         Task {
