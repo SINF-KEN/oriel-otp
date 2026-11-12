@@ -291,7 +291,7 @@ Passwords.
 
 ## Code
 
-Everything lives in `Authenticator/EnteAuth/` and is added to the project as a synchronized folder:
+Everything lives in `Authenticator/EnteAuth/`:
 
 | File | Purpose |
 | --- | --- |
