@@ -160,11 +160,15 @@ nonisolated struct EnteAPIClient: Sendable {
     let server: URL
     let session: URLSession
 
-    init(server: URL = defaultServer, session: URLSession = .ente) throws {
+    /// Where the server's time is recorded, to tell whether this device's clock is wrong.
+    let clock: EnteServerClock
+
+    init(server: URL = defaultServer, session: URLSession = .ente, clock: EnteServerClock = .shared) throws {
         // Credentials and tokens must never travel unencrypted.
         guard server.scheme == "https", Self.isPlainServer(server) else { throw EnteAPIError.invalidServerURL }
         self.server = server
         self.session = session
+        self.clock = clock
     }
 
     func srpAttributes(email: String) async throws -> EnteSRPAttributes? {
@@ -364,11 +368,13 @@ nonisolated struct EnteAPIClient: Sendable {
     private func send<T: Decodable>(_ method: String, _ path: String, token: String? = nil, query: [String: String] = [:], body: [String: String]? = nil,
                                     json: Data? = nil) async throws -> T {
         let request = try request(method, path, token: token, query: query, body: body, json: json)
+        let sent = AppClock.now
         let (bytes, response) = try await session.bytes(for: request)
         guard let response = response as? HTTPURLResponse else {
             bytes.task.cancel()
             throw EnteAPIError.invalidResponse
         }
+        clock.record(dateHeader: response.value(forHTTPHeaderField: "Date"), sent: sent, received: AppClock.now)
         guard (200..<300).contains(response.statusCode) else {
             bytes.task.cancel()
             throw EnteAPIError.http(statusCode: response.statusCode)

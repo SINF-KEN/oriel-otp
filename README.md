@@ -42,7 +42,7 @@ The screenshots are taken from the app in the simulator and on a Mac, with made-
 - **Ente Auth codes without a YubiKey.** Signed in, your Ente Auth accounts are listed with the YubiKey's and their
   codes calculated by the app, also offline. Accounts added, renamed, pinned or deleted in the app are synced back
   to Ente Auth, and changes from Ente's apps show up here. New accounts can go on the YubiKey, in Ente Auth
-  or both.
+  or both. If the device's clock is more than 30 seconds off Ente's, which makes codes fail, the list says so.
 - **Adding accounts.** Scan a QR code or enter the details by hand. Accounts can require a touch of the YubiKey
   before a code is shown.
 - **Everyday use.** Search, pin favorites, tap a code to copy it, rename and delete accounts, Steam codes, and an optional

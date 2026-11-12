@@ -34,6 +34,10 @@ extension MainView {
                     YubiOtpRowView(otp: otp)
                 }
             }
+            if let skew = model.cloud.clockSkew {
+                ClockWarningRow(skew: skew)
+                    .listRowSeparator(.hidden)
+            }
             if showsTagFilter {
                 TagFilterBar(tags: model.allTags, selection: $selectedTag)
                     .listRowSeparator(.hidden)

@@ -30,7 +30,7 @@ import YubiKit
 /// list is pulled down, after each change made here and when the network comes back with changes waiting.
 @Observable final class EnteCloud {
 
-    static let shared = EnteCloud(autoFill: .shared, device: .shared)
+    static let shared = EnteCloud(autoFill: .shared, device: .shared, serverClock: .shared)
 
     enum AddResult: Equatable {
         case added
@@ -49,6 +49,9 @@ import YubiKit
     private(set) var isSyncing = false
     /// The last error of a sync the user asked for, or the session being rejected.
     var error: Error?
+    /// How far this device's clock was from Ente's at the last sync, when it's too far off for codes to work. Positive
+    /// when the device is behind.
+    private(set) var clockSkew: TimeInterval?
 
     /// Called after the vault changed.
     @ObservationIgnored var onChange: (() -> Void)?
@@ -56,6 +59,8 @@ import YubiKit
     @ObservationIgnored private let store: EnteSessionStore
     @ObservationIgnored private let storage: EnteVaultStorage
     @ObservationIgnored private let urlSession: URLSession
+    /// The server's time, read from the answers of the syncs.
+    @ObservationIgnored private let serverClock: EnteServerClock
     @ObservationIgnored private let watch: WatchAccountSync
     /// Nil in the tests, which mustn't change the accounts AutoFill uses.
     @ObservationIgnored private let autoFill: AutoFillAccountSync?
@@ -78,10 +83,12 @@ import YubiKit
     @ObservationIgnored private var isVaultUnreadable = false
 
     init(store: EnteSessionStore = EnteSessionStore(), storage: EnteVaultStorage = EnteVaultFile(), session: URLSession = .ente,
-         watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil, device: DeviceAccounts? = nil) {
+         watch: WatchAccountSync = .shared, autoFill: AutoFillAccountSync? = nil, device: DeviceAccounts? = nil,
+         serverClock: EnteServerClock = EnteServerClock()) {
         self.store = store
         self.storage = storage
         self.urlSession = session
+        self.serverClock = serverClock
         self.watch = watch
         self.autoFill = autoFill
         self.device = device
@@ -348,6 +355,7 @@ import YubiKit
         let task = Task {
             _ = await previous?.result
             self.queuedSync = nil
+            defer { self.updateClockSkew() }
             try await self.performSync(session)
         }
         queuedSync = task
@@ -355,12 +363,19 @@ import YubiKit
         return task
     }
 
+    private func updateClockSkew() {
+        let skew = serverClock.measurement?.skew
+        if skew != clockSkew {
+            clockSkew = skew
+        }
+    }
+
     private func performSync(_ session: EnteSavedSession) async throws {
         guard let vault, vault.belongs(to: session) else { return }
         isSyncing = true
         defer { isSyncing = false }
         let generation = generation
-        let api = try EnteAPIClient(server: session.server, session: urlSession)
+        let api = try EnteAPIClient(server: session.server, session: urlSession, clock: serverClock)
 
         let changes = try await EnteAuthenticatorSync.changes(api: api, token: session.token, since: vault.lastSyncTime)
         let pulled = await Self.decrypt(changes.entities, authenticatorKey: session.authenticatorKey)
