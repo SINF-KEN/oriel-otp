@@ -6,6 +6,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/attaswift/BigInt",
       "state" : {
+        "branch" : "master",
         "revision" : "96fb3b174cb919b57de3edbb6ab7bb4a775137af"
       }
     },
