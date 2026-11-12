@@ -35,8 +35,8 @@ alone.
 The test is `AuthenticatorUITests/ScreenshotTests.swift`. To add a screenshot, navigate to the screen there and
 call `save("name")`, then add `docs/screenshots/name.png` to the README.
 
-The same script runs the accessibility audits in `AuthenticatorUITests/AccessibilityAuditTests.swift` and the tap
-to copy tests, which take about 13 minutes more, when asked to:
+The same script runs the accessibility audits in `AuthenticatorUITests/AccessibilityAuditTests.swift`, the tap
+to copy tests and the tests without a YubiKey (`NoYubiKeyTests`), which take about 15 minutes more, when asked to:
 
 ```bash
 tools/screenshots.sh audits

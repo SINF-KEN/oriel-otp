@@ -8,9 +8,10 @@
 # the UI does.
 #
 #   screenshots  only the screenshots, in about half a minute after the build
-#   audits       the tap to copy tests and the accessibility audits: in light mode, at the largest text size, right to
-#                left, in dark mode and with Increase Contrast. They take about 13 minutes. All of them run even when
-#                one fails, and the script then lists what failed and exits with an error.
+#   audits       the tap to copy tests, the tests without a YubiKey, and the accessibility audits: in light mode, at
+#                the largest text size, right to left, in dark mode and with Increase Contrast. They take about 15
+#                minutes. All of them run even when one fails, and the script then lists what failed and exits with an
+#                error.
 #
 # Usage: tools/screenshots.sh [screenshots] [audits]   (default: screenshots)
 #   DEVICE_TYPE  simulator device type, e.g. "iPad Air 11-inch (M4)" (default: the newest iPhone Pro)
@@ -123,7 +124,7 @@ for group in "${groups[@]}"; do
             ;;
         audits)
             # The dark mode and Increase Contrast audits skip themselves here.
-            run_audit audits light disabled TapToCopyTests AccessibilityAuditTests
+            run_audit audits light disabled TapToCopyTests NoYubiKeyTests AccessibilityAuditTests
             run_audit dark dark disabled AccessibilityAuditTests/testDarkAppearance
             run_audit increased-contrast-light light enabled AccessibilityAuditTests/testIncreasedContrast
             run_audit increased-contrast-dark dark enabled AccessibilityAuditTests/testIncreasedContrast

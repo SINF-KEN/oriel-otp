@@ -116,5 +116,6 @@ swift-sodium is required up to the next major version (`0.11.0..<1.0.0`), so Dep
   [testflight.md](testflight.md).
 - **Screenshots** runs the iPhone (`tools/screenshots.sh`) and Mac (`tools/screenshots-macos.sh`) screenshot tests
   on two runners, and pushes changed screenshots to the `bot/screenshots` branch for a pull request.
-- **Accessibility** runs the accessibility audits and tap to copy tests (`tools/screenshots.sh audits`) on an iPhone
+- **Accessibility** runs the accessibility audits, the tap to copy tests and `NoYubiKeyTests` (`tools/screenshots.sh
+  audits`) on an iPhone
   and an iPad, in several appearances and text sizes.
