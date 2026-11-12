@@ -1577,7 +1577,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein YubiKey gibt seine Konten nie wieder heraus, daher kann es später nicht zu Ente Auth kopiert werden. Wählen Sie „YubiKey und Ente Auth“, um es an beiden Orten zu behalten."
+            "value" : "Ein YubiKey gibt seine Konten nie wieder heraus, daher kann es später nicht zu Ente Auth kopiert werden. Wähle „YubiKey und Ente Auth“, um es an beiden Orten zu behalten."
           }
         },
         "fr" : {
@@ -1606,7 +1606,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein YubiKey gibt seine Konten nie wieder heraus, daher kann dieses Konto nicht zu Ente Auth kopiert werden. Um ein Konto an beiden Orten zu behalten, fügen Sie es erneut hinzu und wählen Sie „YubiKey und Ente Auth“."
+            "value" : "Ein YubiKey gibt seine Konten nie wieder heraus, daher kann dieses Konto nicht zu Ente Auth kopiert werden. Um ein Konto an beiden Orten zu behalten, füge es erneut hinzu und wähle „YubiKey und Ente Auth“."
           }
         },
         "fr" : {
@@ -2041,7 +2041,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Konten auf den Servern von Ente können hier nicht erstellt werden. Erstellen Sie eines in den Apps von Ente oder verwenden Sie einen selbst gehosteten Server."
+            "value" : "Konten auf den Servern von Ente können hier nicht erstellt werden. Erstelle eines in den Apps von Ente oder verwende einen selbst gehosteten Server."
           }
         },
         "fr" : {
@@ -2128,7 +2128,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Konten auf dem YubiKey werden von ihm gelöscht. Konten in Ente Auth werden auf allen Ihren Geräten in den Papierkorb verschoben, aus dem die Ente-Auth-App sie wiederherstellen kann."
+            "value" : "Konten auf dem YubiKey werden von ihm gelöscht. Konten in Ente Auth werden auf allen deinen Geräten in den Papierkorb verschoben, aus dem die Ente-Auth-App sie wiederherstellen kann."
           }
         },
         "fr" : {
@@ -2186,7 +2186,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sofern konfiguriert, erfordern (OATH) Konten in dieser App eine zusätzliche Berührung des YubiKeys um den OTP Code zu berechnen. Mit dieser Einstellung kannst Du diese Einstellung deaktivieren und die Anzahl an erforderlichen Berührungen reduzieren."
+            "value" : "Sofern konfiguriert, erfordern (OATH) Konten in dieser App eine zusätzliche Berührung des YubiKeys um den OTP Code zu berechnen. Mit dieser Einstellung kannst du diese Einstellung deaktivieren und die Anzahl an erforderlichen Berührungen reduzieren."
           }
         },
         "fr" : {
@@ -2910,7 +2910,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Alle Konten sind auf dem neuen Server, und dieses Gerät synchronisiert jetzt damit. Sie sind weiterhin auf %@. Prüfen Sie, ob Ihre Codes funktionieren, bevor Sie sie dort löschen, und melden Sie sich auf Ihren anderen Geräten beim neuen Server an."
+            "value" : "Alle Konten sind auf dem neuen Server, und dieses Gerät synchronisiert jetzt damit. Sie sind weiterhin auf %@. Prüfe, ob deine Codes funktionieren, bevor du sie dort löschst, und melde dich auf deinen anderen Geräten beim neuen Server an."
           }
         },
         "fr" : {
@@ -3113,7 +3113,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sie nutzen bereits Ente Auth? Wählen Sie „Ablage“ > „Mit Ente Auth synchronisieren“, melden Sie sich an und wählen Sie die Konten aus, die auf Ihren YubiKey sollen.\n\nMit „Angemeldet bleiben“ werden Ihre Ente-Auth-Konten auch hier angezeigt, und Ihre Änderungen werden in Ente Auth gespeichert. Ihre Ente-Auth-Daten werden auf diesem Mac entschlüsselt."
+            "value" : "Du nutzt schon Ente Auth? Wähle „Ablage“ > „Mit Ente Auth synchronisieren“, melde dich an und wähle die Konten aus, die auf deinen YubiKey sollen.\n\nMit „Angemeldet bleiben“ werden deine Ente-Auth-Konten auch hier angezeigt, und deine Änderungen werden in Ente Auth gespeichert. Deine Ente-Auth-Daten werden auf diesem Mac entschlüsselt."
           }
         },
         "fr" : {
@@ -4051,7 +4051,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wählen Sie „Eigener Server“, wenn Sie Ente selbst betreiben."
+            "value" : "Wähle „Eigener Server“, wenn du Ente selbst betreibst."
           }
         },
         "fr" : {
@@ -4136,7 +4136,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lösche die auf diesem Gerät gespeicherten Passwörter. Dadurch wirst Du bei der nächsten Verwendung eines passwortgeschützten YubiKeys nach dem dazugehörigen Passwort gefragt."
+            "value" : "Lösche die auf diesem Gerät gespeicherten Passwörter. Dadurch wirst du bei der nächsten Verwendung eines passwortgeschützten YubiKeys nach dem dazugehörigen Passwort gefragt."
           }
         },
         "fr" : {
@@ -5121,7 +5121,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihre Konten werden kopiert. Lassen Sie die App geöffnet, bis der Vorgang abgeschlossen ist."
+            "value" : "Deine Konten werden kopiert. Lass die App geöffnet, bis der Vorgang abgeschlossen ist."
           }
         },
         "fr" : {
@@ -5771,7 +5771,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihr Konto auf %@ löschen?"
+            "value" : "Dein Konto auf %@ löschen?"
           }
         },
         "fr" : {
@@ -5829,7 +5829,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Beim Löschen des Kontos werden es und alle seine Ente Auth-Konten von Ihrem Server entfernt. Geben Sie sein Passwort ein, um zu bestätigen, dass es Ihnen gehört. Ihr Passwort verlässt dieses Gerät nie."
+            "value" : "Beim Löschen des Kontos werden es und alle seine Ente-Auth-Konten von deinem Server entfernt. Gib sein Passwort ein, um zu bestätigen, dass es dir gehört. Dein Passwort verlässt dieses Gerät nie."
           }
         },
         "fr" : {
@@ -6000,7 +6000,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Deaktivierung von Yubico OTP verhindert, dass der YubiKey als Tastatur angezeigt wird. Wenn Du Yubico OTP nicht verwendest, ist dies die empfohlene Lösung. Dies kann auf der Einstellungsseite wieder aktiviert werden."
+            "value" : "Die Deaktivierung von Yubico OTP verhindert, dass der YubiKey als Tastatur angezeigt wird. Wenn du Yubico OTP nicht verwendest, ist dies die empfohlene Lösung. Dies kann auf der Einstellungsseite wieder aktiviert werden."
           }
         },
         "fr" : {
@@ -6232,7 +6232,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ente hat diese Sitzung beendet. Öffnen Sie „Mit Ente Auth synchronisieren“ und geben Sie Ihr Passwort ein, um wieder zu synchronisieren."
+            "value" : "Ente hat diese Sitzung beendet. Öffne „Mit Ente Auth synchronisieren“ und gib dein Passwort ein, um wieder zu synchronisieren."
           }
         },
         "fr" : {
@@ -6609,7 +6609,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Geben Sie den an %@ gesendeten Bestätigungscode ein. Ohne E-Mail auf Ihrem Server steht er im Protokoll des Servers."
+            "value" : "Gib den an %@ gesendeten Bestätigungscode ein. Ohne E-Mail auf deinem Server steht er im Protokoll des Servers."
           }
         },
         "fr" : {
@@ -6638,7 +6638,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Deinen Code der App-Sperre ein, um Deine Konten zu sichern"
+            "value" : "Gib deinen Code der App-Sperre ein, um deine Konten zu sichern"
           }
         },
         "fr" : {
@@ -6667,7 +6667,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Deinen Code der App-Sperre ein, um den QR-Code anzuzeigen"
+            "value" : "Gib deinen Code der App-Sperre ein, um den QR-Code anzuzeigen"
           }
         },
         "fr" : {
@@ -6696,7 +6696,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Dein Passwort der App-Sperre ein, um Deine Konten zu sichern"
+            "value" : "Gib dein Passwort der App-Sperre ein, um deine Konten zu sichern"
           }
         },
         "fr" : {
@@ -6725,7 +6725,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Dein Passwort der App-Sperre ein, um den QR-Code anzuzeigen"
+            "value" : "Gib dein Passwort der App-Sperre ein, um den QR-Code anzuzeigen"
           }
         },
         "fr" : {
@@ -6754,7 +6754,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Deinen Code ein"
+            "value" : "Gib deinen Code ein"
           }
         },
         "fr" : {
@@ -6783,7 +6783,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Deinen aktuellen Code ein"
+            "value" : "Gib deinen aktuellen Code ein"
           }
         },
         "fr" : {
@@ -6812,7 +6812,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Dein aktuelles Passwort ein"
+            "value" : "Gib dein aktuelles Passwort ein"
           }
         },
         "fr" : {
@@ -6841,7 +6841,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gib Dein Passwort ein"
+            "value" : "Gib dein Passwort ein"
           }
         },
         "fr" : {
@@ -7156,7 +7156,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Setze die Codes Deiner zeitbasierten Konten in Ente Auth und auf diesem Gerät in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt."
+            "value" : "Setze die Codes deiner zeitbasierten Konten in Ente Auth und auf diesem Gerät in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf deinem YubiKey können nicht eingesetzt werden. Wenn du die App sperrst, wird sie zuerst entsperrt."
           }
         },
         "fr" : {
@@ -7185,7 +7185,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Setze die Codes Deiner zeitbasierten Konten in Ente Auth und auf diesem Gerät in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf Deinem YubiKey können nicht eingesetzt werden. Wenn Du die App sperrst, wird sie zuerst entsperrt. Wähle in den Einstellungen Oriel OTP für „Codes einrichten in“, um Konten über Einrichtungslinks und QR-Codes hinzuzufügen."
+            "value" : "Setze die Codes deiner zeitbasierten Konten in Ente Auth und auf diesem Gerät in Safari und anderen Apps ein. Jedes Konto wird auf den Websites in seinen Details vorgeschlagen. Codes von Konten auf deinem YubiKey können nicht eingesetzt werden. Wenn du die App sperrst, wird sie zuerst entsperrt. Wähle in den Einstellungen Oriel OTP für „Codes einrichten in“, um Konten über Einrichtungslinks und QR-Codes hinzuzufügen."
           }
         },
         "fr" : {
@@ -7473,7 +7473,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ausgeblendete Codes werden als Punkte angezeigt, bis Sie auf einen tippen, wodurch er auch kopiert wird. In Spotlight können die Namen Ihrer Ente Auth-Konten und der Konten auf diesem Gerät gesucht werden; ihre Codes und Geheimnisse werden nie hinzugefügt."
+            "value" : "Ausgeblendete Codes werden als Punkte angezeigt, bis du auf einen tippst, wodurch er auch kopiert wird. In Spotlight können die Namen deiner Ente-Auth-Konten und der Konten auf diesem Gerät gesucht werden; ihre Codes und Geheimnisse werden nie hinzugefügt."
           }
         },
         "fr" : {
@@ -7673,7 +7673,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn aktiviert, wird beim Scannen des YubiKey eine Benachrichtigung angezeigt. Wenn Du auf die Benachrichtigung tippst, wird der Yubico OTP Code angezeigt."
+            "value" : "Wenn aktiviert, wird beim Scannen des YubiKey eine Benachrichtigung angezeigt. Wenn du auf die Benachrichtigung tippst, wird der Yubico OTP Code angezeigt."
           }
         },
         "fr" : {
@@ -7730,7 +7730,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wenn Sie Ihr Passwort vergessen, können Sie Ihre Konten nur mit diesem Schlüssel wiederherstellen. Ihr Server kann das Passwort nicht zurücksetzen, und dieser Schlüssel wird nur jetzt angezeigt. Bewahren Sie ihn an einem sicheren Ort auf, nicht auf diesem Gerät."
+            "value" : "Wenn du dein Passwort vergisst, kannst du deine Konten nur mit diesem Schlüssel wiederherstellen. Dein Server kann das Passwort nicht zurücksetzen, und dieser Schlüssel wird nur jetzt angezeigt. Bewahre ihn an einem sicheren Ort auf, nicht auf diesem Gerät."
           }
         },
         "fr" : {
@@ -7758,7 +7758,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Falls Du einen YubiKey mit NFC Funktionalität besitzt, ziehe bitte in der Hauptansicht der App nach unten um das NFC Scanning zu aktivieren.\n\nHalte den YubiKey waagerecht und neige das iPhone zum YubiKey.\n\nBerühre mit der Mitte des YubiKeys den Rand Deines iPhones."
+            "value" : "Falls du einen YubiKey mit NFC Funktionalität besitzt, ziehe bitte in der Hauptansicht der App nach unten um das NFC Scanning zu aktivieren.\n\nHalte den YubiKey waagerecht und neige das iPhone zum YubiKey.\n\nBerühre mit der Mitte des YubiKeys den Rand deines iPhones."
           }
         },
         "fr" : {
@@ -7786,7 +7786,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Falls Dein YubiKey einen USB-C-Anschluss hat, schließe ihn an.\n\nBerühre den YubiKey, sobald Du dazu aufgefordert wirst."
+            "value" : "Falls dein YubiKey einen USB-C-Anschluss hat, schließe ihn an.\n\nBerühre den YubiKey, sobald du dazu aufgefordert wirst."
           }
         },
         "fr" : {
@@ -8798,7 +8798,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihre Konten nach %@ umziehen?"
+            "value" : "Deine Konten nach %@ umziehen?"
           }
         },
         "fr" : {
@@ -9405,7 +9405,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es wurde kein QR-Code für ein Konto gefunden. Achten Sie darauf, dass der ganze QR-Code sichtbar ist."
+            "value" : "Es wurde kein QR-Code für ein Konto gefunden. Achte darauf, dass der ganze QR-Code sichtbar ist."
           }
         },
         "fr" : {
@@ -10212,7 +10212,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Öffnen Sie Oriel OTP, um die Codes von Konten auf einem YubiKey abzurufen."
+            "value" : "Öffne Oriel OTP, um die Codes von Konten auf einem YubiKey abzurufen."
           }
         },
         "fr" : {
@@ -10500,7 +10500,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Andere Anwendungen können Client-Zertifikate auf Deinem YubiKey zur Authentifizierung und Signatur verwenden."
+            "value" : "Andere Anwendungen können Client-Zertifikate auf deinem YubiKey zur Authentifizierung und Signatur verwenden."
           }
         },
         "fr" : {
@@ -11184,7 +11184,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schließe Deinen YubiKey an"
+            "value" : "Schließe deinen YubiKey an"
           }
         },
         "fr" : {
@@ -11213,7 +11213,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schließen Sie Ihren YubiKey an und versuchen Sie es erneut."
+            "value" : "Schließe deinen YubiKey an und versuche es erneut."
           }
         },
         "fr" : {
@@ -11242,7 +11242,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schließen Sie Ihren YubiKey direkt oder über einen USB-Hub oder Adapter an Ihren Mac an.\n\nBerühren Sie den YubiKey, wenn Sie dazu aufgefordert werden."
+            "value" : "Schließe deinen YubiKey direkt oder über einen USB-Hub oder Adapter an deinen Mac an.\n\nBerühre den YubiKey, wenn du dazu aufgefordert wirst."
           }
         },
         "fr" : {
@@ -11300,7 +11300,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Richte Deine Kamera auf einen QR-Code, um ihn zu scannen"
+            "value" : "Richte deine Kamera auf einen QR-Code, um ihn zu scannen"
           }
         },
         "fr" : {
@@ -11675,7 +11675,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "QR-Codes erhalten Sie von den Diensten, die Sie schützen möchten.\n\nBeim Hinzufügen eines Kontos findet Oriel OTP den QR-Code auf Ihrem Bildschirm, liest ein kopiertes oder abgelegtes Bild davon oder nimmt eines mit Ihrem iPhone auf."
+            "value" : "QR-Codes erhältst du von den Diensten, die du absichern möchtest.\n\nBeim Hinzufügen eines Kontos findet Oriel OTP den QR-Code auf deinem Bildschirm, liest ein kopiertes oder abgelegtes Bild davon oder nimmt eines mit deinem iPhone auf."
           }
         },
         "fr" : {
@@ -11935,7 +11935,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entferne Deinen YubiKey und stecke ihn erneut wieder ein."
+            "value" : "Entferne deinen YubiKey und stecke ihn erneut wieder ein."
           }
         },
         "fr" : {
@@ -11964,7 +11964,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entferne Deinen YubiKey und stecke ihn erneut"
+            "value" : "Entferne deinen YubiKey und stecke ihn erneut"
           }
         },
         "fr" : {
@@ -12337,7 +12337,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lösche alle auf Deinem YubiKey gespeicherten Konten. Stelle bitte unbedingt sicher, dass Du sie nirgendwo verwendest bevor Du fortfährst."
+            "value" : "Lösche alle auf deinem YubiKey gespeicherten Konten. Stelle bitte unbedingt sicher, dass du sie nirgendwo verwendest bevor du fortfährst."
           }
         },
         "fr" : {
@@ -12987,7 +12987,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scanne Deinen YubiKey"
+            "value" : "Scanne deinen YubiKey"
           }
         },
         "fr" : {
@@ -13680,7 +13680,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zeigen Sie den QR-Code auf dem Bildschirm an, kopieren Sie ihn oder legen Sie ein Bild davon hier ab. Um ihn mit Ihrem iPhone oder iPad zu fotografieren, verwenden Sie das Menü „Ablage“. Oder geben Sie die Daten unten ein."
+            "value" : "Zeige den QR-Code auf dem Bildschirm an, kopiere ihn oder lege ein Bild davon hier ab. Um ihn mit deinem iPhone oder iPad zu fotografieren, verwende das Menü „Ablage“. Oder gib die Daten unten ein."
           }
         },
         "fr" : {
@@ -13738,7 +13738,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Melden Sie sich über „Mit Ente Auth synchronisieren“ an, um auf diesem Gerät angemeldet zu bleiben."
+            "value" : "Melde dich über „Mit Ente Auth synchronisieren“ an, um auf diesem Gerät angemeldet zu bleiben."
           }
         },
         "fr" : {
@@ -13825,7 +13825,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bei Ihrem Server anmelden"
+            "value" : "Bei deinem Server anmelden"
           }
         },
         "fr" : {
@@ -13854,7 +13854,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Melden Sie sich mit Ihrem neuen Passwort an, um es zu verwenden."
+            "value" : "Melde dich mit deinem neuen Passwort an, um es zu verwenden."
           }
         },
         "fr" : {
@@ -14057,7 +14057,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Einige Konten sind nicht auf dem neuen Server angekommen. Es wurde nichts umgestellt, und Ihre Konten sind weiterhin auf dem alten Server. Versuchen Sie es erneut."
+            "value" : "Einige Konten sind nicht auf dem neuen Server angekommen. Es wurde nichts umgestellt, und deine Konten sind weiterhin auf dem alten Server. Versuche es erneut."
           }
         },
         "fr" : {
@@ -14143,7 +14143,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Etwas ist schief gelaufen und Dein Key reagiert nicht"
+            "value" : "Etwas ist schief gelaufen und dein Key reagiert nicht"
           }
         },
         "fr" : {
@@ -14288,7 +14288,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "„Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Face ID oder Touch ID, damit Sie ohne Ihr Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
+            "value" : "„Angemeldet bleiben“ speichert deine Sitzung und den Schlüssel, der deine Konten entschlüsselt, im Schlüsselbund, geschützt durch Face ID oder Touch ID, damit du ohne dein Passwort erneut synchronisieren kannst. Das Passwort selbst wird nie gespeichert."
           }
         },
         "fr" : {
@@ -14317,7 +14317,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "„Angemeldet bleiben“ speichert Ihre Sitzung und den Schlüssel, der Ihre Konten entschlüsselt, im Schlüsselbund, geschützt durch Touch ID oder das Passwort Ihres Mac, damit Sie ohne Ihr Passwort erneut synchronisieren können. Das Passwort selbst wird nie gespeichert."
+            "value" : "„Angemeldet bleiben“ speichert deine Sitzung und den Schlüssel, der deine Konten entschlüsselt, im Schlüsselbund, geschützt durch Touch ID oder das Passwort deines Mac, damit du ohne dein Passwort erneut synchronisieren kannst. Das Passwort selbst wird nie gespeichert."
           }
         },
         "fr" : {
@@ -14982,7 +14982,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dieses Fenster konnte nicht gelesen werden. Kopieren Sie stattdessen den QR-Code oder ziehen Sie ein Bild davon hierher."
+            "value" : "Dieses Fenster konnte nicht gelesen werden. Kopiere stattdessen den QR-Code oder ziehe ein Bild davon hierher."
           }
         },
         "fr" : {
@@ -15040,7 +15040,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Das Konto und seine Daten wurden von Ihrem Server gelöscht. Codes auf Ihrem YubiKey sind davon nicht betroffen."
+            "value" : "Das Konto und seine Daten wurden von deinem Server gelöscht. Codes auf deinem YubiKey sind davon nicht betroffen."
           }
         },
         "fr" : {
@@ -15127,7 +15127,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Das Konto auf dem neuen Server, das eine andere E-Mail-Adresse und ein anderes Passwort haben kann. Ihr Passwort verlässt dieses Gerät nie."
+            "value" : "Das Konto auf dem neuen Server, das eine andere E-Mail-Adresse und ein anderes Passwort haben kann. Dein Passwort verlässt dieses Gerät nie."
           }
         },
         "fr" : {
@@ -15185,7 +15185,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Die Adresse des Ente-Servers, den Sie betreiben, dieselbe, die seine Apps verwenden, z. B. https://auth.example.com. Ihre E-Mail-Adresse und Anmeldeanfragen gehen nur an diesen Server."
+            "value" : "Die Adresse des Ente-Servers, den du betreibst, dieselbe, die seine Apps verwenden, z. B. https://auth.example.com. Deine E-Mail-Adresse und Anmeldeanfragen gehen nur an diesen Server."
           }
         },
         "fr" : {
@@ -15243,7 +15243,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Das Ente-Konto, in dem sich Ihre Codes jetzt befinden. Ihr Passwort verlässt dieses Gerät nie."
+            "value" : "Das Ente-Konto, in dem sich deine Codes jetzt befinden. Dein Passwort verlässt dieses Gerät nie."
           }
         },
         "fr" : {
@@ -15272,7 +15272,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die FIDO-Anwendung Deines YubiKey wurde auf die Werkseinstellungen zurückgesetzt."
+            "value" : "Die FIDO-Anwendung deines YubiKey wurde auf die Werkseinstellungen zurückgesetzt."
           }
         },
         "fr" : {
@@ -15388,7 +15388,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Der alte Server hat diese Sitzung beendet. Öffnen Sie „Aus Ente Auth synchronisieren“, geben Sie Ihr Passwort ein und versuchen Sie es erneut."
+            "value" : "Der alte Server hat diese Sitzung beendet. Öffne „Aus Ente Auth synchronisieren“, gib dein Passwort ein und versuche es erneut."
           }
         },
         "fr" : {
@@ -15532,7 +15532,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Der Server hat das Löschen dieses Kontos nicht erlaubt. Bitten Sie die Person, die ihn betreibt, es zu löschen."
+            "value" : "Der Server hat das Löschen dieses Kontos nicht erlaubt. Bitte die Person, die ihn betreibt, es zu löschen."
           }
         },
         "fr" : {
@@ -15561,7 +15561,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Der Server hat das Konto nicht wie erwartet gespeichert. Versuchen Sie, sich anzumelden, oder erstellen Sie es mit einer anderen E-Mail-Adresse neu."
+            "value" : "Der Server hat das Konto nicht wie erwartet gespeichert. Versuche, dich anzumelden, oder erstelle es mit einer anderen E-Mail-Adresse neu."
           }
         },
         "fr" : {
@@ -15676,7 +15676,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Der YubiKey ist voll. Löschen Sie ein Konto, um ein weiteres hinzuzufügen."
+            "value" : "Der YubiKey ist voll. Lösche ein Konto, um ein weiteres hinzuzufügen."
           }
         },
         "fr" : {
@@ -15820,7 +15820,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das Konto wird in Ente Auth für %@ gespeichert und erscheint auf Ihren anderen Geräten."
+            "value" : "Das Konto wird in Ente Auth für %@ gespeichert und erscheint auf deinen anderen Geräten."
           }
         },
         "fr" : {
@@ -15935,7 +15935,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Menüleiste zeigt Ihre angehefteten Konten oder alle Konten, wenn keines angeheftet ist. Klicken Sie auf ein Konto, um seinen Code zu kopieren. Ist die App nur in der Menüleiste, erscheint sie nicht im Dock."
+            "value" : "Die Menüleiste zeigt deine angehefteten Konten oder alle Konten, wenn keines angeheftet ist. Klicke auf ein Konto, um seinen Code zu kopieren. Ist die App nur in der Menüleiste, erscheint sie nicht im Dock."
           }
         },
         "fr" : {
@@ -16137,7 +16137,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Sitzung, der Schlüssel und die Kopie Ihrer Konten werden von diesem Gerät gelöscht. Einige hier vorgenommene Änderungen wurden noch nicht mit Ente Auth synchronisiert und gehen verloren."
+            "value" : "Die Sitzung, der Schlüssel und die Kopie deiner Konten werden von diesem Gerät gelöscht. Einige hier vorgenommene Änderungen wurden noch nicht mit Ente Auth synchronisiert und gehen verloren."
           }
         },
         "fr" : {
@@ -16166,7 +16166,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Die Sitzung, der Schlüssel und die Kopie Ihrer Konten werden von diesem Gerät gelöscht. Ihre Konten bleiben in Ente Auth."
+            "value" : "Die Sitzung, der Schlüssel und die Kopie deiner Konten werden von diesem Gerät gelöscht. Deine Konten bleiben in Ente Auth."
           }
         },
         "fr" : {
@@ -16369,7 +16369,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Zertifikate wurden zu Deinem %@ hinzugefügt und können von anderen Applikationen verwendet werden."
+            "value" : "Diese Zertifikate wurden zu deinem %@ hinzugefügt und können von anderen Applikationen verwendet werden."
           }
         },
         "fr" : {
@@ -16630,7 +16630,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Auf diesem Server gibt es bereits ein Konto mit dieser E-Mail-Adresse. Melden Sie sich stattdessen an."
+            "value" : "Auf diesem Server gibt es bereits ein Konto mit dieser E-Mail-Adresse. Melde dich stattdessen an."
           }
         },
         "fr" : {
@@ -16659,7 +16659,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dieser Server lässt keine neuen Konten zu. Aktivieren Sie die Registrierung in seinen Einstellungen und versuchen Sie es erneut."
+            "value" : "Dieser Server lässt keine neuen Konten zu. Aktiviere die Registrierung in seinen Einstellungen und versuche es erneut."
           }
         },
         "fr" : {
@@ -16774,7 +16774,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch wird das Konto auf allen Ihren Geräten in den Papierkorb von Ente Auth verschoben. Sie können es in der Ente-Auth-App wiederherstellen."
+            "value" : "Dadurch wird das Konto auf allen deinen Geräten in den Papierkorb von Ente Auth verschoben. Du kannst es in der Ente-Auth-App wiederherstellen."
           }
         },
         "fr" : {
@@ -16831,7 +16831,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch werden die Konten vom YubiKey entfernt. Sie können danach keine Codes mehr für sie erzeugen."
+            "value" : "Dadurch werden die Konten vom YubiKey entfernt. Du kannst danach keine Codes mehr für sie erzeugen."
           }
         },
         "fr" : {
@@ -16859,7 +16859,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Diese Einstellung wird von Deinem YubiKey nicht unterstützt."
+            "value" : "Diese Einstellung wird von deinem YubiKey nicht unterstützt."
           }
         },
         "fr" : {
@@ -16915,7 +16915,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch werden alle OATH TOTP/HOTP-Konten unwiderruflich von Deinem YubiKey gelöscht."
+            "value" : "Dadurch werden alle OATH TOTP/HOTP-Konten unwiderruflich von deinem YubiKey gelöscht."
           }
         },
         "fr" : {
@@ -16943,7 +16943,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dadurch werden alle U2F- und FIDO2-Konten, einschließlich der Passkeys, unwiderruflich von Deinem YubiKey gelöscht."
+            "value" : "Dadurch werden alle U2F- und FIDO2-Konten, einschließlich der Passkeys, unwiderruflich von deinem YubiKey gelöscht."
           }
         },
         "fr" : {
@@ -17001,7 +17001,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Um ein Konto zu einem FIPS-Schlüssel hinzuzufügen, musst Du zunächst ein Passwort für die OATH-Anwendung festlegen."
+            "value" : "Um ein Konto zu einem FIPS-Schlüssel hinzuzufügen, musst du zunächst ein Passwort für die OATH-Anwendung festlegen."
           }
         },
         "fr" : {
@@ -17115,7 +17115,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Um Konten auch in Ente Auth zu speichern, wählen Sie im Menü „Aus Ente Auth synchronisieren“ und melden Sie sich mit aktiviertem „Angemeldet bleiben“ an."
+            "value" : "Um Konten auch in Ente Auth zu speichern, wähle im Menü „Aus Ente Auth synchronisieren“ und melde dich mit aktiviertem „Angemeldet bleiben“ an."
           }
         },
         "fr" : {
@@ -17339,7 +17339,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zeitüberschreitung um Deinen YubiKey zu beühren."
+            "value" : "Zeitüberschreitung beim Berühren deines YubiKey."
           }
         },
         "fr" : {
@@ -17397,7 +17397,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Berühren Sie die Taste am YubiKey, um den Code für %@ zu erhalten."
+            "value" : "Berühre die Taste am YubiKey, um den Code für %@ zu erhalten."
           }
         },
         "fr" : {
@@ -17426,7 +17426,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Berühren Sie Ihren YubiKey"
+            "value" : "Berühre deinen YubiKey"
           }
         },
         "fr" : {
@@ -17743,7 +17743,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entsperren Sie Oriel OTP und versuchen Sie es erneut."
+            "value" : "Entsperre Oriel OTP und versuche es erneut."
           }
         },
         "fr" : {
@@ -17772,7 +17772,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Entsperren Sie Oriel OTP, um den Code zu kopieren."
+            "value" : "Entsperre Oriel OTP, um den Code zu kopieren."
           }
         },
         "fr" : {
@@ -17830,7 +17830,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entsperre Dein Gerät, um Oriel OTP zu öffnen."
+            "value" : "Entsperre dein Gerät, um Oriel OTP zu öffnen."
           }
         },
         "fr" : {
@@ -17975,7 +17975,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Verwenden Sie mindestens %lld Zeichen für Ihr Passwort."
+            "value" : "Verwende mindestens %lld Zeichen für dein Passwort."
           }
         },
         "fr" : {
@@ -18033,7 +18033,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwende Deinen PUK-Code, um die PIN zurückzusetzen."
+            "value" : "Verwende deinen PUK-Code, um die PIN zurückzusetzen."
           }
         },
         "fr" : {
@@ -18377,7 +18377,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solange der YubiKey verbunden ist, wird die Bildschirmtastatur nicht angezeigt. Um die Tastatur anzuzeigen, musst Du den YubiKey abziehen und erneut verbinden."
+            "value" : "Solange der YubiKey verbunden ist, wird die Bildschirmtastatur nicht angezeigt. Um die Tastatur anzuzeigen, musst du den YubiKey abziehen und erneut verbinden."
           }
         },
         "fr" : {
@@ -18579,7 +18579,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihre Konten werden Ende-zu-Ende-verschlüsselt vom alten auf den neuen Server kopiert. Vom alten Server wird nichts gelöscht. Wenn Sie den neuen Server selbst hosten, können Sie im nächsten Schritt ein Konto darauf erstellen."
+            "value" : "Deine Konten werden Ende-zu-Ende-verschlüsselt vom alten auf den neuen Server kopiert. Vom alten Server wird nichts gelöscht. Wenn du den neuen Server selbst hostest, kannst du im nächsten Schritt ein Konto darauf erstellen."
           }
         },
         "fr" : {
@@ -18608,7 +18608,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihre Konten werden auf den neuen Server kopiert und bleiben auf dem alten. Sonst ändert sich auf diesem Gerät nichts."
+            "value" : "Deine Konten werden auf den neuen Server kopiert und bleiben auf dem alten. Sonst ändert sich auf diesem Gerät nichts."
           }
         },
         "fr" : {
@@ -18637,7 +18637,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihre Konten werden kopiert, danach synchronisiert dieses Gerät mit dem neuen Server statt mit %@. Die Konten bleiben auf dem alten Server, und Ihre anderen Geräte nutzen ihn weiter, bis Sie sich dort beim neuen Server anmelden."
+            "value" : "Deine Konten werden kopiert, danach synchronisiert dieses Gerät mit dem neuen Server statt mit %@. Die Konten bleiben auf dem alten Server, und deine anderen Geräte nutzen ihn weiter, bis du dich dort beim neuen Server anmeldest."
           }
         },
         "fr" : {
@@ -18666,7 +18666,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihre Konten haben sich während des Umzugs geändert. Es wurde nichts umgestellt. Versuchen Sie es erneut, um auch die Änderungen zu kopieren."
+            "value" : "Deine Konten haben sich während des Umzugs geändert. Es wurde nichts umgestellt. Versuche es erneut, um auch die Änderungen zu kopieren."
           }
         },
         "fr" : {
@@ -18695,7 +18695,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre E-Mail-Adresse und Ihre Anmeldeanfragen werden an Ente oder an Ihren eigenen Server gesendet. Ihre Ente-Auth-Konten sind Ende-zu-Ende-verschlüsselt und werden nur auf diesem Gerät entschlüsselt, und Ihr Passwort verlässt es nie. Wenn Sie angemeldet bleiben, werden die Konten auf diesem Gerät aufbewahrt und mit denen Ihres YubiKey aufgelistet, und Konten, die Sie hier hinzufügen, umbenennen, anheften oder löschen, werden auch in Ente Auth geändert."
+            "value" : "Deine E-Mail-Adresse und deine Anmeldeanfragen werden an Ente oder an deinen eigenen Server gesendet. Deine Ente-Auth-Konten sind Ende-zu-Ende-verschlüsselt und werden nur auf diesem Gerät entschlüsselt, und dein Passwort verlässt es nie. Wenn du angemeldet bleibst, werden die Konten auf diesem Gerät aufbewahrt und mit denen deines YubiKey aufgelistet, und Konten, die du hier hinzufügst, umbenennst, anheftest oder löschst, werden auch in Ente Auth geändert."
           }
         },
         "fr" : {
@@ -18724,7 +18724,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre Ente-Auth-Konten werden verschlüsselt auf diesem Gerät aufbewahrt und mit denen Ihres YubiKey aufgelistet, sodass ihre Codes auch offline funktionieren. Sie werden mit Ente synchronisiert, wenn die App geöffnet wird, nach jeder Änderung und wenn Sie die Liste aktualisieren. Wählen Sie „Konten synchronisieren“, um Konten für Ihren YubiKey auszuwählen."
+            "value" : "Deine Ente-Auth-Konten werden verschlüsselt auf diesem Gerät aufbewahrt und mit denen deines YubiKey aufgelistet, sodass ihre Codes auch offline funktionieren. Sie werden mit Ente synchronisiert, wenn die App geöffnet wird, nach jeder Änderung und wenn du die Liste aktualisierst. Wähle „Konten synchronisieren“, um Konten für deinen YubiKey auszuwählen."
           }
         },
         "fr" : {
@@ -18782,7 +18782,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihr Passwort verlässt dieses Gerät nie, und Ihr Server kann es nicht zurücksetzen. Ein Code wird an diese E-Mail-Adresse gesendet oder in das Protokoll Ihres Servers geschrieben, wenn er keine E-Mails senden kann."
+            "value" : "Dein Passwort verlässt dieses Gerät nie, und dein Server kann es nicht zurücksetzen. Ein Code wird an diese E-Mail-Adresse gesendet oder in das Protokoll deines Servers geschrieben, wenn er keine E-Mails senden kann."
           }
         },
         "fr" : {
@@ -18839,7 +18839,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine Anmeldedaten sowie eine eventuell festgelegte PIN werden von diesem YubiKey entfernt. Stelle bitte sicher, dass Du diese Anmeldedaten zunächst auf den jeweiligen Websites deaktivierst, um zu vermeiden, dass Du Dich aus Deinen Konten aussperrst."
+            "value" : "Deine Anmeldedaten sowie eine eventuell festgelegte PIN werden von diesem YubiKey entfernt. Stelle bitte sicher, dass du diese Anmeldedaten zunächst auf den jeweiligen Websites deaktivierst, um zu vermeiden, dass du dich aus deinen Konten aussperrst."
           }
         },
         "fr" : {
@@ -18897,7 +18897,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ihr Wiederherstellungsschlüssel"
+            "value" : "Dein Wiederherstellungsschlüssel"
           }
         },
         "fr" : {
@@ -18926,7 +18926,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Mac gespeichert, geschützt durch Touch ID oder das Passwort Ihres Mac. Eine Kopie der Konten wird auf diesem Mac aufbewahrt, verschlüsselt mit einem Schlüssel, der ihn nie verlässt. Ihr Ente-Passwort wird nie gespeichert."
+            "value" : "Deine Sitzung und der Schlüssel, der deine Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Mac gespeichert, geschützt durch Touch ID oder das Passwort deines Mac. Eine Kopie der Konten wird auf diesem Mac aufbewahrt, verschlüsselt mit einem Schlüssel, der ihn nie verlässt. Dein Ente-Passwort wird nie gespeichert."
           }
         },
         "fr" : {
@@ -18955,7 +18955,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ihre Sitzung und der Schlüssel, der Ihre Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Geräts gespeichert, geschützt durch Face ID oder Touch ID. Eine Kopie der Konten wird auf diesem Gerät aufbewahrt, verschlüsselt mit einem Schlüssel, der es nie verlässt. Ihr Ente-Passwort wird nie gespeichert."
+            "value" : "Deine Sitzung und der Schlüssel, der deine Ente-Auth-Konten entschlüsselt, werden im Schlüsselbund dieses Geräts gespeichert, geschützt durch Face ID oder Touch ID. Eine Kopie der Konten wird auf diesem Gerät aufbewahrt, verschlüsselt mit einem Schlüssel, der es nie verlässt. Dein Ente-Passwort wird nie gespeichert."
           }
         },
         "fr" : {
