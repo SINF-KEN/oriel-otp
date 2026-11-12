@@ -35,7 +35,7 @@ final class AccessibilityAuditTests: XCTestCase {
 
     /// At the largest accessibility text size no text may be cut off, and all of it has to follow the text size.
     @MainActor func testLargestTextSize() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate,
+        app.launchArguments = ["-DemoDate", Self.demoDate, "-CopiedSeconds", "60",
                                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
         app.launch()
         try auditMainScreens(for: [.dynamicType, .textClipped])
@@ -45,7 +45,7 @@ final class AccessibilityAuditTests: XCTestCase {
     /// so this uses the right-to-left pseudolanguage: English text in a mirrored layout. At the largest text size, like
     /// `testLargestTextSize`: at the default size the audit only warns that text might be cut off at larger sizes.
     @MainActor func testRightToLeft() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate,
+        app.launchArguments = ["-DemoDate", Self.demoDate, "-CopiedSeconds", "60",
                                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL",
                                "-AppleTextDirection", "YES", "-NSForceRightToLeftWritingDirection", "YES"]
         app.launch()
@@ -54,7 +54,7 @@ final class AccessibilityAuditTests: XCTestCase {
 
     /// In light mode, text and icons have to stand out from their background.
     @MainActor func testLightAppearance() throws {
-        app.launchArguments = ["-DemoDate", Self.demoDate]
+        app.launchArguments = ["-DemoDate", Self.demoDate, "-CopiedSeconds", "60"]
         app.launch()
         try auditMainScreens(for: .contrast, allowsNearlyPassingContrast: true)
     }
@@ -66,7 +66,7 @@ final class AccessibilityAuditTests: XCTestCase {
     @MainActor func testDarkAppearance() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["APPEARANCE"] == "dark",
                           "Runs in dark mode, from tools/screenshots.sh audits")
-        app.launchArguments = ["-DemoDate", Self.demoDate]
+        app.launchArguments = ["-DemoDate", Self.demoDate, "-CopiedSeconds", "60"]
         app.launch()
         try auditMainScreens(for: .contrast, allowsNearlyPassingContrast: true)
     }
@@ -76,7 +76,7 @@ final class AccessibilityAuditTests: XCTestCase {
     @MainActor func testIncreasedContrast() throws {
         try XCTSkipUnless(ProcessInfo.processInfo.environment["INCREASE_CONTRAST"] == "enabled",
                           "Runs with Increase Contrast on, from tools/screenshots.sh audits")
-        app.launchArguments = ["-DemoDate", Self.demoDate]
+        app.launchArguments = ["-DemoDate", Self.demoDate, "-CopiedSeconds", "60"]
         app.launch()
         try auditMainScreens(for: .contrast)
     }
@@ -91,6 +91,15 @@ final class AccessibilityAuditTests: XCTestCase {
         let bank = app.descendants(matching: .any)["account-row.60/Bank:alice"].firstMatch
         XCTAssertTrue(bank.waitForExistence(timeout: 20), "The simulated YubiKey's accounts didn't show")
         try audit("account list", types)
+
+        // The checkmark a row shows after its code is copied, once the toast over the navigation bar has gone.
+        let copy = app.buttons["account-row.60/Bank:alice.copy"].firstMatch
+        XCTAssertTrue(copy.waitForExistence(timeout: 20), "The code isn't a button of its own")
+        copy.tap()
+        let toast = app.staticTexts["Copied to clipboard"].firstMatch
+        XCTAssertTrue(toast.waitForExistence(timeout: 5), "The toast didn't show")
+        XCTAssertTrue(toast.waitForNonExistence(timeout: 15), "The toast didn't go away")
+        try audit("copied code", types)
 
         // On the name, near the top: at the larger sizes the middle of the row is the code, which copies it.
         bank.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
