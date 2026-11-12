@@ -15,82 +15,82 @@
  */
 #if os(macOS)
 
-import AppIntents
-import Foundation
+    import AppIntents
+    import Foundation
 
-/// Reads the plugged-in YubiKey for Shortcuts, connecting to it if the app isn't already.
-@MainActor enum YubiKeyAccess {
+    /// Reads the plugged-in YubiKey for Shortcuts, connecting to it if the app isn't already.
+    @MainActor enum YubiKeyAccess {
 
-    enum AccessError: LocalizedError {
-        case noYubiKey
-        case accountNotFound
-        case locked
+        enum AccessError: LocalizedError {
+            case noYubiKey
+            case accountNotFound
+            case locked
 
-        var errorDescription: String? {
-            switch self {
-            case .noYubiKey:
-                String(localized: "Plug in your YubiKey and try again.", comment: "Mac Shortcuts error")
-            case .accountNotFound:
-                String(localized: "The account isn't on the plugged-in YubiKey.", comment: "Mac Shortcuts error")
-            case .locked:
-                String(localized: "Unlock Oriel OTP and try again.", comment: "Mac Shortcuts error when the app is locked")
+            var errorDescription: String? {
+                switch self {
+                case .noYubiKey:
+                    String(localized: "Plug in your YubiKey and try again.", comment: "Mac Shortcuts error")
+                case .accountNotFound:
+                    String(localized: "The account isn't on the plugged-in YubiKey.", comment: "Mac Shortcuts error")
+                case .locked:
+                    String(localized: "Unlock Oriel OTP and try again.", comment: "Mac Shortcuts error when the app is locked")
+                }
             }
+        }
+
+        static func accounts() async throws -> [AccountEntity] {
+            try await withSession { session in
+                try await session.calculateAll().map { credential, _ in
+                    AccountEntity(id: credential.id, issuer: credential.issuer, accountName: credential.accountName)
+                }
+            }
+        }
+
+        static func code(for id: String) async throws -> String {
+            try await withSession { session in
+                guard let credential = try await session.calculateAll().map(\.0).first(where: { $0.id == id }) else {
+                    throw AccessError.accountNotFound
+                }
+                if credential.requiresTouch {
+                    TouchPrompt.show(for: credential.issuer ?? credential.accountName)
+                }
+                defer { TouchPrompt.hide() }
+                return try await session.calculate(credential: credential).code
+            }
+        }
+
+        /// Shortcuts don't get past the app lock. Touch ID or the Mac's password is asked for when it unlocks the app,
+        /// a code or password has to be entered in the app.
+        private static func unlockApp() async throws {
+            let lock = AppLock.shared
+            if lock.isLocked && lock.method == .device {
+                await lock.unlockWithDeviceOwner()
+            }
+            guard !lock.isLocked else { throw AccessError.locked }
+        }
+
+        private static func withSession<T>(_ body: (OATHSession) async throws -> T) async throws -> T {
+            try await unlockApp()
+            let manager = ConnectionManager.shared
+            let wasSuspended = manager.areWiredConnectionsSuspended
+            manager.resumeWiredConnections()
+            defer {
+                // Let go of the YubiKey again if nothing else in the app is using it.
+                if wasSuspended && !MainWindowState.shared.isVisible {
+                    Task { await manager.suspendWiredConnections() }
+                }
+            }
+            if manager.wiredConnection == nil {
+                let connection = Task { try await manager.nextWiredConnection() }
+                let timeout = Task {
+                    try await Task.sleep(for: .seconds(5))
+                    connection.cancel()
+                }
+                defer { timeout.cancel() }
+                guard (try? await connection.value) != nil else { throw AccessError.noYubiKey }
+            }
+            return try await body(OATHSessionHandler.shared.anySession())
         }
     }
-
-    static func accounts() async throws -> [AccountEntity] {
-        try await withSession { session in
-            try await session.calculateAll().map { credential, _ in
-                AccountEntity(id: credential.id, issuer: credential.issuer, accountName: credential.accountName)
-            }
-        }
-    }
-
-    static func code(for id: String) async throws -> String {
-        try await withSession { session in
-            guard let credential = try await session.calculateAll().map(\.0).first(where: { $0.id == id }) else {
-                throw AccessError.accountNotFound
-            }
-            if credential.requiresTouch {
-                TouchPrompt.show(for: credential.issuer ?? credential.accountName)
-            }
-            defer { TouchPrompt.hide() }
-            return try await session.calculate(credential: credential).code
-        }
-    }
-
-    /// Shortcuts don't get past the app lock. Touch ID or the Mac's password is asked for when it unlocks the app,
-    /// a code or password has to be entered in the app.
-    private static func unlockApp() async throws {
-        let lock = AppLock.shared
-        if lock.isLocked && lock.method == .device {
-            await lock.unlockWithDeviceOwner()
-        }
-        guard !lock.isLocked else { throw AccessError.locked }
-    }
-
-    private static func withSession<T>(_ body: (OATHSession) async throws -> T) async throws -> T {
-        try await unlockApp()
-        let manager = ConnectionManager.shared
-        let wasSuspended = manager.areWiredConnectionsSuspended
-        manager.resumeWiredConnections()
-        defer {
-            // Let go of the YubiKey again if nothing else in the app is using it.
-            if wasSuspended && !MainWindowState.shared.isVisible {
-                Task { await manager.suspendWiredConnections() }
-            }
-        }
-        if manager.wiredConnection == nil {
-            let connection = Task { try await manager.nextWiredConnection() }
-            let timeout = Task {
-                try await Task.sleep(for: .seconds(5))
-                connection.cancel()
-            }
-            defer { timeout.cancel() }
-            guard (try? await connection.value) != nil else { throw AccessError.noYubiKey }
-        }
-        return try await body(OATHSessionHandler.shared.anySession())
-    }
-}
 
 #endif

@@ -58,14 +58,16 @@ struct OTPAuthParsingTests {
     @Test(arguments: [TimeInterval(1e19), 30.5, .nan, .infinity])
     func templatesNeedAWholePeriodOfAtMostADay(period: TimeInterval) {
         #expect(throws: CredentialTemplateError.period) {
-            try YubiKitOATHSession.CredentialTemplate(type: .totp(period: period), algorithm: .sha1, secret: Data([1, 2, 3]),
-                                                      issuer: "A", accountName: "b", digits: 6)
+            try YubiKitOATHSession.CredentialTemplate(
+                type: .totp(period: period), algorithm: .sha1, secret: Data([1, 2, 3]),
+                issuer: "A", accountName: "b", digits: 6)
         }
     }
 
     @Test func aPeriodThatIsntAnIntIsntExported() {
-        let template = YubiKitOATHSession.CredentialTemplate(type: .totp(period: 1e19), algorithm: .sha1, secret: Data([1, 2, 3]),
-                                                             issuer: "A", name: "b", digits: 6)
+        let template = YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 1e19), algorithm: .sha1, secret: Data([1, 2, 3]),
+            issuer: "A", name: "b", digits: 6)
         #expect(EnteCodeExporter.otpauthURL(for: template) == nil)
         #expect(throws: (any Error).self) { try EnteCodeExporter.rawData(for: template) }
     }
@@ -118,7 +120,7 @@ struct OTPAuthParsingTests {
         "otpauth://totp/A:b?secret=\(testSecret)&period=30&Period=60",
         "otpauth://totp/A:b?secret=\(testSecret)&digits=6&digits=8",
         "otpauth://totp/A:b?secret=\(testSecret)&algorithm=SHA1&ALGORITHM=SHA512",
-        "otpauth://totp/b?secret=\(testSecret)&issuer=A&Issuer=B",
+        "otpauth://totp/b?secret=\(testSecret)&issuer=A&Issuer=B"
     ])
     func rejectsASettingGivenTwice(url: String) throws {
         #expect(throws: CredentialTemplateError.repeatedParameter) { try yubiKeyTemplate(url) }
@@ -173,7 +175,7 @@ struct OTPAuthParsingTests {
 
     @Test(arguments: [
         "otpauth://totp/%20Example%20:%20alice%20?secret=\(testSecret)",
-        "otpauth://totp/alice%20?secret=\(testSecret)&issuer=%20Example",
+        "otpauth://totp/alice%20?secret=\(testSecret)&issuer=%20Example"
     ])
     func bothParsersTrimNames(url: String) throws {
         let template = try yubiKeyTemplate(url)
@@ -190,9 +192,10 @@ struct OTPAuthParsingTests {
 
     @Test(arguments: [(nil, "Issuer:alice"), ("", "Issuer:alice"), ("Example", "alice:work"), (nil, "alice")] as [(String?, String)])
     func exportedNamesWithAColonReadBackTheSame(issuer: String?, name: String) throws {
-        let template = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1,
-                                                                 secret: try #require(Data(base32Encoded: testSecret)),
-                                                                 issuer: issuer, accountName: name, digits: 6)
+        let template = try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 30), algorithm: .sha1,
+            secret: try #require(Data(base32Encoded: testSecret)),
+            issuer: issuer, accountName: name, digits: 6)
         let rawData = String(decoding: try EnteCodeExporter.rawData(for: template), as: UTF8.self)
         let parsed = try #require(EnteCodeParser.parse(id: "1", rawData: rawData)?.template)
         #expect(parsed.issuer == template.issuer)

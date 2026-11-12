@@ -16,71 +16,74 @@
  */
 
 #if os(iOS)
-import SwiftUI
+    import SwiftUI
 
-struct AppIconView: View {
+    struct AppIconView: View {
 
-    private struct AppIcon: Identifiable {
-        // nil is the primary app icon, otherwise the name of an alternate Icon Composer (.icon) file.
-        let iconName: String?
-        let preview: String
-        let title: String
-        var id: String { iconName ?? "" }
-    }
+        private struct AppIcon: Identifiable {
+            // nil is the primary app icon, otherwise the name of an alternate Icon Composer (.icon) file.
+            let iconName: String?
+            let preview: String
+            let title: String
+            var id: String { iconName ?? "" }
+        }
 
-    private let icons = [
-        AppIcon(iconName: nil, preview: "icon", title: String(localized: "Pink", comment: "App icon name")),
-        AppIcon(iconName: "AppIcon-Dark", preview: "icon-dark", title: String(localized: "Dark", comment: "App icon name"))
-    ]
+        private let icons = [
+            AppIcon(iconName: nil, preview: "icon", title: String(localized: "Pink", comment: "App icon name")),
+            AppIcon(iconName: "AppIcon-Dark", preview: "icon-dark", title: String(localized: "Dark", comment: "App icon name"))
+        ]
 
-    @State private var selected = UIApplication.shared.alternateIconName
-    @State private var errorMessage: String?
+        @State private var selected = UIApplication.shared.alternateIconName
+        @State private var errorMessage: String?
 
-    var body: some View {
-        List {
-            ForEach(icons) { icon in
-                Button {
-                    select(icon)
-                } label: {
-                    HStack {
-                        Image(icon.preview)
-                            .resizable()
-                            // Previews are rendered from the .icon files and already carry the system icon shape.
-                            .frame(width: 60, height: 60)
-                            .padding(.vertical, 4)
-                            .accessibilityHidden(true)
-                        Text(icon.title)
-                            .foregroundStyle(Color(.label))
-                            .padding(.leading, 8)
-                        Spacer()
-                        if selected == icon.iconName {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.accentColor)
+        var body: some View {
+            List {
+                ForEach(icons) { icon in
+                    Button {
+                        select(icon)
+                    } label: {
+                        HStack {
+                            Image(icon.preview)
+                                .resizable()
+                                // Previews are rendered from the .icon files and already carry the system icon shape.
+                                .frame(width: 60, height: 60)
+                                .padding(.vertical, 4)
+                                .accessibilityHidden(true)
+                            Text(icon.title)
+                                .foregroundStyle(Color(.label))
+                                .padding(.leading, 8)
+                            Spacer()
+                            if selected == icon.iconName {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(Color.accentColor)
+                            }
                         }
                     }
+                    .accessibilityAddTraits(selected == icon.iconName ? .isSelected : [])
                 }
-                .accessibilityAddTraits(selected == icon.iconName ? .isSelected : [])
+            }
+            .navigationTitle(String(localized: "App icon", comment: "App icon navigation title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .alert(
+                String(localized: "Failed to change app icon"),
+                isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })
+            ) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage ?? "")
             }
         }
-        .navigationTitle(String(localized: "App icon", comment: "App icon navigation title"))
-        .navigationBarTitleDisplayMode(.inline)
-        .alert(String(localized: "Failed to change app icon"), isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(errorMessage ?? "")
-        }
-    }
 
-    private func select(_ icon: AppIcon) {
-        guard selected != icon.iconName, UIApplication.shared.supportsAlternateIcons else { return }
-        Task {
-            do {
-                try await UIApplication.shared.setAlternateIconName(icon.iconName)
-                selected = icon.iconName
-            } catch {
-                errorMessage = error.localizedDescription
+        private func select(_ icon: AppIcon) {
+            guard selected != icon.iconName, UIApplication.shared.supportsAlternateIcons else { return }
+            Task {
+                do {
+                    try await UIApplication.shared.setAlternateIconName(icon.iconName)
+                    selected = icon.iconName
+                } catch {
+                    errorMessage = error.localizedDescription
+                }
             }
         }
     }
-}
 #endif

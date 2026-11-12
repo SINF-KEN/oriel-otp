@@ -90,7 +90,8 @@ private let rfcSecret = Data("12345678901234567890".utf8).base32EncodedString
 struct EnteEntryEditorTests {
 
     @Test func renamesAndKeepsWhatTheAppDoesntUse() throws {
-        let object = #"{"rawData":"otpauth://totp/Old:alice?secret=JBSWY3DPEHPK3PXP&issuer=Old&period=30&image=x","display":{"tags":["work"],"note":"Backup codes in the safe","pinned":true}}"#
+        let object =
+            #"{"rawData":"otpauth://totp/Old:alice?secret=JBSWY3DPEHPK3PXP&issuer=Old&period=30&image=x","display":{"tags":["work"],"note":"Backup codes in the safe","pinned":true}}"#
         var editor = try #require(EnteEntryEditor(rawData: object))
         editor.rename(issuer: "New+Co", accountName: "bob#1@example.com")
         let edited = try #require(editor.rawData)
@@ -189,7 +190,9 @@ struct EnteCloudCodeTests {
 
     @Test func samePinnedOrCountedAccountIsTheSameAccount() throws {
         let first = try #require(EnteCloudCode(rawData: rawData("otpauth://hotp/A:alice?secret=JBSWY3DPEHPK3PXP&counter=1")))
-        let next = try #require(EnteCloudCode(rawData: rawData("otpauth://hotp/A:alice?secret=JBSWY3DPEHPK3PXP&counter=2&codeDisplay=%7B%22pinned%22%3Atrue%7D")))
+        let next = try #require(
+            EnteCloudCode(
+                rawData: rawData("otpauth://hotp/A:alice?secret=JBSWY3DPEHPK3PXP&counter=2&codeDisplay=%7B%22pinned%22%3Atrue%7D")))
         let renamed = try #require(EnteCloudCode(rawData: rawData("otpauth://hotp/B:alice?secret=JBSWY3DPEHPK3PXP&counter=2")))
         #expect(first.isSameAccount(as: next))
         #expect(!first.isSameAccount(as: renamed))
@@ -211,18 +214,25 @@ struct EnteVaultTests {
     }
 
     @Test func accountsChangedAtTheSameTimeAreAddedInTheSameOrder() {
-        let items: [(id: String, uri: String, updatedAt: Int64)] = ["c", "a", "b"].map { ($0, "otpauth://totp/\($0):alice?secret=JBSWY3DPEHPK3PXP", 1) }
+        let items: [(id: String, uri: String, updatedAt: Int64)] = ["c", "a", "b"].map {
+            ($0, "otpauth://totp/\($0):alice?secret=JBSWY3DPEHPK3PXP", 1)
+        }
         #expect(vault(with: items).items.map(\.id) == ["a", "b", "c"])
         #expect(vault(with: items.reversed()).items.map(\.id) == ["a", "b", "c"])
     }
 
     @Test func pullAddsChangesAndDeletes() {
-        var vault = vault(with: [("a", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP", 1), ("b", "otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", 2)])
+        var vault = vault(with: [
+            ("a", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP", 1), ("b", "otpauth://totp/B:alice?secret=JBSWY3DPEHPK3PXP", 2)
+        ])
         #expect(vault.items.map(\.id) == ["a", "b"])
         #expect(vault.lastSyncTime == 2)
 
-        vault.merge([(entity("a", updatedAt: 3), rawData("otpauth://totp/A2:alice?secret=JBSWY3DPEHPK3PXP")),
-                     (entity("b", updatedAt: 4, isDeleted: true), nil)], latest: 4)
+        vault.merge(
+            [
+                (entity("a", updatedAt: 3), rawData("otpauth://totp/A2:alice?secret=JBSWY3DPEHPK3PXP")),
+                (entity("b", updatedAt: 4, isDeleted: true), nil)
+            ], latest: 4)
         #expect(vault.items.map(\.id) == ["a"])
         #expect(vault.items[0].rawData == rawData("otpauth://totp/A2:alice?secret=JBSWY3DPEHPK3PXP"))
         #expect(vault.items[0].serverUpdatedAt == 3)
@@ -323,8 +333,8 @@ struct EnteVaultTests {
         #expect(bytes.range(of: Data("JBSWY3DPEHPK3PXP".utf8)) == nil)
         #expect(bytes.range(of: Data("alice".utf8)) == nil)
         #if os(iOS)
-        // On the Mac this is Time Machine's, which the temporary folder of CI's runners doesn't keep.
-        #expect(try url.resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup == true)
+            // On the Mac this is Time Machine's, which the temporary folder of CI's runners doesn't keep.
+            #expect(try url.resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup == true)
         #endif
 
         // Without its key, e.g. after a restore on another device, the file can't be read.
@@ -344,10 +354,17 @@ struct EnteVaultTests {
     private func cloud(with uris: [String]) throws -> EnteCloud {
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
         var vault = EnteVault(email: "alice@example.com", server: server)
-        vault.merge(uris.enumerated().map { (EnteAuthenticatorEntity(id: "e\($0)", encryptedData: nil, header: nil, isDeleted: false, updatedAt: Int64($0 + 1)), rawData($1)) },
-                    latest: Int64(uris.count))
+        vault.merge(
+            uris.enumerated().map {
+                (
+                    EnteAuthenticatorEntity(id: "e\($0)", encryptedData: nil, header: nil, isDeleted: false, updatedAt: Int64($0 + 1)),
+                    rawData($1)
+                )
+            },
+            latest: Int64(uris.count))
         let storage = InMemoryVaultStorage()
         try storage.save(vault)
         return EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
@@ -359,7 +376,8 @@ struct EnteVaultTests {
         let model = MainViewModel(cloud: cloud, device: device)
         #expect(model.accounts.map(\.title) == ["Apple", "Zebra"])
 
-        let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: try #require(URL(string: "otpauth://totp/Mango:alice?secret=\(rfcSecret)")))
+        let template = try YubiKitOATHSession.CredentialTemplate(
+            otpauthURL: try #require(URL(string: "otpauth://totp/Mango:alice?secret=\(rfcSecret)")))
         _ = try model.addDeviceAccount(template)
         #expect(model.accounts.map(\.title) == ["Apple", "Mango", "Zebra"])
 
@@ -369,9 +387,11 @@ struct EnteVaultTests {
     }
 
     @Test func listsTheAccountsWithCodesCalculatedHere() throws {
-        let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=\(rfcSecret)",
-                                     "otpauth://hotp/VPN:alice?secret=\(rfcSecret)&counter=0",
-                                     "otpauth://totp/Old:alice?secret=\(rfcSecret)&codeDisplay=%7B%22trashed%22%3Atrue%7D"])
+        let cloud = try cloud(with: [
+            "otpauth://totp/GitHub:alice?secret=\(rfcSecret)",
+            "otpauth://hotp/VPN:alice?secret=\(rfcSecret)&counter=0",
+            "otpauth://totp/Old:alice?secret=\(rfcSecret)&codeDisplay=%7B%22trashed%22%3Atrue%7D"
+        ])
         let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(model.cloudAccounts.map(\.title) == ["GitHub", "VPN"])
         #expect(model.accounts.allSatisfy { $0.isInEnte })
@@ -379,7 +399,8 @@ struct EnteVaultTests {
         #expect(!model.accountsLoaded)
 
         let totp = try #require(model.cloudAccounts.first { $0.title == "GitHub" })
-        let expected = try #require(EnteCloudCode(rawData: rawData("otpauth://totp/GitHub:alice?secret=\(rfcSecret)"))).code(at: AppClock.now)
+        let expected = try #require(EnteCloudCode(rawData: rawData("otpauth://totp/GitHub:alice?secret=\(rfcSecret)"))).code(
+            at: AppClock.now)
         #expect(totp.otp?.code == expected.code)
         #expect(totp.accountId != "GitHub:alice")
 
@@ -395,7 +416,9 @@ struct EnteVaultTests {
     }
 
     @Test func changesGoToTheVault() throws {
-        let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP"])
+        let cloud = try cloud(with: [
+            "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP", "otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP"
+        ])
         let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         let github = try #require(model.cloudAccounts.first { $0.title == "GitHub" })
 
@@ -427,10 +450,12 @@ struct EnteVaultTests {
         let defaults = makeTestDefaults()
         let keychain = InMemoryKeychain()
         let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
         let storage = InMemoryVaultStorage()
         try storage.save(EnteVault(email: "alice@example.com", server: server))
-        let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
 
         let context = LAContext()
         await cloud.syncAutomatically(authentication: KeychainAuthentication(context: context))
@@ -442,16 +467,23 @@ struct EnteVaultTests {
     @Test func readsAVaultLockedAtLaunchOnceTheDeviceIsUnlocked() async throws {
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
         var vault = EnteVault(email: "alice@example.com", server: server)
-        vault.merge([(EnteAuthenticatorEntity(id: "e0", encryptedData: nil, header: nil, isDeleted: false, updatedAt: 1),
-                      rawData("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP"))], latest: 1)
+        vault.merge(
+            [
+                (
+                    EnteAuthenticatorEntity(id: "e0", encryptedData: nil, header: nil, isDeleted: false, updatedAt: 1),
+                    rawData("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP")
+                )
+            ], latest: 1)
         _ = vault.add(rawData: rawData("otpauth://totp/GitLab:alice?secret=JBSWY3DPEHPK3PXP"))
         let storage = LockedVaultStorage()
         try storage.save(vault)
 
         // Launched in the background while the device is locked.
-        let cloud = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
         let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         #expect(!cloud.isEnabled)
         #expect(model.cloudAccounts.isEmpty)
@@ -464,10 +496,12 @@ struct EnteVaultTests {
     }
 
     @Test func offersCopyingToTheYubiKeyWhenItCanStoreTheAccount() throws {
-        let cloud = try cloud(with: ["otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&algorithm=SHA256&digits=8&period=60",
-                                     "otpauth://hotp/VPN:alice?secret=JBSWY3DPEHPK3PXP&counter=5",
-                                     "otpauth://steam/Steam:alice?secret=JBSWY3DPEHPK3PXP",
-                                     "otpauth://totp/Long:alice?secret=JBSWY3DPEHPK3PXP&digits=10"])
+        let cloud = try cloud(with: [
+            "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&algorithm=SHA256&digits=8&period=60",
+            "otpauth://hotp/VPN:alice?secret=JBSWY3DPEHPK3PXP&counter=5",
+            "otpauth://steam/Steam:alice?secret=JBSWY3DPEHPK3PXP",
+            "otpauth://totp/Long:alice?secret=JBSWY3DPEHPK3PXP&digits=10"
+        ])
         let model = MainViewModel(cloud: cloud, device: DeviceAccounts(storage: MemoryDeviceStorage()))
         func account(_ title: String) throws -> Account { try #require(model.cloudAccounts.first { $0.title == title }) }
 
@@ -501,221 +535,231 @@ struct EnteVaultTests {
 
 #if DEBUG && (targetEnvironment(simulator) || os(macOS))
 
-/// Syncs the vault with the fake Ente server in both directions, with another device changing the same account.
-@MainActor @Suite(.serialized)
-struct EnteCloudSyncTests {
+    /// Syncs the vault with the fake Ente server in both directions, with another device changing the same account.
+    @MainActor @Suite(.serialized)
+    struct EnteCloudSyncTests {
 
-    /// Another device signed in to the same account, which writes to Ente directly.
-    struct OtherDevice {
-        let api: EnteAPIClient
-        let token: String
-        let key: Data
+        /// Another device signed in to the same account, which writes to Ente directly.
+        struct OtherDevice {
+            let api: EnteAPIClient
+            let token: String
+            let key: Data
 
-        @discardableResult
-        func add(_ uri: String) async throws -> String {
-            let encrypted = try EnteAuthenticatorSync.encrypt(rawData(uri), authenticatorKey: key)
-            return try await api.createAuthenticatorEntity(token: token, encryptedData: encrypted.encryptedData, header: encrypted.header).id
+            @discardableResult
+            func add(_ uri: String) async throws -> String {
+                let encrypted = try EnteAuthenticatorSync.encrypt(rawData(uri), authenticatorKey: key)
+                return try await api.createAuthenticatorEntity(
+                    token: token, encryptedData: encrypted.encryptedData, header: encrypted.header
+                ).id
+            }
+
+            func update(_ id: String, _ uri: String) async throws {
+                let encrypted = try EnteAuthenticatorSync.encrypt(rawData(uri), authenticatorKey: key)
+                try await api.updateAuthenticatorEntity(
+                    token: token, id: id, encryptedData: encrypted.encryptedData, header: encrypted.header)
+            }
+
+            /// Deletes an entity for good, like another device emptying Ente's trash. Only the tests do this: the app
+            /// moves accounts to the trash instead, so the API client has no hard delete.
+            func delete(_ id: String) async throws {
+                let request = try api.request("DELETE", "/authenticator/entity", token: token, query: ["id": id])
+                let (_, response) = try await api.session.data(for: request)
+                #expect((response as? HTTPURLResponse)?.statusCode == 200)
+            }
+
+            /// The plain text of each entity that isn't deleted, by id.
+            func entities() async throws -> [String: String] {
+                let decrypted = try await EnteAuthenticatorSync.decryptedEntities(api: api, token: token, authenticatorKey: key)
+                return Dictionary(uniqueKeysWithValues: decrypted.compactMap { id, rawData in rawData.map { (id, $0) } })
+            }
         }
 
-        func update(_ id: String, _ uri: String) async throws {
-            let encrypted = try EnteAuthenticatorSync.encrypt(rawData(uri), authenticatorKey: key)
-            try await api.updateAuthenticatorEntity(token: token, id: id, encryptedData: encrypted.encryptedData, header: encrypted.header)
+        let defaults = makeTestDefaults()
+        let keychain = InMemoryKeychain()
+        /// Kept across the clouds of a test, like the vault file across launches.
+        let storage = InMemoryVaultStorage()
+        let online: URLSession
+
+        init() {
+            online = URLSession.stubbed([FakeEnteServer.self])
         }
 
-        /// Deletes an entity for good, like another device emptying Ente's trash. Only the tests do this: the app
-        /// moves accounts to the trash instead, so the API client has no hard delete.
-        func delete(_ id: String) async throws {
-            let request = try api.request("DELETE", "/authenticator/entity", token: token, query: ["id": id])
-            let (_, response) = try await api.session.data(for: request)
-            #expect((response as? HTTPURLResponse)?.statusCode == 200)
+        private var store: EnteSessionStore {
+            EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
         }
 
-        /// The plain text of each entity that isn't deleted, by id.
-        func entities() async throws -> [String: String] {
-            let decrypted = try await EnteAuthenticatorSync.decryptedEntities(api: api, token: token, authenticatorKey: key)
-            return Dictionary(uniqueKeysWithValues: decrypted.compactMap { id, rawData in rawData.map { (id, $0) } })
+        /// Signs in to a new account on the fake server and saves the session, like signing in with Stay signed in does.
+        /// The account signs in with an email code rather than SRP, whose arithmetic is slow in Debug builds.
+        private func signIn() async throws -> OtherDevice {
+            let api = try EnteAPIClient(server: FakeEnteServer.newAccountServer(), session: online)
+            let (flow, step) = try await EnteLoginFlow.start(api: api, email: "alice+nosrp@example.com", password: FakeEnteServer.password)
+            #expect(step == .emailCode)
+            #expect(try await flow.submitCode(FakeEnteServer.code) == .complete)
+            let keys = try #require(flow.keys)
+            let key = try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
+            try store.save(EnteSavedSession(server: api.server, email: "alice@example.com", token: keys.token, authenticatorKey: key))
+            return OtherDevice(api: api, token: keys.token, key: key)
+        }
+
+        private func cloud(session: URLSession? = nil) -> EnteCloud {
+            EnteCloud(store: store, storage: storage, session: session ?? online, watch: WatchAccountSync(defaults: defaults))
+        }
+
+        private func template(_ issuer: String, _ type: YubiKitOATHSession.CredentialType = .totp(period: 30)) throws
+            -> YubiKitOATHSession.CredentialTemplate
+        {
+            try YubiKitOATHSession.CredentialTemplate(
+                type: type, algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+                issuer: issuer, accountName: "alice", digits: 6)
+        }
+
+        private func id(of issuer: String, in cloud: EnteCloud) throws -> String {
+            try #require(cloud.accounts.first { $0.code.issuer == issuer }).id
+        }
+
+        @Test func changesGoBothWays() async throws {
+            let other = try await signIn()
+            let cloud = cloud()
+            let gitHub = try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+
+            await cloud.sync()
+            #expect(cloud.accounts.map(\.code.issuer) == ["GitHub"])
+
+            // Added here, seen by the other device.
+            #expect(try cloud.add(template("GitLab")) == .added)
+            await cloud.sync()
+            #expect(!cloud.hasPendingChanges)
+            var entities = try await other.entities()
+            #expect(
+                entities.values.compactMap { EnteCodeParser.parse(id: "", rawData: $0)?.credentialId }.sorted() == [
+                    "GitHub:alice", "GitLab:alice"
+                ])
+
+            // Renamed on the other device, then here.
+            try await other.update(gitHub, "otpauth://totp/GitHub:bob?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+            await cloud.sync()
+            #expect(cloud.accounts.first { $0.code.issuer == "GitHub" }?.code.accountName == "bob")
+            try cloud.rename(try id(of: "GitHub", in: cloud), issuer: "GitHub", accountName: "carol")
+            await cloud.sync()
+            entities = try await other.entities()
+            #expect(EnteCodeParser.parse(id: "", rawData: entities[gitHub] ?? "")?.accountName == "carol")
+
+            // Deleted here: moved to Ente's trash, like Ente Auth does.
+            let gitLab = try #require(cloud.vault?.items.first { EnteCloudCode(rawData: $0.rawData ?? "")?.issuer == "GitLab" }?.entityID)
+            try cloud.delete(try id(of: "GitLab", in: cloud))
+            await cloud.sync()
+            entities = try await other.entities()
+            #expect(EnteEntry(rawData: entities[gitLab] ?? "").isTrashed)
+            #expect(!cloud.accounts.contains { $0.code.issuer == "GitLab" })
+
+            // Deleted for good on the other device.
+            try await other.delete(gitHub)
+            await cloud.sync()
+            #expect(cloud.accounts.isEmpty)
+            #expect(cloud.vault?.items.count == 1)
+        }
+
+        @Test func changesMadeOfflineAreUploadedLater() async throws {
+            let other = try await signIn()
+            try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+            await cloud().sync()
+
+            let offline = cloud(session: OfflineURLProtocol.session)
+            #expect(offline.accounts.count == 1)
+            #expect(try offline.add(template("GitLab")) == .added)
+            try offline.setPinned(try id(of: "GitHub", in: offline), true)
+            await offline.sync(reportsErrors: false)
+            #expect(offline.hasPendingChanges)
+            #expect(offline.error == nil)
+            #expect(offline.accounts.count == 2)
+
+            // Back online, e.g. after a relaunch.
+            let online = cloud()
+            #expect(online.hasPendingChanges)
+            await online.sync()
+            #expect(!online.hasPendingChanges)
+            let entities = try await other.entities().values
+            #expect(entities.count == 2)
+            #expect(entities.contains { EnteCodeParser.parse(id: "", rawData: $0)?.credentialId == "GitLab:alice" })
+            #expect(entities.contains { EnteEntry(rawData: $0).isPinned })
+        }
+
+        @Test func anotherDevicesNewerChangeWins() async throws {
+            let other = try await signIn()
+            let id = try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+            await cloud().sync()
+
+            // Renamed here while offline, and on the other device before this one synced again.
+            let offline = cloud(session: OfflineURLProtocol.session)
+            try offline.rename(try self.id(of: "GitHub", in: offline), issuer: "GitHub", accountName: "here")
+            await offline.sync()
+            try await other.update(id, "otpauth://totp/GitHub:there?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+
+            let online = cloud()
+            await online.sync()
+            #expect(online.accounts.map(\.code.accountName) == ["there"])
+            #expect(!online.hasPendingChanges)
+            let entities = try await other.entities()
+            #expect(EnteCodeParser.parse(id: "", rawData: entities[id] ?? "")?.accountName == "there")
+        }
+
+        @Test func aChangeToAnAccountDeletedElsewhereIsDropped() async throws {
+            let other = try await signIn()
+            let id = try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+            await cloud().sync()
+
+            let offline = cloud(session: OfflineURLProtocol.session)
+            try offline.setPinned(try self.id(of: "GitHub", in: offline), true)
+            try await other.delete(id)
+
+            let online = cloud()
+            await online.sync()
+            #expect(online.vault?.items.isEmpty == true)
+            #expect(try await other.entities().isEmpty)
+        }
+
+        @Test func hotpCountersMoveOnEverywhere() async throws {
+            let other = try await signIn()
+            let id = try await other.add("otpauth://hotp/VPN:alice?secret=\(rfcSecret)&issuer=VPN&counter=0")
+            let cloud = cloud()
+            await cloud.sync()
+
+            #expect(cloud.nextHOTPCode(try self.id(of: "VPN", in: cloud)) == "755224")
+            await cloud.sync()
+            let entities = try await other.entities()
+            #expect(EnteCloudCode(rawData: entities[id] ?? "")?.counter == 1)
+        }
+
+        @Test func aRejectedSessionKeepsTheVault() async throws {
+            let other = try await signIn()
+            try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+            await cloud().sync()
+
+            // Ended from another device.
+            try store.save(
+                EnteSavedSession(server: other.api.server, email: "alice@example.com", token: "revoked", authenticatorKey: other.key))
+            let cloud = cloud()
+            _ = try? cloud.add(template("GitLab"))
+            await cloud.sync()
+            #expect(cloud.error != nil)
+            #expect(store.savedAccount?.hasSession == false)
+            // The codes still work and the change waits for the password.
+            #expect(cloud.accounts.count == 2)
+            #expect(cloud.hasPendingChanges)
+        }
+
+        @Test func signingInToAnotherAccountReplacesTheVault() async throws {
+            let other = try await signIn()
+            try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
+            let cloud = cloud()
+            await cloud.sync()
+            #expect(cloud.accounts.count == 1)
+
+            cloud.use(EnteSavedSession(server: other.api.server, email: "bob@example.com", token: other.token, authenticatorKey: other.key))
+            #expect(cloud.email == "bob@example.com")
+            #expect(cloud.accounts.isEmpty)
         }
     }
-
-    let defaults = makeTestDefaults()
-    let keychain = InMemoryKeychain()
-    /// Kept across the clouds of a test, like the vault file across launches.
-    let storage = InMemoryVaultStorage()
-    let online: URLSession
-
-    init() {
-        online = URLSession.stubbed([FakeEnteServer.self])
-    }
-
-    private var store: EnteSessionStore {
-        EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
-    }
-
-    /// Signs in to a new account on the fake server and saves the session, like signing in with Stay signed in does.
-    /// The account signs in with an email code rather than SRP, whose arithmetic is slow in Debug builds.
-    private func signIn() async throws -> OtherDevice {
-        let api = try EnteAPIClient(server: FakeEnteServer.newAccountServer(), session: online)
-        let (flow, step) = try await EnteLoginFlow.start(api: api, email: "alice+nosrp@example.com", password: FakeEnteServer.password)
-        #expect(step == .emailCode)
-        #expect(try await flow.submitCode(FakeEnteServer.code) == .complete)
-        let keys = try #require(flow.keys)
-        let key = try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
-        try store.save(EnteSavedSession(server: api.server, email: "alice@example.com", token: keys.token, authenticatorKey: key))
-        return OtherDevice(api: api, token: keys.token, key: key)
-    }
-
-    private func cloud(session: URLSession? = nil) -> EnteCloud {
-        EnteCloud(store: store, storage: storage, session: session ?? online, watch: WatchAccountSync(defaults: defaults))
-    }
-
-    private func template(_ issuer: String, _ type: YubiKitOATHSession.CredentialType = .totp(period: 30)) throws -> YubiKitOATHSession.CredentialTemplate {
-        try YubiKitOATHSession.CredentialTemplate(type: type, algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
-                                                  issuer: issuer, accountName: "alice", digits: 6)
-    }
-
-    private func id(of issuer: String, in cloud: EnteCloud) throws -> String {
-        try #require(cloud.accounts.first { $0.code.issuer == issuer }).id
-    }
-
-    @Test func changesGoBothWays() async throws {
-        let other = try await signIn()
-        let cloud = cloud()
-        let gitHub = try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-
-        await cloud.sync()
-        #expect(cloud.accounts.map(\.code.issuer) == ["GitHub"])
-
-        // Added here, seen by the other device.
-        #expect(try cloud.add(template("GitLab")) == .added)
-        await cloud.sync()
-        #expect(!cloud.hasPendingChanges)
-        var entities = try await other.entities()
-        #expect(entities.values.compactMap { EnteCodeParser.parse(id: "", rawData: $0)?.credentialId }.sorted() == ["GitHub:alice", "GitLab:alice"])
-
-        // Renamed on the other device, then here.
-        try await other.update(gitHub, "otpauth://totp/GitHub:bob?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-        await cloud.sync()
-        #expect(cloud.accounts.first { $0.code.issuer == "GitHub" }?.code.accountName == "bob")
-        try cloud.rename(try id(of: "GitHub", in: cloud), issuer: "GitHub", accountName: "carol")
-        await cloud.sync()
-        entities = try await other.entities()
-        #expect(EnteCodeParser.parse(id: "", rawData: entities[gitHub] ?? "")?.accountName == "carol")
-
-        // Deleted here: moved to Ente's trash, like Ente Auth does.
-        let gitLab = try #require(cloud.vault?.items.first { EnteCloudCode(rawData: $0.rawData ?? "")?.issuer == "GitLab" }?.entityID)
-        try cloud.delete(try id(of: "GitLab", in: cloud))
-        await cloud.sync()
-        entities = try await other.entities()
-        #expect(EnteEntry(rawData: entities[gitLab] ?? "").isTrashed)
-        #expect(!cloud.accounts.contains { $0.code.issuer == "GitLab" })
-
-        // Deleted for good on the other device.
-        try await other.delete(gitHub)
-        await cloud.sync()
-        #expect(cloud.accounts.isEmpty)
-        #expect(cloud.vault?.items.count == 1)
-    }
-
-    @Test func changesMadeOfflineAreUploadedLater() async throws {
-        let other = try await signIn()
-        try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-        await cloud().sync()
-
-        let offline = cloud(session: OfflineURLProtocol.session)
-        #expect(offline.accounts.count == 1)
-        #expect(try offline.add(template("GitLab")) == .added)
-        try offline.setPinned(try id(of: "GitHub", in: offline), true)
-        await offline.sync(reportsErrors: false)
-        #expect(offline.hasPendingChanges)
-        #expect(offline.error == nil)
-        #expect(offline.accounts.count == 2)
-
-        // Back online, e.g. after a relaunch.
-        let online = cloud()
-        #expect(online.hasPendingChanges)
-        await online.sync()
-        #expect(!online.hasPendingChanges)
-        let entities = try await other.entities().values
-        #expect(entities.count == 2)
-        #expect(entities.contains { EnteCodeParser.parse(id: "", rawData: $0)?.credentialId == "GitLab:alice" })
-        #expect(entities.contains { EnteEntry(rawData: $0).isPinned })
-    }
-
-    @Test func anotherDevicesNewerChangeWins() async throws {
-        let other = try await signIn()
-        let id = try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-        await cloud().sync()
-
-        // Renamed here while offline, and on the other device before this one synced again.
-        let offline = cloud(session: OfflineURLProtocol.session)
-        try offline.rename(try self.id(of: "GitHub", in: offline), issuer: "GitHub", accountName: "here")
-        await offline.sync()
-        try await other.update(id, "otpauth://totp/GitHub:there?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-
-        let online = cloud()
-        await online.sync()
-        #expect(online.accounts.map(\.code.accountName) == ["there"])
-        #expect(!online.hasPendingChanges)
-        let entities = try await other.entities()
-        #expect(EnteCodeParser.parse(id: "", rawData: entities[id] ?? "")?.accountName == "there")
-    }
-
-    @Test func aChangeToAnAccountDeletedElsewhereIsDropped() async throws {
-        let other = try await signIn()
-        let id = try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-        await cloud().sync()
-
-        let offline = cloud(session: OfflineURLProtocol.session)
-        try offline.setPinned(try self.id(of: "GitHub", in: offline), true)
-        try await other.delete(id)
-
-        let online = cloud()
-        await online.sync()
-        #expect(online.vault?.items.isEmpty == true)
-        #expect(try await other.entities().isEmpty)
-    }
-
-    @Test func hotpCountersMoveOnEverywhere() async throws {
-        let other = try await signIn()
-        let id = try await other.add("otpauth://hotp/VPN:alice?secret=\(rfcSecret)&issuer=VPN&counter=0")
-        let cloud = cloud()
-        await cloud.sync()
-
-        #expect(cloud.nextHOTPCode(try self.id(of: "VPN", in: cloud)) == "755224")
-        await cloud.sync()
-        let entities = try await other.entities()
-        #expect(EnteCloudCode(rawData: entities[id] ?? "")?.counter == 1)
-    }
-
-    @Test func aRejectedSessionKeepsTheVault() async throws {
-        let other = try await signIn()
-        try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-        await cloud().sync()
-
-        // Ended from another device.
-        try store.save(EnteSavedSession(server: other.api.server, email: "alice@example.com", token: "revoked", authenticatorKey: other.key))
-        let cloud = cloud()
-        _ = try? cloud.add(template("GitLab"))
-        await cloud.sync()
-        #expect(cloud.error != nil)
-        #expect(store.savedAccount?.hasSession == false)
-        // The codes still work and the change waits for the password.
-        #expect(cloud.accounts.count == 2)
-        #expect(cloud.hasPendingChanges)
-    }
-
-    @Test func signingInToAnotherAccountReplacesTheVault() async throws {
-        let other = try await signIn()
-        try await other.add("otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub")
-        let cloud = cloud()
-        await cloud.sync()
-        #expect(cloud.accounts.count == 1)
-
-        cloud.use(EnteSavedSession(server: other.api.server, email: "bob@example.com", token: other.token, authenticatorKey: other.key))
-        #expect(cloud.email == "bob@example.com")
-        #expect(cloud.accounts.isEmpty)
-    }
-}
 
 #endif
 

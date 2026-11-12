@@ -16,132 +16,135 @@
 
 #if DEBUG && (targetEnvironment(simulator) || os(macOS))
 
-import Foundation
-import Testing
+    import Foundation
+    import Testing
 
-@testable import OrielOTP
+    @testable import OrielOTP
 
-/// Deletes accounts on the fake Ente server, which checks the challenge like Ente's server.
-@MainActor struct EnteAccountDeletionTests {
+    /// Deletes accounts on the fake Ente server, which checks the challenge like Ente's server.
+    @MainActor struct EnteAccountDeletionTests {
 
-    private let session: URLSession = {
-        return URLSession.stubbed([FakeEnteServer.self])
-    }()
-    private let defaults = makeTestDefaults()
-    private let keychain = InMemoryKeychain()
-    private var store: EnteSessionStore { EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true) }
+        private let session: URLSession = {
+            return URLSession.stubbed([FakeEnteServer.self])
+        }()
+        private let defaults = makeTestDefaults()
+        private let keychain = InMemoryKeychain()
+        private var store: EnteSessionStore { EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true) }
 
-    private func model(_ server: URL, email: String = "alice@example.com") -> EnteAccountDeletionViewModel {
-        let watch = WatchAccountSync(defaults: defaults)
-        return EnteAccountDeletionViewModel(server: server, email: email, session: session, store: store,
-                                            cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch))
-    }
+        private func model(_ server: URL, email: String = "alice@example.com") -> EnteAccountDeletionViewModel {
+            let watch = WatchAccountSync(defaults: defaults)
+            return EnteAccountDeletionViewModel(
+                server: server, email: email, session: session, store: store,
+                cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch))
+        }
 
-    private func finish(_ model: EnteAccountDeletionViewModel) async throws {
-        while model.isBusy {
-            try await Task.sleep(for: .milliseconds(20))
+        private func finish(_ model: EnteAccountDeletionViewModel) async throws {
+            while model.isBusy {
+                try await Task.sleep(for: .milliseconds(20))
+            }
+        }
+
+        private func delete(_ model: EnteAccountDeletionViewModel, password: String = FakeEnteServer.password) async throws {
+            model.password = password
+            model.delete()
+            try await finish(model)
+        }
+
+        private func accountExists(_ server: URL, email: String = "alice@example.com") async throws -> Bool {
+            try await EnteAPIClient(server: server, session: session).srpAttributes(email: email) != nil
+        }
+
+        @Test func deletesTheAccountWithItsPassword() async throws {
+            let server = FakeEnteServer.newAccountServer()
+            #expect(try await accountExists(server))
+            let model = model(server)
+            try await delete(model)
+            #expect(model.error == nil)
+            #expect(model.phase == .deleted)
+            #expect(model.password.isEmpty)
+            #expect(try await !accountExists(server))
+        }
+
+        @Test func asksForTheEmailCodeFirstWhenTheAccountNeedsIt() async throws {
+            let server = FakeEnteServer.newAccountServer()
+            let model = model(server, email: "alice+mfa@example.com")
+            try await delete(model)
+            #expect(model.phase == .emailCode)
+            #expect(try await accountExists(server))
+            model.code = FakeEnteServer.code
+            model.submitCode()
+            try await finish(model)
+            #expect(model.phase == .deleted)
+            #expect(try await !accountExists(server))
+        }
+
+        @Test func aWrongPasswordDeletesNothing() async throws {
+            let server = FakeEnteServer.newAccountServer()
+            let model = model(server)
+            try await delete(model, password: "wrong")
+            #expect(model.phase == .password)
+            #expect(model.error?.localizedDescription == EnteLoginError.incorrectPassword.errorDescription)
+            #expect(try await accountExists(server))
+        }
+
+        @Test func entesServersAreRefused() async throws {
+            let model = model(EnteAPIClient.defaultServer)
+            try await delete(model)
+            #expect(model.phase == .password)
+            #expect(model.error?.localizedDescription == EnteAccountDeletionError.notAllowedOnEnte.errorDescription)
+        }
+
+        @Test func forgetsTheSavedSessionOfTheDeletedAccount() async throws {
+            let server = FakeEnteServer.newAccountServer()
+            try store.save(
+                EnteSavedSession(server: server, email: "Alice@example.com", token: "token", authenticatorKey: EnteCrypto.randomBytes(32)))
+            try await delete(model(server))
+            #expect(store.savedAccount == nil)
+        }
+
+        @Test func keepsTheSavedSessionOfAnotherAccount() async throws {
+            let other = FakeEnteServer.newAccountServer()
+            try store.save(
+                EnteSavedSession(server: other, email: "alice@example.com", token: "token", authenticatorKey: EnteCrypto.randomBytes(32)))
+            try await delete(model(FakeEnteServer.newAccountServer()))
+            #expect(store.savedAccount?.server == other)
+        }
+
+        /// What the guideline asks for: an account created in the app can be deleted in the app.
+        @Test func deletesAnAccountCreatedInTheApp() async throws {
+            let server = FakeEnteServer.emptyServer()
+            let signUp = EnteSignUpViewModel(server: server, email: "alice@example.com", session: session)
+            signUp.password = "correct horse"
+            signUp.confirmation = "correct horse"
+            signUp.sendCode()
+            while signUp.isBusy { try await Task.sleep(for: .milliseconds(20)) }
+            signUp.code = FakeEnteServer.code
+            signUp.submitCode()
+            while signUp.isBusy { try await Task.sleep(for: .milliseconds(20)) }
+            signUp.hasSavedRecoveryKey = true
+            signUp.finish()
+            while signUp.isBusy { try await Task.sleep(for: .milliseconds(20)) }
+            #expect(signUp.phase == .finished)
+            #expect(try await accountExists(server))
+
+            let model = model(server)
+            try await delete(model, password: "correct horse")
+            #expect(model.error == nil)
+            #expect(model.phase == .deleted)
+            #expect(try await !accountExists(server))
         }
     }
 
-    private func delete(_ model: EnteAccountDeletionViewModel, password: String = FakeEnteServer.password) async throws {
-        model.password = password
-        model.delete()
-        try await finish(model)
+    @MainActor struct EnteDeletionChallengeTests {
+
+        @Test func onlyATokenIsSentBackOpened() {
+            #expect(EnteAccountDeletionViewModel.isChallenge("delete-jwt" + EnteCrypto.randomBytes(32).enteURLSafeBase64))
+            #expect(EnteAccountDeletionViewModel.isChallenge("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjF9.c2lnbmF0dXJl"))
+            #expect(!EnteAccountDeletionViewModel.isChallenge("my secret notes"))
+            #expect(!EnteAccountDeletionViewModel.isChallenge("short"))
+            #expect(!EnteAccountDeletionViewModel.isChallenge(String(repeating: "a", count: 5000)))
+            #expect(!EnteAccountDeletionViewModel.isChallenge("otpauth://totp/A:b?secret=JBSWY3DPEHPK3PXP"))
+        }
     }
-
-    private func accountExists(_ server: URL, email: String = "alice@example.com") async throws -> Bool {
-        try await EnteAPIClient(server: server, session: session).srpAttributes(email: email) != nil
-    }
-
-    @Test func deletesTheAccountWithItsPassword() async throws {
-        let server = FakeEnteServer.newAccountServer()
-        #expect(try await accountExists(server))
-        let model = model(server)
-        try await delete(model)
-        #expect(model.error == nil)
-        #expect(model.phase == .deleted)
-        #expect(model.password.isEmpty)
-        #expect(try await !accountExists(server))
-    }
-
-    @Test func asksForTheEmailCodeFirstWhenTheAccountNeedsIt() async throws {
-        let server = FakeEnteServer.newAccountServer()
-        let model = model(server, email: "alice+mfa@example.com")
-        try await delete(model)
-        #expect(model.phase == .emailCode)
-        #expect(try await accountExists(server))
-        model.code = FakeEnteServer.code
-        model.submitCode()
-        try await finish(model)
-        #expect(model.phase == .deleted)
-        #expect(try await !accountExists(server))
-    }
-
-    @Test func aWrongPasswordDeletesNothing() async throws {
-        let server = FakeEnteServer.newAccountServer()
-        let model = model(server)
-        try await delete(model, password: "wrong")
-        #expect(model.phase == .password)
-        #expect(model.error?.localizedDescription == EnteLoginError.incorrectPassword.errorDescription)
-        #expect(try await accountExists(server))
-    }
-
-    @Test func entesServersAreRefused() async throws {
-        let model = model(EnteAPIClient.defaultServer)
-        try await delete(model)
-        #expect(model.phase == .password)
-        #expect(model.error?.localizedDescription == EnteAccountDeletionError.notAllowedOnEnte.errorDescription)
-    }
-
-    @Test func forgetsTheSavedSessionOfTheDeletedAccount() async throws {
-        let server = FakeEnteServer.newAccountServer()
-        try store.save(EnteSavedSession(server: server, email: "Alice@example.com", token: "token", authenticatorKey: EnteCrypto.randomBytes(32)))
-        try await delete(model(server))
-        #expect(store.savedAccount == nil)
-    }
-
-    @Test func keepsTheSavedSessionOfAnotherAccount() async throws {
-        let other = FakeEnteServer.newAccountServer()
-        try store.save(EnteSavedSession(server: other, email: "alice@example.com", token: "token", authenticatorKey: EnteCrypto.randomBytes(32)))
-        try await delete(model(FakeEnteServer.newAccountServer()))
-        #expect(store.savedAccount?.server == other)
-    }
-
-    /// What the guideline asks for: an account created in the app can be deleted in the app.
-    @Test func deletesAnAccountCreatedInTheApp() async throws {
-        let server = FakeEnteServer.emptyServer()
-        let signUp = EnteSignUpViewModel(server: server, email: "alice@example.com", session: session)
-        signUp.password = "correct horse"
-        signUp.confirmation = "correct horse"
-        signUp.sendCode()
-        while signUp.isBusy { try await Task.sleep(for: .milliseconds(20)) }
-        signUp.code = FakeEnteServer.code
-        signUp.submitCode()
-        while signUp.isBusy { try await Task.sleep(for: .milliseconds(20)) }
-        signUp.hasSavedRecoveryKey = true
-        signUp.finish()
-        while signUp.isBusy { try await Task.sleep(for: .milliseconds(20)) }
-        #expect(signUp.phase == .finished)
-        #expect(try await accountExists(server))
-
-        let model = model(server)
-        try await delete(model, password: "correct horse")
-        #expect(model.error == nil)
-        #expect(model.phase == .deleted)
-        #expect(try await !accountExists(server))
-    }
-}
-
-@MainActor struct EnteDeletionChallengeTests {
-
-    @Test func onlyATokenIsSentBackOpened() {
-        #expect(EnteAccountDeletionViewModel.isChallenge("delete-jwt" + EnteCrypto.randomBytes(32).enteURLSafeBase64))
-        #expect(EnteAccountDeletionViewModel.isChallenge("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOjF9.c2lnbmF0dXJl"))
-        #expect(!EnteAccountDeletionViewModel.isChallenge("my secret notes"))
-        #expect(!EnteAccountDeletionViewModel.isChallenge("short"))
-        #expect(!EnteAccountDeletionViewModel.isChallenge(String(repeating: "a", count: 5000)))
-        #expect(!EnteAccountDeletionViewModel.isChallenge("otpauth://totp/A:b?secret=JBSWY3DPEHPK3PXP"))
-    }
-}
 
 #endif

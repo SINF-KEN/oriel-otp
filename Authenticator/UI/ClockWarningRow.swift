@@ -43,22 +43,34 @@ struct ClockWarningRow: View {
     /// How far off the clock is, e.g. "2 minutes, 5 seconds".
     static func amount(_ skew: TimeInterval) -> String {
         let seconds = Int(abs(skew).rounded())
-        return Duration.seconds(seconds).formatted(.units(allowed: [.days, .hours, .minutes, .seconds], width: .wide,
-                                                          maximumUnitCount: 2))
+        return Duration.seconds(seconds).formatted(
+            .units(
+                allowed: [.days, .hours, .minutes, .seconds], width: .wide,
+                maximumUnitCount: 2))
     }
 
     static func problem(skew: TimeInterval) -> String {
         let amount = amount(skew)
         return skew > 0
-            ? String(localized: "This device's clock is \(amount) behind, so codes may not work.", comment: "Warning above the accounts when the device's clock is wrong. The placeholder is how far, e.g. 2 minutes, 5 seconds.")
-            : String(localized: "This device's clock is \(amount) ahead, so codes may not work.", comment: "Warning above the accounts when the device's clock is wrong. The placeholder is how far, e.g. 2 minutes, 5 seconds.")
+            ? String(
+                localized: "This device's clock is \(amount) behind, so codes may not work.",
+                comment:
+                    "Warning above the accounts when the device's clock is wrong. The placeholder is how far, e.g. 2 minutes, 5 seconds.")
+            : String(
+                localized: "This device's clock is \(amount) ahead, so codes may not work.",
+                comment:
+                    "Warning above the accounts when the device's clock is wrong. The placeholder is how far, e.g. 2 minutes, 5 seconds.")
     }
 
     static var fix: String {
         #if os(macOS)
-        String(localized: "Turn on setting the time automatically in System Settings > General > Date & Time.", comment: "How to fix the device's clock, on the Mac")
+            String(
+                localized: "Turn on setting the time automatically in System Settings > General > Date & Time.",
+                comment: "How to fix the device's clock, on the Mac")
         #else
-        String(localized: "Turn on Set Automatically in Settings > General > Date & Time.", comment: "How to fix the device's clock, on iPhone and iPad")
+            String(
+                localized: "Turn on Set Automatically in Settings > General > Date & Time.",
+                comment: "How to fix the device's clock, on iPhone and iPad")
         #endif
     }
 }

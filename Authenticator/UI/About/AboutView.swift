@@ -15,14 +15,12 @@
  * limitations under the License.
  */
 
-
-
 import SwiftUI
 
 struct AboutView: View {
-    
+
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         NavigationStack {
             SettingsList {
@@ -52,7 +50,7 @@ struct AboutView: View {
                 .padding(.top, 10)
                 .padding(.horizontal, 20)
                 .listRowBackground(Color.black.opacity(0))
-                
+
                 Section("Application") {
                     NavigationLink {
                         TutorialView()
@@ -70,13 +68,13 @@ struct AboutView: View {
                     }
                     .accessibilityIdentifier("about.version-history")
                     #if os(iOS)
-                    NavigationLink {
-                        AppIconView()
-                    } label: {
-                        ListIconView(image: Image(systemName: "app.badge"), color: Color(.systemGreen), padding: 5)
-                        Text("App icon")
-                    }
-                    .accessibilityIdentifier("about.app-icon")
+                        NavigationLink {
+                            AppIconView()
+                        } label: {
+                            ListIconView(image: Image(systemName: "app.badge"), color: Color(.systemGreen), padding: 5)
+                            Text("App icon")
+                        }
+                        .accessibilityIdentifier("about.app-icon")
                     #endif
                     Button {
                         Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/LICENSE")!)
@@ -119,7 +117,8 @@ struct AboutView: View {
                         Platform.open(URL(string: "https://github.com/SINF-KEN/oriel-otp/blob/main/SUPPORT.md")!)
                     } label: {
                         HStack {
-                            ListIconView(image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)
+                            ListIconView(
+                                image: Image(systemName: "person.crop.circle.badge.questionmark"), color: Color(.systemRed), padding: 5)
                             Text("Contact support")
                                 .foregroundStyle(.primary)
                         }
@@ -136,40 +135,42 @@ struct AboutView: View {
                 }
             }
             #if os(macOS)
-            // Rows, like on iOS, rather than bordered push buttons.
-            .buttonStyle(.plain)
+                // Rows, like on iOS, rather than bordered push buttons.
+                .buttonStyle(.plain)
             #endif
             .navigationTitle(String(localized: "About", comment: "About navigation title"))
             #if os(iOS)
-            // A window with its own close button on the Mac.
-            .accessibilityAction(.escape) { dismiss() }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    CloseButton { dismiss() }
+                // A window with its own close button on the Mac.
+                .accessibilityAction(.escape) { dismiss() }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        CloseButton { dismiss() }
+                    }
                 }
-            }
             #endif
         }
     }
 }
 
 struct AboutLanguageView: View {
-    
+
     var shouldShowLanguageNote: Bool {
         guard let langCode = Bundle.main.preferredLocalizations.first else { return false }
         return langCode.lowercased() == "sk"
     }
-    
+
     var body: some View {
         if shouldShowLanguageNote {
-            Text("This translation is a community effort. To suggest a correction, [open an issue on GitHub](https://github.com/SINF-KEN/oriel-otp/issues).")
-                .multilineTextAlignment(.center)
-                .scaledFont(.footnote)
-                .foregroundStyle(.secondary)
-                .padding(.top, 15)
+            Text(
+                "This translation is a community effort. To suggest a correction, [open an issue on GitHub](https://github.com/SINF-KEN/oriel-otp/issues)."
+            )
+            .multilineTextAlignment(.center)
+            .scaledFont(.footnote)
+            .foregroundStyle(.secondary)
+            .padding(.top, 15)
         } else {
             EmptyView()
         }
     }
-    
+
 }

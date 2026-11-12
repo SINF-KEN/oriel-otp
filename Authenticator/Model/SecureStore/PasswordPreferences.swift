@@ -23,7 +23,7 @@ enum AuthenticationType {
     case faceId
     case passcode
     case none
-    
+
     var title: String {
         switch self {
         case .touchId:
@@ -67,18 +67,18 @@ class PasswordPreferences {
         let context = LAContext()
         var errorPolicy: NSError?
         var errorBiometricPolicy: NSError?
-        
+
         let hasAuthentication = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &errorPolicy)
         let hasBiometricAuthentication = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &errorBiometricPolicy)
-        
+
         if let error = errorPolicy {
             logAuthenticationPolicyError(error, policy: "authentication")
         }
-        
+
         if let error = errorBiometricPolicy {
             logAuthenticationPolicyError(error, policy: "biometric")
         }
-        
+
         if !hasAuthentication {
             return .none
         }
@@ -92,14 +92,15 @@ class PasswordPreferences {
 
     private static func logAuthenticationPolicyError(_ error: NSError, policy: String) {
         if error.domain == LAError.errorDomain,
-           let code = LAError.Code(rawValue: error.code),
-           [.biometryNotAvailable, .biometryNotEnrolled, .passcodeNotSet].contains(code) {
+            let code = LAError.Code(rawValue: error.code),
+            [.biometryNotAvailable, .biometryNotEnrolled, .passcodeNotSet].contains(code)
+        {
             return
         }
 
         Logger.system.error("PasswordPreferences, \(policy) policy error: \(String(describing: error.localizedDescription))")
     }
-    
+
     func migrate(fromKeyIdentifier: String, toKeyIdentifier: String) {
         if defaults.value(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier) != nil {
             let value = defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier)
@@ -107,7 +108,7 @@ class PasswordPreferences {
             defaults.removeObject(forKey: PasswordPreferences.PasswordUserDefaultsKey + fromKeyIdentifier)
         }
     }
-    
+
     func neverSavePassword(keyIdentifier: String) -> Bool {
         return defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier) == PasswordSaveType.never.rawValue
     }
@@ -116,20 +117,20 @@ class PasswordPreferences {
         let savedPreference = defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
         return savedPreference == PasswordSaveType.save.rawValue
     }
-    
+
     func useScreenLock(keyIdentifier: String) -> Bool {
         let savedPreference = defaults.integer(forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
         return savedPreference == PasswordSaveType.lock.rawValue
     }
-    
+
     func setPasswordPreference(saveType: PasswordSaveType, keyIdentifier: String) {
         defaults.set(saveType.rawValue, forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
     }
-    
+
     func resetPasswordPreference(keyIdentifier: String) {
         defaults.set(PasswordSaveType.none.rawValue, forKey: PasswordPreferences.PasswordUserDefaultsKey + keyIdentifier)
     }
-    
+
     func resetPasswordPreferenceForAll() {
         for key in defaults.dictionaryRepresentation().keys {
             if key.starts(with: PasswordPreferences.PasswordUserDefaultsKey) {

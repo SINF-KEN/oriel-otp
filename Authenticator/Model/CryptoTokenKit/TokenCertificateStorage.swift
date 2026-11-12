@@ -19,7 +19,7 @@ import Foundation
 import CryptoTokenKit
 
 struct TokenCertificateStorage {
-    
+
     enum TokenCertificateStorageError: Error {
         case failedCreatingTokenKeychainCertificate
         case failedCreatingTokenKeychainKey
@@ -38,7 +38,7 @@ struct TokenCertificateStorage {
     func storeTokenCertificate(certificate: SecCertificate) -> Error? {
 
         let label = certificate.tokenObjectId()
-        
+
         // Create token keychain certificate using the certificate and derived label
         guard let tokenKeychainCertificate = TKTokenKeychainCertificate(certificate: certificate, objectID: label) else {
             return TokenCertificateStorageError.failedCreatingTokenKeychainCertificate
@@ -61,14 +61,14 @@ struct TokenCertificateStorage {
         tokenConfiguration.keychainItems.append(contentsOf: [tokenKeychainCertificate, tokenKeychainKey])
         return nil
     }
-    
+
     func getTokenCertificate(withObjectId objectId: String) -> SecCertificate? {
         let certificates = listTokenCertificates()
         return certificates.first { certificate in
             return certificate.tokenObjectId() == objectId
         }
     }
-    
+
     func listTokenCertificates() -> [SecCertificate] {
         guard let tokenDriverConfiguration = Self.driverConfiguration else { return [SecCertificate]() }
         let certificates = tokenDriverConfiguration.tokenConfigurations
@@ -83,7 +83,7 @@ struct TokenCertificateStorage {
 
     func removeTokenCertificate(certificate: SecCertificate) -> Bool {
         guard let tokenDriverConfiguration = Self.driverConfiguration else { return false }
-        tokenDriverConfiguration.removeTokenConfiguration(for: certificate.tokenObjectId() )
+        tokenDriverConfiguration.removeTokenConfiguration(for: certificate.tokenObjectId())
         return true
     }
 }

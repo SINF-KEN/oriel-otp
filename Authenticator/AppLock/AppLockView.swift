@@ -45,15 +45,22 @@ struct AppLockPrompt: View {
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
             if lock.isUnavailable {
-                Text(String(localized: "Unlock your device to open Oriel OTP.", comment: "App lock screen before the device was first unlocked"))
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
+                Text(
+                    String(
+                        localized: "Unlock your device to open Oriel OTP.", comment: "App lock screen before the device was first unlocked")
+                )
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
             } else if lock.method == .device {
                 Button {
                     Task { await lock.unlockWithDeviceOwner() }
                 } label: {
-                    Text(String(localized: "Unlock with \(AppLock.deviceOwnerTitle)", comment: "App lock screen button. The placeholder is Face ID, Touch ID or Device passcode."))
-                        .padding(.horizontal, 8)
+                    Text(
+                        String(
+                            localized: "Unlock with \(AppLock.deviceOwnerTitle)",
+                            comment: "App lock screen button. The placeholder is Face ID, Touch ID or Device passcode.")
+                    )
+                    .padding(.horizontal, 8)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Color(.unlockButton))
@@ -61,10 +68,12 @@ struct AppLockPrompt: View {
                 .disabled(lock.isAuthenticating)
                 .accessibilityIdentifier("app-lock.unlock")
             } else {
-                AppLockSecretEntry(method: lock.method,
-                                   prompt: lock.method == .password
-                                       ? String(localized: "Enter your password", comment: "App lock screen prompt")
-                                       : String(localized: "Enter your code", comment: "App lock screen prompt")) {
+                AppLockSecretEntry(
+                    method: lock.method,
+                    prompt: lock.method == .password
+                        ? String(localized: "Enter your password", comment: "App lock screen prompt")
+                        : String(localized: "Enter your code", comment: "App lock screen prompt")
+                ) {
                     lock.unlock(with: $0)
                 }
             }
@@ -87,7 +96,8 @@ struct AppLockSecretEntry: View {
 
     /// Announced for VoiceOver, which can't see the dots shake.
     static let wrongCodeMessage = String(localized: "Wrong code. Try again.", comment: "VoiceOver announcement after a wrong app lock code")
-    static let wrongPasswordMessage = String(localized: "Wrong password. Try again.", comment: "VoiceOver announcement after a wrong app lock password")
+    static let wrongPasswordMessage = String(
+        localized: "Wrong password. Try again.", comment: "VoiceOver announcement after a wrong app lock password")
 
     var body: some View {
         VStack(spacing: 20) {
@@ -96,7 +106,9 @@ struct AppLockSecretEntry: View {
                 .multilineTextAlignment(.center)
             if checksRetryDate, let retryDate = lock.retryDate {
                 Label {
-                    Text("Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).", comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
+                    Text(
+                        "Too many attempts. Try again in \(Text(timerInterval: Date.now...retryDate, countsDown: true)).",
+                        comment: "App lock wait after wrong codes. The placeholder counts down, e.g. 0:30.")
                 } icon: {
                     // So it doesn't take the red to see that something's wrong.
                     Image(systemName: "hourglass")
@@ -170,8 +182,10 @@ private struct AppLockCodePad: View {
                     .buttonStyle(.plain)
                     .accessibilityShowsLargeContentViewer()
                     .accessibilityLabel(String(localized: "Delete", comment: "App lock number pad delete button"))
-                    .accessibilityInputLabels([String(localized: "Delete", comment: "App lock number pad delete button"),
-                                               String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")])
+                    .accessibilityInputLabels([
+                        String(localized: "Delete", comment: "App lock number pad delete button"),
+                        String(localized: "Backspace", comment: "Voice Control name for the app lock delete key")
+                    ])
                     .accessibilityIdentifier("app-lock.delete")
                     .opacity(code.isEmpty ? 0 : 1)
                     .disabled(code.isEmpty)
@@ -283,83 +297,83 @@ nonisolated private struct Shake: GeometryEffect {
 }
 
 #if os(macOS)
-extension View {
-    /// Covers the view with the lock screen while the app is locked: the Mac's windows and sheets.
-    func appLockCover() -> some View {
-        modifier(AppLockCover())
+    extension View {
+        /// Covers the view with the lock screen while the app is locked: the Mac's windows and sheets.
+        func appLockCover() -> some View {
+            modifier(AppLockCover())
+        }
     }
-}
 
-private struct AppLockCover: ViewModifier {
-    func body(content: Content) -> some View {
-        let isLocked = AppLock.shared.isLocked
-        content
-            .disabled(isLocked)
-            .accessibilityHidden(isLocked)
-            .overlay {
-                if isLocked {
-                    // Its own, as the main window sets the body font and control size below its toolbar.
-                    AppLockView()
-                        .scaledBodyFont()
+    private struct AppLockCover: ViewModifier {
+        func body(content: Content) -> some View {
+            let isLocked = AppLock.shared.isLocked
+            content
+                .disabled(isLocked)
+                .accessibilityHidden(isLocked)
+                .overlay {
+                    if isLocked {
+                        // Its own, as the main window sets the body font and control size below its toolbar.
+                        AppLockView()
+                            .scaledBodyFont()
+                    }
+                }
+        }
+    }
+#else
+    extension View {
+        /// Nothing on iOS, where `AppLockWindow` covers the whole scene.
+        func appLockCover() -> some View { self }
+    }
+
+    /// Shows the lock screen in a window of its own above the app's, so it covers the sheets and alerts too.
+    @MainActor final class AppLockWindow {
+
+        private let window: UIWindow
+
+        init(windowScene: UIWindowScene) {
+            window = UIWindow(windowScene: windowScene)
+            window.windowLevel = .alert + 1
+            window.rootViewController = UIHostingController(rootView: AppLockView())
+            // VoiceOver stays on the lock screen and can't reach the app's window behind it.
+            window.rootViewController?.view.accessibilityViewIsModal = true
+            update(animated: false)
+            observe()
+        }
+
+        /// Shows or hides the window for the lock. Called directly when the app goes to the background, so the lock
+        /// screen is there before the app switcher takes its snapshot.
+        func update(animated: Bool) {
+            if AppLock.shared.isLocked {
+                let wasHidden = window.isHidden
+                window.alpha = 1
+                window.isHidden = false
+                window.makeKey()
+                // Moves VoiceOver to the lock screen, so it doesn't stay on the app behind it.
+                if wasHidden {
+                    UIAccessibility.post(notification: .screenChanged, argument: nil)
+                }
+            } else if !window.isHidden {
+                let window = window
+                UIView.animate(withDuration: animated ? 0.2 : 0) {
+                    window.alpha = 0
+                } completion: { _ in
+                    guard !AppLock.shared.isLocked else { return }
+                    window.isHidden = true
+                    window.windowScene?.windows.first { $0 !== window && !$0.isHidden }?.makeKey()
+                    UIAccessibility.post(notification: .screenChanged, argument: nil)
                 }
             }
-    }
-}
-#else
-extension View {
-    /// Nothing on iOS, where `AppLockWindow` covers the whole scene.
-    func appLockCover() -> some View { self }
-}
+        }
 
-/// Shows the lock screen in a window of its own above the app's, so it covers the sheets and alerts too.
-@MainActor final class AppLockWindow {
-
-    private let window: UIWindow
-
-    init(windowScene: UIWindowScene) {
-        window = UIWindow(windowScene: windowScene)
-        window.windowLevel = .alert + 1
-        window.rootViewController = UIHostingController(rootView: AppLockView())
-        // VoiceOver stays on the lock screen and can't reach the app's window behind it.
-        window.rootViewController?.view.accessibilityViewIsModal = true
-        update(animated: false)
-        observe()
-    }
-
-    /// Shows or hides the window for the lock. Called directly when the app goes to the background, so the lock
-    /// screen is there before the app switcher takes its snapshot.
-    func update(animated: Bool) {
-        if AppLock.shared.isLocked {
-            let wasHidden = window.isHidden
-            window.alpha = 1
-            window.isHidden = false
-            window.makeKey()
-            // Moves VoiceOver to the lock screen, so it doesn't stay on the app behind it.
-            if wasHidden {
-                UIAccessibility.post(notification: .screenChanged, argument: nil)
-            }
-        } else if !window.isHidden {
-            let window = window
-            UIView.animate(withDuration: animated ? 0.2 : 0) {
-                window.alpha = 0
-            } completion: { _ in
-                guard !AppLock.shared.isLocked else { return }
-                window.isHidden = true
-                window.windowScene?.windows.first { $0 !== window && !$0.isHidden }?.makeKey()
-                UIAccessibility.post(notification: .screenChanged, argument: nil)
+        private func observe() {
+            withObservationTracking {
+                _ = AppLock.shared.isLocked
+            } onChange: { [weak self] in
+                Task { @MainActor in
+                    self?.update(animated: true)
+                    self?.observe()
+                }
             }
         }
     }
-
-    private func observe() {
-        withObservationTracking {
-            _ = AppLock.shared.isLocked
-        } onChange: { [weak self] in
-            Task { @MainActor in
-                self?.update(animated: true)
-                self?.observe()
-            }
-        }
-    }
-}
 #endif

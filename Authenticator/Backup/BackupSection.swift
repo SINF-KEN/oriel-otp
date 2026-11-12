@@ -45,7 +45,9 @@ struct BackupSection: View {
                 BackupView(rawData: device.backupData) { saved in
                     isBackingUp = false
                     if saved {
-                        notice = String(localized: "Backup saved. Keep the file and its password somewhere safe, away from this device.", comment: "Message after a backup was saved")
+                        notice = String(
+                            localized: "Backup saved. Keep the file and its password somewhere safe, away from this device.",
+                            comment: "Message after a backup was saved")
                     }
                 }
                 .appLockCover()
@@ -67,7 +69,11 @@ struct BackupSection: View {
                 }
                 .appLockCover()
             }
-            Button(String(localized: "Import from another app…", comment: "Backup settings button that imports accounts exported by another authenticator app")) {
+            Button(
+                String(
+                    localized: "Import from another app…",
+                    comment: "Backup settings button that imports accounts exported by another authenticator app")
+            ) {
                 isPickingImport = true
             }
             .accessibilityIdentifier("backup.import")
@@ -82,11 +88,23 @@ struct BackupSection: View {
         } footer: {
             VStack(alignment: .leading, spacing: 8) {
                 if device.accounts.isEmpty {
-                    Text(String(localized: "Accounts saved on this device can be backed up to a file encrypted with a password you choose. There are none yet. A backup, or an encrypted export from Ente Auth, can be restored here.", comment: "Backup settings footer without accounts on this device"))
+                    Text(
+                        String(
+                            localized:
+                                "Accounts saved on this device can be backed up to a file encrypted with a password you choose. There are none yet. A backup, or an encrypted export from Ente Auth, can be restored here.",
+                            comment: "Backup settings footer without accounts on this device"))
                 } else {
-                    Text(String(localized: "Saves the accounts kept only on this device to a file encrypted with a password you choose, which Ente Auth can open too. Without a backup they're lost with the device. Accounts on a YubiKey or in Ente Auth aren't included.", comment: "Backup settings footer"))
+                    Text(
+                        String(
+                            localized:
+                                "Saves the accounts kept only on this device to a file encrypted with a password you choose, which Ente Auth can open too. Without a backup they're lost with the device. Accounts on a YubiKey or in Ente Auth aren't included.",
+                            comment: "Backup settings footer"))
                 }
-                Text(String(localized: "Import reads exports from Google Authenticator (a screenshot of its QR code), Aegis, 2FAS and Raivo without encryption, and text files of otpauth links. The accounts are saved on this device. Delete the export afterwards: anyone with it has the accounts.", comment: "Backup settings footer about importing from another authenticator app"))
+                Text(
+                    String(
+                        localized:
+                            "Import reads exports from Google Authenticator (a screenshot of its QR code), Aegis, 2FAS and Raivo without encryption, and text files of otpauth links. The accounts are saved on this device. Delete the export afterwards: anyone with it has the accounts.",
+                        comment: "Backup settings footer about importing from another authenticator app"))
             }
         }
         .alert(notice ?? "", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
@@ -109,7 +127,8 @@ struct BackupSection: View {
             if isScoped { url.stopAccessingSecurityScopedResource() }
         }
         guard let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= DeviceBackup.maximumFileSize,
-              let data = try? Data(contentsOf: url), DeviceBackup.isBackup(data) else {
+            let data = try? Data(contentsOf: url), DeviceBackup.isBackup(data)
+        else {
             error = DeviceBackupError.notABackup
             return
         }
@@ -124,7 +143,8 @@ struct BackupSection: View {
             if isScoped { url.stopAccessingSecurityScopedResource() }
         }
         guard let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= AuthenticatorImport.maximumFileSize,
-              let data = try? Data(contentsOf: url) else {
+            let data = try? Data(contentsOf: url)
+        else {
             error = AuthenticatorImportError.unknownFormat
             return
         }
@@ -142,14 +162,22 @@ struct BackupSection: View {
 
     /// Counts after a colon rather than in a sentence, which reads right for any number in every language.
     static func summary(of result: DeviceAccounts.RestoreResult, imported: Bool = false) -> String {
-        var lines = [imported
-            ? String(localized: "Accounts imported: \(result.added)", comment: "Import result. The placeholder is a number.")
-            : String(localized: "Accounts restored: \(result.added)", comment: "Backup restore result. The placeholder is a number.")]
+        var lines = [
+            imported
+                ? String(localized: "Accounts imported: \(result.added)", comment: "Import result. The placeholder is a number.")
+                : String(localized: "Accounts restored: \(result.added)", comment: "Backup restore result. The placeholder is a number.")
+        ]
         if result.alreadyPresent > 0 {
-            lines.append(String(localized: "Already on this device: \(result.alreadyPresent)", comment: "Backup restore result. The placeholder is a number of accounts."))
+            lines.append(
+                String(
+                    localized: "Already on this device: \(result.alreadyPresent)",
+                    comment: "Backup restore result. The placeholder is a number of accounts."))
         }
         if result.skipped > 0 {
-            lines.append(String(localized: "Couldn't be read: \(result.skipped)", comment: "Backup restore result. The placeholder is a number of accounts."))
+            lines.append(
+                String(
+                    localized: "Couldn't be read: \(result.skipped)",
+                    comment: "Backup restore result. The placeholder is a number of accounts."))
         }
         return lines.joined(separator: "\n")
     }
@@ -225,7 +253,7 @@ private struct BackupView: View {
                 }
             }
             #if os(macOS)
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 460)
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 460)
             #endif
             .navigationTitle(String(localized: "Back up accounts", comment: "Backup navigation title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -239,7 +267,8 @@ private struct BackupView: View {
                 }
             }
             .errorAlert(error: $error)
-            .fileExporter(isPresented: $isExporting, document: document, contentType: .json, defaultFilename: DeviceBackup.fileName()) { result in
+            .fileExporter(isPresented: $isExporting, document: document, contentType: .json, defaultFilename: DeviceBackup.fileName()) {
+                result in
                 switch result {
                 case .success: done(true)
                 case .failure(let error): self.error = error
@@ -263,9 +292,11 @@ private struct BackupView: View {
                 SecureField(String(localized: "Confirm password", comment: "Ente account creation field"), text: $confirmation)
                     .accessibilityIdentifier("backup.confirmation")
                     .onSubmit { if canSave { save() } }
-                Button(String(localized: "Save backup…", comment: "Backup button that encrypts the accounts and opens the save dialog")) { save() }
-                    .disabled(!canSave)
-                    .accessibilityIdentifier("backup.save")
+                Button(String(localized: "Save backup…", comment: "Backup button that encrypts the accounts and opens the save dialog")) {
+                    save()
+                }
+                .disabled(!canSave)
+                .accessibilityIdentifier("backup.save")
             } header: {
                 Text(String(localized: "Backup password", comment: "Backup password section header"))
             } footer: {
@@ -274,7 +305,11 @@ private struct BackupView: View {
                 } else if isLongEnough, !confirmation.isEmpty, password != confirmation {
                     Text(String(localized: "The passwords don't match.", comment: "Backup password footer when the two entries differ"))
                 } else {
-                    Text(String(localized: "Choose a password of at least \(DeviceBackup.minimumPasswordLength) characters. Anyone with the file can try passwords as often as they like, so pick a long one. You need it to restore the backup: it can't be reset, and it isn't stored in the app.", comment: "Backup password footer. The placeholder is the minimum length, 8."))
+                    Text(
+                        String(
+                            localized:
+                                "Choose a password of at least \(DeviceBackup.minimumPasswordLength) characters. Anyone with the file can try passwords as often as they like, so pick a long one. You need it to restore the backup: it can't be reset, and it isn't stored in the app.",
+                            comment: "Backup password footer. The placeholder is the minimum length, 8."))
                 }
             }
         }
@@ -336,7 +371,11 @@ private struct RestoreView: View {
                     if isDecrypting {
                         Text(String(localized: "Decrypting the backup. This can take a few seconds.", comment: "Backup restore progress"))
                     } else {
-                        Text(String(localized: "Enter the password the backup was made with. Its accounts are added to this device. Accounts that are here already are left as they are.", comment: "Backup restore footer"))
+                        Text(
+                            String(
+                                localized:
+                                    "Enter the password the backup was made with. Its accounts are added to this device. Accounts that are here already are left as they are.",
+                                comment: "Backup restore footer"))
                     }
                 }
             }
@@ -345,7 +384,7 @@ private struct RestoreView: View {
             .scrollDismissesKeyboard(.immediately)
             .disabled(isDecrypting)
             #if os(macOS)
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 320, idealHeight: 360)
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 320, idealHeight: 360)
             #endif
             .navigationTitle(String(localized: "Restore from backup", comment: "Backup restore navigation title"))
             .navigationBarTitleDisplayMode(.inline)

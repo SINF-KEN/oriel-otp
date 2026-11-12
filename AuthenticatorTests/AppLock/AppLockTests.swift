@@ -110,13 +110,18 @@ nonisolated final class FakeProtectedData: @unchecked Sendable {
         defaults.removePersistentDomain(forName: suite)
     }
 
-    func makeLock(now: @escaping () -> Date = { Date(timeIntervalSinceReferenceDate: 800_000_000) },
-                  uptime: @escaping () -> TimeInterval = { 1000 },
-                  keepsSavedLock: Bool = false,
-                  hasDeviceOwner: Bool = true,
-                  deviceOwner: Bool = true) -> AppLock {
-        AppLock(storage: storage, defaults: defaults, keepsSavedLock: keepsSavedLock, now: now, uptime: uptime, deviceOwnerIsAvailable: { hasDeviceOwner },
-                authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil }, protectedData: protectedData.data)
+    func makeLock(
+        now: @escaping () -> Date = { Date(timeIntervalSinceReferenceDate: 800_000_000) },
+        uptime: @escaping () -> TimeInterval = { 1000 },
+        keepsSavedLock: Bool = false,
+        hasDeviceOwner: Bool = true,
+        deviceOwner: Bool = true
+    ) -> AppLock {
+        AppLock(
+            storage: storage, defaults: defaults, keepsSavedLock: keepsSavedLock, now: now, uptime: uptime,
+            deviceOwnerIsAvailable: { hasDeviceOwner },
+            authenticateDeviceOwner: { _ in deviceOwner ? KeychainAuthentication(context: LAContext()) : nil },
+            protectedData: protectedData.data)
     }
 
     @Test func notLockedWithoutALock() {
@@ -226,8 +231,10 @@ nonisolated final class FakeProtectedData: @unchecked Sendable {
         #expect(lock.unlock(with: "1234"))
     }
 
-    @Test(arguments: ["0000", "1111", "999999", "1234", "4321", "123456", "654321", "7890", "0987", "1212", "6969", "123123",
-                      "121212", "2580", "1004", "147258"])
+    @Test(arguments: [
+        "0000", "1111", "999999", "1234", "4321", "123456", "654321", "7890", "0987", "1212", "6969", "123123",
+        "121212", "2580", "1004", "147258"
+    ])
     func easyCodesAreTurnedDown(code: String) {
         #expect(AppLockConfiguration.isEasyToGuess(code: code))
     }
@@ -540,8 +547,9 @@ nonisolated final class FakeProtectedData: @unchecked Sendable {
 
     @Test func waitingActionsGetTheFaceIDThatUnlockedTheApp() async throws {
         let context = LAContext()
-        let lock = AppLock(storage: storage, defaults: defaults, authenticateDeviceOwner: { _ in KeychainAuthentication(context: context) },
-                           protectedData: protectedData.data)
+        let lock = AppLock(
+            storage: storage, defaults: defaults, authenticateDeviceOwner: { _ in KeychainAuthentication(context: context) },
+            protectedData: protectedData.data)
         try lock.setMethod(.device)
         lock.lock()
 

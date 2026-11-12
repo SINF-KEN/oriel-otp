@@ -20,14 +20,14 @@ import Testing
 @testable import OrielOTP
 
 #if os(macOS)
-// On the Mac the data protection keychain needs a provisioned keychain access group, which ad-hoc signed CI builds
-// don't have.
-nonisolated private let hasKeychainAccessGroup: Bool = {
-    guard let task = SecTaskCreateFromSelf(nil) else { return false }
-    return SecTaskCopyValueForEntitlement(task, "keychain-access-groups" as CFString, nil) != nil
-}()
+    // On the Mac the data protection keychain needs a provisioned keychain access group, which ad-hoc signed CI builds
+    // don't have.
+    nonisolated private let hasKeychainAccessGroup: Bool = {
+        guard let task = SecTaskCreateFromSelf(nil) else { return false }
+        return SecTaskCopyValueForEntitlement(task, "keychain-access-groups" as CFString, nil) != nil
+    }()
 #else
-nonisolated private let hasKeychainAccessGroup = SharedKeychain.accessGroup != nil
+    nonisolated private let hasKeychainAccessGroup = SharedKeychain.accessGroup != nil
 #endif
 
 /// The app's items go to its own keychain group, except the ones the AutoFill extension reads.
@@ -35,11 +35,13 @@ nonisolated private let hasKeychainAccessGroup = SharedKeychain.accessGroup != n
 struct SharedKeychainTests {
 
     private static func accessGroup(service: String, account: String) -> String? {
-        var query: [String: Any] = [String(kSecClass): kSecClassGenericPassword, String(kSecAttrService): service,
-                                    String(kSecAttrAccount): account, String(kSecReturnAttributes): true,
-                                    String(kSecMatchLimit): kSecMatchLimitOne]
+        var query: [String: Any] = [
+            String(kSecClass): kSecClassGenericPassword, String(kSecAttrService): service,
+            String(kSecAttrAccount): account, String(kSecReturnAttributes): true,
+            String(kSecMatchLimit): kSecMatchLimitOne
+        ]
         #if os(macOS)
-        query[String(kSecUseDataProtectionKeychain)] = true
+            query[String(kSecUseDataProtectionKeychain)] = true
         #endif
         var result: AnyObject?
         guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess else { return nil }

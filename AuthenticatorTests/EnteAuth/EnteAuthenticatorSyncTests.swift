@@ -23,7 +23,8 @@ import YubiKit
 struct EnteCodeParserTests {
 
     @Test func parsesJSONStringWithCodeDisplay() throws {
-        let raw = #""otpauth://totp/GitHub:alice%40example.com?algorithm=SHA1&digits=6&issuer=GitHub&period=30&secret=JBSWY3DPEHPK3PXP&codeDisplay=%7B%22pinned%22%3Atrue%2C%22trashed%22%3Afalse%7D""#
+        let raw =
+            #""otpauth://totp/GitHub:alice%40example.com?algorithm=SHA1&digits=6&issuer=GitHub&period=30&secret=JBSWY3DPEHPK3PXP&codeDisplay=%7B%22pinned%22%3Atrue%2C%22trashed%22%3Afalse%7D""#
         let code = try #require(EnteCodeParser.parse(id: "1", rawData: raw))
         let template = try #require(code.template)
         #expect(template.issuer == "GitHub")
@@ -69,7 +70,8 @@ struct EnteCodeParserTests {
     }
 
     @Test func reportsAccountsTheYubiKeyCantStore() throws {
-        let code = try #require(EnteCodeParser.parse(id: "1", rawData: #""otpauth://totp/Example:alice?secret=JBSWY3DPEHPK3PXP&digits=10""#))
+        let code = try #require(
+            EnteCodeParser.parse(id: "1", rawData: #""otpauth://totp/Example:alice?secret=JBSWY3DPEHPK3PXP&digits=10""#))
         #expect(code.template == nil)
         #expect(code.unsupportedReason != nil)
         #expect(code.title == "Example")
@@ -80,12 +82,14 @@ struct EnteCodeParserTests {
     }
 
     @Test func exportedAccountsParseBack() throws {
-        let totp = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 60), algorithm: .sha256,
-                                                             secret: Data(base32Encoded: "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP")!,
-                                                             issuer: "Team#1", accountName: "alice@example.com", digits: 8)
-        let hotp = try YubiKitOATHSession.CredentialTemplate(type: .hotp(counter: 7), algorithm: .sha1,
-                                                             secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
-                                                             issuer: nil, accountName: "bob", digits: 6)
+        let totp = try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 60), algorithm: .sha256,
+            secret: Data(base32Encoded: "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP")!,
+            issuer: "Team#1", accountName: "alice@example.com", digits: 8)
+        let hotp = try YubiKitOATHSession.CredentialTemplate(
+            type: .hotp(counter: 7), algorithm: .sha1,
+            secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+            issuer: nil, accountName: "bob", digits: 6)
         for template in [totp, hotp] {
             let rawData = try #require(String(data: try EnteCodeExporter.rawData(for: template), encoding: .utf8))
             let code = try #require(EnteCodeParser.parse(id: "1", rawData: rawData))
@@ -101,9 +105,10 @@ struct EnteCodeParserTests {
     }
 
     @Test func exportsSteamAccountsAsSteam() throws {
-        let template = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1,
-                                                                 secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
-                                                                 issuer: "Steam", accountName: "gamer", digits: 6)
+        let template = try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 30), algorithm: .sha1,
+            secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+            issuer: "Steam", accountName: "gamer", digits: 6)
         let url = try #require(EnteCodeExporter.otpauthURL(for: template))
         #expect(url.host == "steam")
         #expect(url.query?.contains("digits=5") == true)
@@ -184,14 +189,16 @@ struct EnteAuthenticatorSyncTests {
             try entity("a", "otpauth://totp/Zeta:alice?secret=JBSWY3DPEHPK3PXP", key: authenticatorKey, updatedAt: 1),
             try entity("b", "otpauth://totp/Alpha:bob?secret=JBSWY3DPEHPK3PXP", key: authenticatorKey, updatedAt: 2),
             try entity("c", "otpauth://totp/Deleted:carol?secret=JBSWY3DPEHPK3PXP", key: authenticatorKey, updatedAt: 3),
-            try entity("c", nil, key: authenticatorKey, updatedAt: 4, isDeleted: true),
+            try entity("c", nil, key: authenticatorKey, updatedAt: 4, isDeleted: true)
         ]
         EnteMockURLProtocol.requests = []
         EnteMockURLProtocol.handler = { request in
             switch request.url?.path {
             case "/authenticator/key":
-                let body = ["encryptedKey": encryptedAuthenticatorKey.cipherText.base64EncodedString(),
-                            "header": encryptedAuthenticatorKey.nonce.base64EncodedString()]
+                let body = [
+                    "encryptedKey": encryptedAuthenticatorKey.cipherText.base64EncodedString(),
+                    "header": encryptedAuthenticatorKey.nonce.base64EncodedString()
+                ]
                 return (200, try! JSONSerialization.data(withJSONObject: body))
             case "/authenticator/entity/diff":
                 return (200, try! JSONSerialization.data(withJSONObject: ["diff": diff]))
@@ -238,7 +245,8 @@ struct EnteAuthenticatorSyncTests {
 
         let key = try await EnteAuthenticatorSync.authenticatorKeyCreatingIfNeeded(api: api, keys: keys)
         #expect(key.count == 32)
-        #expect(EnteMockURLProtocol.requests.map { "\($0.httpMethod ?? "") \($0.url?.path ?? "")" }
+        #expect(
+            EnteMockURLProtocol.requests.map { "\($0.httpMethod ?? "") \($0.url?.path ?? "")" }
                 == ["GET /authenticator/key", "POST /authenticator/key"])
         #expect(EnteMockURLProtocol.requests.last?.value(forHTTPHeaderField: "X-Auth-Token") == "t")
         // The key is stored encrypted with the master key, like Ente Auth stores it.
@@ -256,8 +264,10 @@ struct EnteAuthenticatorSyncTests {
         EnteMockURLProtocol.handler = { request in
             switch (request.httpMethod, request.url?.path) {
             case ("GET", "/authenticator/key") where created:
-                let body = ["encryptedKey": encryptedOtherKey.cipherText.base64EncodedString(),
-                            "header": encryptedOtherKey.nonce.base64EncodedString()]
+                let body = [
+                    "encryptedKey": encryptedOtherKey.cipherText.base64EncodedString(),
+                    "header": encryptedOtherKey.nonce.base64EncodedString()
+                ]
                 return (200, try! JSONSerialization.data(withJSONObject: body))
             case ("POST", "/authenticator/key"):
                 // Another app created the key after this one found none.
@@ -285,8 +295,10 @@ struct EnteAuthenticatorSyncTests {
         EnteMockURLProtocol.handler = { request in
             switch request.url?.path {
             case "/users/srp/attributes":
-                let attributes: [String: Any] = ["srpUserID": "id", "srpSalt": "AA==", "memLimit": 1, "opsLimit": 1,
-                                                 "kekSalt": "AA==", "isEmailMFAEnabled": true]
+                let attributes: [String: Any] = [
+                    "srpUserID": "id", "srpSalt": "AA==", "memLimit": 1, "opsLimit": 1,
+                    "kekSalt": "AA==", "isEmailMFAEnabled": true
+                ]
                 return (200, try! JSONSerialization.data(withJSONObject: ["attributes": attributes]))
             case "/users/ott":
                 return (200, Data("{}".utf8))
@@ -303,7 +315,9 @@ struct EnteAuthenticatorSyncTests {
     /// with 404, and deleting wins.
     @MainActor @Test func aChangeToAnAccountDeletedElsewhereRemovesIt() async throws {
         let authenticatorKey = EnteCrypto.randomBytes(32)
-        let existing = [try entity("a", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub", key: authenticatorKey, updatedAt: 1)]
+        let existing = [
+            try entity("a", "otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub", key: authenticatorKey, updatedAt: 1)
+        ]
         EnteMockURLProtocol.requests = []
         EnteMockURLProtocol.bodies = []
         EnteMockURLProtocol.handler = { request in
@@ -315,11 +329,13 @@ struct EnteAuthenticatorSyncTests {
                 return (404, Data())
             }
         }
-        let session = EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t", authenticatorKey: authenticatorKey)
+        let session = EnteSavedSession(
+            server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t", authenticatorKey: authenticatorKey)
         let defaults = makeTestDefaults()
-        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                              storage: InMemoryVaultStorage(), session: URLSession.stubbed([EnteMockURLProtocol.self]),
-                              watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+            storage: InMemoryVaultStorage(), session: URLSession.stubbed([EnteMockURLProtocol.self]),
+            watch: WatchAccountSync(defaults: defaults))
         cloud.use(session)
         try await cloud.syncNow()
         #expect(cloud.vault?.items.map(\.id) == ["a"])
@@ -338,12 +354,15 @@ struct EnteAuthenticatorSyncTests {
         EnteMockURLProtocol.handler = { _ in (200, try! JSONSerialization.data(withJSONObject: ["diff": []])) }
         let defaults = makeTestDefaults()
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: URL(string: "https://other.test")!, email: "a@b.c", token: "t",
-                                        authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(
+                server: URL(string: "https://other.test")!, email: "a@b.c", token: "t",
+                authenticatorKey: EnteCrypto.randomBytes(32)))
         let storage = InMemoryVaultStorage()
         try storage.save(EnteVault(email: "a@b.c", server: URL(string: "https://ente.test")!))
-        let cloud = EnteCloud(store: store, storage: storage, session: URLSession.stubbed([EnteMockURLProtocol.self]),
-                              watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: store, storage: storage, session: URLSession.stubbed([EnteMockURLProtocol.self]),
+            watch: WatchAccountSync(defaults: defaults))
         await cloud.sync()
         #expect(EnteMockURLProtocol.requests.allSatisfy { $0.url?.host == "other.test" })
         #expect(!EnteMockURLProtocol.requests.contains { $0.url?.host == "ente.test" })
@@ -358,13 +377,16 @@ struct EnteAuthenticatorSyncTests {
         let defaults = makeTestDefaults()
         defaults.set("https://typed.test", forKey: DefaultsKey.enteServer)
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t",
-                                        authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(
+                server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t",
+                authenticatorKey: EnteCrypto.randomBytes(32)))
         let watch = WatchAccountSync(defaults: defaults)
         let session = URLSession.stubbed([EnteMockURLProtocol.self])
         let cloud = EnteCloud(store: store, storage: InMemoryVaultStorage(), session: session, watch: watch)
-        let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults, session: session,
-                                      cloud: cloud)
+        let sheet = EnteSyncViewModel(
+            existingCredentialIds: [], store: store, defaults: defaults, session: session,
+            cloud: cloud)
         sheet.useSavedSession()
         while sheet.isBusy { await Task.yield() }
 
@@ -390,24 +412,28 @@ struct EnteAuthenticatorSyncTests {
                 return (404, Data())
             }
         }
-        let session = EnteSavedSession(server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t", authenticatorKey: authenticatorKey)
+        let session = EnteSavedSession(
+            server: URL(string: "https://ente.test")!, email: "a@b.c", token: "t", authenticatorKey: authenticatorKey)
         let defaults = makeTestDefaults()
-        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
-                              storage: InMemoryVaultStorage(), session: URLSession.stubbed([EnteMockURLProtocol.self]),
-                              watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true),
+            storage: InMemoryVaultStorage(), session: URLSession.stubbed([EnteMockURLProtocol.self]),
+            watch: WatchAccountSync(defaults: defaults))
         cloud.use(session)
         try await cloud.syncNow()
         let secret = Data(base32Encoded: "JBSWY3DPEHPK3PXP")!
 
         // The vault on the device already has it, so nothing is uploaded.
-        let duplicate = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1, secret: secret,
-                                                                  issuer: "GitHub", accountName: "alice", digits: 6)
+        let duplicate = try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 30), algorithm: .sha1, secret: secret,
+            issuer: "GitHub", accountName: "alice", digits: 6)
         #expect(try cloud.add(duplicate) == .alreadyPresent)
         await cloud.sync()
         #expect(!EnteMockURLProtocol.requests.contains { $0.httpMethod == "POST" })
 
-        let template = try YubiKitOATHSession.CredentialTemplate(type: .totp(period: 30), algorithm: .sha1, secret: secret,
-                                                                 issuer: "GitLab", accountName: "alice", digits: 6)
+        let template = try YubiKitOATHSession.CredentialTemplate(
+            type: .totp(period: 30), algorithm: .sha1, secret: secret,
+            issuer: "GitLab", accountName: "alice", digits: 6)
         #expect(try cloud.add(template) == .added)
         await cloud.sync()
         #expect(cloud.vault?.items.first { $0.entityID == "b" }?.isPending == false)
@@ -427,7 +453,7 @@ struct EnteAuthenticatorSyncTests {
         let key = EnteCrypto.randomBytes(32)
         let diff: [[String: Any]] = [
             try entity("a", "otpauth://totp/A:alice?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 5),
-            try entity("b", nil, key: key, updatedAt: 7, isDeleted: true),
+            try entity("b", nil, key: key, updatedAt: 7, isDeleted: true)
         ]
         EnteMockURLProtocol.requests = []
         EnteMockURLProtocol.handler = { request in
@@ -460,7 +486,8 @@ struct EnteAuthenticatorSyncTests {
 
     @Test func pagesThroughAServerThatReturnsFewerThanAskedFor() async throws {
         let key = EnteCrypto.randomBytes(32)
-        let rows = try (1...7).map { try entity("e\($0)", "otpauth://totp/E:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: Int64($0)) }
+        let rows =
+            try (1...7).map { try entity("e\($0)", "otpauth://totp/E:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: Int64($0)) }
             + [try entity("e3", nil, key: key, updatedAt: 8, isDeleted: true)]
         Self.serveDiff(rows, cap: 2)
         let entities = try await EnteAuthenticatorSync.allEntities(api: try EnteMockURLProtocol.makeAPI(), token: "t")
@@ -478,7 +505,7 @@ struct EnteAuthenticatorSyncTests {
             try entity("b", "otpauth://totp/B:b?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 2),
             try entity("c", "otpauth://totp/C:c?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 3),
             try entity("d", "otpauth://totp/D:d?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 3),
-            try entity("e", "otpauth://totp/E:e?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 4),
+            try entity("e", "otpauth://totp/E:e?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 4)
         ]
         Self.serveDiff(rows, cap: 3)
         let changes = try await EnteAuthenticatorSync.changes(api: try EnteMockURLProtocol.makeAPI(), token: "t", since: 0)
@@ -489,7 +516,8 @@ struct EnteAuthenticatorSyncTests {
     @Test func stopsWhenMoreEntitiesChangedAtOneTimeThanFitAPage() async throws {
         let key = EnteCrypto.randomBytes(32)
         // Three entities changed at time 2 but the server returns two at a time: "c" can't be reached.
-        let rows = try ["a", "b", "c"].map { try entity($0, "otpauth://totp/X:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 2) }
+        let rows =
+            try ["a", "b", "c"].map { try entity($0, "otpauth://totp/X:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 2) }
             + [try entity("d", "otpauth://totp/D:d?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: 3)]
         Self.serveDiff(rows, cap: 2)
         await #expect(throws: EnteAPIError.invalidResponse) {
@@ -500,7 +528,9 @@ struct EnteAuthenticatorSyncTests {
 
     @Test func stopsOnAServerThatIgnoresSinceTime() async throws {
         let key = EnteCrypto.randomBytes(32)
-        let rows = try (1...3).map { try entity("e\($0)", "otpauth://totp/E:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: Int64($0)) }
+        let rows = try (1...3).map {
+            try entity("e\($0)", "otpauth://totp/E:\($0)?secret=JBSWY3DPEHPK3PXP", key: key, updatedAt: Int64($0))
+        }
         EnteMockURLProtocol.requests = []
         EnteMockURLProtocol.handler = { _ in (200, try! JSONSerialization.data(withJSONObject: ["diff": rows])) }
         let changes = try await EnteAuthenticatorSync.changes(api: try EnteMockURLProtocol.makeAPI(), token: "t", since: 0)

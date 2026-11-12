@@ -48,8 +48,10 @@ import OSLog
     }
 
     /// Without `indexes`, in the tests, nothing is added to Spotlight.
-    init(defaults: UserDefaults = .standard, indexes: Bool = true,
-         updateShortcuts: @escaping @MainActor () -> Void = { OrielOTPShortcuts.updateAppShortcutParameters() }) {
+    init(
+        defaults: UserDefaults = .standard, indexes: Bool = true,
+        updateShortcuts: @escaping @MainActor () -> Void = { OrielOTPShortcuts.updateAppShortcutParameters() }
+    ) {
         self.defaults = defaults
         self.indexes = indexes
         self.updateShortcuts = updateShortcuts

@@ -34,7 +34,9 @@ struct ServiceIconTests {
         #expect(ServiceIcon.icon(issuer: "GitHub", accountName: "alice")?.slug == "github")
         // Case, accents, spaces and punctuation don't matter.
         #expect(ServiceIcon.icon(issuer: "  github ", accountName: "alice")?.slug == "github")
-        #expect(ServiceIcon.icon(issuer: "Proton Mail", accountName: "alice")?.slug == ServiceIcon.icon(issuer: "protonmail", accountName: "")?.slug)
+        #expect(
+            ServiceIcon.icon(issuer: "Proton Mail", accountName: "alice")?.slug
+                == ServiceIcon.icon(issuer: "protonmail", accountName: "")?.slug)
     }
 
     @Test func findsTheBrandOfADomainOrAFirstWord() {
@@ -136,8 +138,9 @@ struct EnteTagsTests {
 
     private func signedOutCloud() -> EnteCloud {
         let defaults = makeTestDefaults()
-        return EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true), storage: InMemoryVaultStorage(),
-                         session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+        return EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true), storage: InMemoryVaultStorage(),
+            session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
     }
 
     @Test func tagsOfAnAccountOnThisDeviceAreSavedWithIt() throws {

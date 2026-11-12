@@ -32,8 +32,9 @@ struct EnteCryptoTests {
         let salt = Data(repeating: 1, count: EnteCrypto.saltLength)
         let first = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: 2, memLimit: 64 * 1024 * 1024)
         let second = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: 2, memLimit: 64 * 1024 * 1024)
-        let otherSalt = try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: Data(repeating: 2, count: EnteCrypto.saltLength),
-                                                              opsLimit: 2, memLimit: 64 * 1024 * 1024)
+        let otherSalt = try EnteCrypto.deriveKeyEncryptionKey(
+            password: "password", salt: Data(repeating: 2, count: EnteCrypto.saltLength),
+            opsLimit: 2, memLimit: 64 * 1024 * 1024)
         #expect(first.count == 32)
         #expect(first == second)
         #expect(first != otherSalt)
@@ -48,8 +49,10 @@ struct EnteCryptoTests {
             #expect(EnteCrypto.isAllowed(opsLimit: UInt64(opsLimit), memLimit: memLimit))
         }
         let salt = Data(repeating: 1, count: EnteCrypto.saltLength)
-        for (opsLimit, memLimit) in [(UInt64(1), 64 * mebibyte), (2, 8 * 1024), (2, 63 * mebibyte), (0, 0),
-                                     (2, 2048 * mebibyte), (2, .max), (257, 64 * mebibyte), (.max, 64 * mebibyte)] {
+        for (opsLimit, memLimit) in [
+            (UInt64(1), 64 * mebibyte), (2, 8 * 1024), (2, 63 * mebibyte), (0, 0),
+            (2, 2048 * mebibyte), (2, .max), (257, 64 * mebibyte), (.max, 64 * mebibyte)
+        ] {
             #expect(throws: EnteCryptoError.invalidKeyLimits) {
                 try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: salt, opsLimit: opsLimit, memLimit: memLimit)
             }
@@ -67,12 +70,13 @@ struct EnteCryptoTests {
         (16, 1024 * mebibyte),
         (5, 1024 * mebibyte),
         (32, 256 * mebibyte),
-        (128, 64 * mebibyte),
+        (128, 64 * mebibyte)
     ]
 
     @Test(arguments: limitsTooHigh) func limitsFromTheServerThatAreTooHighFail(opsLimit: UInt64, memLimit: UInt64) {
         #expect(throws: EnteCryptoError.invalidKeyLimits) {
-            try EnteCrypto.deriveKeyEncryptionKey(password: "password", salt: Data(repeating: 1, count: EnteCrypto.saltLength), opsLimit: opsLimit, memLimit: memLimit)
+            try EnteCrypto.deriveKeyEncryptionKey(
+                password: "password", salt: Data(repeating: 1, count: EnteCrypto.saltLength), opsLimit: opsLimit, memLimit: memLimit)
         }
     }
 
@@ -84,7 +88,7 @@ struct EnteCryptoTests {
         (8, 512 * mebibyte),
         (16, 256 * mebibyte),
         (32, 128 * mebibyte),
-        (64, 64 * mebibyte),
+        (64, 64 * mebibyte)
     ]
 
     @Test(arguments: realLimits) func limitsAccountsReallyHaveAreAllowed(opsLimit: UInt64, memLimit: UInt64) {
@@ -101,7 +105,8 @@ struct EnteCryptoTests {
             #expect(EnteCrypto.isAllowed(opsLimit: limit.opsLimit, memLimit: limit.memLimit))
         }
         // Limits that would leave too little memory are skipped, but the last one is always tried.
-        #expect(EnteCrypto.newKeyLimits(availableMemory: 900 * mebibyte).map(\.memLimit) == [512 * mebibyte, 256 * mebibyte, 128 * mebibyte])
+        #expect(
+            EnteCrypto.newKeyLimits(availableMemory: 900 * mebibyte).map(\.memLimit) == [512 * mebibyte, 256 * mebibyte, 128 * mebibyte])
         #expect(EnteCrypto.newKeyLimits(availableMemory: 100 * mebibyte).map(\.memLimit) == [128 * mebibyte])
     }
 
@@ -146,8 +151,10 @@ struct EnteCryptoTests {
         var header = [UInt8](repeating: 0, count: Int(crypto_secretstream_xchacha20poly1305_headerbytes()))
         #expect(crypto_secretstream_xchacha20poly1305_init_push(&state, &header, key) == 0)
         var cipherText = [UInt8](repeating: 0, count: message.count + Int(crypto_secretstream_xchacha20poly1305_abytes()))
-        #expect(crypto_secretstream_xchacha20poly1305_push(&state, &cipherText, nil, message, UInt64(message.count), nil, 0,
-                                                           UInt8(crypto_secretstream_xchacha20poly1305_TAG_MESSAGE)) == 0)
+        #expect(
+            crypto_secretstream_xchacha20poly1305_push(
+                &state, &cipherText, nil, message, UInt64(message.count), nil, 0,
+                UInt8(crypto_secretstream_xchacha20poly1305_TAG_MESSAGE)) == 0)
         #expect(throws: EnteCryptoError.decryptionFailed) {
             try EnteCrypto.secretStreamDecrypt(Data(cipherText), header: Data(header), key: Data(key))
         }
@@ -190,12 +197,13 @@ struct EnteCryptoTests {
         var response = account.authResponse
         let other = try EnteCrypto.generateKeyPair()
         let attributes = response.keyAttributes!
-        response.keyAttributes = EnteKeyAttributes(kekSalt: attributes.kekSalt, encryptedKey: attributes.encryptedKey,
-                                                   keyDecryptionNonce: attributes.keyDecryptionNonce,
-                                                   publicKey: other.publicKey.base64EncodedString(),
-                                                   encryptedSecretKey: attributes.encryptedSecretKey,
-                                                   secretKeyDecryptionNonce: attributes.secretKeyDecryptionNonce,
-                                                   memLimit: attributes.memLimit, opsLimit: attributes.opsLimit)
+        response.keyAttributes = EnteKeyAttributes(
+            kekSalt: attributes.kekSalt, encryptedKey: attributes.encryptedKey,
+            keyDecryptionNonce: attributes.keyDecryptionNonce,
+            publicKey: other.publicKey.base64EncodedString(),
+            encryptedSecretKey: attributes.encryptedSecretKey,
+            secretKeyDecryptionNonce: attributes.secretKeyDecryptionNonce,
+            memLimit: attributes.memLimit, opsLimit: attributes.opsLimit)
         await #expect(throws: EnteLoginError.invalidAccountData) {
             try await EnteLoginFlow.decryptKeys(response, keyEncryptionKey: account.keyEncryptionKey)
         }
@@ -213,14 +221,16 @@ struct FakeEnteAccount {
         let (publicKey, secretKey) = try EnteCrypto.generateKeyPair()
         let encryptedKey = try EnteCrypto.secretBox(masterKey, key: keyEncryptionKey)
         let encryptedSecretKey = try EnteCrypto.secretBox(secretKey, key: masterKey)
-        let attributes = EnteKeyAttributes(kekSalt: Data(count: 16).base64EncodedString(),
-                                           encryptedKey: encryptedKey.cipherText.base64EncodedString(),
-                                           keyDecryptionNonce: encryptedKey.nonce.base64EncodedString(),
-                                           publicKey: publicKey.base64EncodedString(),
-                                           encryptedSecretKey: encryptedSecretKey.cipherText.base64EncodedString(),
-                                           secretKeyDecryptionNonce: encryptedSecretKey.nonce.base64EncodedString(),
-                                           memLimit: 64 * 1024 * 1024, opsLimit: 2)
-        authResponse = EnteAuthResponse(id: 42, keyAttributes: attributes,
-                                        encryptedToken: try EnteCrypto.sealedBox(token, publicKey: publicKey).base64EncodedString())
+        let attributes = EnteKeyAttributes(
+            kekSalt: Data(count: 16).base64EncodedString(),
+            encryptedKey: encryptedKey.cipherText.base64EncodedString(),
+            keyDecryptionNonce: encryptedKey.nonce.base64EncodedString(),
+            publicKey: publicKey.base64EncodedString(),
+            encryptedSecretKey: encryptedSecretKey.cipherText.base64EncodedString(),
+            secretKeyDecryptionNonce: encryptedSecretKey.nonce.base64EncodedString(),
+            memLimit: 64 * 1024 * 1024, opsLimit: 2)
+        authResponse = EnteAuthResponse(
+            id: 42, keyAttributes: attributes,
+            encryptedToken: try EnteCrypto.sealedBox(token, publicKey: publicKey).base64EncodedString())
     }
 }

@@ -129,8 +129,9 @@ func makeTestDefaults() -> UserDefaults {
     let defaults = makeTestDefaults()
     var store: EnteSessionStore { EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true) }
 
-    let session = EnteSavedSession(server: URL(string: "https://ente.example.org")!, email: "alice@example.com",
-                                   token: "the-token", authenticatorKey: Data(repeating: 7, count: 32))
+    let session = EnteSavedSession(
+        server: URL(string: "https://ente.example.org")!, email: "alice@example.com",
+        token: "the-token", authenticatorKey: Data(repeating: 7, count: 32))
 
     @Test func savesTheTokenAndKeyBehindAuthentication() async throws {
         try store.save(session)
@@ -157,10 +158,13 @@ func makeTestDefaults() -> UserDefaults {
 
     @Test func signOutForgetsTheSessionWithoutWaitingForTheServer() async throws {
         let watch = WatchAccountSync(defaults: defaults)
-        try store.save(EnteSavedSession(server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
-                                        authenticatorKey: Data(repeating: 7, count: 32)))
-        let logout = await store.signOut(cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
-                                         session: URLSession.stubbed([UnansweredLogoutServer.self]))
+        try store.save(
+            EnteSavedSession(
+                server: UnansweredLogoutServer.server, email: "alice@example.com", token: "old-token",
+                authenticatorKey: Data(repeating: 7, count: 32)))
+        let logout = await store.signOut(
+            cloud: EnteCloud(store: store, storage: InMemoryVaultStorage(), watch: watch),
+            session: URLSession.stubbed([UnansweredLogoutServer.self]))
         #expect(store.savedAccount == nil)
         #expect(!keychain.hasValue(for: "session"))
 
@@ -208,157 +212,165 @@ func makeTestDefaults() -> UserDefaults {
 
 #if DEBUG && (targetEnvironment(simulator) || os(macOS))
 
-/// Signs in to the demo server like a user would, then relaunches the sync screen with the same keychain.
-@MainActor @Suite(.serialized)
-struct EnteSavedAccountTests {
+    /// Signs in to the demo server like a user would, then relaunches the sync screen with the same keychain.
+    @MainActor @Suite(.serialized)
+    struct EnteSavedAccountTests {
 
-    let keychain = InMemoryKeychain()
-    let defaults = makeTestDefaults()
-    /// Kept across relaunches, like the vault file.
-    let vaultStorage = InMemoryVaultStorage()
+        let keychain = InMemoryKeychain()
+        let defaults = makeTestDefaults()
+        /// Kept across relaunches, like the vault file.
+        let vaultStorage = InMemoryVaultStorage()
 
-    init() {
-        URLProtocol.registerClass(FakeEnteServer.self)
-    }
-
-    private func makeModel(canSave: Bool = true) -> EnteSyncViewModel {
-        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: canSave)
-        let watch = WatchAccountSync(defaults: defaults)
-        return EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults,
-                                 cloud: EnteCloud(store: store, storage: vaultStorage, watch: watch))
-    }
-
-    /// Waits for the model's network and crypto work to finish. On CI signing in can take most of a minute, as the
-    /// other tests derive keys at the same time, and several minutes in an unoptimised build.
-    private func settle(_ model: EnteSyncViewModel) async throws {
-        for _ in 0..<12000 where model.isBusy {
-            try await Task.sleep(for: .milliseconds(50))
+        init() {
+            URLProtocol.registerClass(FakeEnteServer.self)
         }
-        #expect(!model.isBusy)
+
+        private func makeModel(canSave: Bool = true) -> EnteSyncViewModel {
+            let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: canSave)
+            let watch = WatchAccountSync(defaults: defaults)
+            return EnteSyncViewModel(
+                existingCredentialIds: [], store: store, defaults: defaults,
+                cloud: EnteCloud(store: store, storage: vaultStorage, watch: watch))
+        }
+
+        /// Waits for the model's network and crypto work to finish. On CI signing in can take most of a minute, as the
+        /// other tests derive keys at the same time, and several minutes in an unoptimised build.
+        private func settle(_ model: EnteSyncViewModel) async throws {
+            for _ in 0..<12000 where model.isBusy {
+                try await Task.sleep(for: .milliseconds(50))
+            }
+            #expect(!model.isBusy)
+        }
+
+        private func signIn(_ model: EnteSyncViewModel, server: URL = FakeEnteServer.server) async throws {
+            model.email = "alice@example.com"
+            model.server = server.absoluteString
+            model.password = FakeEnteServer.password
+            model.signIn()
+            try await settle(model)
+            #expect(model.error == nil)
+            #expect(model.phase == .accounts)
+        }
+
+        @Test func staysSignedInByDefault() {
+            #expect(makeModel().staySignedIn)
+            #expect(!makeModel(canSave: false).staySignedIn)
+        }
+
+        @Test func syncsAfterARelaunchWithoutThePassword() async throws {
+            try await signIn(makeModel())
+            let saved = try await EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true).unlock()
+            #expect(saved.server == FakeEnteServer.server)
+            #expect(!saved.token.isEmpty)
+            #expect(saved.authenticatorKey.count == 32)
+
+            let relaunched = makeModel()
+            #expect(relaunched.phase == .savedSession(email: "alice@example.com"))
+            relaunched.useSavedSession()
+            try await settle(relaunched)
+            #expect(relaunched.error == nil)
+            #expect(relaunched.phase == .accounts)
+            #expect(!relaunched.codes.isEmpty)
+            #expect(relaunched.password.isEmpty)
+        }
+
+        @Test func aNewAccountGetsAnAuthenticatorKeyAndStaysSignedIn() async throws {
+            let server = FakeEnteServer.newAccountServer()
+            let model = makeModel()
+            try await signIn(model, server: server)
+            #expect(model.codes.isEmpty)
+            #expect(FakeEnteServer.hasAuthenticatorKey(server))
+            #expect(try await EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true).unlock().server == server)
+
+            let relaunched = makeModel()
+            #expect(relaunched.phase == .savedSession(email: "alice@example.com"))
+            relaunched.useSavedSession()
+            try await settle(relaunched)
+            #expect(relaunched.error == nil)
+            #expect(relaunched.phase == .accounts)
+        }
+
+        @Test func notStayingSignedInCreatesNoAuthenticatorKey() async throws {
+            let server = FakeEnteServer.newAccountServer()
+            let model = makeModel()
+            model.staySignedIn = false
+            try await signIn(model, server: server)
+            #expect(!FakeEnteServer.hasAuthenticatorKey(server))
+            model.close()
+        }
+
+        @Test func aRejectedTokenAsksForThePasswordAndKeepsTheAccount() async throws {
+            let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
+            try store.save(
+                EnteSavedSession(
+                    server: FakeEnteServer.server, email: "alice@example.com", token: "revoked",
+                    authenticatorKey: EnteCrypto.randomBytes(32)))
+            let model = makeModel()
+            model.useSavedSession()
+            try await settle(model)
+            #expect(model.phase == .signIn)
+            #expect(model.email == "alice@example.com")
+            #expect(store.savedAccount == EnteSavedAccount(email: "alice@example.com", server: FakeEnteServer.server, hasSession: false))
+
+            // Opening the sync screen again goes straight to signing in to the same account.
+            let reopened = makeModel()
+            #expect(reopened.phase == .signIn)
+            #expect(reopened.email == "alice@example.com")
+            #expect(reopened.server == FakeEnteServer.server.absoluteString)
+
+            model.password = FakeEnteServer.password
+            model.signIn()
+            try await settle(model)
+            #expect(model.phase == .accounts)
+            #expect(store.savedAccount?.hasSession == true)
+        }
+
+        @Test func signOutForgetsTheAccount() async throws {
+            let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
+            let watch = WatchAccountSync(defaults: defaults)
+            try store.save(
+                EnteSavedSession(
+                    server: FakeEnteServer.server, email: "alice@example.com", token: "the-token",
+                    authenticatorKey: EnteCrypto.randomBytes(32)))
+            let cloud = EnteCloud(store: store, storage: vaultStorage, watch: watch)
+            #expect(cloud.isEnabled)
+            await store.signOut(cloud: cloud)
+            #expect(store.savedAccount == nil)
+            #expect(!keychain.hasValue(for: "session"))
+            // The copy of the accounts goes too.
+            #expect(!cloud.isEnabled)
+            #expect(try vaultStorage.load() == nil)
+        }
+
+        @Test func signingInKeepsTheAccountsOnTheDevice() async throws {
+            let model = makeModel()
+            try await signIn(model)
+            let saved = try #require(try vaultStorage.load())
+            #expect(saved.email == "alice@example.com")
+            #expect(saved.lastSyncTime > 0)
+            // After a relaunch the accounts are there before syncing, without the ones in Ente's trash or deleted.
+            let relaunched = EnteCloud(
+                store: EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true), storage: vaultStorage,
+                watch: WatchAccountSync(defaults: defaults))
+            #expect(relaunched.codes.map(\.id) == model.codes.map(\.id))
+            #expect(!relaunched.codes.contains { ["e11", "e12"].contains($0.id) })
+            #expect(relaunched.accounts.contains { $0.code.kind == .steam })
+        }
+
+        @Test func notStayingSignedInForgetsTheAccount() async throws {
+            let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
+            try store.save(
+                EnteSavedSession(
+                    server: FakeEnteServer.server, email: "alice@example.com", token: "revoked",
+                    authenticatorKey: EnteCrypto.randomBytes(32)))
+            store.forgetSession()
+            let model = makeModel()
+            model.staySignedIn = false
+            try await signIn(model)
+            #expect(store.savedAccount == nil)
+            #expect(try vaultStorage.load() == nil)
+            model.close()
+        }
     }
-
-    private func signIn(_ model: EnteSyncViewModel, server: URL = FakeEnteServer.server) async throws {
-        model.email = "alice@example.com"
-        model.server = server.absoluteString
-        model.password = FakeEnteServer.password
-        model.signIn()
-        try await settle(model)
-        #expect(model.error == nil)
-        #expect(model.phase == .accounts)
-    }
-
-    @Test func staysSignedInByDefault() {
-        #expect(makeModel().staySignedIn)
-        #expect(!makeModel(canSave: false).staySignedIn)
-    }
-
-    @Test func syncsAfterARelaunchWithoutThePassword() async throws {
-        try await signIn(makeModel())
-        let saved = try await EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true).unlock()
-        #expect(saved.server == FakeEnteServer.server)
-        #expect(!saved.token.isEmpty)
-        #expect(saved.authenticatorKey.count == 32)
-
-        let relaunched = makeModel()
-        #expect(relaunched.phase == .savedSession(email: "alice@example.com"))
-        relaunched.useSavedSession()
-        try await settle(relaunched)
-        #expect(relaunched.error == nil)
-        #expect(relaunched.phase == .accounts)
-        #expect(!relaunched.codes.isEmpty)
-        #expect(relaunched.password.isEmpty)
-    }
-
-    @Test func aNewAccountGetsAnAuthenticatorKeyAndStaysSignedIn() async throws {
-        let server = FakeEnteServer.newAccountServer()
-        let model = makeModel()
-        try await signIn(model, server: server)
-        #expect(model.codes.isEmpty)
-        #expect(FakeEnteServer.hasAuthenticatorKey(server))
-        #expect(try await EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true).unlock().server == server)
-
-        let relaunched = makeModel()
-        #expect(relaunched.phase == .savedSession(email: "alice@example.com"))
-        relaunched.useSavedSession()
-        try await settle(relaunched)
-        #expect(relaunched.error == nil)
-        #expect(relaunched.phase == .accounts)
-    }
-
-    @Test func notStayingSignedInCreatesNoAuthenticatorKey() async throws {
-        let server = FakeEnteServer.newAccountServer()
-        let model = makeModel()
-        model.staySignedIn = false
-        try await signIn(model, server: server)
-        #expect(!FakeEnteServer.hasAuthenticatorKey(server))
-        model.close()
-    }
-
-    @Test func aRejectedTokenAsksForThePasswordAndKeepsTheAccount() async throws {
-        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: FakeEnteServer.server, email: "alice@example.com", token: "revoked",
-                                        authenticatorKey: EnteCrypto.randomBytes(32)))
-        let model = makeModel()
-        model.useSavedSession()
-        try await settle(model)
-        #expect(model.phase == .signIn)
-        #expect(model.email == "alice@example.com")
-        #expect(store.savedAccount == EnteSavedAccount(email: "alice@example.com", server: FakeEnteServer.server, hasSession: false))
-
-        // Opening the sync screen again goes straight to signing in to the same account.
-        let reopened = makeModel()
-        #expect(reopened.phase == .signIn)
-        #expect(reopened.email == "alice@example.com")
-        #expect(reopened.server == FakeEnteServer.server.absoluteString)
-
-        model.password = FakeEnteServer.password
-        model.signIn()
-        try await settle(model)
-        #expect(model.phase == .accounts)
-        #expect(store.savedAccount?.hasSession == true)
-    }
-
-    @Test func signOutForgetsTheAccount() async throws {
-        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
-        let watch = WatchAccountSync(defaults: defaults)
-        try store.save(EnteSavedSession(server: FakeEnteServer.server, email: "alice@example.com", token: "the-token",
-                                        authenticatorKey: EnteCrypto.randomBytes(32)))
-        let cloud = EnteCloud(store: store, storage: vaultStorage, watch: watch)
-        #expect(cloud.isEnabled)
-        await store.signOut(cloud: cloud)
-        #expect(store.savedAccount == nil)
-        #expect(!keychain.hasValue(for: "session"))
-        // The copy of the accounts goes too.
-        #expect(!cloud.isEnabled)
-        #expect(try vaultStorage.load() == nil)
-    }
-
-    @Test func signingInKeepsTheAccountsOnTheDevice() async throws {
-        let model = makeModel()
-        try await signIn(model)
-        let saved = try #require(try vaultStorage.load())
-        #expect(saved.email == "alice@example.com")
-        #expect(saved.lastSyncTime > 0)
-        // After a relaunch the accounts are there before syncing, without the ones in Ente's trash or deleted.
-        let relaunched = EnteCloud(store: EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true), storage: vaultStorage,
-                                   watch: WatchAccountSync(defaults: defaults))
-        #expect(relaunched.codes.map(\.id) == model.codes.map(\.id))
-        #expect(!relaunched.codes.contains { ["e11", "e12"].contains($0.id) })
-        #expect(relaunched.accounts.contains { $0.code.kind == .steam })
-    }
-
-    @Test func notStayingSignedInForgetsTheAccount() async throws {
-        let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: FakeEnteServer.server, email: "alice@example.com", token: "revoked",
-                                        authenticatorKey: EnteCrypto.randomBytes(32)))
-        store.forgetSession()
-        let model = makeModel()
-        model.staySignedIn = false
-        try await signIn(model)
-        #expect(store.savedAccount == nil)
-        #expect(try vaultStorage.load() == nil)
-        model.close()
-    }
-}
 
 #endif

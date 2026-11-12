@@ -112,7 +112,7 @@ struct AccountQRCodeView: View {
                 }
             }
             #if os(macOS)
-            .textScaledFrame(minWidth: 420, idealWidth: 460, minHeight: 520, idealHeight: 560)
+                .textScaledFrame(minWidth: 420, idealWidth: 460, minHeight: 520, idealHeight: 560)
             #endif
             .navigationTitle(String(localized: "QR code", comment: "Title of the sheet that shows an account's QR code"))
             .navigationBarTitleDisplayMode(.inline)
@@ -131,8 +131,12 @@ struct AccountQRCodeView: View {
 
     private var unlockPrompt: String {
         lock.method == .password
-            ? String(localized: "Enter your app lock password to show the QR code", comment: "Prompt for the app lock password before an account's QR code is shown")
-            : String(localized: "Enter your app lock code to show the QR code", comment: "Prompt for the app lock code before an account's QR code is shown")
+            ? String(
+                localized: "Enter your app lock password to show the QR code",
+                comment: "Prompt for the app lock password before an account's QR code is shown")
+            : String(
+                localized: "Enter your app lock code to show the QR code",
+                comment: "Prompt for the app lock code before an account's QR code is shown")
     }
 }
 
@@ -157,11 +161,16 @@ struct AccountQRCodeContent: View {
                 .privacySensitive()
                 .accessibilityLabel(String(localized: "QR code of the account", comment: "VoiceOver label of an account's QR code"))
                 .accessibilityIdentifier("account-qr-code.image")
-            Text(String(localized: "Scan it with another device or authenticator app to add the account there. Anyone who sees this code can make the account's codes, so don't share it or take a screenshot of it.", comment: "Under an account's QR code"))
-                .scaledFont(.footnote)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 360)
+            Text(
+                String(
+                    localized:
+                        "Scan it with another device or authenticator app to add the account there. Anyone who sees this code can make the account's codes, so don't share it or take a screenshot of it.",
+                    comment: "Under an account's QR code")
+            )
+            .scaledFont(.footnote)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            .frame(maxWidth: 360)
         }
     }
 }

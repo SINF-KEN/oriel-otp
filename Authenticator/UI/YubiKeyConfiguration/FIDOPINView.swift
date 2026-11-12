@@ -10,21 +10,22 @@
 import SwiftUI
 
 struct FIDOPINView: View {
-    
+
     @State var model = FIDOPINViewModel()
     @Environment(\.dismiss) private var dismiss
 
     @State var presentSetPIN = false
     @State var presentChangePIN = false
     @State var presentErrorAlert = false
-    
+
     @State var error: Error? = nil
-    
+
     @State var showSetButton = true
     @State var showChangeButton = false
-    
+
     func areButtonsDisabled() -> Bool {
-        model.state == .unknown || model.state.isFatalError() || model.isProcessing || model.state.isBlocked() || model.state.isPermanentlyBlocked()
+        model.state == .unknown || model.state.isFatalError() || model.isProcessing || model.state.isBlocked()
+            || model.state.isPermanentlyBlocked()
     }
 
     var body: some View {
@@ -35,7 +36,7 @@ struct FIDOPINView: View {
             Text("To prevent unauthorized access the FIDO application can be protected by a PIN.")
                 .scaledFont(.subheadline)
                 .multilineTextAlignment(.center)
-            
+
             // With a symbol, so it doesn't take the red to see it's a problem.
             if model.state.isBlocked() {
                 Label {
@@ -81,16 +82,19 @@ struct FIDOPINView: View {
             FIDOSetChangePINView(type: .change)
                 .appLockCover()
         }
-        .alert(error?.localizedDescription ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: {
-            Button(role: .cancel) {
-                error = nil
-                if model.state.isFatalError() {
-                    dismiss()
+        .alert(
+            error?.localizedDescription ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert,
+            actions: {
+                Button(role: .cancel) {
+                    error = nil
+                    if model.state.isFatalError() {
+                        dismiss()
+                    }
+                } label: {
+                    Text("OK")
                 }
-            } label: {
-                Text("OK")
             }
-        })
+        )
         .onChange(of: model.state) { _, state in
             updateState()
         }
@@ -100,7 +104,7 @@ struct FIDOPINView: View {
         }
         .environment(model)
     }
-    
+
     func updateState() {
         withAnimation(.unlessReduceMotion) {
             switch model.state {
@@ -124,26 +128,26 @@ struct FIDOPINView: View {
 }
 
 struct FIDOSetChangePINView: View {
-    
+
     enum Action { case set, change }
     var type: Action
-    
+
     @Environment(\.dismiss) private var dismiss
-    
+
     @Environment(FIDOPINViewModel.self) var model
     @FocusState private var focusedField: FocusedField?
 
     enum FocusedField {
         case currentPIN, newPIN, repeatedPIN
     }
-    
+
     @State private var currentPIN: String = ""
     @State private var newPIN: String = ""
     @State private var repeatedPIN: String = ""
-    
+
     @State private var presentErrorAlert = false
     @State private var errorMessage: String? = nil
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -178,7 +182,9 @@ struct FIDOSetChangePINView: View {
                         Text("Verify")
                     }
                 } footer: {
-                    Text( "\(model.pincomplexity ? String(localized: "A PIN must be at least \(model.minPinLength) characters long, contain at least 2 unique characters, and not be a commonly used PIN, like \"123456\". It may contain letters, numbers and special characters.") : String(localized: "A PIN must be at least \(model.minPinLength) characters long and may contain letters, numbers and special characters."))")
+                    Text(
+                        "\(model.pincomplexity ? String(localized: "A PIN must be at least \(model.minPinLength) characters long, contain at least 2 unique characters, and not be a commonly used PIN, like \"123456\". It may contain letters, numbers and special characters.") : String(localized: "A PIN must be at least \(model.minPinLength) characters long and may contain letters, numbers and special characters."))"
+                    )
                 }
                 .onSubmit {
                     if focusedField == .currentPIN {
@@ -219,19 +225,21 @@ struct FIDOSetChangePINView: View {
                 default: break
                 }
             }
-            .alert(errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert, actions: {
-                Button(role: .cancel) {
-                    errorMessage = nil
-                    if model.state.isFatalError() {
-                        dismiss()
+            .alert(
+                errorMessage ?? String(localized: "Unknown error"), isPresented: $presentErrorAlert,
+                actions: {
+                    Button(role: .cancel) {
+                        errorMessage = nil
+                        if model.state.isFatalError() {
+                            dismiss()
+                        }
+                    } label: {
+                        Text("OK")
                     }
-                } label: {
-                    Text("OK")
-                }
-            })
+                })
         }
     }
-    
+
     private func presentValidationError(_ message: String) {
         errorMessage = message
         presentErrorAlert.toggle()
@@ -240,7 +248,7 @@ struct FIDOSetChangePINView: View {
         repeatedPIN = ""
         focusedField = type == .set ? .newPIN : .currentPIN
     }
-    
+
     private func setNewPin() {
         guard newPIN == repeatedPIN else {
             presentValidationError(String(localized: "PINs do not match.", comment: "Set PIN view validation error"))

@@ -60,8 +60,9 @@ final class MemoryKeychainItem: WatchKeychainItem, @unchecked Sendable {
 }
 
 private func account(_ id: String, issuer: String = "GitHub", name: String = "alice") -> OTPAccount {
-    OTPAccount(id: id, kind: .totp, issuer: issuer, accountName: name, secret: Data("12345678901234567890".utf8),
-               algorithm: .sha1, digits: 6, period: 30, isPinned: false)
+    OTPAccount(
+        id: id, kind: .totp, issuer: issuer, accountName: name, secret: Data("12345678901234567890".utf8),
+        algorithm: .sha1, digits: 6, period: 30, isPinned: false)
 }
 
 private func makeDefaults() -> UserDefaults {
@@ -322,8 +323,10 @@ struct WatchAccountsMessageTests {
             self.applicationContext = applicationContext
         }
 
-        func sendMessage(_ message: [String: Any], replyHandler: (([String: Any]) -> Void)?,
-                         errorHandler: ((any Error) -> Void)?) {
+        func sendMessage(
+            _ message: [String: Any], replyHandler: (([String: Any]) -> Void)?,
+            errorHandler: ((any Error) -> Void)?
+        ) {
             sentMessages.append(message)
         }
     }

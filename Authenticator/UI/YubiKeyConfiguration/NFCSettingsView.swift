@@ -18,9 +18,9 @@
 import SwiftUI
 
 struct NFCSettingsView: View {
-    
+
     @State private var model = ApplicationSettingsViewModel()
-    
+
     var body: some View {
         Form {
             Section {
@@ -31,7 +31,9 @@ struct NFCSettingsView: View {
             Section {
                 Toggle("Bypass touch requirement", isOn: $model.isBypassTouchEnabled)
             } footer: {
-                Text("Accounts that require touch will need an extra NFC tap to calculate its code. Bypassing it minimizes the number of NFC taps needed.")
+                Text(
+                    "Accounts that require touch will need an extra NFC tap to calculate its code. Bypassing it minimizes the number of NFC taps needed."
+                )
             }
         }
         .formStyle(.grouped)

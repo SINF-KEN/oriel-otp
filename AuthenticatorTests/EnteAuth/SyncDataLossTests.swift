@@ -74,15 +74,21 @@ struct SyncDataLossTests {
 
     private let server = URL(string: "https://api.example.com")!
 
-    private func template(_ issuer: String, _ type: YubiKitOATHSession.CredentialType = .totp(period: 30)) throws -> YubiKitOATHSession.CredentialTemplate {
-        try YubiKitOATHSession.CredentialTemplate(type: type, algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
-                                                  issuer: issuer, accountName: "alice", digits: 6)
+    private func template(_ issuer: String, _ type: YubiKitOATHSession.CredentialType = .totp(period: 30)) throws
+        -> YubiKitOATHSession.CredentialTemplate
+    {
+        try YubiKitOATHSession.CredentialTemplate(
+            type: type, algorithm: .sha1, secret: Data(base32Encoded: "JBSWY3DPEHPK3PXP")!,
+            issuer: issuer, accountName: "alice", digits: 6)
     }
 
-    private func signedIn(storage: EnteVaultStorage, defaults: UserDefaults = makeTestDefaults(), keychain: InMemoryKeychain = InMemoryKeychain(),
-                          device: DeviceAccounts? = nil, session: URLSession = OfflineURLProtocol.session) throws -> (EnteCloud, EnteSessionStore) {
+    private func signedIn(
+        storage: EnteVaultStorage, defaults: UserDefaults = makeTestDefaults(), keychain: InMemoryKeychain = InMemoryKeychain(),
+        device: DeviceAccounts? = nil, session: URLSession = OfflineURLProtocol.session
+    ) throws -> (EnteCloud, EnteSessionStore) {
         let store = EnteSessionStore(keychain: keychain, defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
         try storage.save(EnteVault(email: "alice@example.com", server: server))
         let cloud = EnteCloud(store: store, storage: storage, session: session, watch: WatchAccountSync(defaults: defaults), device: device)
         return (cloud, store)
@@ -102,8 +108,9 @@ struct SyncDataLossTests {
         #expect(try model.moveToEnte(account) == .moved)
         #expect(cloud.hasPendingChanges)
 
-        let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults,
-                                      session: OfflineURLProtocol.session, cloud: cloud)
+        let sheet = EnteSyncViewModel(
+            existingCredentialIds: [], store: store, defaults: defaults,
+            session: OfflineURLProtocol.session, cloud: cloud)
         #expect(sheet.hasPendingChanges)
         sheet.signOut()
         while sheet.isBusy { await Task.yield() }
@@ -129,7 +136,9 @@ struct SyncDataLossTests {
         // The next launch, with room on the disk.
         deviceStorage.saveError = nil
         let device = DeviceAccounts(storage: deviceStorage)
-        _ = EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults), device: device)
+        _ = EnteCloud(
+            store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults), device: device
+        )
         #expect(device.accounts.map(\.code.issuer) == ["Bank"])
         #expect(try storage.load() == nil)
     }
@@ -144,8 +153,9 @@ struct SyncDataLossTests {
         _ = try cloud.add(template("Bank"))
         GatedURLProtocol.requestCount = 0
 
-        let sheet = EnteSyncViewModel(existingCredentialIds: [], store: store, defaults: defaults,
-                                      session: GatedURLProtocol.session, cloud: cloud)
+        let sheet = EnteSyncViewModel(
+            existingCredentialIds: [], store: store, defaults: defaults,
+            session: GatedURLProtocol.session, cloud: cloud)
         sheet.usesOwnServer = true
         sheet.server = server.absoluteString + "/"
         sheet.email = email
@@ -168,8 +178,10 @@ struct SyncDataLossTests {
         let (cloud, _) = try signedIn(storage: InMemoryVaultStorage())
         _ = try cloud.add(template("Bank"))
 
-        cloud.use(EnteSavedSession(server: URL(string: "https://API.example.com/")!, email: "Alice@example.com", token: "t2",
-                                   authenticatorKey: EnteCrypto.randomBytes(32)))
+        cloud.use(
+            EnteSavedSession(
+                server: URL(string: "https://API.example.com/")!, email: "Alice@example.com", token: "t2",
+                authenticatorKey: EnteCrypto.randomBytes(32)))
         #expect(cloud.hasPendingChanges)
         #expect(cloud.accounts.map(\.code.issuer) == ["Bank"])
     }
@@ -182,8 +194,9 @@ struct SyncDataLossTests {
         var vault = EnteVault(email: "alice@example.com", server: server)
         _ = vault.add(rawData: rawData("otpauth://totp/Bank:alice?secret=JBSWY3DPEHPK3PXP&issuer=Bank"))
         try storage.save(vault)
-        let cloud = EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true), storage: storage,
-                              session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true), storage: storage,
+            session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
         #expect(!cloud.isEnabled)
 
         // Still locked: nothing is written.
@@ -324,7 +337,8 @@ struct SyncDataLossTests {
     @Test func aStaleRejectionKeepsTheNewSession() async throws {
         let defaults = makeTestDefaults()
         let keychain = InMemoryKeychain()
-        let (cloud, store) = try signedIn(storage: InMemoryVaultStorage(), defaults: defaults, keychain: keychain, session: GatedURLProtocol.session)
+        let (cloud, store) = try signedIn(
+            storage: InMemoryVaultStorage(), defaults: defaults, keychain: keychain, session: GatedURLProtocol.session)
         let old = EnteSavedSession(server: server, email: "alice@example.com", token: "old", authenticatorKey: EnteCrypto.randomBytes(32))
         cloud.use(old)
         let gate = DispatchSemaphore(value: 0)

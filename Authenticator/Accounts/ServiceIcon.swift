@@ -78,10 +78,11 @@ nonisolated struct ServiceIcon: Sendable, Equatable {
 
     /// "Crédit Agricole" and "credit-agricole" both give "creditagricole".
     static func normalized(_ name: String) -> String {
-        String(name.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
-            .lowercased()
-            .unicodeScalars
-            .filter { CharacterSet.alphanumerics.contains($0) })
+        String(
+            name.folding(options: [.caseInsensitive, .diacriticInsensitive, .widthInsensitive], locale: nil)
+                .lowercased()
+                .unicodeScalars
+                .filter { CharacterSet.alphanumerics.contains($0) })
     }
 
     // MARK: - Colors

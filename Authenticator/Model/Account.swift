@@ -62,10 +62,10 @@ import YubiKit
     }
     /// The brand's icon, nil to show the first letter of the name.
     private(set) var serviceIcon: ServiceIcon?
-    
+
     /// Called every time `isPinned` is set.
     @ObservationIgnored var onPinnedChange: ((Account) -> Void)?
-    
+
     var id = UUID()
     /// Identifies the account in the list. An account can be on the YubiKey and in Ente Auth with the same name.
     var accountId: String {
@@ -88,8 +88,11 @@ import YubiKit
     @ObservationIgnored private var calculateCompletion: ((OATHSession.OTP) -> ())? = nil
     /// Asks for the next code when this one expires. Replaced with each new code, whose expiry is the one that counts.
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
-    
-    init(credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, requestRefresh: @escaping (Account) -> Void, connectionType: OATHSession.ConnectionType, isPinned: Bool, location: Location = .yubiKey) {
+
+    init(
+        credential: OATHSession.Credential, code: OATHSession.OTP?, keyVersion: Version, requestRefresh: @escaping (Account) -> Void,
+        connectionType: OATHSession.ConnectionType, isPinned: Bool, location: Location = .yubiKey
+    ) {
 
         self.credential = credential
         self.location = location
@@ -98,7 +101,7 @@ import YubiKit
         self.isPinned = isPinned
         self.keyVersion = keyVersion
         self.requiresTouch = credential.requiresTouch
-        
+
         if code == nil {
             enableRefresh = true
             state = .requiresCalculation
@@ -118,7 +121,7 @@ import YubiKit
             serviceIcon = icon
         }
     }
-    
+
     private func updateCodeStatus() {
         let canCopyCode = otp != nil && state != .expired
         if self.canCopyCode != canCopyCode {
@@ -137,7 +140,7 @@ import YubiKit
         calculateCompletion = completion
         requestRefresh(self)
     }
-    
+
     var isOnYubiKey: Bool { location == .yubiKey }
 
     var isInEnte: Bool {
@@ -158,19 +161,19 @@ import YubiKit
         subTitle = credential.subTitle
         updateServiceIcon()
     }
-    
+
     func update(otp: OATHSession.OTP?) {
         guard self.otp != otp, let otp else { return }
         self.otp = otp
-        
+
         if let calculateCompletion {
             calculateCompletion(otp)
         }
         self.calculateCompletion = nil
-        
+
         if self.credential.type == .totp {
             self.timeLeft = otp.validity.end.timeIntervalSince(AppClock.now)
-            
+
             // Schedule refresh if connection is wired
             if let timeLeft, connectionType == .wired {
                 refreshTask?.cancel()
@@ -185,7 +188,7 @@ import YubiKit
             self.state = .requiresCalculation
         }
     }
-    
+
     /// The code to show, or none while there's no code or it has expired.
     var formattedCode: String? {
         guard let otp, canCopyCode else { return nil }
@@ -211,10 +214,11 @@ import YubiKit
     /// only a view that shows the countdown should read it.
     var formattedNextCode: String? {
         guard let secondsLeft, secondsLeft <= Self.nextCodeLead, canCopyCode, let end = otp?.validity.end,
-              let next = codeAtDate?(end) else { return nil }
+            let next = codeAtDate?(end)
+        else { return nil }
         return format(next)
     }
-    
+
     /// Whole seconds until a time-based code changes, rounded up so it reads 1 until the code has expired.
     var secondsLeft: Int? {
         guard credential.type == .totp, let validity = otp?.validity else { return nil }
@@ -223,19 +227,19 @@ import YubiKit
     }
 
     var iconColor: Color {
-#if DEBUG
-        // return hard coded nice looking colors for app store screen shots
-        switch self.title {
-        case "Twitter":
-            return Color("Color5")
-        case "Microsoft":
-            return Color("Color7")
-        case "GitHub":
-            return Color("Color8")
-        default:
-            break
-        }
-#endif
+        #if DEBUG
+            // return hard coded nice looking colors for app store screen shots
+            switch self.title {
+            case "Twitter":
+                return Color("Color5")
+            case "Microsoft":
+                return Color("Color7")
+            case "GitHub":
+                return Color("Color8")
+            default:
+                break
+            }
+        #endif
         return Color.colorSetForAccountIcons[Self.colorIndex(for: accountId, count: Color.colorSetForAccountIcons.count)]
     }
 

@@ -26,7 +26,7 @@ struct ApplicationSettingsViewModel {
             SettingsConfig.isBypassTouchEnabled = newValue
         }
     }
-    
+
     var isNFCOnAppLaunchEnabled: Bool {
         get {
             return SettingsConfig.isNFCOnAppLaunchEnabled
@@ -35,5 +35,5 @@ struct ApplicationSettingsViewModel {
             SettingsConfig.isNFCOnAppLaunchEnabled = newValue
         }
     }
-    
+
 }

@@ -70,8 +70,9 @@ struct HostileServerPagingTests {
         var vault = EnteVault(email: "alice@example.com", server: server)
         vault.lastSyncTime = lastSyncTime
         try storage.save(vault)
-        let cloud = EnteCloud(store: store, storage: storage, session: URLSession.stubbed([HostileDiffStub.self]),
-                              watch: WatchAccountSync(defaults: defaults))
+        let cloud = EnteCloud(
+            store: store, storage: storage, session: URLSession.stubbed([HostileDiffStub.self]),
+            watch: WatchAccountSync(defaults: defaults))
         cloud.use(session)
         return cloud
     }

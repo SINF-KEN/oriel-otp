@@ -50,7 +50,7 @@ struct AccountQRCodeTests {
         "otpauth://hotp/Example:bob?secret=JBSWY3DPEHPK3PXP&issuer=Example&counter=7",
         "otpauth://steam/Steam:gamer?secret=JBSWY3DPEHPK3PXP&issuer=Steam",
         "otpauth://totp/alice?secret=JBSWY3DPEHPK3PXP",
-        "otpauth://totp/A%26B%20Co:alice?secret=JBSWY3DPEHPK3PXP&issuer=A%26B%20Co",
+        "otpauth://totp/A%26B%20Co:alice?secret=JBSWY3DPEHPK3PXP&issuer=A%26B%20Co"
     ])
     func theLinkReadsBackAsTheSameAccount(uri: String) throws {
         let code = try code(uri)
@@ -59,7 +59,9 @@ struct AccountQRCodeTests {
 
     /// Ente's display settings, such as pinned and tags, belong to this app, not to the account's link.
     @Test func leavesOutEntesDisplaySettings() throws {
-        let code = try code(#"otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub&codeDisplay=%7B%22pinned%22%3Atrue%2C%22tags%22%3A%5B%22work%22%5D%7D"#)
+        let code = try code(
+            #"otpauth://totp/GitHub:alice?secret=JBSWY3DPEHPK3PXP&issuer=GitHub&codeDisplay=%7B%22pinned%22%3Atrue%2C%22tags%22%3A%5B%22work%22%5D%7D"#
+        )
         #expect(code.isPinned)
         let url = try #require(code.otpauthURL)
         #expect(!url.absoluteString.contains("codeDisplay"))

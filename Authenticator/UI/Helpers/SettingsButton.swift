@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import SwiftUI
 
 // A plain button row for the actions section of a SettingsView. The grouped Form supplies the row height,
@@ -23,12 +22,12 @@ import SwiftUI
 public struct SettingsButton: View {
     private let text: String
     private let action: () -> Void
-    
+
     public init(_ text: String, action: @escaping () -> Void) {
         self.text = text
         self.action = action
     }
-    
+
     public var body: some View {
         Button(text, action: action)
     }

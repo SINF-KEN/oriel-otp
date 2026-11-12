@@ -71,7 +71,7 @@ struct AddAccountView: View {
     @State private var period: TimeInterval = 30
     @State private var errorMessage: String?
     #if os(macOS)
-    @State private var qrCodeError: QRCodeReader.ReadError?
+        @State private var qrCodeError: QRCodeReader.ReadError?
     #endif
     /// The last choice of where to save, the default when both can be chosen.
     @AppStorage(AccountDestinations.storageKey) private var lastDestinations = AccountDestinations.device.rawValue
@@ -80,8 +80,11 @@ struct AddAccountView: View {
     private let enteEmail = EnteCloud.shared.email
     @FocusState private var focusedField: Field?
 
-    init(showAddCredential: Binding<Bool>, accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, AccountDestinations), Never>,
-         oathURL: URL?, destinations: AccountDestinations) {
+    init(
+        showAddCredential: Binding<Bool>,
+        accountSubject: PassthroughSubject<(YubiKitOATHSession.CredentialTemplate?, Bool, AccountDestinations), Never>,
+        oathURL: URL?, destinations: AccountDestinations
+    ) {
         _showAddAccount = showAddCredential
         self.accountSubject = accountSubject
         availableDestinations = destinations
@@ -91,15 +94,16 @@ struct AddAccountView: View {
             defaults.set(AccountDestinations.both.rawValue, forKey: AccountDestinations.storageKey)
             defaults.removeObject(forKey: "EnteAuth.AddNewAccounts")
         }
-        let last = AccountDestinations(rawValue: defaults.object(forKey: AccountDestinations.storageKey) as? Int ?? AccountDestinations.device.rawValue)
+        let last = AccountDestinations(
+            rawValue: defaults.object(forKey: AccountDestinations.storageKey) as? Int ?? AccountDestinations.device.rawValue)
         _chosenDestinations = State(initialValue: last.isEmpty || !destinations.isSuperset(of: last) ? .device : last)
         let template = oathURL.flatMap { try? YubiKitOATHSession.CredentialTemplate(otpauthURL: $0) }
         _template = State(initialValue: template)
         #if os(iOS)
-        _mode = State(initialValue: template == nil ? .scanning : .prefilled)
+            _mode = State(initialValue: template == nil ? .scanning : .prefilled)
         #else
-        // The Mac has no camera scanner. QR codes are read from the screen or an image in the form instead.
-        _mode = State(initialValue: template == nil ? .manual : .prefilled)
+            // The Mac has no camera scanner. QR codes are read from the screen or an image in the form instead.
+            _mode = State(initialValue: template == nil ? .manual : .prefilled)
         #endif
         _issuer = State(initialValue: template?.issuer ?? "")
         _accountName = State(initialValue: template?.name ?? "")
@@ -109,13 +113,13 @@ struct AddAccountView: View {
         Group {
             // The form isn't there under the scanner, so VoiceOver can't find it behind it.
             #if os(iOS)
-            if mode == .scanning {
-                scanner
-            } else {
-                form
-            }
+                if mode == .scanning {
+                    scanner
+                } else {
+                    form
+                }
             #else
-            form
+                form
             #endif
         }
         .onDisappear {
@@ -127,22 +131,24 @@ struct AddAccountView: View {
         NavigationStack {
             Form {
                 #if os(macOS)
-                if template == nil {
-                    qrCodeSection
-                }
+                    if template == nil {
+                        qrCodeSection
+                    }
                 #endif
                 Section {
                     LabeledContent(String(localized: "Issuer", comment: "Add account field")) {
                         // Wraps rather than cutting off a long name at the larger text sizes.
-                        TextField(String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer,
-                                  prompt: Text(String(localized: "Optional", comment: "Add account issuer placeholder")), axis: .vertical)
-                            .formRowTextBox()
-                            .submitsOnReturn($issuer, submit: focusNextField)
-                            // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
-                            .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
-                            .accessibilityIdentifier("add-account.issuer")
-                            .submitLabel(.next)
-                            .focused($focusedField, equals: .issuer)
+                        TextField(
+                            String(localized: "Optional", comment: "Add account issuer placeholder"), text: $issuer,
+                            prompt: Text(String(localized: "Optional", comment: "Add account issuer placeholder")), axis: .vertical
+                        )
+                        .formRowTextBox()
+                        .submitsOnReturn($issuer, submit: focusNextField)
+                        // Named after the row rather than the placeholder, for VoiceOver and Voice Control.
+                        .accessibilityLabel(String(localized: "Issuer", comment: "Add account field"))
+                        .accessibilityIdentifier("add-account.issuer")
+                        .submitLabel(.next)
+                        .focused($focusedField, equals: .issuer)
                     }
                     LabeledContent(String(localized: "Account name", comment: "Add account field")) {
                         TextField(String("john@doe.com"), text: $accountName, prompt: Text(verbatim: "john@doe.com"), axis: .vertical)
@@ -158,14 +164,16 @@ struct AddAccountView: View {
                     }
                     if mode == .manual {
                         LabeledContent(String(localized: "Secret", comment: "Add account field")) {
-                            TextField(String(localized: "Secret", comment: "Add account field"), text: $secret,
-                                      prompt: Text(String(localized: "Secret", comment: "Add account field")))
-                                .formRowTextBox()
-                                .accessibilityIdentifier("add-account.secret")
-                                .textInputAutocapitalization(.characters)
-                                .autocorrectionDisabled()
-                                .submitLabel(.done)
-                                .focused($focusedField, equals: .secret)
+                            TextField(
+                                String(localized: "Secret", comment: "Add account field"), text: $secret,
+                                prompt: Text(String(localized: "Secret", comment: "Add account field"))
+                            )
+                            .formRowTextBox()
+                            .accessibilityIdentifier("add-account.secret")
+                            .textInputAutocapitalization(.characters)
+                            .autocorrectionDisabled()
+                            .submitLabel(.done)
+                            .focused($focusedField, equals: .secret)
                         }
                     }
                     if destinations.contains(.yubiKey) {
@@ -202,10 +210,14 @@ struct AddAccountView: View {
                     } header: {
                         Text(String(localized: "Advanced settings", comment: "Add account section header"))
                     } footer: {
-                        Text(String(localized: "Normally these settings should not be changed, doing so may result in the code not working as expected", comment: "Add account advanced settings footer"))
+                        Text(
+                            String(
+                                localized:
+                                    "Normally these settings should not be changed, doing so may result in the code not working as expected",
+                                comment: "Add account advanced settings footer"))
                     }
                     #if os(iOS)
-                    .pickerStyle(.navigationLink)
+                        .pickerStyle(.navigationLink)
                     #endif
                 }
             }
@@ -225,30 +237,34 @@ struct AddAccountView: View {
                 }
             }
             #if os(macOS)
-            .onDrop(of: [.image, .fileURL, .url], isTargeted: nil) { providers in
-                readQRCode { try await QRCodeReader.read(providers) }
-                return true
-            }
-            // File > Import from iPhone or iPad, to take a picture of a QR code with Continuity Camera.
-            .importsItemProviders([.image]) { providers in
-                readQRCode { try await QRCodeReader.read(providers) }
-                return true
-            }
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+                .onDrop(of: [.image, .fileURL, .url], isTargeted: nil) { providers in
+                    readQRCode { try await QRCodeReader.read(providers) }
+                    return true
+                }
+                // File > Import from iPhone or iPad, to take a picture of a QR code with Continuity Camera.
+                .importsItemProviders([.image]) { providers in
+                    readQRCode { try await QRCodeReader.read(providers) }
+                    return true
+                }
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
-            .alert(String(localized: "Not valid credential information", comment: "Add account error message"),
-                   isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
-                Button("OK", role: .cancel) { }
+            .alert(
+                String(localized: "Not valid credential information", comment: "Add account error message"),
+                isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })
+            ) {
+                Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage ?? "")
             }
             #if os(macOS)
-            .alert(String(localized: "Couldn't read a QR code", comment: "Mac add account QR code error title"),
-                   isPresented: Binding(get: { qrCodeError != nil }, set: { if !$0 { qrCodeError = nil } }), presenting: qrCodeError) { _ in
-                Button("OK", role: .cancel) { }
-            } message: { error in
-                Text(error.localizedDescription)
-            }
+                .alert(
+                    String(localized: "Couldn't read a QR code", comment: "Mac add account QR code error title"),
+                    isPresented: Binding(get: { qrCodeError != nil }, set: { if !$0 { qrCodeError = nil } }), presenting: qrCodeError
+                ) { _ in
+                    Button("OK", role: .cancel) {}
+                } message: { error in
+                    Text(error.localizedDescription)
+                }
             #endif
         }
     }
@@ -283,8 +299,10 @@ struct AddAccountView: View {
     @ViewBuilder private var destinationSection: some View {
         Section {
             if hasChoice {
-                Picker(String(localized: "Save to", comment: "Add account picker of where the account is saved"),
-                       selection: Binding(get: { destinations }, set: { chosenDestinations = $0 })) {
+                Picker(
+                    String(localized: "Save to", comment: "Add account picker of where the account is saved"),
+                    selection: Binding(get: { destinations }, set: { chosenDestinations = $0 })
+                ) {
                     Group {
                         Text(String(localized: "This device", comment: "Add account destination")).tag(AccountDestinations.device)
                         if availableDestinations.contains(.yubiKey) {
@@ -294,7 +312,8 @@ struct AddAccountView: View {
                             Text(String(localized: "Ente Auth", comment: "Add account destination")).tag(AccountDestinations.ente)
                         }
                         if availableDestinations.isSuperset(of: .both), !isHOTP {
-                            Text(String(localized: "YubiKey and Ente Auth", comment: "Add account destination")).tag(AccountDestinations.both)
+                            Text(String(localized: "YubiKey and Ente Auth", comment: "Add account destination")).tag(
+                                AccountDestinations.both)
                         }
                     }
                     .scaledBodyFont()
@@ -309,97 +328,125 @@ struct AddAccountView: View {
 
     @ViewBuilder private var destinationFooter: some View {
         if destinations == .device {
-            Text(String(localized: "The account is kept only on this device and isn't in its backups. Back it up in the app's settings or keep the service's recovery codes, as you'd otherwise lose the account with the device.", comment: "Add account footer when adding to this device"))
+            Text(
+                String(
+                    localized:
+                        "The account is kept only on this device and isn't in its backups. Back it up in the app's settings or keep the service's recovery codes, as you'd otherwise lose the account with the device.",
+                    comment: "Add account footer when adding to this device"))
         } else if let enteEmail {
             switch destinations {
             case .ente:
-                Text(String(localized: "The account is saved in Ente Auth for \(enteEmail.isolated) and appears on your other devices.", comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
+                Text(
+                    String(
+                        localized: "The account is saved in Ente Auth for \(enteEmail.isolated) and appears on your other devices.",
+                        comment: "Add account footer when adding to Ente Auth only. The placeholder is an email address."))
             case .both:
-                Text(String(localized: "Saves the account in Ente Auth for \(enteEmail.isolated) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.", comment: "Add account Ente Auth footer. The placeholder is an email address."))
+                Text(
+                    String(
+                        localized:
+                            "Saves the account in Ente Auth for \(enteEmail.isolated) too. A YubiKey never gives its accounts back, so this is the only time it can be copied.",
+                        comment: "Add account Ente Auth footer. The placeholder is an email address."))
             default:
                 if isHOTP {
-                    Text(String(localized: "A HOTP account is saved in one place only, as each copy would count its codes on its own.", comment: "Add account footer for a HOTP account"))
+                    Text(
+                        String(
+                            localized: "A HOTP account is saved in one place only, as each copy would count its codes on its own.",
+                            comment: "Add account footer for a HOTP account"))
                 } else {
-                    Text(String(localized: "A YubiKey never gives its accounts back, so it can't be copied to Ente Auth later. Choose YubiKey and Ente Auth to keep it in both.", comment: "Add account footer when adding to the YubiKey only"))
+                    Text(
+                        String(
+                            localized:
+                                "A YubiKey never gives its accounts back, so it can't be copied to Ente Auth later. Choose YubiKey and Ente Auth to keep it in both.",
+                            comment: "Add account footer when adding to the YubiKey only"))
                 }
             }
         } else {
-            Text(String(localized: "To save accounts in Ente Auth too, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on.", comment: "Add account footer without a saved Ente session"))
+            Text(
+                String(
+                    localized:
+                        "To save accounts in Ente Auth too, choose Sync from Ente Auth in the menu and sign in with Stay signed in turned on.",
+                    comment: "Add account footer without a saved Ente session"))
         }
     }
 
     #if os(iOS)
-    private var scanner: some View {
-        NavigationStack {
-            ScanAccountRepresentable { account in
-                template = account
-                issuer = account.issuer ?? ""
-                accountName = account.name
-                mode = .prefilled
-            }
-            .ignoresSafeArea()
-            .navigationTitle(String(localized: "Add account", comment: "Add account navigation title"))
-            .navigationBarTitleDisplayMode(.inline)
-            // A black bar, so the white title is on black rather than on whatever the camera shows.
-            .toolbarBackground(.black, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .accessibilityAction(.escape) { showAddAccount = false }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    CloseButton { showAddAccount = false }
+        private var scanner: some View {
+            NavigationStack {
+                ScanAccountRepresentable { account in
+                    template = account
+                    issuer = account.issuer ?? ""
+                    accountName = account.name
+                    mode = .prefilled
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button { mode = .manual } label: {
-                        Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
+                .ignoresSafeArea()
+                .navigationTitle(String(localized: "Add account", comment: "Add account navigation title"))
+                .navigationBarTitleDisplayMode(.inline)
+                // A black bar, so the white title is on black rather than on whatever the camera shows.
+                .toolbarBackground(.black, for: .navigationBar)
+                .toolbarBackground(.visible, for: .navigationBar)
+                .accessibilityAction(.escape) { showAddAccount = false }
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        CloseButton { showAddAccount = false }
                     }
-                    .accessibilityInputLabels(VoiceControlNames.enterManually)
-                    .accessibilityIdentifier("add-account.enter-manually")
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            mode = .manual
+                        } label: {
+                            Label(String(localized: "Enter manually", comment: "Scan QR code add manually button"), systemImage: "keyboard")
+                        }
+                        .accessibilityInputLabels(VoiceControlNames.enterManually)
+                        .accessibilityIdentifier("add-account.enter-manually")
+                    }
                 }
             }
+            // The camera preview is dark in both appearances.
+            .environment(\.colorScheme, .dark)
         }
-        // The camera preview is dark in both appearances.
-        .environment(\.colorScheme, .dark)
-    }
     #endif
 
     #if os(macOS)
-    private var qrCodeSection: some View {
-        Section {
-            Button {
-                readQRCode { try await QRCodeReader.scanWindow() }
-            } label: {
-                Label(String(localized: "Scan QR Code on Screen", comment: "Mac add account button"), systemImage: "qrcode.viewfinder")
+        private var qrCodeSection: some View {
+            Section {
+                Button {
+                    readQRCode { try await QRCodeReader.scanWindow() }
+                } label: {
+                    Label(String(localized: "Scan QR Code on Screen", comment: "Mac add account button"), systemImage: "qrcode.viewfinder")
+                }
+                Button {
+                    readQRCode { try QRCodeReader.readPasteboard() }
+                } label: {
+                    Label(String(localized: "Paste QR Code or Link", comment: "Mac add account button"), systemImage: "doc.on.clipboard")
+                }
+            } header: {
+                Text(String(localized: "QR code", comment: "Mac add account section header"))
+            } footer: {
+                Text(
+                    String(
+                        localized:
+                            "Show the QR code on screen, copy it, or drop a picture of it here. To take a picture with your iPhone or iPad, use the File menu. Or enter the details below.",
+                        comment: "Mac add account QR code footer"))
             }
-            Button {
-                readQRCode { try QRCodeReader.readPasteboard() }
-            } label: {
-                Label(String(localized: "Paste QR Code or Link", comment: "Mac add account button"), systemImage: "doc.on.clipboard")
-            }
-        } header: {
-            Text(String(localized: "QR code", comment: "Mac add account section header"))
-        } footer: {
-            Text(String(localized: "Show the QR code on screen, copy it, or drop a picture of it here. To take a picture with your iPhone or iPad, use the File menu. Or enter the details below.", comment: "Mac add account QR code footer"))
         }
-    }
 
-    private func readQRCode(_ read: @escaping () async throws -> URL) {
-        Task {
-            do {
-                let url = try await read()
-                let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
-                self.template = template
-                issuer = template.issuer ?? ""
-                accountName = template.name
-                mode = .prefilled
-            } catch let error as QRCodeReader.ReadError {
-                qrCodeError = error
-            } catch is CancellationError {
-                // The window picker was cancelled.
-            } catch {
-                errorMessage = error.localizedDescription
+        private func readQRCode(_ read: @escaping () async throws -> URL) {
+            Task {
+                do {
+                    let url = try await read()
+                    let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
+                    self.template = template
+                    issuer = template.issuer ?? ""
+                    accountName = template.name
+                    mode = .prefilled
+                } catch let error as QRCodeReader.ReadError {
+                    qrCodeError = error
+                } catch is CancellationError {
+                    // The window picker was cancelled.
+                } catch {
+                    errorMessage = error.localizedDescription
+                }
             }
         }
-    }
     #endif
 
     private func save() {
@@ -409,20 +456,22 @@ struct AddAccountView: View {
             case .manual:
                 let secret = Data(base32Encoded: secret.replacingOccurrences(of: " ", with: "")) ?? Data()
                 let type: YubiKitOATHSession.CredentialType = kind == .hotp ? .hotp(counter: 0) : .totp(period: period)
-                credential = try YubiKitOATHSession.CredentialTemplate(type: type,
-                                                                       algorithm: .algorithmFromString(algorithm),
-                                                                       secret: secret,
-                                                                       issuer: issuer,
-                                                                       accountName: accountName,
-                                                                       digits: digits)
+                credential = try YubiKitOATHSession.CredentialTemplate(
+                    type: type,
+                    algorithm: .algorithmFromString(algorithm),
+                    secret: secret,
+                    issuer: issuer,
+                    accountName: accountName,
+                    digits: digits)
             case .prefilled, .scanning:
                 guard let template else { return }
-                credential = try YubiKitOATHSession.CredentialTemplate(type: template.type,
-                                                                       algorithm: template.algorithm,
-                                                                       secret: template.secret,
-                                                                       issuer: issuer,
-                                                                       accountName: accountName,
-                                                                       digits: Int(template.digits))
+                credential = try YubiKitOATHSession.CredentialTemplate(
+                    type: template.type,
+                    algorithm: template.algorithm,
+                    secret: template.secret,
+                    issuer: issuer,
+                    accountName: accountName,
+                    digits: Int(template.digits))
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -438,22 +487,22 @@ struct AddAccountView: View {
 }
 
 #if os(iOS)
-// Hosts the QR scanner. It sits in a container because it removes itself from its superview when it finishes.
-private struct ScanAccountRepresentable: UIViewRepresentable {
+    // Hosts the QR scanner. It sits in a container because it removes itself from its superview when it finishes.
+    private struct ScanAccountRepresentable: UIViewRepresentable {
 
-    let completion: (YubiKitOATHSession.CredentialTemplate) -> Void
+        let completion: (YubiKitOATHSession.CredentialTemplate) -> Void
 
-    func makeUIView(context: Context) -> UIView {
-        let container = UIView()
-        let scanView = ScanAccountView(frame: container.bounds, completionHandler: completion)
-        scanView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        container.addSubview(scanView)
-        return container
+        func makeUIView(context: Context) -> UIView {
+            let container = UIView()
+            let scanView = ScanAccountView(frame: container.bounds, completionHandler: completion)
+            scanView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            container.addSubview(scanView)
+            return container
+        }
+
+        func updateUIView(_ uiView: UIView, context: Context) {
+        }
     }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-    }
-}
 #endif
 
 extension View {

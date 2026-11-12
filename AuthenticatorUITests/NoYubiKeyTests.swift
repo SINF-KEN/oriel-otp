@@ -16,95 +16,99 @@
 
 #if os(iOS)
 
-import XCTest
+    import XCTest
 
-/// Someone with no YubiKey and no Ente account can add an account and get its codes.
-final class NoYubiKeyTests: XCTestCase {
+    /// Someone with no YubiKey and no Ente account can add an account and get its codes.
+    final class NoYubiKeyTests: XCTestCase {
 
-    private var app: XCUIApplication!
+        private var app: XCUIApplication!
 
-    @MainActor override func setUp() async throws {
-        continueAfterFailure = false
-        app = XCUIApplication()
-        app.launch()
-    }
-
-    @MainActor func testAddAnAccountWithoutAYubiKey() throws {
-        unplugSimulatedYubiKey()
-        let add = app.buttons["accounts.empty-add-account"].firstMatch
-        XCTAssertTrue(add.waitForExistence(timeout: 20), "The empty list doesn't offer to add an account")
-        XCTAssertTrue(add.isEnabled)
-        attachScreenshot("empty-list")
-        add.tap()
-
-        let manually = app.buttons["add-account.enter-manually"].firstMatch
-        if manually.waitForExistence(timeout: 5) {
-            manually.tap()
+        @MainActor override func setUp() async throws {
+            continueAfterFailure = false
+            app = XCUIApplication()
+            app.launch()
         }
-        let issuer = app.textFields["add-account.issuer"].firstMatch
-        XCTAssertTrue(issuer.waitForExistence(timeout: 20), "The add account form didn't show")
-        issuer.tap()
-        issuer.typeText("Example")
-        let name = app.textFields["add-account.account-name"].firstMatch
-        name.tap()
-        name.typeText("alice")
-        let secret = app.textFields["add-account.secret"].firstMatch
-        secret.tap()
-        secret.typeText("JBSWY3DPEHPK3PXP")
-        attachScreenshot("add-account")
-        let save = app.buttons["add-account.save"].firstMatch
-        XCTAssertTrue(save.waitForExistence(timeout: 20), "The add account form has no Save button")
-        save.tap()
 
-        let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'account-row.device/'")).firstMatch
-        XCTAssertTrue(row.waitForExistence(timeout: 20), "The account isn't in the list")
-        attachScreenshot("account-list")
-        row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
+        @MainActor func testAddAnAccountWithoutAYubiKey() throws {
+            unplugSimulatedYubiKey()
+            let add = app.buttons["accounts.empty-add-account"].firstMatch
+            XCTAssertTrue(add.waitForExistence(timeout: 20), "The empty list doesn't offer to add an account")
+            XCTAssertTrue(add.isEnabled)
+            attachScreenshot("empty-list")
+            add.tap()
 
-        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account didn't open")
-        XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.isEnabled, "The account has no code")
-        XCTAssertTrue(app.staticTexts["Stored on this device"].firstMatch.exists)
-        attachScreenshot("account-details")
+            let manually = app.buttons["add-account.enter-manually"].firstMatch
+            if manually.waitForExistence(timeout: 5) {
+                manually.tap()
+            }
+            let issuer = app.textFields["add-account.issuer"].firstMatch
+            XCTAssertTrue(issuer.waitForExistence(timeout: 20), "The add account form didn't show")
+            issuer.tap()
+            issuer.typeText("Example")
+            let name = app.textFields["add-account.account-name"].firstMatch
+            name.tap()
+            name.typeText("alice")
+            let secret = app.textFields["add-account.secret"].firstMatch
+            secret.tap()
+            secret.typeText("JBSWY3DPEHPK3PXP")
+            attachScreenshot("add-account")
+            let save = app.buttons["add-account.save"].firstMatch
+            XCTAssertTrue(save.waitForExistence(timeout: 20), "The add account form has no Save button")
+            save.tap()
 
-        // In the last seconds of each code, the next one shows under it. Longer than the 30 seconds a code lasts.
-        let next = app.staticTexts["account-details.next-code"].firstMatch
-        XCTAssertTrue(next.waitForExistence(timeout: 35), "The next code didn't show before the code changed")
-        XCTAssertTrue(next.label.hasPrefix("Next code: "))
-        attachScreenshot("next-code")
+            let row = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'account-row.device/'"))
+                .firstMatch
+            XCTAssertTrue(row.waitForExistence(timeout: 20), "The account isn't in the list")
+            attachScreenshot("account-list")
+            row.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).tap()
 
-        // Leaves the simulator as it was, and the delete alert is what says there's no other copy.
-        app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch.tap()
-        // The More menu's items are the system's, which don't keep their identifiers.
-        app.buttons["Delete"].firstMatch.tap()
-        let alert = app.alerts.firstMatch
-        XCTAssertTrue(alert.waitForExistence(timeout: 20))
-        attachScreenshot("delete-alert")
-        alert.buttons["Delete"].tap()
-        XCTAssertTrue(app.buttons["accounts.empty-add-account"].firstMatch.waitForExistence(timeout: 20), "The account wasn't deleted")
+            XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.waitForExistence(timeout: 20), "The account didn't open")
+            XCTAssertTrue(app.buttons["account-details.copy"].firstMatch.isEnabled, "The account has no code")
+            XCTAssertTrue(app.staticTexts["Stored on this device"].firstMatch.exists)
+            attachScreenshot("account-details")
+
+            // In the last seconds of each code, the next one shows under it. Longer than the 30 seconds a code lasts.
+            let next = app.staticTexts["account-details.next-code"].firstMatch
+            XCTAssertTrue(next.waitForExistence(timeout: 35), "The next code didn't show before the code changed")
+            XCTAssertTrue(next.label.hasPrefix("Next code: "))
+            attachScreenshot("next-code")
+
+            // Leaves the simulator as it was, and the delete alert is what says there's no other copy.
+            app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}"))
+                .firstMatch.tap()
+            // The More menu's items are the system's, which don't keep their identifiers.
+            app.buttons["Delete"].firstMatch.tap()
+            let alert = app.alerts.firstMatch
+            XCTAssertTrue(alert.waitForExistence(timeout: 20))
+            attachScreenshot("delete-alert")
+            alert.buttons["Delete"].tap()
+            XCTAssertTrue(app.buttons["accounts.empty-add-account"].firstMatch.waitForExistence(timeout: 20), "The account wasn't deleted")
+        }
+
+        /// The codes shown when the YubiKey is unplugged still expire, which mustn't go looking for a YubiKey.
+        @MainActor func testUnpluggingDoesntAskForAYubiKeyLater() throws {
+            unplugSimulatedYubiKey()
+            XCTAssertTrue(app.buttons["accounts.empty-add-account"].firstMatch.waitForExistence(timeout: 20))
+            // Longer than the 30 seconds a code lasts.
+            XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 35), "An alert showed after the YubiKey was unplugged")
+        }
+
+        @MainActor private func unplugSimulatedYubiKey() {
+            let more = app.navigationBars.buttons.matching(
+                NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")
+            ).firstMatch
+            XCTAssertTrue(more.waitForExistence(timeout: 20))
+            more.tap()
+            app.buttons["Simulated YubiKey"].firstMatch.tap()
+            app.descendants(matching: .any)["Plugged in"].firstMatch.tap()
+        }
+
+        @MainActor private func attachScreenshot(_ name: String) {
+            let attachment = XCTAttachment(screenshot: app.screenshot())
+            attachment.name = name
+            attachment.lifetime = .keepAlways
+            add(attachment)
+        }
     }
-
-    /// The codes shown when the YubiKey is unplugged still expire, which mustn't go looking for a YubiKey.
-    @MainActor func testUnpluggingDoesntAskForAYubiKeyLater() throws {
-        unplugSimulatedYubiKey()
-        XCTAssertTrue(app.buttons["accounts.empty-add-account"].firstMatch.waitForExistence(timeout: 20))
-        // Longer than the 30 seconds a code lasts.
-        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 35), "An alert showed after the YubiKey was unplugged")
-    }
-
-    @MainActor private func unplugSimulatedYubiKey() {
-        let more = app.navigationBars.buttons.matching(NSPredicate(format: "identifier IN {'OverflowBarButtonItem', 'TopOverflowBarButtonItem'}")).firstMatch
-        XCTAssertTrue(more.waitForExistence(timeout: 20))
-        more.tap()
-        app.buttons["Simulated YubiKey"].firstMatch.tap()
-        app.descendants(matching: .any)["Plugged in"].firstMatch.tap()
-    }
-
-    @MainActor private func attachScreenshot(_ name: String) {
-        let attachment = XCTAttachment(screenshot: app.screenshot())
-        attachment.name = name
-        attachment.lifetime = .keepAlways
-        add(attachment)
-    }
-}
 
 #endif

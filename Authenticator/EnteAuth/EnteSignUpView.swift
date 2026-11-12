@@ -53,7 +53,7 @@ struct EnteSignUpView: View {
             .scrollDismissesKeyboard(.immediately)
             .disabled(model.isBusy)
             #if os(macOS)
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
             .navigationTitle(String(localized: "Create account", comment: "Ente account creation navigation title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -108,7 +108,11 @@ struct EnteSignUpView: View {
         } header: {
             Text(String(localized: "New account on \(host)", comment: "Ente account creation header. The placeholder is the server."))
         } footer: {
-            Text(String(localized: "Your password never leaves this device, and your server can't reset it. A code is sent to this email, or written to your server's log if it can't send email.", comment: "Ente account creation footer"))
+            Text(
+                String(
+                    localized:
+                        "Your password never leaves this device, and your server can't reset it. A code is sent to this email, or written to your server's log if it can't send email.",
+                    comment: "Ente account creation footer"))
         }
     }
 
@@ -129,7 +133,11 @@ struct EnteSignUpView: View {
             if model.isDerivingKeys {
                 Text(String(localized: "Deriving your keys. This can take a few seconds.", comment: "Ente sign in progress"))
             } else {
-                Text(String(localized: "Enter the verification code sent to \(model.email.isolated). Without email on your server, it's in the server's log.", comment: "Ente account creation email code footer. The placeholder is the email address."))
+                Text(
+                    String(
+                        localized:
+                            "Enter the verification code sent to \(model.email.isolated). Without email on your server, it's in the server's log.",
+                        comment: "Ente account creation email code footer. The placeholder is the email address."))
             }
         }
     }
@@ -153,18 +161,27 @@ struct EnteSignUpView: View {
                 Button(String(localized: "Save recovery key", comment: "Ente account creation button")) {
                     isExportingRecoveryKey = true
                 }
-                .fileExporter(isPresented: $isExportingRecoveryKey, item: recoveryKey, contentTypes: [.utf8PlainText],
-                              defaultFilename: String(localized: "Ente recovery key", comment: "Ente recovery key file name and share title")) { _ in }
-                ShareLink(String(localized: "Share recovery key", comment: "Ente account creation button"), item: recoveryKey,
-                          preview: SharePreview(String(localized: "Ente recovery key", comment: "Ente recovery key file name and share title")))
+                .fileExporter(
+                    isPresented: $isExportingRecoveryKey, item: recoveryKey, contentTypes: [.utf8PlainText],
+                    defaultFilename: String(localized: "Ente recovery key", comment: "Ente recovery key file name and share title")
+                ) { _ in }
+                ShareLink(
+                    String(localized: "Share recovery key", comment: "Ente account creation button"), item: recoveryKey,
+                    preview: SharePreview(String(localized: "Ente recovery key", comment: "Ente recovery key file name and share title")))
             } header: {
                 Text(String(localized: "Your recovery key", comment: "Ente account creation header"))
             } footer: {
-                Text(String(localized: "If you forget your password, this key is the only way to get your accounts back. Your server can't reset the password, and this key is shown only now. Keep it somewhere safe, away from this device.", comment: "Ente account creation recovery key footer"))
+                Text(
+                    String(
+                        localized:
+                            "If you forget your password, this key is the only way to get your accounts back. Your server can't reset the password, and this key is shown only now. Keep it somewhere safe, away from this device.",
+                        comment: "Ente account creation recovery key footer"))
             }
             Section {
-                Toggle(String(localized: "I saved my recovery key", comment: "Ente account creation toggle"), isOn: $model.hasSavedRecoveryKey)
-                    .accessibilityIdentifier("ente.sign-up.saved")
+                Toggle(
+                    String(localized: "I saved my recovery key", comment: "Ente account creation toggle"), isOn: $model.hasSavedRecoveryKey
+                )
+                .accessibilityIdentifier("ente.sign-up.saved")
                 Button(String(localized: "Create account", comment: "Ente account creation navigation title")) { model.finish() }
                     .disabled(!model.hasSavedRecoveryKey)
                     .accessibilityIdentifier("ente.sign-up.create")
@@ -174,8 +191,11 @@ struct EnteSignUpView: View {
 
     private var finishedSection: some View {
         Section {
-            LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: model.email.leftToRightIfAddress)
-            LabeledContent(String(localized: "Server", comment: "Ente saved account server label"), value: model.server.host ?? model.server.absoluteString)
+            LabeledContent(
+                String(localized: "Account", comment: "Ente saved session account label"), value: model.email.leftToRightIfAddress)
+            LabeledContent(
+                String(localized: "Server", comment: "Ente saved account server label"),
+                value: model.server.host ?? model.server.absoluteString)
         } header: {
             Text(String(localized: "Account created", comment: "Ente account creation finished header"))
         } footer: {

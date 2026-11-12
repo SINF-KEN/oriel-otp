@@ -34,7 +34,7 @@ final class ConnectionManager {
 
     private(set) var wiredConnection: SmartCardConnection?
     #if os(iOS)
-    private(set) var nfcConnection: NFCSmartCardConnection?
+        private(set) var nfcConnection: NFCSmartCardConnection?
     #endif
 
     private struct Subscriber {
@@ -50,28 +50,28 @@ final class ConnectionManager {
     private var isWiredSuspended = false
     private var resumeWiredLoop: CheckedContinuation<Void, Never>?
     #if os(iOS)
-    private var nfcCloseWaiters: [CheckedContinuation<Error?, Never>] = []
-    // The NFC sheet being presented, shared by callers asking for a connection while it's up.
-    private var pendingNFCConnection: Task<NFCSmartCardConnection, Error>?
+        private var nfcCloseWaiters: [CheckedContinuation<Error?, Never>] = []
+        // The NFC sheet being presented, shared by callers asking for a connection while it's up.
+        private var pendingNFCConnection: Task<NFCSmartCardConnection, Error>?
     #endif
 
     nonisolated private convenience init() {
         #if DEBUG && (targetEnvironment(simulator) || os(macOS))
-        // There are no USB smart card slots in the simulator and YubiKit asserts when it can't find any,
-        // so debug builds connect to a simulated YubiKey instead.
-        if SimulatedYubiKey.isEnabled {
-            self.init(makeWiredConnection: { await SimulatedYubiKey.nextConnection() })
-            return
-        }
+            // There are no USB smart card slots in the simulator and YubiKit asserts when it can't find any,
+            // so debug builds connect to a simulated YubiKey instead.
+            if SimulatedYubiKey.isEnabled {
+                self.init(makeWiredConnection: { await SimulatedYubiKey.nextConnection() })
+                return
+            }
         #endif
         #if targetEnvironment(simulator)
-        self.init(makeWiredConnection: nil)
-        #else
-        if DeviceCapabilities.hasLightningPort {
             self.init(makeWiredConnection: nil)
-        } else {
-            self.init(makeWiredConnection: { try await WiredSmartCardConnection.makeConnection() })
-        }
+        #else
+            if DeviceCapabilities.hasLightningPort {
+                self.init(makeWiredConnection: nil)
+            } else {
+                self.init(makeWiredConnection: { try await WiredSmartCardConnection.makeConnection() })
+            }
         #endif
     }
 
@@ -181,101 +181,102 @@ final class ConnectionManager {
 
     #if os(iOS)
 
-    /// Returns the open NFC connection, or presents the NFC sheet and waits for a YubiKey.
-    ///
-    /// Callers arriving while the sheet is presented wait for the same connection instead of failing as busy.
-    func nfcConnection(alertMessage: String? = nil) async throws -> NFCSmartCardConnection {
-        if let nfcConnection { return nfcConnection }
-        if let pendingNFCConnection { return try await pendingNFCConnection.value }
-        guard DeviceCapabilities.supportsNFC else { throw SmartCardConnectionError.unsupported }
-        let message = alertMessage ?? String(localized: "Scan your YubiKey", comment: "iOS NFC alert scan")
-        let pending = Task { try await NFCSmartCardConnection(alertMessage: message) }
-        pendingNFCConnection = pending
-        defer { pendingNFCConnection = nil }
-        let connection = try await withTaskCancellationHandler {
-            try await pending.value
-        } onCancel: {
-            pending.cancel()
+        /// Returns the open NFC connection, or presents the NFC sheet and waits for a YubiKey.
+        ///
+        /// Callers arriving while the sheet is presented wait for the same connection instead of failing as busy.
+        func nfcConnection(alertMessage: String? = nil) async throws -> NFCSmartCardConnection {
+            if let nfcConnection { return nfcConnection }
+            if let pendingNFCConnection { return try await pendingNFCConnection.value }
+            guard DeviceCapabilities.supportsNFC else { throw SmartCardConnectionError.unsupported }
+            let message = alertMessage ?? String(localized: "Scan your YubiKey", comment: "iOS NFC alert scan")
+            let pending = Task { try await NFCSmartCardConnection(alertMessage: message) }
+            pendingNFCConnection = pending
+            defer { pendingNFCConnection = nil }
+            let connection = try await withTaskCancellationHandler {
+                try await pending.value
+            } onCancel: {
+                pending.cancel()
+            }
+            Logger.connection.debug("ConnectionManager: NFC connection")
+            nfcConnection = connection
+            Task {
+                let error = await connection.waitUntilClosed()
+                Logger.connection.debug("ConnectionManager: NFC connection closed, error: \(String(describing: error))")
+                nfcConnection = nil
+                nfcCloseWaiters.forEach { $0.resume(returning: error) }
+                nfcCloseWaiters.removeAll()
+            }
+            return connection
         }
-        Logger.connection.debug("ConnectionManager: NFC connection")
-        nfcConnection = connection
-        Task {
-            let error = await connection.waitUntilClosed()
-            Logger.connection.debug("ConnectionManager: NFC connection closed, error: \(String(describing: error))")
-            nfcConnection = nil
-            nfcCloseWaiters.forEach { $0.resume(returning: error) }
-            nfcCloseWaiters.removeAll()
-        }
-        return connection
-    }
 
-    /// Returns the wired connection if there is one, otherwise an NFC connection. Without NFC it waits for
-    /// a YubiKey to be inserted.
-    func anyConnection(alertMessage: String? = nil) async throws -> SmartCardConnection {
-        if let wiredConnection { return wiredConnection }
-        if DeviceCapabilities.supportsNFC {
-            return try await nfcConnection(alertMessage: alertMessage)
+        /// Returns the wired connection if there is one, otherwise an NFC connection. Without NFC it waits for
+        /// a YubiKey to be inserted.
+        func anyConnection(alertMessage: String? = nil) async throws -> SmartCardConnection {
+            if let wiredConnection { return wiredConnection }
+            if DeviceCapabilities.supportsNFC {
+                return try await nfcConnection(alertMessage: alertMessage)
+            }
+            return try await nextWiredConnection()
         }
-        return try await nextWiredConnection()
-    }
 
-    /// Waits until the connection closes and returns the error it was closed with, if any.
-    func waitUntilClosed(_ connection: SmartCardConnection) async -> Error? {
-        guard connection is NFCSmartCardConnection else {
-            return await connection.waitUntilClosed()
+        /// Waits until the connection closes and returns the error it was closed with, if any.
+        func waitUntilClosed(_ connection: SmartCardConnection) async -> Error? {
+            guard connection is NFCSmartCardConnection else {
+                return await connection.waitUntilClosed()
+            }
+            guard nfcConnection != nil else { return nil }
+            return await withCheckedContinuation { nfcCloseWaiters.append($0) }
         }
-        guard nfcConnection != nil else { return nil }
-        return await withCheckedContinuation { nfcCloseWaiters.append($0) }
-    }
 
-    /// Closes the NFC connection showing a success message in the NFC sheet.
-    nonisolated func closeNFC(message: String? = nil) {
-        Task { @MainActor in
-            await ConnectionManager.shared.nfcConnection?.close(message: message ?? String(localized: "Success", comment: "iOS NFC alert default success message"))
+        /// Closes the NFC connection showing a success message in the NFC sheet.
+        nonisolated func closeNFC(message: String? = nil) {
+            Task { @MainActor in
+                await ConnectionManager.shared.nfcConnection?.close(
+                    message: message ?? String(localized: "Success", comment: "iOS NFC alert default success message"))
+            }
         }
-    }
 
-    /// Closes the NFC connection showing an error message in the NFC sheet.
-    nonisolated func closeNFC(errorMessage: String) {
-        Task { @MainActor in
-            await ConnectionManager.shared.nfcConnection?.close(error: NFCErrorMessage(errorDescription: errorMessage))
+        /// Closes the NFC connection showing an error message in the NFC sheet.
+        nonisolated func closeNFC(errorMessage: String) {
+            Task { @MainActor in
+                await ConnectionManager.shared.nfcConnection?.close(error: NFCErrorMessage(errorDescription: errorMessage))
+            }
         }
-    }
     #else
-    // The Mac has no NFC, so the YubiKey is always wired.
+        // The Mac has no NFC, so the YubiKey is always wired.
 
-    func nfcConnection(alertMessage: String? = nil) async throws -> SmartCardConnection {
-        throw SmartCardConnectionError.unsupported
-    }
+        func nfcConnection(alertMessage: String? = nil) async throws -> SmartCardConnection {
+            throw SmartCardConnectionError.unsupported
+        }
 
-    func anyConnection(alertMessage: String? = nil) async throws -> SmartCardConnection {
-        if let wiredConnection { return wiredConnection }
-        return try await nextWiredConnection()
-    }
+        func anyConnection(alertMessage: String? = nil) async throws -> SmartCardConnection {
+            if let wiredConnection { return wiredConnection }
+            return try await nextWiredConnection()
+        }
 
-    func waitUntilClosed(_ connection: SmartCardConnection) async -> Error? {
-        await connection.waitUntilClosed()
-    }
+        func waitUntilClosed(_ connection: SmartCardConnection) async -> Error? {
+            await connection.waitUntilClosed()
+        }
 
-    nonisolated func closeNFC(message: String? = nil) {}
+        nonisolated func closeNFC(message: String? = nil) {}
 
-    nonisolated func closeNFC(errorMessage: String) {}
+        nonisolated func closeNFC(errorMessage: String) {}
     #endif
 }
 
 #if os(iOS)
-/// An error whose description is shown in the NFC sheet when it's closed.
-private struct NFCErrorMessage: LocalizedError {
-    let errorDescription: String?
-}
+    /// An error whose description is shown in the NFC sheet when it's closed.
+    private struct NFCErrorMessage: LocalizedError {
+        let errorDescription: String?
+    }
 #endif
 
 extension SmartCardConnection {
     var isNFC: Bool {
         #if os(iOS)
-        self is NFCSmartCardConnection
+            self is NFCSmartCardConnection
         #else
-        false
+            false
         #endif
     }
 }

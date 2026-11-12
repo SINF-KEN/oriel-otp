@@ -12,20 +12,22 @@ import SwiftUI
 // Shown over the token request when the inserted USB-C YubiKey has Yubico OTP enabled, since it then appears
 // as an external keyboard and hides the on-screen keyboard needed to enter the PIN.
 struct TokenRequestYubiOTPView: View {
-    
+
     let model: TokenRequestViewModel
-    
+
     @Environment(\.dismiss) private var dismiss
     @State private var isOTPDisabled = false
     @State private var error: Error? = nil
-    
+
     var body: some View {
         ScrollView {
             ZStack(alignment: .topLeading) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Yubico OTP enabled").scaledFont(.title).bold()
-                    .accessibilityAddTraits(.isHeader)
-                    Text("This YubiKey has Yubico OTP enabled which makes it appear as an external keyboard to the iPhone. Unfortunately this causes problem with the normal on-screen keyboard.")
+                        .accessibilityAddTraits(.isHeader)
+                    Text(
+                        "This YubiKey has Yubico OTP enabled which makes it appear as an external keyboard to the iPhone. Unfortunately this causes problem with the normal on-screen keyboard."
+                    )
                     Spacer().frame(height: 15)
                     Button {
                         disableOTP()
@@ -36,9 +38,11 @@ struct TokenRequestYubiOTPView: View {
                             .foregroundStyle(Color(.systemBackground))
                     }
                     .prominentActionButtonStyle()
-                    Text("Disabling Yubico OTP will prevent the YubiKey from appearing as a keyboard. If you don’t use Yubico OTP this is the recommended solution. This can be re-enabled from the settings page.")
-                        .scaledFont(.footnote)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        "Disabling Yubico OTP will prevent the YubiKey from appearing as a keyboard. If you don’t use Yubico OTP this is the recommended solution. This can be re-enabled from the settings page."
+                    )
+                    .scaledFont(.footnote)
+                    .foregroundStyle(.secondary)
                     Spacer().frame(height: 25)
                     Button {
                         ignoreThisKey()
@@ -47,14 +51,16 @@ struct TokenRequestYubiOTPView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .secondaryActionButtonStyle()
-                    Text("While the YubiKey is inserted the on-screen keyboard will not appear. To show the keyboard you will have to remove the YubiKey and then re-insert it.")
-                        .scaledFont(.footnote)
-                        .foregroundStyle(.secondary)
+                    Text(
+                        "While the YubiKey is inserted the on-screen keyboard will not appear. To show the keyboard you will have to remove the YubiKey and then re-insert it."
+                    )
+                    .scaledFont(.footnote)
+                    .foregroundStyle(.secondary)
                 }
                 .opacity(isOTPDisabled ? 0 : 1)
                 VStack(alignment: .leading, spacing: 15) {
                     Text("Yubico OTP has been disabled").scaledFont(.title).bold()
-                    .accessibilityAddTraits(.isHeader)
+                        .accessibilityAddTraits(.isHeader)
                     Text("Remove and re-insert your YubiKey")
                 }
                 .opacity(isOTPDisabled ? 1 : 0)
@@ -62,13 +68,18 @@ struct TokenRequestYubiOTPView: View {
             .padding(30)
             .accentColor(Color(.yubiBlue))
         }
-        .alert(String(localized: "Error reading YubiKey", comment: "PIV extension error title"), isPresented: .constant(error != nil), presenting: error) { _ in
+        .alert(
+            String(localized: "Error reading YubiKey", comment: "PIV extension error title"), isPresented: .constant(error != nil),
+            presenting: error
+        ) { _ in
             Button(String(localized: "OK")) {
                 error = nil
                 dismiss()
             }
         } message: { error in
-            Text("\(LocalizedErrorWrapper(error: error).localizedDescription)\n\n\(String(localized: "Remove and reinsert your YubiKey", comment: "PIV extension error reinsert key")).")
+            Text(
+                "\(LocalizedErrorWrapper(error: error).localizedDescription)\n\n\(String(localized: "Remove and reinsert your YubiKey", comment: "PIV extension error reinsert key"))."
+            )
         }
         .task {
             await model.waitForKeyRemoval()
@@ -76,7 +87,7 @@ struct TokenRequestYubiOTPView: View {
             dismiss()
         }
     }
-    
+
     private func disableOTP() {
         Task {
             do {
@@ -89,7 +100,7 @@ struct TokenRequestYubiOTPView: View {
             }
         }
     }
-    
+
     private func ignoreThisKey() {
         Task {
             do {

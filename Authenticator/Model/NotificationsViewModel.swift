@@ -23,16 +23,19 @@ import UserNotifications
     var showPIVTokenView: Bool = false
     var presentDisableOTP: Bool = false
     var userInfo: [AnyHashable: Any]?
-    
+
     override init() {
         super.init()
         UNUserNotificationCenter.current().delegate = self
     }
-    
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
         #if os(iOS)
-        userInfo = response.notification.request.content.userInfo
-        showPIVTokenView = true
+            userInfo = response.notification.request.content.userInfo
+            showPIVTokenView = true
         #endif
         // On the Mac the only notification asks to touch the YubiKey, and clicking it just brings the app forward.
         completionHandler()

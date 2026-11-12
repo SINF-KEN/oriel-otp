@@ -37,11 +37,11 @@ import LocalAuthentication
  */
 nonisolated final class SecureStore: Sendable {
     let secureStoreQueryable: SecureStoreQueryable
-    
+
     public init(secureStoreQueryable: SecureStoreQueryable) {
         self.secureStoreQueryable = secureStoreQueryable
     }
-    
+
     /// Deletes the item and adds it again: updating an item keeps the protection it was added with, so a value saved
     /// with authentication over one saved without it would stay readable without it.
     public func setValue(_ value: Data, useAuthentication: Bool, for userAccount: String) throws {
@@ -57,14 +57,14 @@ nonisolated final class SecureStore: Sendable {
             throw error(from: status)
         }
     }
-    
+
     public func setValue(_ value: String, useAuthentication: Bool, for userAccount: String) throws {
         guard let encodedPassword = value.data(using: .utf8) else {
             throw SecureStoreError.string2DataConversionError
         }
         try setValue(encodedPassword, useAuthentication: useAuthentication, for: userAccount)
     }
-    
+
     /* getValue is asynchronous to avoid main thread blocking while scanning NFC and
     validating password with device's biometric or passcode protection.
     */
@@ -74,29 +74,34 @@ nonisolated final class SecureStore: Sendable {
 
     /// Doesn't ask the user if `authentication` satisfies the item's access control.
     @concurrent func getValue(for userAccount: String, authentication: KeychainAuthentication?) async throws -> Data {
-        guard let data = try copyValueData(for: userAccount, useAuthentication: hasValueProtected(for: userAccount), authentication: authentication) else {
+        guard
+            let data = try copyValueData(
+                for: userAccount, useAuthentication: hasValueProtected(for: userAccount), authentication: authentication)
+        else {
             throw SecureStoreError.dataCastError
         }
         return data
     }
-    
+
     @concurrent public func getValue(for userAccount: String) async throws -> String {
         try string(from: copyValueData(for: userAccount, useAuthentication: hasValueProtected(for: userAccount)))
     }
-    
+
     @concurrent public func getValue(for userAccount: String, useAuthentication: Bool) async throws -> String {
         try string(from: copyValueData(for: userAccount, useAuthentication: useAuthentication))
     }
-    
+
     private func string(from data: Data?) throws -> String {
         guard let data, let string = String(data: data, encoding: .utf8) else {
             throw SecureStoreError.data2StringConversionError
         }
         return string
     }
-    
+
     /// Blocks while the user authenticates if the item is protected. Returns nil if the item has no data.
-    private func copyValueData(for userAccount: String, useAuthentication: Bool, authentication: KeychainAuthentication? = nil) throws -> Data? {
+    private func copyValueData(for userAccount: String, useAuthentication: Bool, authentication: KeychainAuthentication? = nil) throws
+        -> Data?
+    {
         var query = secureStoreQueryable.setUpQuery(useAuthentication: useAuthentication)
         if let authentication {
             query[String(kSecUseAuthenticationContext)] = authentication.context
@@ -105,18 +110,19 @@ nonisolated final class SecureStore: Sendable {
         query[String(kSecReturnAttributes)] = kCFBooleanTrue
         query[String(kSecReturnData)] = kCFBooleanTrue
         query[String(kSecAttrAccount)] = userAccount
-        
+
         var queryResult: AnyObject?
         let status = withUnsafeMutablePointer(to: &queryResult) {
             SecItemCopyMatching(query as CFDictionary, $0)
         }
-        
+
         switch status {
         case errSecSuccess:
             let queriedItem = queryResult as? [String: Any]
             let data = queriedItem?[String(kSecValueData)] as? Data
             if let data, !useAuthentication, let accessible = queriedItem?[String(kSecAttrAccessible)] as? String,
-               Self.leavesTheDevice.contains(accessible) {
+                Self.leavesTheDevice.contains(accessible)
+            {
                 // Saved by an earlier version, which let it go into backups and onto other devices. If adding it
                 // again fails, it is tried again on the next read.
                 try? setValue(data, useAuthentication: false, for: userAccount)
@@ -132,10 +138,12 @@ nonisolated final class SecureStore: Sendable {
             throw error(from: status)
         }
     }
-    
+
     /// The protection of items that can go into backups and onto other devices.
-    private static let leavesTheDevice: Set<String> = [kSecAttrAccessibleWhenUnlocked as String,
-                                                       kSecAttrAccessibleAfterFirstUnlock as String]
+    private static let leavesTheDevice: Set<String> = [
+        kSecAttrAccessibleWhenUnlocked as String,
+        kSecAttrAccessibleAfterFirstUnlock as String
+    ]
 
     public func hasValue(for userAccount: String) -> Bool {
         let status = self.getStatus(for: userAccount)
@@ -146,12 +154,12 @@ nonisolated final class SecureStore: Sendable {
             return false
         }
     }
-    
+
     public func hasValueProtected(for userAccount: String) -> Bool {
         let status = self.getStatus(for: userAccount)
         return status == errSecInteractionNotAllowed
     }
-    
+
     public func removeAllValues() throws {
         let query = secureStoreQueryable.setUpQuery(useAuthentication: false)
         let status = SecItemDelete(query as CFDictionary)
@@ -159,7 +167,7 @@ nonisolated final class SecureStore: Sendable {
             throw error(from: status)
         }
     }
-        
+
     private func getStatus(for userAccount: String) -> OSStatus {
         var query = secureStoreQueryable.setUpQuery(useAuthentication: false)
         query[String(kSecAttrAccount)] = userAccount
@@ -168,19 +176,21 @@ nonisolated final class SecureStore: Sendable {
         query[String(kSecUseAuthenticationContext)] = context
         return SecItemCopyMatching(query as CFDictionary, nil)
     }
-    
+
     public func removeValue(for userAccount: String) throws {
         var query = secureStoreQueryable.setUpQuery(useAuthentication: false)
         query[String(kSecAttrAccount)] = userAccount
-        
+
         let status = SecItemDelete(query as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else {
             throw error(from: status)
         }
     }
-    
+
     private func error(from status: OSStatus) -> SecureStoreError {
-        let message = SecCopyErrorMessageString(status, nil) as String? ?? String(localized: "Unhandled Error", comment: "Keychain error without a message")
+        let message =
+            SecCopyErrorMessageString(status, nil) as String?
+            ?? String(localized: "Unhandled Error", comment: "Keychain error without a message")
         return SecureStoreError.unhandledError(message: message)
     }
 }

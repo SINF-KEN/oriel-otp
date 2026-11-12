@@ -27,9 +27,14 @@ enum AuthenticatorImportError: Error, LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .unknownFormat:
-            String(localized: "This file isn't an export this app can read. Export from Google Authenticator, Aegis, 2FAS or Raivo, or choose a text file of otpauth links.", comment: "Import error")
+            String(
+                localized:
+                    "This file isn't an export this app can read. Export from Google Authenticator, Aegis, 2FAS or Raivo, or choose a text file of otpauth links.",
+                comment: "Import error")
         case .encrypted(let app):
-            String(localized: "This \(app) export is encrypted. Export it again without encryption, import it, then delete the file.", comment: "Import error. The placeholder is the name of another authenticator app, e.g. Aegis.")
+            String(
+                localized: "This \(app) export is encrypted. Export it again without encryption, import it, then delete the file.",
+                comment: "Import error. The placeholder is the name of another authenticator app, e.g. Aegis.")
         case .noAccounts:
             String(localized: "There are no accounts in this file.", comment: "Import error")
         }
@@ -117,9 +122,10 @@ nonisolated enum AuthenticatorImport {
             guard let info = entry["info"] as? [String: Any], let secret = info["secret"] as? String else { return nil }
             let type = (entry["type"] as? String)?.lowercased() ?? "totp"
             guard ["totp", "hotp", "steam"].contains(type) else { return nil }
-            return otpauthURL(type: type, issuer: entry["issuer"] as? String, name: entry["name"] as? String, secret: secret,
-                              algorithm: info["algo"] as? String, digits: integer(info["digits"]),
-                              period: integer(info["period"]), counter: integer(info["counter"]))
+            return otpauthURL(
+                type: type, issuer: entry["issuer"] as? String, name: entry["name"] as? String, secret: secret,
+                algorithm: info["algo"] as? String, digits: integer(info["digits"]),
+                period: integer(info["period"]), counter: integer(info["counter"]))
         }
     }
 
@@ -136,9 +142,10 @@ nonisolated enum AuthenticatorImport {
             let type = (otp["tokenType"] as? String)?.lowercased() ?? "totp"
             guard ["totp", "hotp", "steam"].contains(type) else { return nil }
             let issuer = (otp["issuer"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? service["name"] as? String
-            return otpauthURL(type: type, issuer: issuer, name: otp["account"] as? String ?? otp["label"] as? String, secret: secret,
-                              algorithm: otp["algorithm"] as? String, digits: integer(otp["digits"]),
-                              period: integer(otp["period"]), counter: integer(otp["counter"]))
+            return otpauthURL(
+                type: type, issuer: issuer, name: otp["account"] as? String ?? otp["label"] as? String, secret: secret,
+                algorithm: otp["algorithm"] as? String, digits: integer(otp["digits"]),
+                period: integer(otp["period"]), counter: integer(otp["counter"]))
         }
     }
 
@@ -149,9 +156,10 @@ nonisolated enum AuthenticatorImport {
             guard let secret = entry["secret"] as? String else { return nil }
             let type = (entry["kind"] as? String)?.lowercased() ?? "totp"
             guard ["totp", "hotp"].contains(type) else { return nil }
-            return otpauthURL(type: type, issuer: entry["issuer"] as? String, name: entry["account"] as? String, secret: secret,
-                              algorithm: entry["algorithm"] as? String, digits: integer(entry["digits"]),
-                              period: integer(entry["timer"]), counter: integer(entry["counter"]))
+            return otpauthURL(
+                type: type, issuer: entry["issuer"] as? String, name: entry["account"] as? String, secret: secret,
+                algorithm: entry["algorithm"] as? String, digits: integer(entry["digits"]),
+                period: integer(entry["timer"]), counter: integer(entry["counter"]))
         }
     }
 
@@ -168,8 +176,10 @@ nonisolated enum AuthenticatorImport {
 
     /// An otpauth URL in the form every authenticator reads: the label is "issuer:name", and the issuer is repeated
     /// as a parameter. Default values are left out.
-    static func otpauthURL(type: String, issuer: String?, name: String?, secret: String, algorithm: String?,
-                           digits: Int?, period: Int?, counter: Int?) -> String? {
+    static func otpauthURL(
+        type: String, issuer: String?, name: String?, secret: String, algorithm: String?,
+        digits: Int?, period: Int?, counter: Int?
+    ) -> String? {
         let secret = secret.uppercased().filter { !" -=".contains($0) }
         guard !secret.isEmpty, OTPAuthURLParser.base32Decode(secret) != nil else { return nil }
         let issuer = issuer?.trimmingCharacters(in: .whitespaces).nilIfEmpty
@@ -187,7 +197,8 @@ nonisolated enum AuthenticatorImport {
             items.append(URLQueryItem(name: "issuer", value: "Steam"))
         }
         if let algorithm = algorithm?.uppercased().replacingOccurrences(of: "-", with: ""), algorithm != "SHA1",
-           ["SHA256", "SHA512"].contains(algorithm) {
+            ["SHA256", "SHA512"].contains(algorithm)
+        {
             items.append(URLQueryItem(name: "algorithm", value: algorithm))
         }
         if let digits, digits != 6, type != "steam" {
@@ -223,9 +234,10 @@ nonisolated enum GoogleAuthenticatorMigration {
 
     static func otpauthURLs(fromLink link: String) throws -> [String] {
         guard let components = URLComponents(string: link.trimmingCharacters(in: .whitespacesAndNewlines)),
-              components.scheme?.lowercased() == "otpauth-migration",
-              let encoded = components.queryItems?.first(where: { $0.name == "data" })?.value,
-              let payload = Data(base64Encoded: base64Padded(encoded)) else {
+            components.scheme?.lowercased() == "otpauth-migration",
+            let encoded = components.queryItems?.first(where: { $0.name == "data" })?.value,
+            let payload = Data(base64Encoded: base64Padded(encoded))
+        else {
             throw AuthenticatorImportError.unknownFormat
         }
         return try accounts(inPayload: payload).compactMap(\.otpauthURL)
@@ -241,18 +253,20 @@ nonisolated enum GoogleAuthenticatorMigration {
         var counter: Int64 = 0
 
         var otpauthURL: String? {
-            let type = switch type {
-            case 1: "hotp"
-            case 2, 0: "totp"
-            default: ""
-            }
+            let type =
+                switch type {
+                case 1: "hotp"
+                case 2, 0: "totp"
+                default: ""
+                }
             guard !type.isEmpty, !secret.isEmpty else { return nil }
-            let algorithm: String? = switch algorithm {
-            case 2: "SHA256"
-            case 3: "SHA512"
-            case 0, 1: nil
-            default: "unsupported"
-            }
+            let algorithm: String? =
+                switch algorithm {
+                case 2: "SHA256"
+                case 3: "SHA512"
+                case 0, 1: nil
+                default: "unsupported"
+                }
             // MD5 isn't an algorithm the app calculates.
             guard algorithm != "unsupported" else { return nil }
             // A name may start with the issuer, e.g. "GitHub:alice", like the label of an otpauth URL.
@@ -260,9 +274,10 @@ nonisolated enum GoogleAuthenticatorMigration {
             if !issuer.isEmpty, name.hasPrefix(issuer + ":") {
                 name = String(name.dropFirst(issuer.count + 1)).trimmingCharacters(in: .whitespaces)
             }
-            return AuthenticatorImport.otpauthURL(type: type, issuer: issuer, name: name, secret: Self.base32(secret),
-                                                  algorithm: algorithm, digits: digits == 2 ? 8 : 6, period: 30,
-                                                  counter: Int(clamping: counter))
+            return AuthenticatorImport.otpauthURL(
+                type: type, issuer: issuer, name: name, secret: Self.base32(secret),
+                algorithm: algorithm, digits: digits == 2 ? 8 : 6, period: 30,
+                counter: Int(clamping: counter))
         }
 
         private static func base32(_ data: Data) -> String {

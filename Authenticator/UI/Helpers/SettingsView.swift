@@ -10,12 +10,12 @@
 import SwiftUI
 
 struct SettingsView<Content: View, Buttons: View>: View {
-    
+
     var image: Image? = nil
     var imageColor: Color = .blue
     @ViewBuilder var content: () -> Content
     @ViewBuilder var buttons: () -> Buttons
-    
+
     var body: some View {
         Form {
             Section {

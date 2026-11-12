@@ -21,18 +21,23 @@ import OSLog
 
 class TokenSession: TKTokenSession, TKTokenSessionDelegate {
 
-    var signSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when signing starts
-    var decryptSessionEndTime = Date(timeIntervalSinceNow: -10) // create endTime in the past to force recreation of endTime when decryption starts
-    
+    // Both start in the past, so the first request sets a new end time.
+    var signSessionEndTime = Date(timeIntervalSinceNow: -10)
+    var decryptSessionEndTime = Date(timeIntervalSinceNow: -10)
+
     func tokenSession(_ session: TKTokenSession, beginAuthFor operation: TKTokenOperation, constraint: Any) throws -> TKTokenAuthOperation {
-        Logger.ctk.yubilog("Extension: beginAuthFor operation: \(String(describing: operation)), constraint: \(String(describing: constraint))")
+        Logger.ctk.yubilog(
+            "Extension: beginAuthFor operation: \(String(describing: operation)), constraint: \(String(describing: constraint))")
         // Insert code here to create an instance of TKTokenAuthOperation based on the specified operation and constraint.
         // Note that the constraint was previously established when creating token configuration with keychain items.
         return TKTokenPasswordAuthOperation()
     }
 
-    func tokenSession(_ session: TKTokenSession, supports operation: TKTokenOperation, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm) -> Bool {
-        Logger.ctk.yubilog("Extension: supports operation: \(String(describing: operation)), keyObjectID: \(String(describing: keyObjectID))")
+    func tokenSession(_ session: TKTokenSession, supports operation: TKTokenOperation, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm)
+        -> Bool
+    {
+        Logger.ctk.yubilog(
+            "Extension: supports operation: \(String(describing: operation)), keyObjectID: \(String(describing: keyObjectID))")
         let policyOperation: TokenSessionOperation
         switch operation {
         case .readData:
@@ -48,7 +53,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         }
         return TokenSessionPolicy.supports(policyOperation)
     }
-    
+
     func tokenSession(_ session: TKTokenSession, sign dataToSign: Data, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm) throws -> Data {
         Logger.ctk.yubilog("Extension: sign called")
         // tokenSession() gets called multiple times even if we throw an error. This kludge make sure we only pop one notification.
@@ -66,33 +71,40 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             reset()
             signSessionEndTime = Date(timeIntervalSinceNow: 100)
         }
-        
+
         guard let key = try? session.token.configuration.key(for: keyObjectID), let objectId = keyObjectID as? String else {
             throw "No key for you!"
         }
-        
-        guard let keyType = TokenKeyType(keyType: key.keyType, keySizeInBits: key.keySizeInBits), let secKeyAlgorithm = algorithm.secKeyAlgorithm else {
+
+        guard let keyType = TokenKeyType(keyType: key.keyType, keySizeInBits: key.keySizeInBits),
+            let secKeyAlgorithm = algorithm.secKeyAlgorithm
+        else {
             throw NSError(domain: TKErrorDomain, code: TKError.Code.canceledByUser.rawValue, userInfo: nil)
         }
 
         Logger.ctk.yubilog("Extension: sending notification for keyObjectID: \(objectId)")
         let requestID = TokenResponseStore.newRequestID()
-        sendNotification(for: TokenRequest(operation: .signData, data: dataToSign, objectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID))
+        sendNotification(
+            for: TokenRequest(
+                operation: .signData, data: dataToSign, objectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm,
+                requestID: requestID))
 
         let loopEndTime = Date(timeIntervalSinceNow: 95)
         var runLoop = true
         var tick = 0
-        while(runLoop) {
+        while (runLoop) {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: polling tick \(tick)...")
             if let signedData = readTokenResponse(.signed, requestID: requestID) {
                 Logger.ctk.yubilog("Extension: Got signedData from shared container")
-                signSessionEndTime = Date(timeIntervalSinceNow: 3) // Set in future to block duplicate requests from CryptoTokenKit
+                signSessionEndTime = Date(timeIntervalSinceNow: 3)  // Set in future to block duplicate requests from CryptoTokenKit
                 reset()
                 return signedData
             }
-            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: TokenSessionPolicy.canceledByUserKey) {
+            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier),
+                let _ = userDefaults.value(forKey: TokenSessionPolicy.canceledByUserKey)
+            {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 signSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -109,8 +121,9 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     }
 
     // Decryption
-    func tokenSession(_ session: TKTokenSession, decrypt ciphertext: Data, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm) throws -> Data {
-        
+    func tokenSession(_ session: TKTokenSession, decrypt ciphertext: Data, keyObjectID: Any, algorithm: TKTokenKeyAlgorithm) throws -> Data
+    {
+
         // if we're not passed decryptSessionEndTime throw error and cancel all notifications
         if decryptSessionEndTime.timeIntervalSinceNow > 0 {
             cancelAllNotifications()
@@ -122,22 +135,27 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             reset()
             decryptSessionEndTime = Date(timeIntervalSinceNow: 100)
         }
-        
+
         guard let key = try? session.token.configuration.key(for: keyObjectID), let objectId = keyObjectID as? String else {
             throw "No key for you!"
         }
-        
-        guard let keyType = TokenKeyType(keyType: key.keyType, keySizeInBits: key.keySizeInBits), let secKeyAlgorithm = algorithm.secKeyAlgorithm else {
+
+        guard let keyType = TokenKeyType(keyType: key.keyType, keySizeInBits: key.keySizeInBits),
+            let secKeyAlgorithm = algorithm.secKeyAlgorithm
+        else {
             throw NSError(domain: TKErrorDomain, code: TKError.Code.canceledByUser.rawValue, userInfo: nil)
         }
 
         let requestID = TokenResponseStore.newRequestID()
-        sendNotification(for: TokenRequest(operation: .decryptData, data: ciphertext, objectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm, requestID: requestID))
+        sendNotification(
+            for: TokenRequest(
+                operation: .decryptData, data: ciphertext, objectID: objectId, keyType: keyType, algorithm: secKeyAlgorithm,
+                requestID: requestID))
 
         let loopEndTime = Date(timeIntervalSinceNow: 95)
         var runLoop = true
         var tick = 0
-        while(runLoop) {
+        while (runLoop) {
             Thread.sleep(forTimeInterval: 1)
             tick += 1
             Logger.ctk.yubilog("Extension: decrypt polling tick \(tick)...")
@@ -147,7 +165,9 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
                 reset()
                 return decryptedData
             }
-            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier), let _ = userDefaults.value(forKey: TokenSessionPolicy.canceledByUserKey) {
+            if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier),
+                let _ = userDefaults.value(forKey: TokenSessionPolicy.canceledByUserKey)
+            {
                 Logger.ctk.yubilog("Extension: Got canceledByUser!")
                 decryptSessionEndTime = Date(timeIntervalSinceNow: 3)
                 reset()
@@ -163,12 +183,15 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
         throw NSError(domain: TKErrorDomain, code: TKError.Code.canceledByUser.rawValue, userInfo: nil)
     }
 
-    func tokenSession(_ session: TKTokenSession, performKeyExchange otherPartyPublicKeyData: Data, keyObjectID objectID: Any, algorithm: TKTokenKeyAlgorithm, parameters: TKTokenKeyExchangeParameters) throws -> Data {
+    func tokenSession(
+        _ session: TKTokenSession, performKeyExchange otherPartyPublicKeyData: Data, keyObjectID objectID: Any,
+        algorithm: TKTokenKeyAlgorithm, parameters: TKTokenKeyExchangeParameters
+    ) throws -> Data {
         var secret: Data?
-        
+
         // Insert code here to perform Diffie-Hellman style key exchange.
         secret = nil
-        
+
         if let secret = secret {
             return secret
         } else {
@@ -177,7 +200,7 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
             throw NSError(domain: TKErrorDomain, code: TKError.Code.authenticationNeeded.rawValue, userInfo: nil)
         }
     }
-    
+
     private func reset() {
         cancelAllNotifications()
         if let userDefaults = UserDefaults(suiteName: TokenSessionPolicy.appGroupIdentifier) {
@@ -198,7 +221,8 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     // The app writes signed and decrypted data to files with complete file protection in the
     // shared app group container, instead of the unencrypted UserDefaults plist.
     private var tokenResponseStore: TokenResponseStore? {
-        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier) else {
+        guard let container = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: TokenSessionPolicy.appGroupIdentifier)
+        else {
             return nil
         }
         return TokenResponseStore(containerURL: container)
@@ -207,13 +231,13 @@ class TokenSession: TKTokenSession, TKTokenSessionDelegate {
     private func readTokenResponse(_ kind: TokenResponseKind, requestID: String) -> Data? {
         tokenResponseStore?.read(kind, requestID: requestID)
     }
-    
+
     private func cancelAllNotifications() {
         let center = UNUserNotificationCenter.current()
         center.removeAllDeliveredNotifications()
         center.removeAllPendingNotificationRequests()
     }
-    
+
     /// Asks the user to open the app, which does what the request says with the YubiKey.
     private func sendNotification(for request: TokenRequest) {
         cancelAllNotifications()

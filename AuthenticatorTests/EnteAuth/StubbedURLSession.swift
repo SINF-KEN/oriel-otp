@@ -31,8 +31,13 @@ nonisolated final class UnexpectedRequestFailure: URLProtocol, @unchecked Sendab
     }
 
     override func startLoading() {
-        client?.urlProtocol(self, didFailWithError: NSError(domain: Self.errorDomain, code: 1, userInfo: [
-            NSLocalizedDescriptionKey: "No stub answers \(request.url?.absoluteString ?? "")"]))
+        client?.urlProtocol(
+            self,
+            didFailWithError: NSError(
+                domain: Self.errorDomain, code: 1,
+                userInfo: [
+                    NSLocalizedDescriptionKey: "No stub answers \(request.url?.absoluteString ?? "")"
+                ]))
     }
 
     override func stopLoading() {}
@@ -71,11 +76,11 @@ struct NoNetworkInTestsTests {
     }
 
     #if DEBUG && (targetEnvironment(simulator) || os(macOS))
-    @Test func theAppsSessionAnswersOnlyFromTheFakeServer() async {
-        let error = await #expect(throws: (any Error).self) {
-            try await URLSession.ente.data(from: Self.unknownHost)
+        @Test func theAppsSessionAnswersOnlyFromTheFakeServer() async {
+            let error = await #expect(throws: (any Error).self) {
+                try await URLSession.ente.data(from: Self.unknownHost)
+            }
+            #expect((error as? NSError)?.domain == UnstubbedRequestFailure.errorDomain)
         }
-        #expect((error as? NSError)?.domain == UnstubbedRequestFailure.errorDomain)
-    }
     #endif
 }

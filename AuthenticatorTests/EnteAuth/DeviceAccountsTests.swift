@@ -64,7 +64,8 @@ private struct SaveFailed: Error {}
 
     private func template(_ issuer: String, hotp: Bool = false) throws -> YubiKitOATHSession.CredentialTemplate {
         let kind = hotp ? "hotp" : "totp"
-        let url = try #require(URL(string: "otpauth://\(kind)/\(issuer):alice?secret=JBSWY3DPEHPK3PXP&issuer=\(issuer)" + (hotp ? "&counter=0" : "")))
+        let url = try #require(
+            URL(string: "otpauth://\(kind)/\(issuer):alice?secret=JBSWY3DPEHPK3PXP&issuer=\(issuer)" + (hotp ? "&counter=0" : "")))
         return try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
     }
 
@@ -222,15 +223,17 @@ private struct SaveFailed: Error {}
 
     private func signedOutCloud() -> EnteCloud {
         let defaults = makeTestDefaults()
-        return EnteCloud(store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true), storage: InMemoryVaultStorage(),
-                         session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
+        return EnteCloud(
+            store: EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true), storage: InMemoryVaultStorage(),
+            session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))
     }
 
     private func signedInCloud() throws -> EnteCloud {
         let defaults = makeTestDefaults()
         let server = try #require(URL(string: "https://api.example.com"))
         let store = EnteSessionStore(keychain: InMemoryKeychain(), defaults: defaults, canSave: true)
-        try store.save(EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
+        try store.save(
+            EnteSavedSession(server: server, email: "alice@example.com", token: "t", authenticatorKey: EnteCrypto.randomBytes(32)))
         let storage = InMemoryVaultStorage()
         try storage.save(EnteVault(email: "alice@example.com", server: server))
         return EnteCloud(store: store, storage: storage, session: OfflineURLProtocol.session, watch: WatchAccountSync(defaults: defaults))

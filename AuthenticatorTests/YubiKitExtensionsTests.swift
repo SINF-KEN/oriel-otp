@@ -25,7 +25,7 @@ struct YubiKitExtensionsTests {
     @Test(arguments: [
         ("4.1.1", "3.3.3"),
         ("3.4.1", "3.1.4"),
-        ("3.1.4", "3.1.1"),
+        ("3.1.4", "3.1.1")
     ])
     func versionComparison(newer: String, older: String) throws {
         let newer = try #require(Version(newer))
@@ -41,15 +41,19 @@ struct YubiKitExtensionsTests {
 
     @Test func steamCodeFromHMAC() {
         // The HMAC of RFC 4226's first test vector, with offset 10.
-        let hmac = Data([0x1f, 0x86, 0x98, 0x69, 0x0e, 0x02, 0xca, 0x16, 0x61, 0x85,
-                         0x50, 0xef, 0x7f, 0x19, 0xda, 0x8e, 0x94, 0x5b, 0x55, 0x5a])
+        let hmac = Data([
+            0x1f, 0x86, 0x98, 0x69, 0x0e, 0x02, 0xca, 0x16, 0x61, 0x85,
+            0x50, 0xef, 0x7f, 0x19, 0xda, 0x8e, 0x94, 0x5b, 0x55, 0x5a
+        ])
         #expect(YubiKitOATHSession.steamCode(fromResponse: hmac) == "KQ7F9")
     }
 
     @Test func steamCodeFromSliceWithOffsetZero() {
         // YubiKit hands back a slice that starts at index 1, which used to trap when the offset was 0.
-        let response = Data([0x75, 0x8a, 0x1b, 0x2c, 0x3d, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
-                             0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xf0]).dropFirst()
+        let response = Data([
+            0x75, 0x8a, 0x1b, 0x2c, 0x3d, 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
+            0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xf0
+        ]).dropFirst()
         #expect(YubiKitOATHSession.steamCode(fromResponse: response) == "KYT29")
         #expect(YubiKitOATHSession.steamCode(fromResponse: Data()) == nil)
         #expect(YubiKitOATHSession.steamCode(fromResponse: Data([0x01, 0x0f])) == nil)
@@ -68,27 +72,32 @@ struct YubiKitExtensionsTests {
         CredentialKeyCase(accountName: "alice", issuer: "Example", period: 30, isTOTP: true, expected: "Example:alice"),
         CredentialKeyCase(accountName: "alice", issuer: "Example", period: 60, isTOTP: true, expected: "60/Example:alice"),
         CredentialKeyCase(accountName: "alice", issuer: "", period: 60, isTOTP: true, expected: "60/alice"),
-        CredentialKeyCase(accountName: "alice", issuer: nil, period: 0, isTOTP: false, expected: "alice"),
+        CredentialKeyCase(accountName: "alice", issuer: nil, period: 0, isTOTP: false, expected: "alice")
     ])
     func credentialKey(_ testCase: CredentialKeyCase) {
-        let key = OATHCredentialId.key(accountName: testCase.accountName, issuer: testCase.issuer, period: testCase.period, isTOTP: testCase.isTOTP)
+        let key = OATHCredentialId.key(
+            accountName: testCase.accountName, issuer: testCase.issuer, period: testCase.period, isTOTP: testCase.isTOTP)
         #expect(key == testCase.expected)
     }
 
     // RFC 4648 test vectors, plus lowercase and missing padding which the old YubiKit accepted.
-    @Test(arguments: [
-        ("", Data()),
-        ("MY======", Data("f".utf8)),
-        ("MZXW6YTBOI======", Data("foobar".utf8)),
-        ("mzxw6ytboi", Data("foobar".utf8)),
-        ("MZXW6YTB0I", nil),
-    ] as [(String, Data?)])
+    @Test(
+        arguments: [
+            ("", Data()),
+            ("MY======", Data("f".utf8)),
+            ("MZXW6YTBOI======", Data("foobar".utf8)),
+            ("mzxw6ytboi", Data("foobar".utf8)),
+            ("MZXW6YTB0I", nil)
+        ] as [(String, Data?)])
     func base32(encoded: String, decoded: Data?) {
         #expect(Data(base32Encoded: encoded) == decoded)
     }
 
     @Test func otpAuthURL() throws {
-        let url = try #require(URL(string: "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Ignored&algorithm=SHA256&digits=8&period=60"))
+        let url = try #require(
+            URL(
+                string:
+                    "otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Ignored&algorithm=SHA256&digits=8&period=60"))
         let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: url)
         #expect(template.issuer == "Example")
         #expect(template.name == "alice@example.com")
@@ -100,7 +109,7 @@ struct YubiKitExtensionsTests {
 
     @Test(arguments: [
         ("otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP", "Example", "alice@example.com"),
-        ("otpauth://totp/Example:alice:work?secret=JBSWY3DPEHPK3PXP", "Example", "alice:work"),
+        ("otpauth://totp/Example:alice:work?secret=JBSWY3DPEHPK3PXP", "Example", "alice:work")
     ])
     func otpAuthURLLabel(url: String, issuer: String, name: String) throws {
         let template = try YubiKitOATHSession.CredentialTemplate(otpauthURL: try #require(URL(string: url)))
@@ -110,7 +119,7 @@ struct YubiKitExtensionsTests {
 
     @Test(arguments: [
         "otpauth://totp/?secret=JBSWY3DPEHPK3PXP",
-        "otpauth://hotp/alice?secret=JBSWY3DPEHPK3PXP",
+        "otpauth://hotp/alice?secret=JBSWY3DPEHPK3PXP"
     ])
     func invalidOTPAuthURL(url: String) throws {
         let url = try #require(URL(string: url))
@@ -129,7 +138,7 @@ struct YubiKitExtensionsTests {
     @Test(arguments: [
         "otpauth://totp/alice?secret=JBSWY3DPEHPK3PXP&period=0",
         "otpauth://totp/alice?secret=JBSWY3DPEHPK3PXP&period=-1",
-        "otpauth://totp/alice?secret=JBSWY3DPEHPK3PXP&period=abc",
+        "otpauth://totp/alice?secret=JBSWY3DPEHPK3PXP&period=abc"
     ])
     func invalidPeriod(url: String) throws {
         let url = try #require(URL(string: url))

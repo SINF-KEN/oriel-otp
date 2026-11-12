@@ -53,7 +53,7 @@ struct EnteAccountDeletionView: View {
             .scrollDismissesKeyboard(.immediately)
             .disabled(model.isBusy)
             #if os(macOS)
-            .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
+                .textScaledFrame(minWidth: 460, idealWidth: 500, minHeight: 400, idealHeight: 520)
             #endif
             .navigationTitle(String(localized: "Delete account", comment: "Ente account deletion navigation title"))
             .navigationBarTitleDisplayMode(.inline)
@@ -74,12 +74,20 @@ struct EnteAccountDeletionView: View {
                 }
             }
             .errorAlert(error: $model.error)
-            .confirmationDialog(String(localized: "Delete your account on \(host)?", comment: "Ente account deletion confirmation. The placeholder is the server."),
-                                isPresented: $isConfirming, titleVisibility: .visible) {
+            .confirmationDialog(
+                String(
+                    localized: "Delete your account on \(host)?",
+                    comment: "Ente account deletion confirmation. The placeholder is the server."),
+                isPresented: $isConfirming, titleVisibility: .visible
+            ) {
                 Button(String(localized: "Delete account", comment: "Ente account deletion button"), role: .destructive) { model.delete() }
                     .accessibilityIdentifier("ente.delete-account.confirm")
             } message: {
-                Text(String(localized: "The account and every Ente Auth account in it are deleted from the server for good. This can't be undone.", comment: "Ente account deletion confirmation message"))
+                Text(
+                    String(
+                        localized:
+                            "The account and every Ente Auth account in it are deleted from the server for good. This can't be undone.",
+                        comment: "Ente account deletion confirmation message"))
             }
         }
         .interactiveDismissDisabled(model.phase == .deleted)
@@ -115,7 +123,11 @@ struct EnteAccountDeletionView: View {
             if model.isDerivingKeys {
                 derivingKeysText
             } else {
-                Text(String(localized: "Deleting the account removes it and all its Ente Auth accounts from your server. Enter its password to confirm it's yours. Your password never leaves this device.", comment: "Ente account deletion footer"))
+                Text(
+                    String(
+                        localized:
+                            "Deleting the account removes it and all its Ente Auth accounts from your server. Enter its password to confirm it's yours. Your password never leaves this device.",
+                        comment: "Ente account deletion footer"))
             }
         }
     }
@@ -133,7 +145,11 @@ struct EnteAccountDeletionView: View {
             if model.isDerivingKeys {
                 derivingKeysText
             } else {
-                Text(String(localized: "Enter the verification code sent to \(model.email.isolated). Without email on your server, it's in the server's log.", comment: "Ente account creation email code footer. The placeholder is the email address."))
+                Text(
+                    String(
+                        localized:
+                            "Enter the verification code sent to \(model.email.isolated). Without email on your server, it's in the server's log.",
+                        comment: "Ente account creation email code footer. The placeholder is the email address."))
             }
         }
     }
@@ -170,12 +186,18 @@ struct EnteAccountDeletionView: View {
 
     private var deletedSection: some View {
         Section {
-            LabeledContent(String(localized: "Account", comment: "Ente saved session account label"), value: model.email.leftToRightIfAddress)
-            LabeledContent(String(localized: "Server", comment: "Ente saved account server label"), value: model.server.host ?? model.server.absoluteString)
+            LabeledContent(
+                String(localized: "Account", comment: "Ente saved session account label"), value: model.email.leftToRightIfAddress)
+            LabeledContent(
+                String(localized: "Server", comment: "Ente saved account server label"),
+                value: model.server.host ?? model.server.absoluteString)
         } header: {
             Text(String(localized: "Account deleted", comment: "Ente account deletion finished header"))
         } footer: {
-            Text(String(localized: "The account and its data were deleted from your server. Codes on your YubiKey aren't affected.", comment: "Ente account deletion finished footer"))
+            Text(
+                String(
+                    localized: "The account and its data were deleted from your server. Codes on your YubiKey aren't affected.",
+                    comment: "Ente account deletion finished footer"))
         }
     }
 

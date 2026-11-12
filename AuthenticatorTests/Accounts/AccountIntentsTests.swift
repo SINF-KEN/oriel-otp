@@ -24,7 +24,7 @@ import Testing
 
     private static let accounts = [
         AccountEntity(id: "ente/1", issuer: "GitHub", accountName: "alice@example.com"),
-        AccountEntity(id: "device/2", issuer: "Bank", accountName: "alice"),
+        AccountEntity(id: "device/2", issuer: "Bank", accountName: "alice")
     ]
 
     private func query(locked: Bool, suggests: Bool = true) -> AccountQuery {
@@ -90,7 +90,8 @@ import Testing
 
     /// With the app lock off, Siri on the Lock Screen mustn't copy a code or name an account.
     @Test func copyCodeNeedsTheDeviceUnlocked() {
-        #expect(String(describing: CopyCodeIntent.authenticationPolicy)
+        #expect(
+            String(describing: CopyCodeIntent.authenticationPolicy)
                 == String(describing: IntentAuthenticationPolicy.requiresAuthentication))
     }
 }

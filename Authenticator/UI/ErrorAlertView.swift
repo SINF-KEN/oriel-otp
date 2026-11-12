@@ -18,9 +18,12 @@
 import SwiftUI
 
 extension View {
-    func errorAlert(error: Binding<Error?>, buttonTitle: String = String(localized: "OK", comment:"OK button in error alert."), handler: (() -> Void)? = nil) -> some View {
+    func errorAlert(
+        error: Binding<Error?>, buttonTitle: String = String(localized: "OK", comment: "OK button in error alert."),
+        handler: (() -> Void)? = nil
+    ) -> some View {
         let localizedAlertError = error.wrappedValue.map { LocalizedErrorWrapper(error: $0) }
-        
+
         return alert(isPresented: .constant(localizedAlertError != nil), error: localizedAlertError) { _ in
             Button(buttonTitle) {
                 error.wrappedValue = nil
@@ -33,13 +36,13 @@ extension View {
 }
 
 struct LocalizedErrorWrapper: LocalizedError {
-    
+
     enum ErrorType {
         case nsError(NSError), localizedError(LocalizedError), error(Error)
     }
-    
+
     let underlyingError: ErrorType
-    
+
     var errorDescription: String? {
         switch underlyingError {
         case .nsError(let nsError):

@@ -32,7 +32,10 @@ nonisolated class FavoritesStorage: NSObject {
         URL.applicationSupportDirectory.appending(components: "Favorites", "Favorites")
     }
 
-    init(url: URL = defaultURL, keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.favorites), defaults: UserDefaults = .standard) {
+    init(
+        url: URL = defaultURL, keychain: EncryptedFileKey = KeychainFileKey(service: KeychainService.favorites),
+        defaults: UserDefaults = .standard
+    ) {
         file = EncryptedFile(url: url, keychain: keychain)
         self.defaults = defaults
     }
@@ -62,7 +65,9 @@ nonisolated class FavoritesStorage: NSObject {
     func readFavorites() -> Set<String> {
         if let favorites = try? file.load() { return favorites }
         guard let encodedData = defaults.data(forKey: Self.key),
-              let favorites = try? NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSSet.self, NSString.self], from: encodedData) as? Set<String> else {
+            let favorites = try? NSKeyedUnarchiver.unarchivedObject(ofClasses: [NSSet.self, NSString.self], from: encodedData)
+                as? Set<String>
+        else {
             return Set<String>()
         }
         saveFavorites(favorites)
