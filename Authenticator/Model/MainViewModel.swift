@@ -168,6 +168,9 @@ import YubiKit
 
     func sortAccounts() {
         accounts = (keyAccounts + cloudAccounts + deviceAccounts).sorted()
+        #if os(iOS)
+            WidgetAccountSync.shared.update(widgetAccounts())
+        #endif
         let tags = Self.tags(of: accounts)
         if tags != allTags {
             allTags = tags
