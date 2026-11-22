@@ -11,7 +11,7 @@ macosx"`), with macOS 15 as the minimum. It's the same SwiftUI app, compiled aga
 The alternatives were Mac Catalyst and running the iPad app on Apple silicon ("Designed for iPad"). The native
 destination was chosen because:
 
-- YubiKit 1.4.0 supports macOS natively. It talks to a YubiKey as a USB smart card through CryptoTokenKit, which is
+- YubiKit 1.5.0 supports macOS natively. It talks to a YubiKey as a USB smart card through CryptoTokenKit, which is
   how the Mac itself sees the key. Under Catalyst `os(iOS)` is true, so YubiKit and the app would compile their NFC
   and Lightning code, which can't work on a Mac.
 - The app is already SwiftUI, so most views work on the Mac unchanged. What's left are Mac conventions (menu bar
